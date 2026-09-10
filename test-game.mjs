@@ -178,7 +178,7 @@ G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+20*M.SCALE;e.y=T.hero.y;
 M.begin(T.hero,'charge');step(6);
 assert.ok(T.enemies[0].down,'charge launches the enemy');
 assert.ok(T.blood.drops.some(d=>d.vx>700&&d.gravity>3000),'charge blood inherits launch velocity and matching gravity');
-assert.ok(T.blood.drops.every(d=>d.drag===0),'launch blood keeps pace horizontally');
+assert.ok(T.blood.drops.filter(d=>!d.trail).every(d=>d.drag===0),'launch blood keeps pace horizontally');
 const gore=new sandbox.window.AshenBlood(1440,810), walker={x:300,y:660,height:0};
 gore.stain(300,660,35);gore.step(M.STEP,[walker]);walker.x+=25;gore.step(M.STEP,[walker]);
 assert.ok(gore.tracks>0,'boots transfer blood from pools');
@@ -190,6 +190,16 @@ assert.equal(gore.drops.length,0);assert.ok(gore.marks>30,'ballistic blood lands
 const stains=gore.marks;gore.step(70,[]);assert.equal(gore.marks,stains,'drying does not erase stains');
 gore.reset();assert.equal(gore.marks,0);assert.equal(gore.tracks,0);assert.equal(gore.drops.length,0);
 const originalRandom=Math.random;
+const flying={x:300,y:660,height:30,down:{vx:3.375,vz:-3,ground:0}};
+gore.reset();gore.hit(flying,1);gore.step(.05,[flying]);
+const firstTrail=gore.drops.filter(d=>d.trail);assert.equal(firstTrail.length,2);
+flying.x=420;flying.height=65;flying.down.vz=2;gore.step(.05,[flying]);
+const laterTrail=gore.drops.filter(d=>d.trail).slice(-2);
+assert.ok(laterTrail.every(d=>d.x>400&&d.z>350),'fresh blood follows the current airborne body');
+assert.ok(firstTrail.every(d=>d.x<350),'earlier droplets remain behind as a visible trail');
+flying.down.ground=30;const trailCount=gore.drops.filter(d=>d.trail).length;gore.step(.05,[flying]);
+assert.equal(gore.drops.filter(d=>d.trail).length,trailCount,'emission stops at landing');
+gore.reset();
 try {
   Math.random=()=>.5;
   gore.hit({x:300,y:660},1);const stationary={...gore.drops[0]};

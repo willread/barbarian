@@ -8,7 +8,7 @@
     }
     reset() {
       this.ctx.clearRect(0,0,this.width,this.height);
-      this.drops=[]; this.wet=new Float32Array(Math.ceil(this.width/16)*Math.ceil(this.height/16));
+      this.drops=[]; this.emitters=new WeakMap(); this.wet=new Float32Array(Math.ceil(this.width/16)*Math.ceil(this.height/16));
       this.stride=Math.ceil(this.width/16); this.boots=new WeakMap(); this.marks=0; this.tracks=0;
     }
     cell(x,y) {return Math.floor(y/16)*this.stride+Math.floor(x/16)}
@@ -34,6 +34,7 @@
       const horizontal=f.down?(f.down.ground?0:f.down.vx):(f.velocityX||0);
       const vertical=f.down?(f.down.ground?0:f.down.vz):(f.air?.vz??f.attack?.vz??0);
       const launched=!!f.down&&!f.down.ground;
+      if(launched)this.emitters.set(f.down,{wait:0});
       const carryX=horizontal*units*(launched?1:.6),carryY=(f.velocityY||0)*units*.6,carryZ=-vertical*units*(launched?1:.45);
       const force=(launched?25:80)+Math.random()*(launched?65:120),fan=.45+Math.random()*.55,lift=(launched?10:35)+Math.random()*(launched?35:90);
       const sourceHeight=85+Math.random()*50+(f.height||0)*window.AshenMechanics.SCALE;
@@ -54,6 +55,23 @@
       });
       for(let i=0;i<this.wet.length;i++)this.wet[i]=Math.max(0,this.wet[i]-dt/65);
       for(const f of fighters){
+        const emitter=f.down&&this.emitters.get(f.down);
+        if(emitter&&!f.down.ground){
+          emitter.wait-=dt;
+          if(emitter.wait<=0){
+            emitter.wait=.02+Math.random()*.025;
+            const units=window.AshenMechanics.SCALE/window.AshenMechanics.STEP;
+            // Fresh droplets detach at the body's CURRENT position throughout
+            // ascent and descent. They lose momentum and hang behind the body.
+            for(let i=0;i<2;i++)this.drops.push({
+              x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*10,
+              z:60+(f.height||0)*window.AshenMechanics.SCALE+Math.random()*25,
+              vx:f.down.vx*units*(.12+Math.random()*.18),vy:(Math.random()-.5)*35,
+              vz:-f.down.vz*units*.12+(Math.random()-.5)*60,
+              gravity:850,drag:1.6,r:3+Math.random()*4,trail:true,
+            });
+          }
+        }else if(emitter)this.emitters.delete(f.down);
         let b=this.boots.get(f);if(!b){b={x:f.x,y:f.y,distance:0,coat:0,side:1};this.boots.set(f,b)}
         const dx=f.x-b.x,dy=f.y-b.y,travel=Math.hypot(dx,dy);b.x=f.x;b.y=f.y;
         if(f.air||f.height>3){b.distance=0;continue}
@@ -67,6 +85,7 @@
           b.coat*=.82;
         }
       }
+      if(this.drops.length>700)this.drops.splice(0,this.drops.length-700);
     }
     drawGround(ctx){ctx.save();ctx.globalCompositeOperation='multiply';ctx.drawImage(this.floor,0,0);ctx.restore()}
     drawAir(ctx){
