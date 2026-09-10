@@ -3,6 +3,7 @@
   const $ = id => document.getElementById(id);
   const canvas = $('game'), ctx = canvas.getContext('2d');
   const W = 1440, H = 810;
+  const blood = new window.AshenBlood(W, H);
   const { Atlas, LivingBackground, clips, pose, decodeChroma, clamp, smooth } = window.AshenAnimation;
   const M = window.AshenMechanics;
   const { HeroRig, weapons } = window.AshenHeroRig;
@@ -81,6 +82,7 @@
     if (!ready) throw new Error('Artwork is still loading');
     hero = make(470, 660, 100, true); wave = 1; score = 0; kills = 0; magic = 100;
     combo = 0; sparks = []; shake = 0; spell = null; accumulator = 0;
+    blood.reset();
     keys.clear(); pressed.clear(); change('playing'); spawn();
   }
 
@@ -96,6 +98,7 @@
     const isHero = e === hero;
     e.hp = Math.max(0, e.hp - attack.damage * (isHero ? 100 / 48 : 1));
     if (!attack.continuous || e.hp <= 0) {
+      blood.hit(e, attack.direction || 1, e.hp <= 0);
       M.hurt(e, attack, isHero, attacker);
       burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
       shake = attack.knock ? 5 : 2; beep(isHero ? 60 : 100);
@@ -134,6 +137,7 @@
   function update(dt) {
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
+    blood.step(dt, [hero, ...enemies]);
     if (keys.has('k') && canCast()) {
       if (hero.hurtTicks || hero.recovering) {
         hero.hurtTicks = hero.hurtAge = hero.recovering = hero.recoil = hero.stagger = 0;
@@ -318,6 +322,7 @@
     const shade = ctx.createLinearGradient(0, 0, 0, H);
     shade.addColorStop(0, '#080b0f77'); shade.addColorStop(.3, '#080b0f00'); shade.addColorStop(1, '#080b0f44');
     ctx.fillStyle = shade; ctx.fillRect(0, 0, W, H);
+    blood.drawGround(ctx);
     if (phase === 'title') drawFighter(hero, true);
     else [...enemies, hero].sort((a, b) => a.y - b.y).forEach(f => drawFighter(f, f === hero));
     if (!reducedMotion) for (let i = 0; i < 20; i++) {
@@ -330,6 +335,7 @@
       return s.life > 0;
     });
     ctx.globalAlpha = 1;
+    blood.drawAir(ctx);
     drawSpell();
     if (phase === 'playing' && banner > 0) {
       ctx.textAlign = 'center'; ctx.fillStyle = '#f4dfb6'; ctx.font = 'small-caps 36px Georgia';
