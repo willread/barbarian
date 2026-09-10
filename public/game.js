@@ -43,18 +43,19 @@
   }
 
   function canCast() {
-    return phase === 'playing' && magic >= 100 && !spell && !hero.air && !hero.attack && !hero.hurtTicks && !hero.down && !hero.recovering;
+    return phase === 'playing' && magic > 0 && !hero.air && !hero.attack && !hero.hurtTicks && !hero.down && !hero.recovering;
   }
   function syncMagic() {
     const ready = canCast();
     $('magic-fill').style.width = magic + '%';
     $('magic-meter').setAttribute('aria-valuenow', String(magic));
-    $('magic-meter').setAttribute('aria-valuetext', ready ? 'Ready. Press K to cast Stormcall.' : `${magic} percent. Charge with weapon hits and kills.`);
-    $('magic-state').textContent = ready ? 'K · READY' : spell ? 'CASTING' : magic >= 100 ? 'FULL · FINISH MOVE' : magic + '%';
+    $('magic-meter').setAttribute('aria-valuetext', `${Math.ceil(magic)} percent. Hold K to channel Stormcall; release to stop. Charge with weapon hits and kills.`);
+    $('magic-state').textContent = spell ? 'CHANNELING' : ready ? 'HOLD K' : magic > 0 ? Math.ceil(magic) + '% · FINISH MOVE' : 'EMPTY · LAND HITS';
     $('magic').setAttribute('data-ready', String(ready));
   }
 
   function change(next) {
+    if (next !== 'playing') spell = null;
     phase = next;
     $('title').hidden = next !== 'title';
     $('hud').hidden = next === 'title';
@@ -109,7 +110,7 @@
 
   function action(key, on) {
     key = ({ arrowleft: 'a', arrowright: 'd', arrowup: 'w', arrowdown: 's' })[key] || key;
-    if (!on) { keys.delete(key); return; }
+    if (!on) { keys.delete(key); if (key === 'k') { spell = null; syncMagic(); } return; }
     if (key === 'p') {
       keys.clear(); pressed.clear(); accumulator = 0;
       if (phase === 'playing') change('paused');
@@ -128,26 +129,23 @@
     if (f.hp <= 0) { f.death += dt; f.moving = false; }
   }
 
-  function cast() {
-    if (!canCast()) return false;
-    spell = { age: 0, targets: enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y })) };
-    magic = 0; sync(); return true;
-  }
-
   function update(dt) {
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
-    if (spell) {
+    if (keys.has('k') && canCast()) {
+      spell ??= { age: 0, targets: [] };
       spell.age++;
-      // Deliberate responsiveness adaptation: impact at 0.10s, no actor freeze.
-      if (spell.age === 6) {
-        spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
+      // Fixed-step channel: a full meter lasts 200 ticks (~3.34 seconds).
+      // First impact at 0.10s, then a pulse every 0.30s while held.
+      magic = Math.max(0, magic - .5);
+      spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
+      if (spell.age % 18 === 6) {
         for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
-          damage(e, { damage: 8, knock: true, magic: true, direction: e.x > hero.x ? 1 : -1 }, hero);
-        beep(42, .28, 'sine');
+          damage(e, { damage: 2, knock: false, magic: true, direction: e.x > hero.x ? 1 : -1 }, hero);
+        beep(42, .16, 'sine');
       }
-      if (spell.age >= 42) spell = null;
-    }
+      if (magic === 0) spell = null;
+    } else spell = null;
     tickActor(hero, dt);
     for (const e of enemies) tickActor(e, dt);
     if (phase === 'dying') {
@@ -159,11 +157,10 @@
     const dx = Number(keys.has('d')) - Number(keys.has('a'));
     const dy = Number(keys.has('s')) - Number(keys.has('w'));
     const edge = pressed.has('a') ? -1 : pressed.has('d') ? 1 : 0;
-    if (pressed.has('k')) cast();
-    if (pressed.has('j') && pressed.has(' ') && !hero.air) M.begin(hero, 'back');
-    else if (pressed.has(' ')) {
+    if (!spell && pressed.has('j') && pressed.has(' ') && !hero.air) M.begin(hero, 'back');
+    else if (!spell && pressed.has(' ')) {
       if (M.startJump(hero)) beep(160, .12, 'sine');
-    } else if (pressed.has('j')) {
+    } else if (!spell && pressed.has('j')) {
       if (M.begin(hero, M.selectStrike(hero, enemies))) beep(230, .15);
     }
     M.stepMotion(hero, dx, dy, edge, bounds);
@@ -234,15 +231,15 @@
 
   function drawSpell() {
     if (!spell || !stormTexture) return;
-    const age = spell.age;
-    const frame = age < 3 ? 0 : age < 6 ? 1 : age < 9 ? 2 : age < 13 ? 3 : age < 19 ? 4 : age < 27 ? 5 : age < 35 ? 6 : 7;
+    const age = spell.age % 18;
+    const frame = age < 3 ? 0 : age < 6 ? 1 : age < 8 ? 2 : age < 10 ? 3 : age < 12 ? 4 : age < 14 ? 5 : age < 16 ? 6 : 7;
     const cw = stormTexture.width / 4, ch = stormTexture.height / 2;
     ctx.save(); ctx.globalCompositeOperation = 'screen';
     const displayed = reducedMotion ? Math.max(5, frame) : frame;
     for (const target of spell.targets) {
       const height = 690, width = height * cw / ch;
       const baseline = displayed < 4 ? .907 : .78;
-      ctx.globalAlpha = (reducedMotion ? .55 : .9) * (age > 34 ? (42 - age) / 8 : 1);
+      ctx.globalAlpha = (reducedMotion ? .55 : .9) * (age > 14 ? (18 - age) / 4 : 1);
       ctx.drawImage(stormTexture, displayed % 4 * cw, Math.floor(displayed / 4) * ch, cw, ch,
         target.x - width / 2, target.y - height * baseline, width, height);
       if (age >= 6 && age < 13) {
@@ -327,7 +324,7 @@
   $('full').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('stage').requestFullscreen();
   document.querySelectorAll('[data-key]').forEach(button => {
     button.onpointerdown = event => { button.setPointerCapture(event.pointerId); action(button.dataset.key, true); };
-    button.onpointerup = button.onpointercancel = () => action(button.dataset.key, false);
+    button.onpointerup = button.onpointercancel = button.onlostpointercapture = () => action(button.dataset.key, false);
   });
 
   const loadImage = src => new Promise((resolve, reject) => {
@@ -369,7 +366,7 @@
     background?.dispose(); audio?.close();
   };
   window.ashenAxe = {
-    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), weapon: weaponId, kills }), start,
+    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), channeling: !!spell, weapon: weaponId, kills }), start,
     pause: () => action('p', true),
   };
 })();

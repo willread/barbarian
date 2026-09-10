@@ -3,11 +3,12 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 let next, now=0;
 const elements=new Map(), events={}, tools=new Map();
+const magicButton={dataset:{key:'k'},setPointerCapture(){}};
 const context=new Proxy({createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}}),getImageData:()=>({data:new Uint8ClampedArray(0)})},{get:(o,k)=>o[k]??(()=>{})});
 const element=id=>{if(!elements.has(id))elements.set(id,{parentElement:{setAttribute(){}},style:{},hidden:false,disabled:id==='start',setAttribute(){},getContext:type=>type==='webgl'?null:context});return elements.get(id)};
 const sandbox={console,Math,Set,Promise,Float32Array,Uint8ClampedArray,AbortController,
   Image:class{constructor(){this.width=2048;this.height=2048;this.complete=true;this.naturalWidth=2048}set src(v){queueMicrotask(()=>this.onload())}},
-  document:{getElementById:element,createElement:()=>({width:444,height:444,getContext:type=>type==='webgl'?null:context}),querySelectorAll:()=>[],modelContext:{registerTool:t=>tools.set(t.name,t)}},
+  document:{getElementById:element,createElement:()=>({width:444,height:444,getContext:type=>type==='webgl'?null:context}),querySelectorAll:()=>[magicButton],modelContext:{registerTool:t=>tools.set(t.name,t)}},
   requestAnimationFrame:f=>(next=f,1),cancelAnimationFrame(){}};
 sandbox.window={addEventListener:(k,f)=>events[k]=f,removeEventListener(){}};
 vm.runInNewContext(fs.readFileSync('public/mechanics.js','utf8'),sandbox);
@@ -90,22 +91,36 @@ assert.equal(T.hero.jumpLaunch,7);assert.equal(T.hero.velocityX,0);step(25);asse
 events.blur();const before=G.status();step(20);assert.deepEqual(G.status(),before);press('p');
 G.start();T.enemies.forEach((e,i)=>{e.x=650+i*200;e.y=660;e.aiRest=1000});
 const enemyHP=T.enemies[0].hp, castX=T.hero.x, enemyClock=T.enemies[0].clock;
-press('d');press('k');step(1);release('k');assert.equal(G.status().magic,0);
-step(5);assert.equal(T.enemies[0].hp,enemyHP);
-step(1);assert.equal(T.enemies[0].hp,enemyHP-8);assert.ok(T.enemies[0].down);
+press('d');press('k');step(5);assert.equal(G.status().magic,97.5);
+assert.equal(T.enemies[0].hp,enemyHP);
+step(1);assert.equal(T.enemies[0].hp,enemyHP-2);
 assert.ok(T.hero.x>castX,'player moves during the spell');
 assert.ok(T.enemies[0].clock>enemyClock,'enemy simulation continues during the spell');
-release('d');step(42);assert.equal(G.status().magic,0,'magic cannot recharge itself');
-// Only connected axe hits recharge. Kill bonus is in addition to hit charge.
+release('d');step(18);assert.equal(T.enemies[0].hp,enemyHP-4,'held spell keeps attacking');
+release('k');assert.equal(G.status().channeling,false,'release stops immediately');
+const retained=G.status().magic, retainedHP=T.enemies[0].hp;
+step(30);assert.equal(G.status().magic,retained);assert.equal(T.enemies[0].hp,retainedHP);
+press('k');step(1);assert.equal(G.status().magic,retained-.5,'partial charge works');
+events.blur();const pausedCharge=G.status().magic;assert.equal(G.status().channeling,false);
+step(30);assert.equal(G.status().magic,pausedCharge);press('p');step(20);assert.equal(G.status().magic,pausedCharge,'resume requires a fresh hold');
+press('k');step(200);assert.equal(G.status().magic,0);assert.equal(G.status().channeling,false);
+step(40);assert.equal(G.status().magic,0,'empty meter cannot attack or recharge itself');release('k');
+G.start();T.enemies.forEach(e=>e.aiRest=10000);
+magicButton.onpointerdown({pointerId:1});step(6);assert.equal(G.status().magic,97);
+magicButton.onpointercancel();step(20);assert.equal(G.status().magic,97);assert.equal(G.status().channeling,false);
+magicButton.onpointerdown({pointerId:2});step(6);magicButton.onlostpointercapture();step(20);
+assert.equal(G.status().magic,94);assert.equal(G.status().channeling,false);
+// Only connected weapon hits recharge. Kill bonus is in addition to hit charge.
+G.start();T.enemies.forEach(e=>{e.x=-100;e.aiRest=10000});
+press('k');step(200);release('k');
 const chargingTarget=T.enemies[0];
 for(let i=0;i<9;i++) {
   M.init(chargingTarget);chargingTarget.hp=1000;chargingTarget.x=T.hero.x+30*M.SCALE;chargingTarget.y=T.hero.y;chargingTarget.aiRest=10000;
   press('j');step(8);release('j');step(10);
   assert.equal(G.status().magic,Math.min(100,(i+1)*12));
-  if(i===7){press('k');step(1);release('k');assert.equal(G.status().magic,96,'partial meter cannot cast');}
 }
-assert.equal(G.status().magicReady,true);assert.equal(element('magic-state').textContent,'K · READY');
-chargingTarget.x=-100;press('k');step(1);release('k');step(43);
+assert.equal(G.status().magicReady,true);assert.equal(element('magic-state').textContent,'HOLD K');
+chargingTarget.x=-100;press('k');step(200);release('k');
 M.init(chargingTarget);chargingTarget.hp=1;chargingTarget.x=T.hero.x+30*M.SCALE;chargingTarget.y=T.hero.y;chargingTarget.aiRest=10000;
 press('j');step(8);release('j');assert.equal(G.status().magic,32,'connected kill gives 12 + 20');step(10);
 // An interrupted enemy strike cannot deliver its pending contact event.
