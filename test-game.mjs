@@ -179,9 +179,19 @@ gore.stain(300,660,35);gore.step(M.STEP,[walker]);walker.x+=25;gore.step(M.STEP,
 assert.ok(gore.tracks>0,'boots transfer blood from pools');
 const footprints=gore.tracks;walker.air={};walker.x+=30;gore.step(M.STEP,[walker]);
 assert.equal(gore.tracks,footprints,'airborne fighters leave no footprints');
-gore.hit(walker,1,true);assert.equal(gore.drops.length,135);
+gore.hit(walker,1,true);assert.ok(gore.drops.length>=36&&gore.drops.length<=52);
 for(let i=0;i<200;i++)gore.step(M.STEP,[]);
-assert.equal(gore.drops.length,0);assert.ok(gore.marks>50,'ballistic blood lands as persistent pigment');
+assert.equal(gore.drops.length,0);assert.ok(gore.marks>30,'ballistic blood lands as persistent pigment');
 const stains=gore.marks;gore.step(70,[]);assert.equal(gore.marks,stains,'drying does not erase stains');
 gore.reset();assert.equal(gore.marks,0);assert.equal(gore.tracks,0);assert.equal(gore.drops.length,0);
+const originalRandom=Math.random;
+try {
+  Math.random=()=>.5;
+  gore.hit({x:300,y:660},1);const stationary={...gore.drops[0]};
+  assert.ok(gore.drops.length>=18&&gore.drops.length<=28);assert.ok(stationary.r>=3.5);
+  gore.reset();gore.hit({x:300,y:660,velocityX:1,velocityY:-.5,height:10,air:{vz:-2}},1);
+  assert.ok(Math.abs(gore.drops[0].vx-stationary.vx-M.SCALE/M.STEP*.6)<1e-9,'blood inherits victim horizontal velocity');
+  assert.ok(gore.drops[0].vy<stationary.vy);assert.ok(gore.drops[0].vz>stationary.vz);
+  assert.equal(gore.drops[0].z-stationary.z,10*M.SCALE,'airborne hits spray at victim height');
+} finally {Math.random=originalRandom}
 sandbox.window.stopGame();

@@ -28,12 +28,20 @@
       this.marks++;if(track)this.tracks++;
     }
     hit(f,direction,fatal=false) {
-      const count=fatal?135:65;
+      const count=(fatal?36:18)+Math.floor(Math.random()*(fatal?17:11));
+      // Read pre-impact motion in ROM units, then convert to world pixels/sec.
+      const units=window.AshenMechanics.SCALE/window.AshenMechanics.STEP;
+      const horizontal=f.down?(f.down.ground?0:f.down.vx):(f.velocityX||0);
+      const vertical=f.down?(f.down.ground?0:f.down.vz):(f.air?.vz??f.attack?.vz??0);
+      const carryX=horizontal*units*.6,carryY=(f.velocityY||0)*units*.6,carryZ=-vertical*units*.45;
+      const force=80+Math.random()*120,fan=.45+Math.random()*.55,lift=35+Math.random()*90;
+      const sourceHeight=85+Math.random()*50+(f.height||0)*window.AshenMechanics.SCALE;
       this.stain(f.x,f.y,fatal?42:19);
       for(let i=0;i<count;i++) {
-        this.drops.push({x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*12,z:85+Math.random()*70,
-          vx:direction*(60+Math.random()*230)+(Math.random()-.5)*170,vy:(Math.random()-.5)*140,vz:40+Math.random()*180,
-          r:1.2+Math.random()*(fatal?5:3.5)});
+        const angle=(Math.random()-.5)*fan,speed=force*(.5+Math.random()*.8);
+        this.drops.push({x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*12,z:sourceHeight+(Math.random()-.5)*24,
+          vx:carryX+direction*Math.cos(angle)*speed,vy:carryY+Math.sin(angle)*speed*.6,vz:carryZ+lift+(Math.random()-.5)*100,
+          r:(fatal?5:3.5)+Math.random()*(fatal?5:4)});
       }
       if(this.drops.length>700)this.drops.splice(0,this.drops.length-700);
     }
