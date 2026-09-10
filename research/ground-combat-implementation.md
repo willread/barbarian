@@ -88,7 +88,9 @@ The full source scheduler includes RNG tables, two-player targeting, mounts, ter
 
 ## Magic
 
-From restored stage-one state, testing 1, 2, 3 and 4 pots produced the same 267-update input-to-return envelope. Source actors freeze while `FFC104` bit 3 is set. Pot consumption occurs on update 2. The tested soldier loses 4 HP for 1/2 pots and 8 for 3/4 pots at completion. Ashen Axe keeps its storm artwork but now spends its current pool, pauses actor simulation during the cast, and applies these measured tiers on completion. The visual clock continues so clouds, fog and spell effects remain alive.
+From restored stage-one state, testing 1, 2, 3 and 4 pots produced the same 267-update input-to-return envelope. Source actors freeze while `FFC104` bit 3 is set. Pot consumption occurs on update 2. The tested soldier loses 4 HP for 1/2 pots and 8 for 3/4 pots at completion.
+
+The later user-requested responsiveness pass deliberately departs from this timing: Stormcall hits at age 6 (about 0.10s), deals 8 damage, fades out by age 42 (0.70s), and never freezes the actors. A visible 0–100 meter replaces pots. It starts full, requires 100 to cast, and gains 12 for a connected axe hit plus 20 for an axe kill. Magic hits/kills cannot refill it; wave transitions do not grant charge. Full charge becomes available after the current attack, jump or recovery ends. Eight painted lightning/dust cels replace procedural wavy lines, with ground contact registered separately for each row.
 
 ## Reproduction and validation
 
@@ -99,7 +101,7 @@ Local extraction scripts in ignored `work/golden-axe/`:
 - `extra-pose-guides.py`: captures the actual run, charge, air attack, pommel, throw, backward attack and kick poses for painted redraws.
 - `emu.py`, `show-code.py`, the supplied ROM, local core and prepared save states are required. No ROM download is performed.
 
-`test-mechanics.mjs` compares the movement implementation to captured numeric observations and verifies combat boundaries, late entry into an active window, stagger selection and knockdown. `test-game.mjs` exercises the running application at 30/60/120/144 render Hz, pause/focus loss, simultaneous controls, magic freeze/damage, attack interruption, restart, defeat and wave completion. Offline rendering uses real textures. The production build is required before publishing.
+`test-mechanics.mjs` compares the movement implementation to captured numeric observations and verifies combat boundaries, late entry into an active window, stagger selection and knockdown. `test-game.mjs` exercises the running application at 30/60/120/144 render Hz, pause/focus loss, simultaneous controls, fast magic damage with continued actor simulation, charge thresholds and kill bonuses, attack interruption, restart, defeat and wave completion. Offline rendering uses real textures. The production build is required before publishing.
 
 ## Scope
 

@@ -9,8 +9,8 @@
   const bounds = { left: 70, right: W - 70, top: 560, bottom: 755 };
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let running = true, ready = false, raf, last = null, clock = 0, accumulator = 0, spell = null;
-  let phase = 'title', wave = 1, score = 0, kills = 0, magic = 3;
-  let flash = 0, shake = 0, banner = 0, combo = 0, comboTime = 0;
+  let phase = 'title', wave = 1, score = 0, kills = 0, magic = 100, stormTexture;
+  let shake = 0, banner = 0, combo = 0, comboTime = 0;
   let muted = true, audio, background, sparks = [];
   let nextId = 0;
   const make = (x, y, hp = 100, player = false) => M.init({
@@ -35,9 +35,21 @@
   function sync() {
     $('health').style.width = Math.max(0, hero.hp) + '%';
     $('health').parentElement.setAttribute('aria-label', `Health ${Math.max(0, hero.hp)} of 100`);
-    $('magic').textContent = 'STORMCALL  ' + '◆ '.repeat(magic) + '◇ '.repeat(3 - magic);
+    syncMagic();
     $('score').textContent = String(score).padStart(6, '0');
     $('wave').textContent = `WAVE ${wave} / 4`;
+  }
+
+  function canCast() {
+    return phase === 'playing' && magic >= 100 && !spell && !hero.air && !hero.attack && !hero.hurtTicks && !hero.down && !hero.recovering;
+  }
+  function syncMagic() {
+    const ready = canCast();
+    $('magic-fill').style.width = magic + '%';
+    $('magic-meter').setAttribute('aria-valuenow', String(magic));
+    $('magic-meter').setAttribute('aria-valuetext', ready ? 'Ready. Press K to cast Stormcall.' : `${magic} percent. Charge with axe hits and kills.`);
+    $('magic-state').textContent = ready ? 'K · READY' : spell ? 'CASTING' : magic >= 100 ? 'FULL · FINISH MOVE' : magic + '%';
+    $('magic').setAttribute('data-ready', String(ready));
   }
 
   function change(next) {
@@ -64,8 +76,8 @@
 
   function start() {
     if (!ready) throw new Error('Artwork is still loading');
-    hero = make(470, 660, 100, true); wave = 1; score = 0; kills = 0; magic = 3;
-    combo = 0; sparks = []; flash = 0; shake = 0; spell = null; accumulator = 0;
+    hero = make(470, 660, 100, true); wave = 1; score = 0; kills = 0; magic = 100;
+    combo = 0; sparks = []; shake = 0; spell = null; accumulator = 0;
     keys.clear(); pressed.clear(); change('playing'); spawn();
   }
 
@@ -89,6 +101,7 @@
       if (isHero) change('dying');
       else { kills++; score += e.boss ? 1500 : 250; combo++; comboTime = 2.2; }
     }
+    if (!isHero && attacker === hero && !attack.magic) magic = Math.min(100, magic + 12 + (e.hp <= 0 ? 20 : 0));
     sync();
   }
 
@@ -114,25 +127,24 @@
   }
 
   function cast() {
-    if (!magic || hero.air || hero.attack || hero.hurtTicks || hero.down || hero.recovering) return false;
-    spell = { age: 0, power: magic >= 3 ? 8 : 4 };
-    magic = 0; hero.running = false; hero.velocityX = hero.velocityY = 0;
-    hero.moving = false; flash = .3; beep(70, .8); sync(); return true;
+    if (!canCast()) return false;
+    spell = { age: 0, targets: enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y })) };
+    magic = 0; sync(); return true;
   }
 
   function update(dt) {
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
     if (spell) {
-      pressed.clear(); spell.age++;
-      // The traced Ax Battler magic sequence freezes actors for 266 updates.
-      flash = .3 + .2 * Math.sin(spell.age / 9);
-      if (spell.age >= 266) {
-        const power = spell.power; spell = null; flash = .8;
+      spell.age++;
+      // Deliberate responsiveness adaptation: impact at 0.10s, no actor freeze.
+      if (spell.age === 6) {
+        spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
         for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
-          damage(e, { damage: power, knock: true, direction: e.x > hero.x ? 1 : -1 }, hero);
+          damage(e, { damage: 8, knock: true, magic: true, direction: e.x > hero.x ? 1 : -1 }, hero);
+        beep(42, .28, 'sine');
       }
-      return;
+      if (spell.age >= 42) spell = null;
     }
     tickActor(hero, dt);
     for (const e of enemies) tickActor(e, dt);
@@ -145,7 +157,7 @@
     const dx = Number(keys.has('d')) - Number(keys.has('a'));
     const dy = Number(keys.has('s')) - Number(keys.has('w'));
     const edge = pressed.has('a') ? -1 : pressed.has('d') ? 1 : 0;
-    if (pressed.has('k') && cast()) { pressed.clear(); return; }
+    if (pressed.has('k')) cast();
     if (pressed.has('j') && pressed.has(' ') && !hero.air) M.begin(hero, 'back');
     else if (pressed.has(' ')) {
       if (M.startJump(hero)) beep(160, .12, 'sine');
@@ -185,8 +197,9 @@
     }
     if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.death > clips.enemyDeath.duration + .8)) {
       if (wave === 4) change('won');
-      else { wave++; hero.hp = Math.min(100, hero.hp + 20); magic = Math.min(3, magic + 1); spawn(); }
+      else { wave++; hero.hp = Math.min(100, hero.hp + 20); spawn(); }
     }
+    syncMagic();
   }
 
   function drawFighter(f, isHero) {
@@ -198,19 +211,46 @@
     const size = f.boss ? 345 : 292;
     const height = (f.height || 0) * M.SCALE;
     ctx.save();
-    ctx.globalAlpha = opacity * Math.max(.2, 1 - height / 500);
-    ctx.fillStyle = '#07090680'; ctx.beginPath();
-    ctx.ellipse(f.x, f.y - 2, size * .17 * Math.max(.3, 1 - height / 600), 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.save(); ctx.globalAlpha = opacity * Math.max(.12, 1 - height / 450);
+    ctx.translate(f.x, f.y - 2); ctx.scale(1, .24);
+    const radius = size * .23 + height * .035;
+    const shadow = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+    shadow.addColorStop(0, '#05060565'); shadow.addColorStop(.35, '#05060545'); shadow.addColorStop(1, '#05060500');
+    ctx.fillStyle = shadow; ctx.fillRect(-radius, -radius, radius * 2, radius * 2); ctx.restore();
     ctx.globalAlpha = opacity;
     ctx.translate(f.x, f.y - height);
     ctx.scale(f.dir, 1);
     if (f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
-    atlas.paint(ctx, reducedMotion && !f.moving && !f.attack && !f.down && !f.recovering && f.jump === null && f.hp > 0 && f.recoil <= 0 ? 0 : p.frame, size, opacity);
+    atlas.paint(ctx, p.frame, size, opacity, p.breathing && !reducedMotion ? f.clock : null);
     ctx.restore();
     if (!isHero && f.hp > 0 && f.hp < f.max) {
       ctx.fillStyle = '#180e0c'; ctx.fillRect(f.x - 35, f.y - size + 20, 70, 4);
       ctx.fillStyle = f.boss ? '#c470d9' : '#d89969'; ctx.fillRect(f.x - 35, f.y - size + 20, 70 * f.hp / f.max, 4);
     }
+  }
+
+  function drawSpell() {
+    if (!spell || !stormTexture) return;
+    const age = spell.age;
+    const frame = age < 3 ? 0 : age < 6 ? 1 : age < 9 ? 2 : age < 13 ? 3 : age < 19 ? 4 : age < 27 ? 5 : age < 35 ? 6 : 7;
+    const cw = stormTexture.width / 4, ch = stormTexture.height / 2;
+    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    const displayed = reducedMotion ? Math.max(5, frame) : frame;
+    for (const target of spell.targets) {
+      const height = 690, width = height * cw / ch;
+      const baseline = displayed < 4 ? .907 : .78;
+      ctx.globalAlpha = (reducedMotion ? .55 : .9) * (age > 34 ? (42 - age) / 8 : 1);
+      ctx.drawImage(stormTexture, displayed % 4 * cw, Math.floor(displayed / 4) * ch, cw, ch,
+        target.x - width / 2, target.y - height * baseline, width, height);
+      if (age >= 6 && age < 13) {
+        ctx.save(); ctx.translate(target.x, target.y); ctx.scale(1, .3);
+        const light = ctx.createRadialGradient(0, 0, 0, 0, 0, 140);
+        light.addColorStop(0, '#ffe6a855'); light.addColorStop(1, '#ffe6a800');
+        ctx.globalAlpha *= (13 - age) / 7; ctx.fillStyle = light;
+        ctx.fillRect(-140, -140, 280, 280); ctx.restore();
+      }
+    }
+    ctx.restore();
   }
 
   function render(dt) {
@@ -233,15 +273,7 @@
       return s.life > 0;
     });
     ctx.globalAlpha = 1;
-    if (flash > 0) {
-      ctx.fillStyle = `rgba(137,213,255,${flash * (reducedMotion ? .08 : .22)})`; ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = `rgba(190,236,255,${Math.min(1, flash)})`; ctx.lineWidth = 5;
-      for (let i = 0; i < 6; i++) {
-        ctx.beginPath(); const x = (i + .5) * W / 6; ctx.moveTo(x, 0);
-        for (let y = 0; y < H; y += 70) ctx.lineTo(x + Math.sin(i * 17 + y * .12 + Math.floor(clock * 15)) * 40, y);
-        ctx.stroke();
-      }
-    }
+    drawSpell();
     if (phase === 'playing' && banner > 0) {
       ctx.textAlign = 'center'; ctx.fillStyle = '#f4dfb6'; ctx.font = 'small-caps 36px Georgia';
       ctx.fillText(wave === 4 ? 'The Warden approaches' : `Wave ${wave} · The Ashen Legion`, W / 2, 190);
@@ -266,7 +298,7 @@
         if (['won', 'lost'].includes(phase)) { accumulator = 0; break; }
       }
     }
-    flash = Math.max(0, flash - dt); shake = Math.max(0, shake - dt * 35);
+    shake = Math.max(0, shake - dt * 35);
     render(dt); raf = requestAnimationFrame(loop);
   }
 
@@ -308,9 +340,13 @@
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
+    loadImage('/art/storm-strike-v7.png').then(image => { stormTexture = image; }),
     loadImage('/art/valley.png').then(image => { if (running) background = new LivingBackground(image, W, H); }),
     ...names.map(name => loadImage(`/art/${name}.png`).then(image => {
       atlases[name] = new Atlas(decodeChroma(image), atlasConfig[name]);
+      // Prepare the small idle loop while loading, never during active combat.
+      if (name === 'hero-actions-v6' && !reducedMotion && atlases[name].cels?.[0])
+        for (let i = 0; i < 48; i++) atlases[name].breathingCel(atlases[name].cels[0], i * .1 + .00001);
     })),
   ]).then(() => {
     if (!running) return;
@@ -326,7 +362,7 @@
     background?.dispose(); audio?.close();
   };
   window.ashenAxe = {
-    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, kills }), start,
+    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), kills }), start,
     pause: () => action('p', true),
   };
 })();

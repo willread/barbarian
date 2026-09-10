@@ -3,7 +3,7 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 let next, now=0;
 const elements=new Map(), events={}, tools=new Map();
-const context=new Proxy({createLinearGradient:()=>({addColorStop(){}}),getImageData:()=>({data:new Uint8ClampedArray(0)})},{get:(o,k)=>o[k]??(()=>{})});
+const context=new Proxy({createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}}),getImageData:()=>({data:new Uint8ClampedArray(0)})},{get:(o,k)=>o[k]??(()=>{})});
 const element=id=>{if(!elements.has(id))elements.set(id,{parentElement:{setAttribute(){}},style:{},hidden:false,disabled:id==='start',setAttribute(){},getContext:type=>type==='webgl'?null:context});return elements.get(id)};
 const sandbox={console,Math,Set,Promise,Float32Array,Uint8ClampedArray,AbortController,
   Image:class{constructor(){this.width=2048;this.height=2048;this.complete=true;this.naturalWidth=2048}set src(v){queueMicrotask(()=>this.onload())}},
@@ -88,9 +88,25 @@ assert.equal(T.hero.jumpLaunch,7);assert.equal(T.hero.velocityX,0);step(25);asse
 // Focus loss pauses and releases all held inputs.
 events.blur();const before=G.status();step(20);assert.deepEqual(G.status(),before);press('p');
 G.start();T.enemies.forEach((e,i)=>{e.x=650+i*200;e.y=660;e.aiRest=1000});
-const enemyHP=T.enemies[0].hp;press('k');step(1);release('k');assert.equal(G.status().magic,0);
-const frozenX=T.enemies[0].x;step(265);assert.equal(T.enemies[0].x,frozenX);assert.equal(T.enemies[0].hp,enemyHP);
+const enemyHP=T.enemies[0].hp, castX=T.hero.x, enemyClock=T.enemies[0].clock;
+press('d');press('k');step(1);release('k');assert.equal(G.status().magic,0);
+step(5);assert.equal(T.enemies[0].hp,enemyHP);
 step(1);assert.equal(T.enemies[0].hp,enemyHP-8);assert.ok(T.enemies[0].down);
+assert.ok(T.hero.x>castX,'player moves during the spell');
+assert.ok(T.enemies[0].clock>enemyClock,'enemy simulation continues during the spell');
+release('d');step(42);assert.equal(G.status().magic,0,'magic cannot recharge itself');
+// Only connected axe hits recharge. Kill bonus is in addition to hit charge.
+const chargingTarget=T.enemies[0];
+for(let i=0;i<9;i++) {
+  M.init(chargingTarget);chargingTarget.hp=1000;chargingTarget.x=T.hero.x+30*M.SCALE;chargingTarget.y=T.hero.y;chargingTarget.aiRest=10000;
+  press('j');step(8);release('j');step(10);
+  assert.equal(G.status().magic,Math.min(100,(i+1)*12));
+  if(i===7){press('k');step(1);release('k');assert.equal(G.status().magic,96,'partial meter cannot cast');}
+}
+assert.equal(G.status().magicReady,true);assert.equal(element('magic-state').textContent,'K · READY');
+chargingTarget.x=-100;press('k');step(1);release('k');step(43);
+M.init(chargingTarget);chargingTarget.hp=1;chargingTarget.x=T.hero.x+30*M.SCALE;chargingTarget.y=T.hero.y;chargingTarget.aiRest=10000;
+press('j');step(8);release('j');assert.equal(G.status().magic,32,'connected kill gives 12 + 20');step(10);
 // An interrupted enemy strike cannot deliver its pending contact event.
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:610;e.y=660;e.aiRest=1000});
 const victim=T.enemies[0];M.begin(victim,'enemy');victim.attack.age=21;victim.dir=-1;victim.attack.direction=-1;

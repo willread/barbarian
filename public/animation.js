@@ -110,7 +110,39 @@
       });
     }
 
-    paint(ctx, frame, size, alpha = 1) {
+    breathingCel(cel, time) {
+      // One stable painting, continuously deformed around the chest. The face,
+      // axe head and lower body stay pinned; no redrawn poses or detached parts.
+      const phase = Math.floor((((time % 4.8) + 4.8) % 4.8) / 4.8 * 48);
+      this.breathFrames ??= [];
+      if (this.breathFrames[phase]) return this.breathFrames[phase];
+      const source = cel.image, w = source.width, h = source.height;
+      const pixels = source.getContext('2d').getImageData(0, 0, w, h).data;
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+      const context = canvas.getContext('2d'), out = context.createImageData(w, h);
+      out.data.set(pixels);
+      const inhale = (1 - Math.cos(phase / 48 * TAU)) / 2;
+      for (let y = Math.floor(h * .28); y < Math.ceil(h * .55); y++) for (let x = Math.floor(w * .31); x < Math.ceil(w * .91); x++) {
+        const dx = (x / w - .61) / .30, dy = (y / h - .415) / .135;
+        const weight = Math.max(0, 1 - dx * dx - dy * dy) ** 2 * inhale;
+        if (!weight) continue;
+        const sx = clamp(x - dx * w * .007 * weight, 0, w - 1);
+        const sy = clamp(y + h * .004 * weight, 0, h - 1);
+        const ix = Math.floor(sx), iy = Math.floor(sy), fx = sx - ix, fy = sy - iy;
+        const dst = (y * w + x) * 4;
+        let a = 0, r = 0, g = 0, b = 0;
+        for (let j = 0; j < 2; j++) for (let i = 0; i < 2; i++) {
+          const src = (Math.min(h - 1, iy + j) * w + Math.min(w - 1, ix + i)) * 4;
+          const coverage = (i ? fx : 1 - fx) * (j ? fy : 1 - fy) * pixels[src + 3];
+          a += coverage; r += pixels[src] * coverage; g += pixels[src + 1] * coverage; b += pixels[src + 2] * coverage;
+        }
+        if (a) { out.data[dst] = r / a; out.data[dst + 1] = g / a; out.data[dst + 2] = b / a; out.data[dst + 3] = a; }
+        else out.data[dst + 3] = 0;
+      }
+      context.putImageData(out, 0, 0); this.breathFrames[phase] = canvas; return canvas;
+    }
+
+    paint(ctx, frame, size, alpha = 1, breathTime = null) {
       frame = Math.max(0, Math.min(this.frames - 1, frame));
       if (this.remap) frame = this.remap[frame];
       const [px, py] = this.pivots[frame] || [.5, .92];
@@ -121,7 +153,8 @@
       const cel = this.cels?.[frame];
       if (cel) {
         const scale = w / this.cellWidth;
-        ctx.drawImage(cel.image, (cel.left - px * this.cellWidth) * scale, -cel.image.height * scale,
+        const texture = breathTime === null ? cel.image : this.breathingCel(cel, breathTime);
+        ctx.drawImage(texture, (cel.left - px * this.cellWidth) * scale, -cel.image.height * scale,
           cel.image.width * scale, cel.image.height * scale);
       } else ctx.drawImage(this.image, (frame % this.columns) * this.cellWidth,
           Math.floor(frame / this.columns) * this.cellHeight, this.cellWidth, this.cellHeight,
@@ -357,8 +390,7 @@
       return { atlas: hero ? 'hero-walk-v4' : 'enemy-walk-v4', frame: Math.floor(f.stride * 4) % 4 };
     }
     // Complete painted poses. No limb segmentation, mesh warping, or ghosted crossfade.
-    const breath = [0, 1, 2, 3, 2, 1];
-    return hero ? { atlas: 'hero-actions-v6', frame: breath[Math.floor(f.clock / .8) % breath.length] } :
+    return hero ? { atlas: 'hero-actions-v6', frame: 0, breathing: true } :
       { atlas: 'enemy-walk-v4', frame: 0 };
   }
 

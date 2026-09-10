@@ -1,5 +1,11 @@
 # Whole-body animation redraw
 
+## Breathing, shadows and Stormcall (v7)
+
+Idle uses only the canonical hero cel zero. A compact continuous chest displacement generates a cached 48-phase, 4.8-second breath. The face, axe head and lower body retain identical pixels, and there are no independently drawn limbs or crossfades between redrawn identities. All phases are prepared during loading so no pixel processing interrupts play. Reduced motion uses the still cel. Ground shadows use a wide radial opacity falloff and soften/spread as a fighter rises.
+
+`public/art/storm-strike-v7.png` contains eight realistic lightning, dust and ember cels blended with screen compositing. Warm light falls onto the stone under each target. The source black matte disappears through blending; row-specific baselines keep the dust grounded. Exact built-in image-generation prompt and source are in `storm-strike-prompts.json`. See `ground-combat-implementation.md` for the deliberately faster cast and earned charge meter.
+
 ## Hero consistency repair (v6)
 
 The current hero uses `hero-actions-v6.png`, `hero-close-moves-v6.png`, and `hero-extra-motion-v6.png` for corrected rigid axe construction. `hero-reactions-v6.png` replaces both older hero sheets used for damage, collapse and jumping: four hurt/recovery cels, four collapse cels, then four jump cels. The identity reference is the established idle hero, including his face, short fur skirt, round belt buckle, bronze bracers and fur-cuffed boots. Each pose remains a single complete painting.
