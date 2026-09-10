@@ -12,6 +12,7 @@ const sandbox={console,Math,Set,Promise,Float32Array,Uint8ClampedArray,AbortCont
 sandbox.window={addEventListener:(k,f)=>events[k]=f,removeEventListener(){}};
 vm.runInNewContext(fs.readFileSync('public/mechanics.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/animation.js','utf8'),sandbox);
+vm.runInNewContext(fs.readFileSync('public/hero-rig.js','utf8'),sandbox);
 let source=fs.readFileSync('public/game.js','utf8');
 source=source.replace('window.ashenAxe = {','window.__test = { get hero(){return hero}, get enemies(){return enemies}, get clock(){return clock} }; window.ashenAxe = {');
 vm.runInNewContext(source,sandbox);await new Promise(r=>setImmediate(r));
@@ -26,7 +27,7 @@ assert.equal(tools.get('start_new_battle').execute({}).health,100);
 for(const hero of [true,false]) {
   const seen=new Set();
   const count=4;
-  for(let i=0;i<count;i++) { const p=A.pose({hp:100,recoil:0,attack:null,jump:null,moving:true,stride:i/count+.000001,clock:0},hero); seen.add(p.frame); assert.equal(p.atlas,hero?'hero-walk-v4':'enemy-walk-v4'); }
+  for(let i=0;i<count;i++) { const p=A.pose({hp:100,recoil:0,attack:null,jump:null,moving:true,stride:i/count+.000001,clock:0},hero); seen.add(p.frame); assert.equal(p.atlas,hero?'hero-walk-unarmed-v8':'enemy-walk-v4'); }
   assert.equal(seen.size,count); assert.deepEqual([...seen],[0,1,2,3]);
 }
 let draws=0;new A.Atlas({width:2048,height:2048}).paint({drawImage(){draws++}},7,292);assert.equal(draws,1);
@@ -57,7 +58,7 @@ for(const state of [
   {jump:.2,air:{age:12,vz:-1}}, {jump:.6,air:{age:40,vz:2}},
 ]) {
   const p=A.pose({hp:100,recoil:0,jump:null,...state},true);
-  assert.equal(p.atlas,'hero-reactions-v6');
+  assert.equal(p.atlas,'hero-reactions-unarmed-v8');
   assert.ok(p.frame>=0&&p.frame<12);
 }
 for(const period of [3,8,24,48]){const a=A.flowPhase(.7,period),b=A.flowPhase(48+.7,period);assert.ok(Math.abs(a.a-b.a)<1e-12);assert.ok(Math.abs(a.blend-b.blend)<1e-12)}
@@ -122,5 +123,12 @@ for(let wave=1;wave<=4;wave++) {
   step(140);
 }
 assert.equal(G.status().phase,'won');
-console.log('PASS: complete sprites, combat windows, input edges, fixed-step refresh independence, running jumps, pause, magic, interruptions, defeat, restart and victory.');
+element('weapon').onchange({target:{value:'sword'}});
+assert.equal(G.status().weapon,'sword');
+G.start();assert.equal(G.status().weapon,'sword','weapon choice survives restart');
+element('weapon').onchange({target:{value:'invalid'}});
+assert.equal(G.status().weapon,'sword','unknown weapons cannot enter the renderer');
+element('weapon').onchange({target:{value:'axe'}});
+assert.equal(G.status().weapon,'axe');
+console.log('PASS: complete sprites, combat windows, input edges, fixed-step refresh independence, running jumps, pause, magic, interruptions, defeat, restart, victory and weapon selection.');
 sandbox.window.stopGame();

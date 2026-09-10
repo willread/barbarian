@@ -8,7 +8,6 @@
     slash: { ticks: 18, from: 8, to: 12, damage: 2, reach: 43, box: [16,24,-64,40] },
     pommel: { ticks: 22, from: 13, to: 17, damage: 2, reach: 40, box: [16,16,-40,16] },
     kick: { ticks: 39, from: 15, to: 20, damage: 4, reach: 40, box: [16,40,-48,24], knock: true },
-    throw: { ticks: 45, from: 8, to: 8, damage: 4, reach: 24, knock: true },
     air: { ticks: 11, from: 7, to: 10, damage: 6, reach: 36, knock: true },
     back: { ticks: 45, from: 27, to: 32, damage: 12, reach: 38, knock: true },
     charge: { ticks: 32, from: 2, to: 31, damage: 4, reach: 24, knock: true },
@@ -103,13 +102,13 @@
     if (!e) return 'whiff';
     if (e.stagger >= 2 && e.hurtTicks > 0) {
       const distance = Math.abs(e.x - f.x) / SCALE + 4;
-      if (distance < 28 && !e.boss) return 'throw';
       if (distance < 44) return e.stagger >= 4 ? 'kick' : 'pommel';
       return 'kick';
     }
     return 'slash';
   }
   function begin(f, type) {
+    if (!attacks[type]) return false;
     if (!standing(f) || f.attack || f.hurtTicks || (f.air && type !== 'air')) return false;
     if (type === 'air' && (!f.air || (f.air.vz >= 0 && f.height < 24))) return false;
     const direction = type === 'back' ? -f.dir : f.dir;
@@ -153,9 +152,6 @@
     const heavy = attack.knock || f.hp <= 0;
     if (heavy) {
       f.down = { age: 0, vz: isHero ? -4.25 : -4, vx: attack.direction * (isHero ? 2 : 3.375), ground: 0 };
-      if (attack.type === 'throw' && attacker) {
-        f.down.thrower = attacker; f.down.vx = -attack.direction * 3.375;
-      }
       f.hurtTicks = 0; f.stagger = 0; f.invTicks = 0;
     } else {
       f.stagger = Math.min(4, f.stagger + 1);
@@ -171,10 +167,7 @@
     if (f.aiChargeRest > 0) f.aiChargeRest--;
     if (f.down) {
       const d = f.down; d.age++;
-      if (d.thrower && d.age >= 14 && d.age <= 41) {
-        // F85E: the held victim follows the thrower's root before release.
-        f.x = d.thrower.x; f.y = d.thrower.y; f.height = 16; d.vz = -4;
-      } else if (!d.ground) {
+      if (!d.ground) {
         f.x += d.vx * SCALE;
         f.height = Math.max(0, f.height - d.vz); d.vz = Math.min(8, d.vz + .25);
         if (!f.height && d.vz >= 0) d.ground = isHero ? 62 : 32;

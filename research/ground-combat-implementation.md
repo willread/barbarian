@@ -1,3 +1,5 @@
+Current implementation: see [weapon-rig.md](weapon-rig.md). The v8 body sheets and independent weapon rig supersede the historical weapon-in-body artwork and grab/throw implementation below. Grabs are currently disabled and their cels are omitted from active playback.
+
 # Ground-combat reverse engineering and implementation
 
 Follow-up to `golden-axe-mechanics.md`, using the same user-supplied World ROM and deterministic NTSC emulator. No ROM code, graphics, emulator binaries or save states are shipped in the site. The browser mechanics are an original JavaScript implementation of the observations below.

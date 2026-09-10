@@ -5,6 +5,8 @@
   const W = 1440, H = 810;
   const { Atlas, LivingBackground, clips, pose, decodeChroma, clamp, smooth } = window.AshenAnimation;
   const M = window.AshenMechanics;
+  const { HeroRig, weapons } = window.AshenHeroRig;
+  let heroRig, weaponId = 'axe', weaponAtlas;
   const keys = new Set(), pressed = new Set(), atlases = {};
   const bounds = { left: 70, right: W - 70, top: 560, bottom: 755 };
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
@@ -47,7 +49,7 @@
     const ready = canCast();
     $('magic-fill').style.width = magic + '%';
     $('magic-meter').setAttribute('aria-valuenow', String(magic));
-    $('magic-meter').setAttribute('aria-valuetext', ready ? 'Ready. Press K to cast Stormcall.' : `${magic} percent. Charge with axe hits and kills.`);
+    $('magic-meter').setAttribute('aria-valuetext', ready ? 'Ready. Press K to cast Stormcall.' : `${magic} percent. Charge with weapon hits and kills.`);
     $('magic-state').textContent = ready ? 'K · READY' : spell ? 'CASTING' : magic >= 100 ? 'FULL · FINISH MOVE' : magic + '%';
     $('magic').setAttribute('data-ready', String(ready));
   }
@@ -220,8 +222,9 @@
     ctx.globalAlpha = opacity;
     ctx.translate(f.x, f.y - height);
     ctx.scale(f.dir, 1);
-    if (f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
-    atlas.paint(ctx, p.frame, size, opacity, p.breathing && !reducedMotion ? f.clock : null);
+    if (!isHero && f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
+    if (isHero && heroRig) heroRig.paint(ctx, p, size, opacity, reducedMotion ? null : f.clock, weaponId);
+    else atlas.paint(ctx, p.frame, size, opacity);
     ctx.restore();
     if (!isHero && f.hp > 0 && f.hp < f.max) {
       ctx.fillStyle = '#180e0c'; ctx.fillRect(f.x - 35, f.y - size + 20, 70, 4);
@@ -318,6 +321,9 @@
     muted = !muted; $('sound').textContent = muted ? 'SOUND OFF' : 'SOUND ON';
     $('sound').setAttribute('aria-label', muted ? 'Enable sound' : 'Mute sound'); beep(280, .2, 'sine');
   };
+  $('weapon').onchange = event => {
+    if (Object.hasOwn(weapons, event.target.value)) weaponId = event.target.value;
+  };
   $('full').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('stage').requestFullscreen();
   document.querySelectorAll('[data-key]').forEach(button => {
     button.onpointerdown = event => { button.setPointerCapture(event.pointerId); action(button.dataset.key, true); };
@@ -327,29 +333,30 @@
   const loadImage = src => new Promise((resolve, reject) => {
     const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src;
   });
-  const names = ['hero-reactions-v6', 'hero-walk-v4', 'hero-actions-v6', 'hero-extra-motion-v6', 'hero-close-moves-v6', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3'];
+  const names = ['hero-reactions-unarmed-v8', 'hero-walk-unarmed-v8', 'hero-actions-unarmed-v8', 'hero-extra-unarmed-v8', 'hero-close-unarmed-v8', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3'];
   const atlasConfig = {
-    'hero-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .87 },
-    'hero-actions-v6': { columns: 4, rows: 2, frames: 8, scale: 1.16 },
-    'hero-reactions-v6': { columns: 4, rows: 3, frames: 12, scale: .93 },
-    'hero-extra-motion-v6': { columns: 4, rows: 3, frames: 12, scale: 1.2 },
-    'hero-close-moves-v6': { columns: 4, rows: 4, frames: 16, scale: 1.2 },
+    'hero-walk-unarmed-v8': { columns: 4, rows: 1, frames: 4 },
+    'hero-actions-unarmed-v8': { columns: 4, rows: 2, frames: 8, breathRegion: [.5,.275,.3,.11] },
+    'hero-reactions-unarmed-v8': { columns: 4, rows: 3, frames: 12 },
+    'hero-extra-unarmed-v8': { columns: 4, rows: 3, frames: 12 },
+    'hero-close-unarmed-v8': { columns: 4, rows: 3, frames: 12 },
     'enemy-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .88, facing: -1 },
     'enemy-attack-v4': { columns: 4, rows: 1, frames: 4, scale: 1.08, facing: -1 },
     'enemy-charge-v5': { columns: 4, rows: 1, frames: 4, scale: 1.2, facing: -1 },
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
+    loadImage('/art/weapons-v8.png').then(image => { weaponAtlas = new Atlas(decodeChroma(image), { columns: 2, rows: 1, frames: 2 }); }),
     loadImage('/art/storm-strike-v7.png').then(image => { stormTexture = image; }),
     loadImage('/art/valley.png').then(image => { if (running) background = new LivingBackground(image, W, H); }),
     ...names.map(name => loadImage(`/art/${name}.png`).then(image => {
       atlases[name] = new Atlas(decodeChroma(image), atlasConfig[name]);
-      // Prepare the small idle loop while loading, never during active combat.
-      if (name === 'hero-actions-v6' && !reducedMotion && atlases[name].cels?.[0])
-        for (let i = 0; i < 48; i++) atlases[name].breathingCel(atlases[name].cels[0], i * .1 + .00001);
     })),
   ]).then(() => {
     if (!running) return;
+    heroRig = new HeroRig(atlases, weaponAtlas);
+    const idle = atlases['hero-actions-unarmed-v8'];
+    if (!reducedMotion && idle.cels?.[0]) for (let i = 0; i < 48; i++) idle.breathingCel(idle.cels[0], i * .1 + .00001);
     ready = true; $('start').disabled = false; $('start').textContent = '⚔  ENTER THE VALLEY   →';
   }).catch(error => {
     console.error('Animation assets failed to load', error);
@@ -362,7 +369,7 @@
     background?.dispose(); audio?.close();
   };
   window.ashenAxe = {
-    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), kills }), start,
+    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), weapon: weaponId, kills }), start,
     pause: () => action('p', true),
   };
 })();

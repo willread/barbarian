@@ -1,3 +1,5 @@
+Current implementation: see [weapon-rig.md](weapon-rig.md). The v8 body sheets and independent weapon rig supersede the historical weapon-in-body artwork and grab/throw implementation below. Grabs are currently disabled and their cels are omitted from active playback.
+
 # Whole-body animation redraw
 
 ## Breathing, shadows and Stormcall (v7)

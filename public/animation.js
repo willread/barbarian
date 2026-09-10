@@ -56,6 +56,7 @@
       this.scale = options.scale || 1;
       this.remap = options.remap;
       this.facing = options.facing || 1;
+      this.breathRegion = options.breathRegion || [.61, .415, .30, .135];
       this.cels = this.extractWholeCels(image);
     }
 
@@ -106,7 +107,8 @@
           for (let c = 0; c < 4; c++) cel.data[dst + c] = pixels[p * 4 + c];
         }
         ctx.putImageData(cel, 0, 0);
-        return { image: canvas, left: b.left - (frame % this.columns) * this.cellWidth };
+        return { image: canvas, left: b.left - (frame % this.columns) * this.cellWidth,
+          top: b.top - Math.floor(frame / this.columns) * this.cellHeight };
       });
     }
 
@@ -122,8 +124,9 @@
       const context = canvas.getContext('2d'), out = context.createImageData(w, h);
       out.data.set(pixels);
       const inhale = (1 - Math.cos(phase / 48 * TAU)) / 2;
-      for (let y = Math.floor(h * .28); y < Math.ceil(h * .55); y++) for (let x = Math.floor(w * .31); x < Math.ceil(w * .91); x++) {
-        const dx = (x / w - .61) / .30, dy = (y / h - .415) / .135;
+      const [cx, cy, rx, ry] = this.breathRegion;
+      for (let y = Math.floor(h * (cy - ry)); y < Math.ceil(h * (cy + ry)); y++) for (let x = Math.floor(w * (cx - rx)); x < Math.ceil(w * (cx + rx)); x++) {
+        const dx = (x / w - cx) / rx, dy = (y / h - cy) / ry;
         const weight = Math.max(0, 1 - dx * dx - dy * dy) ** 2 * inhale;
         if (!weight) continue;
         const sx = clamp(x - dx * w * .007 * weight, 0, w - 1);
@@ -346,8 +349,8 @@
   }
 
   function pose(f, hero) {
-    const motion = hero ? 'hero-reactions-v6' : 'enemy-motion-v3';
-    const combat = hero ? 'hero-reactions-v6' : 'enemy-combat-v3';
+    const motion = hero ? 'hero-reactions-unarmed-v8' : 'enemy-motion-v3';
+    const combat = hero ? 'hero-reactions-unarmed-v8' : 'enemy-combat-v3';
     const reaction = frame => ({ atlas: combat, frame: hero ? frame - 8 : frame });
     if (f.down) {
       const d = f.down;
@@ -366,17 +369,16 @@
     if (f.attack) {
       const a = f.attack, age = a.age || 0;
       if (a.type === 'charge' || a.type === 'enemyCharge')
-        return hero ? { atlas: 'hero-extra-motion-v6', frame: age < 3 ? 4 : 5 + Math.min(2, Math.floor((age - 3) / 10)) } : { atlas: 'enemy-charge-v5', frame: Math.min(3, Math.floor(age / 9)) };
-      if (a.type === 'air') return { atlas: 'hero-extra-motion-v6', frame: age < 4 ? 8 : age < 7 ? 9 : age < 9 ? 10 : 11 };
-      if (a.type === 'pommel') return { atlas: 'hero-close-moves-v6', frame: age < 7 ? 0 : age < 13 ? 1 : age <= 17 ? 2 : 3 };
-      if (a.type === 'throw') return { atlas: 'hero-close-moves-v6', frame: 4 + Math.min(3, Math.floor(Math.max(0, age - 2) / 14)) };
-      if (a.type === 'back') return { atlas: 'hero-close-moves-v6', frame: age < 14 ? 8 : age < 27 ? 9 : age <= 32 ? 10 : 11 };
-      if (a.type === 'kick') return { atlas: 'hero-close-moves-v6', frame: age < 8 ? 12 : age < 15 ? 13 : age <= 20 ? 14 : 15 };
+        return hero ? { atlas: 'hero-extra-unarmed-v8', frame: age < 3 ? 4 : 5 + Math.min(2, Math.floor((age - 3) / 10)) } : { atlas: 'enemy-charge-v5', frame: Math.min(3, Math.floor(age / 9)) };
+      if (a.type === 'air') return { atlas: 'hero-extra-unarmed-v8', frame: age < 4 ? 8 : age < 7 ? 9 : age < 9 ? 10 : 11 };
+      if (a.type === 'pommel') return { atlas: 'hero-close-unarmed-v8', frame: age < 7 ? 0 : age < 13 ? 1 : age <= 17 ? 2 : 3 };
+      if (a.type === 'back') return { atlas: 'hero-close-unarmed-v8', frame: age < 14 ? 4 : age < 27 ? 5 : age <= 32 ? 6 : 7 };
+      if (a.type === 'kick') return { atlas: 'hero-close-unarmed-v8', frame: age < 8 ? 8 : age < 15 ? 9 : age <= 20 ? 10 : 11 };
       if (hero) {
         // Keep the contact silhouette visible throughout the active window.
         const frame = a.type === 'whiff' ? Math.min(3, Math.floor(Math.max(0, age - 2) / 5)) :
           age < a.from ? 0 : age <= a.to ? 1 : age < a.ticks - 2 ? 2 : 3;
-        return { atlas: 'hero-actions-v6', frame: 4 + frame };
+        return { atlas: 'hero-actions-unarmed-v8', frame: 4 + frame };
       }
       return { atlas: 'enemy-attack-v4', frame: age < a.from - 8 ? 0 : age < a.from ? 1 : age <= a.to ? 2 : 3 };
     }
@@ -386,11 +388,11 @@
       return { atlas: motion, frame: hero ? frame - 4 : frame };
     }
     if (f.moving) {
-      if (hero && f.running) return { atlas: 'hero-extra-motion-v6', frame: Math.floor(f.stride * 4) % 4 };
-      return { atlas: hero ? 'hero-walk-v4' : 'enemy-walk-v4', frame: Math.floor(f.stride * 4) % 4 };
+      if (hero && f.running) return { atlas: 'hero-extra-unarmed-v8', frame: Math.floor(f.stride * 4) % 4 };
+      return { atlas: hero ? 'hero-walk-unarmed-v8' : 'enemy-walk-v4', frame: Math.floor(f.stride * 4) % 4 };
     }
     // Complete painted poses. No limb segmentation, mesh warping, or ghosted crossfade.
-    return hero ? { atlas: 'hero-actions-v6', frame: 0, breathing: true } :
+    return hero ? { atlas: 'hero-actions-unarmed-v8', frame: 0, breathing: true } :
       { atlas: 'enemy-walk-v4', frame: 0 };
   }
 

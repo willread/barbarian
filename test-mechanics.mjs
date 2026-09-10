@@ -38,7 +38,7 @@ for(let tick=1;tick<=18;tick++) {
 }
 assert.equal(e.hp,14);assert.equal(e.hurtTicks,36);assert.equal(h.attack,null);
 M.begin(h,'slash');for(let i=0;i<18;i++)M.tickAttack(h,[e],(target,a)=>M.hurt(target,a,false));assert.equal(e.hurtTicks,61);
-assert.equal(M.selectStrike(h,[e]),'pommel');e.x=16*M.SCALE;assert.equal(M.selectStrike(h,[e]),'throw');
+assert.equal(M.selectStrike(h,[e]),'pommel');e.x=16*M.SCALE;assert.equal(M.selectStrike(h,[e]),'pommel');assert.equal(M.begin(h,'throw'),false);assert.equal(M.attacks.throw,undefined);
 for(const [x,y,selected] of [[43,7,'slash'],[44,0,'whiff'],[43,8,'whiff'],[-20,0,'whiff']]) {
   e.x=x*M.SCALE;e.y=y*M.SCALE;e.stagger=0;assert.equal(M.selectStrike(h,[e]),selected);
 }
