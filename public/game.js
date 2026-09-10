@@ -98,8 +98,10 @@
     const isHero = e === hero;
     e.hp = Math.max(0, e.hp - attack.damage * (isHero ? 100 / 48 : 1));
     if (!attack.continuous || e.hp <= 0) {
-      blood.hit(e, attack.direction || 1, e.hp <= 0);
+      const impact = { ...e };
       M.hurt(e, attack, isHero, attacker);
+      // Keep the wound's original height, but inherit the launch just applied.
+      blood.hit({ ...impact, down: e.down || impact.down }, attack.direction || 1, e.hp <= 0);
       burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
       shake = attack.knock ? 5 : 2; beep(isHero ? 60 : 100);
     }

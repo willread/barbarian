@@ -29,25 +29,27 @@
     }
     hit(f,direction,fatal=false) {
       const count=(fatal?36:18)+Math.floor(Math.random()*(fatal?17:11));
-      // Read pre-impact motion in ROM units, then convert to world pixels/sec.
+      // Knockback uses the newly applied launch; ordinary hits use prior motion.
       const units=window.AshenMechanics.SCALE/window.AshenMechanics.STEP;
       const horizontal=f.down?(f.down.ground?0:f.down.vx):(f.velocityX||0);
       const vertical=f.down?(f.down.ground?0:f.down.vz):(f.air?.vz??f.attack?.vz??0);
-      const carryX=horizontal*units*.6,carryY=(f.velocityY||0)*units*.6,carryZ=-vertical*units*.45;
-      const force=80+Math.random()*120,fan=.45+Math.random()*.55,lift=35+Math.random()*90;
+      const launched=!!f.down&&!f.down.ground;
+      const carryX=horizontal*units*(launched?1:.6),carryY=(f.velocityY||0)*units*.6,carryZ=-vertical*units*(launched?1:.45);
+      const force=(launched?25:80)+Math.random()*(launched?65:120),fan=.45+Math.random()*.55,lift=(launched?10:35)+Math.random()*(launched?35:90);
       const sourceHeight=85+Math.random()*50+(f.height||0)*window.AshenMechanics.SCALE;
-      this.stain(f.x,f.y,fatal?42:19);
+      this.stain(f.x,f.y,launched?7:fatal?42:19);
       for(let i=0;i<count;i++) {
         const angle=(Math.random()-.5)*fan,speed=force*(.5+Math.random()*.8);
         this.drops.push({x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*12,z:sourceHeight+(Math.random()-.5)*24,
           vx:carryX+direction*Math.cos(angle)*speed,vy:carryY+Math.sin(angle)*speed*.6,vz:carryZ+lift+(Math.random()-.5)*100,
+          gravity:launched?.25*units/window.AshenMechanics.STEP:850,drag:launched?0:.8,
           r:(fatal?5:3.5)+Math.random()*(fatal?5:4)});
       }
       if(this.drops.length>700)this.drops.splice(0,this.drops.length-700);
     }
     step(dt,fighters) {
       this.drops=this.drops.filter(d=>{
-        d.x+=d.vx*dt;d.y+=d.vy*dt;d.z+=d.vz*dt;d.vz-=850*dt;d.vx*=Math.exp(-dt*.8);
+        d.x+=d.vx*dt;d.y+=d.vy*dt;d.z+=d.vz*dt;d.vz-=d.gravity*dt;d.vx*=Math.exp(-dt*d.drag);
         if(d.z<=0){this.stain(d.x,Math.max(540,Math.min(790,d.y)),d.r*2.3);return false}return true;
       });
       for(let i=0;i<this.wet.length;i++)this.wet[i]=Math.max(0,this.wet[i]-dt/65);
@@ -69,7 +71,7 @@
     drawGround(ctx){ctx.save();ctx.globalCompositeOperation='multiply';ctx.drawImage(this.floor,0,0);ctx.restore()}
     drawAir(ctx){
       ctx.save();ctx.lineCap='round';
-      for(const d of this.drops){ctx.strokeStyle='#65070c';ctx.lineWidth=d.r;ctx.beginPath();ctx.moveTo(d.x,d.y-d.z);ctx.lineTo(d.x-d.vx*.014,d.y-d.z+d.vz*.014);ctx.stroke()}
+      for(const d of this.drops){ctx.strokeStyle='#43060a';ctx.lineWidth=d.r;ctx.beginPath();ctx.moveTo(d.x,d.y-d.z);ctx.lineTo(d.x-d.vx*.014,d.y-d.z+d.vz*.014);ctx.stroke()}
       ctx.restore();
     }
   }
