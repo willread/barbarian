@@ -39,6 +39,27 @@ sandbox.document.createElement=()=>({getContext:()=>({createImageData:(w,h)=>({d
 const unpacked=new A.Atlas({width:12,height:8,getContext:()=>({getImageData:()=>({data:texture})})},{columns:2,rows:1,frames:2});
 assert.equal(unpacked.cels[0].image.width,8);assert.equal(unpacked.cels[1].image.width,4);
 sandbox.document.createElement=createElement;
+// Dark key material and mixed green edge spill must not survive texture upload.
+const keyedPixels=new Uint8ClampedArray([3,60,5,255, 20,240,15,255, 85,104,75,255, 170,115,40,255, 5,230,4,0]);
+sandbox.document.createElement=()=>({getContext:()=>({drawImage(){},getImageData:()=>({data:keyedPixels}),putImageData(){}})});
+A.decodeChroma({width:5,height:1});
+assert.equal(keyedPixels[3],0,'dark green must be transparent');
+assert.equal(keyedPixels[7],0,'bright green must be transparent');
+assert.equal(keyedPixels[9],85,'mixed edge must have no green spill');
+assert.ok(keyedPixels[11]>0&&keyedPixels[11]<255,'mixed edge retains soft coverage');
+assert.deepEqual([...keyedPixels.slice(12,16)],[170,115,40,255],'bronze remains unchanged');
+assert.equal(keyedPixels[19],0,'source alpha remains transparent');
+sandbox.document.createElement=createElement;
+// Hurt, recovery, knockdown and jumping must all use the current hero identity.
+for(const state of [
+  {recoil:1,hurtAge:0}, {recoil:1,hurtAge:11}, {recovering:50},
+  {down:{ground:0,vz:-2}}, {down:{ground:30,vz:0}},
+  {jump:.2,air:{age:12,vz:-1}}, {jump:.6,air:{age:40,vz:2}},
+]) {
+  const p=A.pose({hp:100,recoil:0,jump:null,...state},true);
+  assert.equal(p.atlas,'hero-reactions-v6');
+  assert.ok(p.frame>=0&&p.frame<12);
+}
 for(const period of [3,8,24,48]){const a=A.flowPhase(.7,period),b=A.flowPhase(48+.7,period);assert.ok(Math.abs(a.a-b.a)<1e-12);assert.ok(Math.abs(a.blend-b.blend)<1e-12)}
 assert.equal(A.jumpHeight(0),0);assert.equal(A.jumpHeight(.96),0);assert.ok(A.jumpHeight(.4083)>118);
 // A melee strike cannot damage anything before the traced active window.

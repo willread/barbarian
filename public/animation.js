@@ -12,11 +12,17 @@
     ctx.drawImage(image, 0, 0);
     const pixels = ctx.getImageData(0, 0, image.width, image.height), data = pixels.data;
     for (let i = 0; i < data.length; i += 4) {
-      const excess = data[i + 1] - Math.max(data[i], data[i + 2]);
-      if (excess > 20 && data[i + 1] > 90) {
-        const key = clamp((excess - 20) / 80);
+      if (!data[i + 3]) continue;
+      const neutral = Math.max(data[i], data[i + 2]);
+      const excess = data[i + 1] - neutral;
+      // Key saturation as well as brightness: dark green in hair, fingers and
+      // blade cutouts otherwise survives as opaque background fragments.
+      if (excess > 8) {
+        const saturation = excess / Math.max(1, data[i + 1]);
+        const key = Math.max(clamp((excess - 8) / 64), clamp((saturation - .35) / .25));
         data[i + 3] = Math.round(data[i + 3] * (1 - key));
-        data[i + 1] = Math.min(data[i + 1], Math.max(data[i], data[i + 2]) + 12);
+        // Remove spill entirely, including partially transparent edge pixels.
+        data[i + 1] = neutral;
       }
     }
     ctx.putImageData(pixels, 0, 0);
@@ -307,52 +313,52 @@
   }
 
   function pose(f, hero) {
-    const motion = hero ? 'hero-motion-v3' : 'enemy-motion-v3';
-    const combat = hero ? 'hero-combat-v3' : 'enemy-combat-v3';
+    const motion = hero ? 'hero-reactions-v6' : 'enemy-motion-v3';
+    const combat = hero ? 'hero-reactions-v6' : 'enemy-combat-v3';
+    const reaction = frame => ({ atlas: combat, frame: hero ? frame - 8 : frame });
     if (f.down) {
       const d = f.down;
       const frame = d.ground ? (f.hp > 0 && d.ground <= 20 ? (d.ground > 10 ? 14 : 13) : 15) : d.vz < 0 ? 13 : 14;
-      return { atlas: combat, frame };
+      return reaction(frame);
     }
     if (f.hp <= 0) {
       const duration = hero ? clips.heroDeath.duration : clips.enemyDeath.duration;
-      return { atlas: combat, frame: 12 + Math.min(3, Math.floor(f.death / duration * 4)) };
+      return reaction(12 + Math.min(3, Math.floor(f.death / duration * 4)));
     }
     if (f.recoil > 0) {
       const progress = clamp((f.hurtAge || 0) / (hero ? 11 : 25));
-      return { atlas: combat, frame: 8 + Math.min(3, Math.floor(progress * 4)) };
+      return reaction(8 + Math.min(3, Math.floor(progress * 4)));
     }
-    if (f.recovering > 0) return { atlas: combat, frame: 11 };
+    if (f.recovering > 0) return reaction(11);
     if (f.attack) {
       const a = f.attack, age = a.age || 0;
       if (a.type === 'charge' || a.type === 'enemyCharge')
-        return hero ? { atlas: 'hero-extra-motion-v5', frame: age < 3 ? 4 : 5 + Math.min(2, Math.floor((age - 3) / 10)) } : { atlas: 'enemy-charge-v5', frame: Math.min(3, Math.floor(age / 9)) };
-      if (a.type === 'air') return { atlas: 'hero-extra-motion-v5', frame: age < 4 ? 8 : age < 7 ? 9 : age < 9 ? 10 : 11 };
-      if (a.type === 'pommel') return { atlas: 'hero-close-moves-v5', frame: age < 7 ? 0 : age < 13 ? 1 : age <= 17 ? 2 : 3 };
-      if (a.type === 'throw') return { atlas: 'hero-close-moves-v5', frame: 4 + Math.min(3, Math.floor(Math.max(0, age - 2) / 14)) };
-      // Cel 9 has a malformed weapon, so it is deliberately excluded.
-      if (a.type === 'back') return { atlas: 'hero-close-moves-v5', frame: age < 27 ? 8 : age <= 32 ? 10 : 11 };
-      if (a.type === 'kick') return { atlas: 'hero-close-moves-v5', frame: age < 8 ? 12 : age < 15 ? 13 : age <= 20 ? 14 : 15 };
+        return hero ? { atlas: 'hero-extra-motion-v6', frame: age < 3 ? 4 : 5 + Math.min(2, Math.floor((age - 3) / 10)) } : { atlas: 'enemy-charge-v5', frame: Math.min(3, Math.floor(age / 9)) };
+      if (a.type === 'air') return { atlas: 'hero-extra-motion-v6', frame: age < 4 ? 8 : age < 7 ? 9 : age < 9 ? 10 : 11 };
+      if (a.type === 'pommel') return { atlas: 'hero-close-moves-v6', frame: age < 7 ? 0 : age < 13 ? 1 : age <= 17 ? 2 : 3 };
+      if (a.type === 'throw') return { atlas: 'hero-close-moves-v6', frame: 4 + Math.min(3, Math.floor(Math.max(0, age - 2) / 14)) };
+      if (a.type === 'back') return { atlas: 'hero-close-moves-v6', frame: age < 14 ? 8 : age < 27 ? 9 : age <= 32 ? 10 : 11 };
+      if (a.type === 'kick') return { atlas: 'hero-close-moves-v6', frame: age < 8 ? 12 : age < 15 ? 13 : age <= 20 ? 14 : 15 };
       if (hero) {
         // Keep the contact silhouette visible throughout the active window.
         const frame = a.type === 'whiff' ? Math.min(3, Math.floor(Math.max(0, age - 2) / 5)) :
           age < a.from ? 0 : age <= a.to ? 1 : age < a.ticks - 2 ? 2 : 3;
-        return { atlas: 'hero-actions-v4', frame: 4 + frame };
+        return { atlas: 'hero-actions-v6', frame: 4 + frame };
       }
       return { atlas: 'enemy-attack-v4', frame: age < a.from - 8 ? 0 : age < a.from ? 1 : age <= a.to ? 2 : 3 };
     }
     if (f.jump !== null) {
       const frame = f.air ? (f.air.age <= 2 ? 12 : f.air.land ? 15 : f.air.vz < 0 ? 13 : 14) :
         f.jump < clips.jump.launch ? 12 : f.jump < .18 ? 13 : f.jump < clips.jump.land ? 14 : 15;
-      return { atlas: motion, frame };
+      return { atlas: motion, frame: hero ? frame - 4 : frame };
     }
     if (f.moving) {
-      if (hero && f.running) return { atlas: 'hero-extra-motion-v5', frame: Math.floor(f.stride * 4) % 4 };
+      if (hero && f.running) return { atlas: 'hero-extra-motion-v6', frame: Math.floor(f.stride * 4) % 4 };
       return { atlas: hero ? 'hero-walk-v4' : 'enemy-walk-v4', frame: Math.floor(f.stride * 4) % 4 };
     }
     // Complete painted poses. No limb segmentation, mesh warping, or ghosted crossfade.
     const breath = [0, 1, 2, 3, 2, 1];
-    return hero ? { atlas: 'hero-actions-v4', frame: breath[Math.floor(f.clock / .8) % breath.length] } :
+    return hero ? { atlas: 'hero-actions-v6', frame: breath[Math.floor(f.clock / .8) % breath.length] } :
       { atlas: 'enemy-walk-v4', frame: 0 };
   }
 

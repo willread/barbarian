@@ -205,7 +205,7 @@
     ctx.translate(f.x, f.y - height);
     ctx.scale(f.dir, 1);
     if (f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
-    atlas.paint(ctx, reducedMotion && !f.moving && !f.attack && f.jump === null && f.hp > 0 && f.recoil <= 0 ? 0 : p.frame, size, opacity);
+    atlas.paint(ctx, reducedMotion && !f.moving && !f.attack && !f.down && !f.recovering && f.jump === null && f.hp > 0 && f.recoil <= 0 ? 0 : p.frame, size, opacity);
     ctx.restore();
     if (!isHero && f.hp > 0 && f.hp < f.max) {
       ctx.fillStyle = '#180e0c'; ctx.fillRect(f.x - 35, f.y - size + 20, 70, 4);
@@ -295,13 +295,13 @@
   const loadImage = src => new Promise((resolve, reject) => {
     const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src;
   });
-  const names = ['hero-motion-v3', 'hero-combat-v3', 'hero-walk-v4', 'hero-actions-v4', 'hero-extra-motion-v5', 'hero-close-moves-v5', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3'];
+  const names = ['hero-reactions-v6', 'hero-walk-v4', 'hero-actions-v6', 'hero-extra-motion-v6', 'hero-close-moves-v6', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3'];
   const atlasConfig = {
     'hero-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .87 },
-    'hero-actions-v4': { columns: 4, rows: 2, frames: 8, scale: 1.16 },
-    'hero-combat-v3': { scale: 1.2 },
-    'hero-extra-motion-v5': { columns: 4, rows: 3, frames: 12, scale: 1.2 },
-    'hero-close-moves-v5': { columns: 4, rows: 4, frames: 16, scale: 1.2 },
+    'hero-actions-v6': { columns: 4, rows: 2, frames: 8, scale: 1.16 },
+    'hero-reactions-v6': { columns: 4, rows: 3, frames: 12, scale: .93 },
+    'hero-extra-motion-v6': { columns: 4, rows: 3, frames: 12, scale: 1.2 },
+    'hero-close-moves-v6': { columns: 4, rows: 4, frames: 16, scale: 1.2 },
     'enemy-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .88, facing: -1 },
     'enemy-attack-v4': { columns: 4, rows: 1, frames: 4, scale: 1.08, facing: -1 },
     'enemy-charge-v5': { columns: 4, rows: 1, frames: 4, scale: 1.2, facing: -1 },

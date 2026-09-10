@@ -1,5 +1,13 @@
 # Whole-body animation redraw
 
+## Hero consistency repair (v6)
+
+The current hero uses `hero-actions-v6.png`, `hero-close-moves-v6.png`, and `hero-extra-motion-v6.png` for corrected rigid axe construction. `hero-reactions-v6.png` replaces both older hero sheets used for damage, collapse and jumping: four hurt/recovery cels, four collapse cels, then four jump cels. The identity reference is the established idle hero, including his face, short fur skirt, round belt buckle, bronze bracers and fur-cuffed boots. Each pose remains a single complete painting.
+
+The runtime chroma decoder now removes dark saturated key pixels as well as bright green, and removes the green excess from partially transparent edge pixels. It preserves existing alpha. This addresses dark green pockets and fringe spill that the former brightness threshold left behind. Reduced-motion playback also retains the selected recovery/knockdown pose instead of forcing cel zero.
+
+Exact built-in image-generation edits, references and final asset paths are recorded in `hero-consistency-art-prompts.json`. Artwork is checked through the actual texture decoder and atlas renderer on alternating dark and light backgrounds before the production build. The earlier tables below document prior versions rather than the current hero damage assets.
+
 The v3 animation pipeline replaces the segmented PaintedRig with complete painted cels. Each displayed pose is one sprite draw. There are no separately transformed thighs, shins, feet, torsos, or weapons, and no crossfade between different silhouettes.
 
 ## Extracted references
