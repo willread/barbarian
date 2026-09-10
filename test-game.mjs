@@ -92,11 +92,13 @@ events.blur();const before=G.status();step(20);assert.deepEqual(G.status(),befor
 G.start();T.enemies.forEach((e,i)=>{e.x=650+i*200;e.y=660;e.aiRest=1000});
 const enemyHP=T.enemies[0].hp, castX=T.hero.x, enemyClock=T.enemies[0].clock;
 press('d');press('k');step(5);assert.equal(G.status().magic,97.5);
-assert.equal(T.enemies[0].hp,enemyHP);
-step(1);assert.equal(T.enemies[0].hp,enemyHP-2);
+assert.ok(Math.abs(T.enemies[0].hp-(enemyHP-5/9))<1e-9);
+const hpBeforeTick=T.enemies[0].hp;
+step(1);assert.ok(Math.abs(T.enemies[0].hp-(hpBeforeTick-1/9))<1e-9,'damage flows every tick');
+assert.equal(T.enemies[0].hurtTicks,0,'channel does not replay hit reactions');
 assert.ok(T.hero.x>castX,'player moves during the spell');
 assert.ok(T.enemies[0].clock>enemyClock,'enemy simulation continues during the spell');
-release('d');step(18);assert.equal(T.enemies[0].hp,enemyHP-4,'held spell keeps attacking');
+release('d');step(18);assert.ok(Math.abs(T.enemies[0].hp-(enemyHP-24/9))<1e-9,'held spell deals steady damage');
 release('k');assert.equal(G.status().channeling,false,'release stops immediately');
 const retained=G.status().magic, retainedHP=T.enemies[0].hp;
 step(30);assert.equal(G.status().magic,retained);assert.equal(T.enemies[0].hp,retainedHP);

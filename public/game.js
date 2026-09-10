@@ -95,9 +95,11 @@
     if (e.hp <= 0) return;
     const isHero = e === hero;
     e.hp = Math.max(0, e.hp - attack.damage * (isHero ? 100 / 48 : 1));
-    M.hurt(e, attack, isHero, attacker);
-    burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
-    shake = attack.knock ? 5 : 2; beep(isHero ? 60 : 100);
+    if (!attack.continuous || e.hp <= 0) {
+      M.hurt(e, attack, isHero, attacker);
+      burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
+      shake = attack.knock ? 5 : 2; beep(isHero ? 60 : 100);
+    }
     // No global hit-stop: source action and stagger windows run continuously.
     if (e.hp <= 0) {
       e.death = 0;
@@ -136,14 +138,11 @@
       spell ??= { age: 0, targets: [] };
       spell.age++;
       // Fixed-step channel: a full meter lasts 200 ticks (~3.34 seconds).
-      // First impact at 0.10s, then a pulse every 0.30s while held.
+      // Continuous damage, without restarting stagger, impact flashes or sound.
       magic = Math.max(0, magic - .5);
       spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
-      if (spell.age % 18 === 6) {
-        for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
-          damage(e, { damage: 2, knock: false, magic: true, direction: e.x > hero.x ? 1 : -1 }, hero);
-        beep(42, .16, 'sine');
-      }
+      for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
+        damage(e, { damage: 1 / 9, knock: false, magic: true, continuous: true, direction: e.x > hero.x ? 1 : -1 }, hero);
       if (magic === 0) spell = null;
     } else spell = null;
     tickActor(hero, dt);
@@ -231,22 +230,23 @@
 
   function drawSpell() {
     if (!spell || !stormTexture) return;
-    const age = spell.age % 18;
-    const frame = age < 3 ? 0 : age < 6 ? 1 : age < 8 ? 2 : age < 10 ? 3 : age < 12 ? 4 : age < 14 ? 5 : age < 16 ? 6 : 7;
+    // Sustain the painted energy column instead of replaying its strike/debris
+    // sequence. A small continuous light variation gives it life without flashes.
+    const strength = smooth(spell.age / 6);
     const cw = stormTexture.width / 4, ch = stormTexture.height / 2;
     ctx.save(); ctx.globalCompositeOperation = 'screen';
-    const displayed = reducedMotion ? Math.max(5, frame) : frame;
+    const displayed = 2;
     for (const target of spell.targets) {
       const height = 690, width = height * cw / ch;
-      const baseline = displayed < 4 ? .907 : .78;
-      ctx.globalAlpha = (reducedMotion ? .55 : .9) * (age > 14 ? (18 - age) / 4 : 1);
+      const baseline = .907;
+      ctx.globalAlpha = strength * (reducedMotion ? .45 : .72 + .025 * Math.sin(clock * 2.4 + target.id));
       ctx.drawImage(stormTexture, displayed % 4 * cw, Math.floor(displayed / 4) * ch, cw, ch,
         target.x - width / 2, target.y - height * baseline, width, height);
-      if (age >= 6 && age < 13) {
+      {
         ctx.save(); ctx.translate(target.x, target.y); ctx.scale(1, .3);
         const light = ctx.createRadialGradient(0, 0, 0, 0, 0, 140);
         light.addColorStop(0, '#ffe6a855'); light.addColorStop(1, '#ffe6a800');
-        ctx.globalAlpha *= (13 - age) / 7; ctx.fillStyle = light;
+        ctx.fillStyle = light;
         ctx.fillRect(-140, -140, 280, 280); ctx.restore();
       }
     }
