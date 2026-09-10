@@ -1,0 +1,141 @@
+{
+  "tool": "built-in image_gen",
+  "background": "Opaque RGB chroma green #00FF00; no alpha",
+  "assets": [
+    {
+      "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-a6e36800-de8b-4a50-8400-48b279ab4272.png",
+      "prompt": "Use case: style-transfer. Perform a POSE-LOCKED PAINTOVER of this exact reference image. Keep its composition EXACTLY: 4 columns 1 row, four complete male warrior sprites on pure chroma green. Preserve each of the FOUR DIFFERENT skeletal poses pixel-for-pixel in silhouette proportions, joint locations, leg angles and relative foot positions. Trace these outlines first: almost FRONT-FACING chest with face slightly turned RIGHT, low compact walking steps, swinging foot tucked underneath body. Knees remain below pelvis, NEVER raised to waist. Pose1 one leg crosses closely ahead with other boot tucked; pose2 legs nearly together/passing; pose3 both legs spread with LEFT foot back and RIGHT foot planted ahead; pose4 other foot tucked behind. Keep these unique silhouette differences exactly as the reference, do not substitute four variants of one pose. Preserve source weapon diagonal from LOW LEFT HIP to HIGH RIGHT SHOULDER: hand remains down by LEFT hip, axe head replaces sword tip near RIGHT shoulder. Free hand hangs by RIGHT hip. Do NOT hold axe horizontally, do NOT add two-handed grip. Change ONLY rendering medium and character surface identity: realistic dimensional oil-painted fantasy barbarian with long black hair, muscular bronze-tan chest, bronze bracers, bronze belt, brown fur loincloth, brown fur-top leather boots, bronze double-blade axe instead of sword. Character surface painting fits original joint positions, not vice versa. No blue costume. Keep source almost frontal torso. Do not generate side profile, running, high-knee marching, detached legs or duplicate limbs. SAME green background, no text/grid/shadow/checkerboard. Output wide 1536\u00d7576 or equivalent with exact same proportions and 4-cell layout.",
+      "references": [
+        "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/ax-battler-exact-walk-guide.png"
+      ],
+      "assessment": "Much closer: frontal chest, diagonal axe across chest, low feet and clear narrow/open pose sequence. Not literal pixel registration. Face identity changed slightly without old art reference.",
+      "layout": "4 columns 1 row",
+      "facing": "right",
+      "background": "solid green",
+      "name": "hero-exact-walk",
+      "project_asset": "public/art/hero-walk-v4.png"
+    },
+    {
+      "name": "enemy-exact-walk",
+      "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-fae8da22-56ae-4b5b-8a81-c4012d94f40a.png",
+      "layout": [
+        4,
+        1
+      ],
+      "facing": "left",
+      "prompt": "Use case: style-transfer. PRIMARY EDIT TARGET image1 is an exact four-frame walk strip extracted from a game. Make a POSE-LOCKED PAINTOVER. Preserve image1's exact four silhouettes, crouched joint positions and proportions, head tilt, hunched chest, bent elbows, hand positions, upright club angle and especially low alternating foot positions. TRACE each pose outline before rendering. Four columns ONE ROW, identical scale, facing LEFT, compact cautious stepping exactly like original. Image2 is identity/material ONLY: replace image1's blue club soldier with our original bronze horned armored skull swordsman, dimensional worn bronze plate and chainmail, dark brown tattered cape, steel longsword held UPRIGHT exactly where club is. Preserve original pose rather than copying any pose from image2. Skull tilt and shoulders follow source. Free hand low beside knee as source. Realistic oil-painted metallic bronze and bone, warm rimlight, no pixel art or teal. Pose1 left-side foot forward planted, other foot behind; pose2 both feet lower near ground, bent knees; pose3 crossed compact low step, pose4 opposite low swinging foot, exactly the reference. NO exaggerated high-knee march, NO sprint stride, NO extra limbs or detached parts. Keep a full-body painted redraw in each cell with naturally connected two legs. Perfectly solid chroma GREEN #00FF00 background, NO text/grid/labels/shadows/checkerboard. Wide 1536x576 or equivalent, exact 4x1 layout, entire figures contained.",
+      "references": [
+        "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/enemy-exact-walk-guide.png",
+        "C:/Users/will/Documents/will/barbarian/public/art/enemy.png"
+      ],
+      "assessment": "Compact crouched staging and low foot sequence closely follows guide; full armor changes precise silhouette.",
+      "project_asset": "public/art/enemy-walk-v4.png"
+    },
+    {
+      "name": "hero-exact-actions",
+      "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-64fc6903-eea0-47b5-ae88-e28212460373.png",
+      "layout": [
+        4,
+        2
+      ],
+      "facing": "right",
+      "attackContactFrame": 5,
+      "prompt": "Use case: style-transfer. PRIMARY EDIT TARGET image1 is exact ROM idle and slash pose sheet. Make a POSE-LOCKED PAINTOVER of every complete character. SECOND image is ONLY the already accepted character identity and realistic oil-painted materials reference: preserve its face long black hair bronze-tan chest bronze bracers belt fur loincloth brown fur boots ornate bronze axe. Change ONLY image1's rendering and identity, keeping all pose silhouettes/joint angles/body sizes/foot placements exactly. EXACT 4 columns by 2 rows = EIGHT full-body paintings on solid chroma GREEN #00FF00. TOP ROW all FOUR identical standing guards traced from image1: chest mostly FRONT, head toward RIGHT, two hands at LEFT shoulder holding weapon diagonally up-left; legs apart in same stance, very tiny breathing changes only. Axe replaces sword but shaft follows EXACT sword angle and grip. BOTTOM ROW columns1-4 trace literal original sequence: 1 hands raised near left shoulder, weapon diagonal up-left, slight ready step; 2 decisive forward slash toward RIGHT, hands extended to right at lower chest height, weight shift follows original; 3 low rightwards followthrough with same literal source knee and foot placement; 4 recovered raised left-shoulder guard exactly as original. DO NOT invent overhead full-body lunge or broad running stride. Preserve original restrained compact motion. No detached legs or extra limbs: every frame newly painted as one complete anatomical body. Keep identical scale across all eight cells and corresponding natural baseline; no clip or cut off axe, modest overhang green okay. Remove pixel sword slash EFFECT LINES, only solid real axe remains; no trails, particles, text, grid, checkerboard or shadows. 1536x1024 or equivalent SAME 3:2 aspect as target, 4x2 layout. Accurate SOURCE pose tracing has priority over dramatic posing.",
+      "references": [
+        "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/ax-battler-exact-actions-guide.png",
+        "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-a6e36800-de8b-4a50-8400-48b279ab4272.png"
+      ],
+      "assessment": "Stable identical idle and compact literal attack staging. Grip/joint angle slightly stylized versus source.",
+      "project_asset": "public/art/hero-actions-v4.png"
+    },
+    {
+      "name": "enemy-exact-attack",
+      "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-6f7c4fc4-c946-4d1c-8d84-cd8f72f973f7.png",
+      "layout": [
+        4,
+        1
+      ],
+      "facing": "left (last frame back-facing followthrough)",
+      "attackContactFrame": 2,
+      "prompt": "Use case: style-transfer. PRIMARY EDIT TARGET image1 is four exact enemy attack animation keys. Make a POSE-LOCKED PAINTOVER of these four complete figures, trace each original silhouette/joint positions/body rotation/foot placement/weapon grip and angle literally before rendering. FOUR columns ONE ROW. Secondary image2 provides ONLY our accepted character identity and realistic painted bronze/bone/cape surfaces, NEVER its walking poses. Preserve original hunched compact body and source motion: FRAME1 crouched anticipation, shoulders leaning LEFT and low, hands at pelvis, weapon diagonal up-right BEHIND the body; FRAME2 torso twisting, bent arm near left shoulder, weapon held horizontally BEHIND toward RIGHT at waist/chest height; FRAME3 decisive forward swinging CONTACT toward LEFT, both arms extended LEFT at chest height and weapon projecting LEFT, source torso leans slightly back; FRAME4 literally source BACK-FACING followthrough, back of helmet and back armor visible, weapon held to RIGHT behind torso, same source staggered knees and feet. Overall attacks LEFT. Final back view is intentional, do NOT force every frame to face camera. Replace club with steel longsword using EXACT same handle/grip/swing angles. Our character is horned skull-faced undead with two curved horns on bronze helm, dimensional battered bronze plate and chainmail, armored boots, tattered dark brown cape. Realistic oil-painted warm rimlight on metal/bone, dark bronze muted brown. Keep cape narrow enough to reveal source torso rotation and not obscure feet. NO invented overhead attack, NO generic forward thrust, NO huge lunge, NO running, NO detached limbs or extra legs. Every cell a complete anatomically connected whole-body redraw at identical scale, original compact leg staging. Perfectly solid chroma GREEN #00FF00 backdrop; no text/grid/labels/shadows/checkerboard/effects/trails. Wide 1536x512 or equivalent, exact 3:1 ratio and 4x1 layout. Fit full figure and entire sword within green spacing, no clipping. SOURCE pose fidelity has priority.",
+      "references": [
+        "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/enemy-exact-attack-guide.png",
+        "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-fae8da22-56ae-4b5b-8a81-c4012d94f40a.png"
+      ],
+      "assessment": "Crouched anticipation, back-directed horizontal rotation, left contact, back-facing followthrough match major guide stages. Leg stance slightly wider than original; no literal pixel registration.",
+      "project_asset": "public/art/enemy-attack-v4.png"
+    }
+  ],
+  "supporting_asset_manifest": {
+    "manifest": {
+      "mode": "built-in image_gen",
+      "requestedDimensions": [
+        2048,
+        2048
+      ],
+      "actualDimensions": [
+        1254,
+        1254
+      ],
+      "actualAlpha": false,
+      "background": "Opaque RGB chroma green; parent decodes",
+      "layout": "4 columns x 4 rows; extract connected whole-figure bounds to retain weapon overhang",
+      "assets": [
+        {
+          "name": "hero-motion-v3",
+          "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-96d97d85-9f54-4975-a60f-e397a51d478b.png",
+          "facing": "right",
+          "sourcePrompt": "heroMotionPrompt",
+          "revisionPrompt": "heroMotionEditPrompt",
+          "project_asset": "public/art/hero-motion-v3.png",
+          "used_frames": [
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "name": "hero-combat-v3",
+          "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-c7cdb14a-2a7e-4f50-be0c-df9a5f079161.png",
+          "facing": "right",
+          "sourcePrompt": "heroCombatPrompt",
+          "project_asset": "public/art/hero-combat-v3.png",
+          "used_frames": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "name": "enemy-combat-v3",
+          "path": "C:/Users/will/.codex/generated_images/01a08938-7324-7271-b288-590f259d8b92/exec-b7336869-32f7-4a67-91a3-7a8e6eaa06b2.png",
+          "facing": "right",
+          "sourcePrompt": "enemyCombatPrompt",
+          "project_asset": "public/art/enemy-combat-v3.png",
+          "used_frames": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        }
+      ]
+    },
+    "prompts": {
+      "heroMotionPrompt": "Use case: stylized-concept. Production fantasy game character animation atlas, EXACT 4 columns by 4 rows, 16 complete full-body figures in equal square cells on a 2048\u00d72048 square. Perfectly SOLID chroma GREEN #00FF00 background, no checkerboard, transparency, labels, numbers, grid, effects or shadows. Image1 is IDENTITY/MATERIAL/PAINTING STYLE ONLY: preserve original long-black-haired bare-chested axe barbarian, muscular realistic anatomy, bronze bracers/belt, brown fur loincloth and boots, ornate double-blade bronze axe. DO NOT copy image1's running poses. Image2 is the PRIMARY WALK POSE GUIDE: chest faces mostly toward viewer three-quarter FRONT, head looks screen RIGHT, compact upright marching steps directly below pelvis. Use richly dimensional oil-painted fantasy realism and warm rimlight, NOT pixel art. Every frame is freshly painted whole body, both legs attached to pelvis, exact same anatomy/scale throughout, no cutout rig or duplicate limbs. Keep every full figure and weapon inside own cell with 12% margin; feet baseline 90%, pelvis horizontally 50%. ROW1: 4 subtle breathing guard poses, knees relaxed, axe diagonal near shoulder. ROW2 and ROW3: eight genuinely successive frames of a compact marching gait, visually DIFFERENT LEG SILHOUETTES following image2. row2col1 viewer-left leg planted straight below pelvis, viewer-right knee lifted forward with boot off ground. row2col2 raised viewer-right boot lowers, legs nearly together. row2col3 BOTH LEGS CLOSE TOGETHER UNDER PELVIS in passing stance, weight transfers to viewer-right foot. row2col4 viewer-right leg straight planted, viewer-left knee lifts. row3col1 viewer-right leg planted, viewer-left knee lifted forward with boot off ground, opposite of row2col1. row3col2 viewer-left boot lowers, legs nearly together. row3col3 BOTH LEGS CLOSE TOGETHER UNDER PELVIS, weight transfers to viewer-left foot. row3col4 viewer-left leg straight planted, viewer-right knee lifts to loop. Use the guide's upright march: short strides and distinctly narrowing/widening knee silhouettes, NO stretched running/sprinting stride. Axe held low across waist. ROW4: jump crouch, rising forward knee lift, airborne tucked knees raised axe, landing crouch. Sixteen connected full-body paintings, strong distinction among alternate planted feet.",
+      "heroMotionEditPrompt": "Use case: precise-object-edit. Edit this 4x4 fantasy sprite atlas with ONLY two corrections; preserve character identity, realistic oil painting style, scale, cell layout, solid bright GREEN background and all other pixels as much as possible. CORRECTION ONE: first row idle poses. Make all four figures hold the EXACT SAME diagonal ready axe pose seen in top-left cell. Only tiny breathing chest rise between them; do not move axe to shoulder or horizontal, keep same angle, hands, stance. CORRECTION TWO: THIRD ROW walking legs. In third-row column1 AND third-row column4, lift the knee on the LEFT SIDE OF THE IMAGE within that cell, with its boot off the ground. Plant the boot on the RIGHT SIDE OF THE IMAGE within that cell firmly on the baseline. This is opposite to second-row column1, where screen-right knee is raised. Third-row columns2 and3 should be narrow feet-together passing poses smoothly transitioning between these left-knee lift frames. Maintain torso looking toward screen RIGHT, hair trails left, axe held horizontally. Do NOT mirror entire character. Paint anatomically connected legs naturally from pelvis; no detached parts, no third leg. PRESERVE SECOND ROW AND FOURTH ROW unchanged. Exactly sixteen whole connected characters.",
+      "heroCombatPrompt": "Use case: stylized-concept. Asset type: production 2D side-scrolling fantasy beat-em-up animation sprite atlas. Create one square 2048x2048 PNG with EXACTLY FOUR columns and FOUR rows, 16 evenly spaced square 512x512 cells. Invisible grid only; never draw grid lines, labels, numbers, text, shadows, checkerboards or background objects. Perfectly SOLID chroma GREEN #00FF00 background. One complete naturally connected whole-body character in EACH cell; redraw the entire body for every frame, NO cutout rig, no detached legs, no extra/duplicated limbs. Keep identical character identity, proportions, camera and scale throughout. Face RIGHT in all frames. Fixed orthographic side/three-quarter view. Center pelvis horizontally at 50% of each cell, ground baseline at 92% of cell height; at least 10% clear margin for weapons, no clipping or cross-cell overlap. Render original hero from input image 1: long flowing black hair, handsome stern male face, very muscular realistic anatomy, bare bronze-tan chest, bronze bracers and belt, dark brown fur loincloth and fur-topped leather boots, ornate bronze double-bladed battle axe. Preserve richly shaded oil-painted fantasy realism, warm directional rimlight, dimensional muscles and metallic detailing, muted bronze and brown. Input image 2 is POSE/STAGING reference ONLY for compact Golden Axe movement. Do NOT copy its pixel-art rendering, blue costume, short hair or sword. All poses must feel like one coherent animation. Atlas name hero-combat-v3. Exactly sixteen complete frames read left-to-right top-to-bottom. ROWS 1 AND 2 are an eight-frame dramatic axe attack: row1col1 guarded start with knees flexed and axe diagonal at shoulder; row1col2 anticipation drawing axe behind shoulder; row1col3 axe lifted over head; row1col4 torso twisting and weight transfers forward just before strike; row2col1 decisive forward/downward axe CONTACT, arms extended toward right and blade at chest-to-waist height ahead; row2col2 low forward followthrough; row2col3 recoil recovery beginning raise axe; row2col4 returns to shoulder guard. ROW3 four hurt reaction frames: chest flinch, leaning backwards, bracing and regaining balance, nearly recovered guard. ROW4 four death frames: staggering, knees buckling, falling sideways down toward ground, completely lying dead across bottom of cell. No gore. Final lying pose must be contained comfortably within its own square with unchanged anatomical scale; curl knees naturally to fit. Background must be perfectly solid chroma GREEN #00FF00, with NO alpha, NO transparency and NO checkerboard. Keep all sixteen complete figures, no grid or labels.",
+      "enemyCombatPrompt": "Use case: stylized-concept. Create one production side-scrolling fantasy beat-em-up animation atlas. Square 2048x2048 PNG, EXACTLY 4 columns \u00d7 4 rows =16 equally sized square cells. Uniform perfectly solid bright chroma GREEN #00FF00 background everywhere outside characters. NO transparency, checkerboard, grid, labels, text, shadows, effects or environment. In each cell paint exactly one complete naturally connected WHOLE-BODY character: both legs attach anatomically to pelvis, sword connects to hands, no cutout rig, no separate legs or extra limbs. All characters FACE RIGHT. Use identical anatomical scale/identity/proportions in all 16 cells, pelvis centered horizontally at 50%, ground baseline at 92% cell height, at least 10% clear margin around weapons, nothing crosses cell edges. Original character from image1: undead skull-faced swordsman, two curved horns on bronze helmet, dimensional battered bronze plate armor, dark chainmail skirt, tattered dark brown cape, armored boots, steel longsword. Image1 faces left: MIRROR facing direction to RIGHT. Realistic richly shaded oil-painted fantasy art, warm rimlight on dimensional bronze armor and bones, muted bronze and dark brown. Image2 provides POSES and STAGING only: use its compact knees-bent cautious hunched guard and measured marching stance. Do not imitate pixel art, teal clothing, club, or simplified anatomy. Atlas name enemy-combat-v3. 16 complete individual poses. ROWS1+2: eight sequential sword attack frames, row1col1 knees-bent upright sword guard; row1col2 compact anticipation; row1col3 sword raised overhead; row1col4 transferring weight toward RIGHT; row2col1 sword thrust or slash extended decisively toward RIGHT at chest height (contact); row2col2 low followthrough; row2col3 recoils raising weapon; row2col4 returns to guarded start. ROW3 four hurt frames: flinch, leaning back, hunched regaining balance, recovery. ROW4 four death frames: staggering, knees buckle, falling sideways, lying fully collapsed on ground with knees curled enough to fit inside cell. No gore. Ensure all sword tips fit cells with ample margin. CRITICAL: skull nose and eyes point RIGHT; cape streams LEFT behind back; sword extends toward RIGHT. Image1's direction MUST be reversed, retain armor design only."
+    }
+  }
+}

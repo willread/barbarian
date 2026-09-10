@@ -3,13 +3,13 @@
   const $ = id => document.getElementById(id);
   const canvas = $('game'), ctx = canvas.getContext('2d');
   const W = 1440, H = 810;
-  const { Atlas, PaintedRig, LivingBackground, clips, pose, jumpHeight, decodeChroma, clamp, smooth } = window.AshenAnimation;
+  const { Atlas, LivingBackground, clips, pose, jumpHeight, decodeChroma, clamp, smooth } = window.AshenAnimation;
   const keys = new Set(), atlases = {};
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let running = true, ready = false, raf, last = 0, clock = 0;
   let phase = 'title', wave = 1, score = 0, kills = 0, magic = 3;
   let flash = 0, shake = 0, banner = 0, combo = 0, comboTime = 0, hitStop = 0;
-  let muted = true, audio, background, sparks = [], heroRig, enemyRig;
+  let muted = true, audio, background, sparks = [];
   let nextId = 0;
   const make = (x, y, hp = 100) => ({
     id: nextId++, x, y, hp, max: hp, dir: 1, attack: null, cool: 0,
@@ -17,10 +17,6 @@
     stride: 0, clock: Math.random() * 4.8, velocityX: 0, velocityY: 0,
   });
   let hero = make(910, 718), enemies = [];
-  const idleSurface = document.createElement('canvas');
-  idleSurface.width = 480; idleSurface.height = 480;
-  const idleCtx = idleSurface.getContext('2d');
-
   function beep(freq, duration = .12, type = 'sawtooth') {
     if (muted) return;
     audio ??= new AudioContext(); audio.resume();
@@ -180,7 +176,8 @@
     }
     const distance = Math.hypot(f.x - oldX, (f.y - oldY) * 1.2);
     f.moving = distance > .08 && f.jump === null;
-    if (f.moving) f.stride = (f.stride + distance / (isHero ? 155 : 103)) % 1;
+    if (speed > 0) f.gaitSpeed = speed;
+    if (f.moving) f.stride = (f.stride + distance / Math.max(1, (f.gaitSpeed || speed) * (isHero ? 40 : 56) / 60)) % 1;
     if (dx) f.dir = dx > 0 ? 1 : -1;
   }
 
@@ -222,9 +219,7 @@
     const opacity = f.hp <= 0 ? 1 - smooth((f.death - duration - .3) / .55) : 1;
     if (opacity <= 0) return;
     const p = pose(f, isHero), atlas = atlases[p.atlas];
-    const rigged = f.hp > 0 && f.recoil <= 0 && !f.attack && f.jump === null;
-    const rig = isHero ? heroRig : enemyRig;
-    if (rigged ? !rig : !atlas) return;
+    if (!atlas) return;
     const size = f.boss ? 345 : 292;
     const height = f.jump === null ? 0 : jumpHeight(f.jump);
     ctx.save();
@@ -235,23 +230,7 @@
     ctx.translate(f.x, f.y - height);
     ctx.scale(f.dir, 1);
     if (f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
-    // Idle is blended in a transparent buffer using premultiplied additive weights;
-    // source-over crossfades would leave ghosts and change silhouette opacity.
-    if (rigged) {
-      rig.draw(ctx, f.stride, size, reducedMotion ? 0 : f.clock, f.moving);
-    } else if (p.next !== undefined && !reducedMotion) {
-      idleCtx.clearRect(0, 0, 480, 480); idleCtx.save(); idleCtx.translate(240, 450);
-      idleCtx.globalCompositeOperation = 'source-over'; atlas.paint(idleCtx, p.frame, size, 1 - p.blend);
-      idleCtx.globalCompositeOperation = 'lighter'; atlas.paint(idleCtx, p.next, size, p.blend);
-      idleCtx.restore(); ctx.globalAlpha = opacity; ctx.drawImage(idleSurface, -240, -450);
-    } else {
-      atlas.paint(ctx, reducedMotion && p.next !== undefined ? 0 : p.frame, size, opacity);
-      if (isHero && f.attack && p.frame === 3 && heroRig.axeHead) {
-        // Restore the off-cell axe tip from the same character's painted weapon.
-        ctx.save(); ctx.scale(size / 444, size / 444);
-        ctx.translate(-.59 * 444, -.988 * 444); ctx.drawImage(heroRig.axeHead, 175, 52); ctx.restore();
-      }
-    }
+    atlas.paint(ctx, reducedMotion && !f.moving && !f.attack && f.jump === null && f.hp > 0 && f.recoil <= 0 ? 0 : p.frame, size, opacity);
     ctx.restore();
     if (!isHero && f.hp > 0 && f.hp < f.max) {
       ctx.fillStyle = '#180e0c'; ctx.fillRect(f.x - 35, f.y - size + 20, 70, 4);
@@ -334,17 +313,17 @@
   const loadImage = src => new Promise((resolve, reject) => {
     const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src;
   });
-  const names = ['hero-attack', 'enemy-attack', 'hero-reactions', 'enemy-reactions'];
+  const names = ['hero-motion-v3', 'hero-combat-v3', 'hero-walk-v4', 'hero-actions-v4', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-combat-v3'];
   const atlasConfig = {
-    'hero-attack': { pivots: [[.48,.989],[.53,.985],[.54,.985],[.59,.988],[.41,.96],[.49,.962],[.52,.96],[.58,.96]], extensions: {4:[[1,1.23,.09,.29]]} },
-    'enemy-attack': { pivots: [[.59,.99],[.53,.99],[.49,.99],[.55,.99],[.44,.94],[.49,.94],[.54,.94],[.55,.94]], remap: [7,1,2,3,4,5,6,7], extensions: {4:[[1,1.28,.28,.17]]} },
-    'hero-reactions': { pivots: [[.48,1],[.52,1],[.51,.9],[.52,1],[.48,.87],[.50,.87],[.5,.87],[.5,.9]] },
-    'enemy-reactions': { pivots: [[.52,.96],[.53,.96],[.52,.96],[.52,.96],[.5,.96],[.5,.96],[.5,.96],[.5,.96]] },
+    'hero-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .87 },
+    'hero-actions-v4': { columns: 4, rows: 2, frames: 8, scale: 1.16 },
+    'hero-combat-v3': { scale: 1.2 },
+    'enemy-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .88, facing: -1 },
+    'enemy-attack-v4': { columns: 4, rows: 1, frames: 4, scale: 1.08, facing: -1 },
+    'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
     loadImage('/art/valley.png').then(image => { if (running) background = new LivingBackground(image, W, H); }),
-    loadImage('/art/hero.png').then(image => { heroRig = new PaintedRig(image, true); }),
-    loadImage('/art/enemy.png').then(image => { enemyRig = new PaintedRig(image, false); }),
     ...names.map(name => loadImage(`/art/${name}.png`).then(image => {
       atlases[name] = new Atlas(decodeChroma(image), atlasConfig[name]);
     })),

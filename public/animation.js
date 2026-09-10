@@ -23,166 +23,104 @@
     return canvas;
   }
 
-  // Solve the knee from hip and planted ankle rather than rotating both legs
-  // with a sine wave. The foot's world velocity is zero through the stance phase.
-  function solveLeg(hip, ankle, upperLength, lowerLength, forward) {
-    const dx = ankle[0] - hip[0], dy = ankle[1] - hip[1];
-    const distance = clamp(Math.hypot(dx, dy), .001, upperLength + lowerLength - .01);
-    const along = (upperLength * upperLength - lowerLength * lowerLength + distance * distance) / (2 * distance);
-    const height = Math.sqrt(Math.max(0, upperLength * upperLength - along * along));
-    return [hip[0] + dx / distance * along + forward * dy / distance * height,
-      hip[1] + dy / distance * along - forward * dx / distance * height];
-  }
-
-  function footPath(phase, stride, lift) {
-    phase = ((phase % 1) + 1) % 1;
-    if (phase < .62) return { x: stride * (.31 - phase), y: 0, angle: 0, planted: true };
-    const p = (phase - .62) / .38;
-    return { x: stride * (-.31 + .62 * smooth(p)), y: -lift * Math.sin(Math.PI * p),
-      angle: -.18 * Math.sin(Math.PI * p), planted: false };
-  }
-
-  class PaintedRig {
-    constructor(image, isHero) {
-      this.hero = isHero; this.forward = isHero ? 1 : -1;
-      this.source = document.createElement('canvas'); this.source.width = 444; this.source.height = 444;
-      this.source.getContext('2d').drawImage(image, 0, 0, image.width / 4, image.height / 2, 0, 0, 444, 444);
-      const configs = isHero ? [
-        { hip: [201,259], knee: [179,330], ankle: [176,405],
-          upper: [[166,245],[211,245],[219,283],[201,339],[161,347],[151,306]],
-          lower: [[159,320],[203,320],[202,374],[197,414],[158,421],[141,392]],
-          foot: [[151,393],[198,394],[211,425],[190,435],[142,435],[144,414]] },
-        { hip: [243,257], knee: [245,329], ankle: [257,410],
-          upper: [[221,246],[266,242],[272,287],[265,338],[225,346],[214,292]],
-          lower: [[223,319],[269,319],[282,403],[271,422],[234,422],[223,375]],
-          foot: [[234,395],[275,395],[304,419],[293,435],[235,435],[229,419]] },
-      ] : [
-        { hip: [268,284], knee: [250,343], ankle: [232,414],
-          upper: [[240,276],[287,278],[288,308],[273,354],[231,358],[222,332]],
-          lower: [[233,333],[275,332],[267,386],[252,422],[214,424],[215,390]],
-          foot: [[215,402],[253,401],[261,427],[240,440],[183,440],[190,422]] },
-        { hip: [337,285], knee: [346,350], ankle: [352,421],
-          upper: [[308,278],[352,277],[370,312],[372,356],[328,364],[313,319]],
-          lower: [[329,343],[373,341],[376,405],[369,433],[334,437],[329,398]],
-          foot: [[334,407],[372,407],[378,437],[361,446],[326,446],[331,425]] },
-      ];
-      this.legs = configs.map(config => ({ ...config,
-        upperImage: this.part(config.upper), lowerImage: this.part(config.lower), footImage: this.part(config.foot),
-        upperLength: Math.hypot(config.knee[0] - config.hip[0], config.knee[1] - config.hip[1]),
-        lowerLength: Math.hypot(config.ankle[0] - config.knee[0], config.ankle[1] - config.knee[1]),
-      }));
-      this.body = this.part([[0,0],[444,0],[444,444],[0,444]]);
-      const body = this.body.getContext('2d'); body.globalCompositeOperation = 'destination-out';
-      for (const leg of this.legs) for (const points of [leg.upper, leg.lower, leg.foot]) {
-        body.beginPath(); points.forEach(([x,y], i) => i ? body.lineTo(x,y) : body.moveTo(x,y)); body.closePath(); body.fill();
-      }
-      // Eliminate residual boot/skirt pixels outside the limb masks. Keep the
-      // long cape behind the enemy, but never leave a stationary foot behind.
-      body.globalCompositeOperation = 'source-over';
-      if (isHero) body.clearRect(0, 285, 280, 159);
-      else { body.clearRect(0, 375, 390, 69); body.clearRect(180, 295, 99, 149); body.clearRect(309, 298, 76, 146); }
-      body.globalCompositeOperation = 'source-over';
-      if (isHero) {
-        this.axeHead = this.part([[284,253],[311,254],[338,269],[348,295],[321,294],
-          [341,310],[325,337],[312,352],[284,356],[262,345],[250,329],[255,312],[273,299]]);
-        const weapon = [[143,224],[192,226],[284,268],[284,254],[311,255],[337,269],
-          [348,294],[320,294],[340,310],[324,337],[312,352],[284,356],
-          [262,345],[250,328],[255,311],[265,306],[185,251],[142,241]];
-        this.weapon = this.part(weapon);
-        // Hands and weapon travel with the shoulders, never with a leg.
-        for (const leg of this.legs) for (const image of [leg.upperImage, leg.lowerImage, leg.footImage]) {
-          const c = image.getContext('2d'); c.globalCompositeOperation = 'destination-out';
-          c.beginPath(); weapon.forEach(([x,y],i) => i ? c.lineTo(x,y) : c.moveTo(x,y)); c.closePath(); c.fill();
-          c.globalCompositeOperation = 'source-over';
-        }
-      }
-    }
-
-    part(points) {
-      const canvas = document.createElement('canvas'); canvas.width = 444; canvas.height = 444;
-      const c = canvas.getContext('2d'); c.beginPath();
-      points.forEach(([x,y], i) => i ? c.lineTo(x,y) : c.moveTo(x,y)); c.closePath(); c.clip();
-      c.drawImage(this.source, 0, 0); return canvas;
-    }
-
-    segment(ctx, image, from, to, targetFrom, targetTo) {
-      const angle = Math.atan2(targetTo[1] - targetFrom[1], targetTo[0] - targetFrom[0]) -
-        Math.atan2(to[1] - from[1], to[0] - from[0]);
-      ctx.save(); ctx.translate(targetFrom[0], targetFrom[1]); ctx.rotate(angle);
-      ctx.translate(-from[0], -from[1]); ctx.drawImage(image, 0, 0); ctx.restore();
-    }
-
-    draw(ctx, stride, size, time, walking = true) {
-      const scale = size / 444;
-      const rootX = this.hero ? 222 : 297;
-      ctx.save(); ctx.scale(scale * this.forward, scale); ctx.translate(-rootX, -432);
-      if (!walking) {
-        // Continuous 4.8-second inhalation: upper ribs expand under a stationary
-        // pelvis; head, hands and axe follow by less than two display pixels.
-        const breath = .5 - .5 * Math.cos(time / 4.8 * TAU);
-        const slices = 40, step = 444 / slices;
-        for (let row = 0; row < slices; row++) {
-          const y = row * step;
-          const weight = clamp((270 - y) / 120);
-          const rib = Math.exp(-Math.pow((y - 156) / 61, 2));
-          const sx = 1 + rib * breath * .009;
-          ctx.drawImage(this.source, 0, y, 444, step + .2,
-            rootX * (1 - sx), y - weight * breath * 2.2, 444 * sx, step + .45);
-        }
-        ctx.restore(); return;
-      }
-      const bob = (this.hero ? 12 : 4) + 1.3 * Math.cos(stride * TAU * 2);
-      const drawLeg = (leg, index) => {
-        const path = footPath(stride + index * .5, (this.hero ? 155 : 103) / scale, this.hero ? 27 : 23);
-        const hip = [leg.hip[0], leg.hip[1] + bob];
-        // Keep a little flexion available at maximum extension.
-        const ankle = [leg.hip[0] + path.x * this.forward, leg.ankle[1] - 6 + path.y];
-        const knee = solveLeg(hip, ankle, leg.upperLength, leg.lowerLength, this.forward);
-        this.segment(ctx, leg.upperImage, leg.hip, leg.knee, hip, knee);
-        this.segment(ctx, leg.lowerImage, leg.knee, leg.ankle, knee, ankle);
-        ctx.save(); ctx.translate(ankle[0], ankle[1]); ctx.rotate(path.angle * this.forward);
-        ctx.translate(-leg.ankle[0], -leg.ankle[1]); ctx.drawImage(leg.footImage, 0, 0); ctx.restore();
-      };
-      drawLeg(this.legs[0], 0);
-      ctx.save(); ctx.translate(0, bob); ctx.drawImage(this.body, 0, 0); ctx.restore();
-      drawLeg(this.legs[1], 1);
-      if (this.weapon) { ctx.save(); ctx.translate(0, bob); ctx.drawImage(this.weapon, 0, 0); ctx.restore(); }
-      ctx.restore();
-    }
-  }
-
   class Atlas {
     constructor(image, options = {}) {
       this.image = image;
       this.columns = options.columns || 4;
-      this.rows = options.rows || 2;
-      this.frames = options.frames || 8;
+      this.rows = options.rows || 4;
+      this.frames = options.frames || 16;
       this.cellWidth = image.width / this.columns;
       this.cellHeight = image.height / this.rows;
-      this.pivots = options.pivots || Array.from({ length: this.frames }, () => [.5, .94]);
+      this.pivots = options.pivots || Array.from({ length: this.frames }, () => [.5, .92]);
+      // Register each complete painted cel to the ground at texture load time.
+      // This changes the anchor only; no body part is cropped, scaled, or moved.
+      if (!options.pivots && image.getContext) {
+        const data = image.getContext('2d').getImageData(0, 0, image.width, image.height).data;
+        for (let frame = 0; frame < this.frames; frame++) {
+          const left = Math.round((frame % this.columns) * this.cellWidth);
+          const top = Math.round(Math.floor(frame / this.columns) * this.cellHeight);
+          const right = Math.round(left + this.cellWidth);
+          for (let y = Math.min(image.height - 1, Math.floor(top + this.cellHeight - 1)); y >= top; y--) {
+            let solid = 0;
+            for (let x = left; x < right; x++) if (data[(y * image.width + x) * 4 + 3] > 160) solid++;
+            if (solid >= 3) { this.pivots[frame][1] = (y + 1 - top) / this.cellHeight; break; }
+          }
+        }
+      }
       this.scale = options.scale || 1;
       this.remap = options.remap;
-      this.extensions = options.extensions || {};
+      this.facing = options.facing || 1;
+      this.cels = this.extractWholeCels(image);
+    }
+
+    extractWholeCels(image) {
+      if (!image.getContext) return null;
+      const width = image.width, height = image.height;
+      const pixels = image.getContext('2d').getImageData(0, 0, width, height).data;
+      if (pixels.length !== width * height * 4) return null;
+      const labels = new Int32Array(width * height), stack = new Int32Array(width * height);
+      const components = [null];
+      // Follow each connected, complete figure across nominal grid boundaries.
+      // A long sword can overhang its cell without being amputated or appearing
+      // in the neighboring frame. This is texture unpacking, never a limb rig.
+      for (let seed = 0; seed < labels.length; seed++) {
+        if (labels[seed] || pixels[seed * 4 + 3] < 40) continue;
+        const id = components.length;
+        let count = 0, sumX = 0, sumY = 0, left = width, right = 0, top = height, bottom = 0, tail = 1;
+        stack[0] = seed; labels[seed] = id;
+        while (tail) {
+          const p = stack[--tail], x = p % width, y = Math.floor(p / width);
+          count++; sumX += x; sumY += y;
+          left = Math.min(left, x); right = Math.max(right, x); top = Math.min(top, y); bottom = Math.max(bottom, y);
+          for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+            const nx = x + dx, ny = y + dy, n = ny * width + nx;
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height || labels[n] || pixels[n * 4 + 3] < 40) continue;
+            labels[n] = id; stack[tail++] = n;
+          }
+        }
+        components.push({ count, left, right, top, bottom,
+          frame: Math.min(this.rows - 1, Math.floor(sumY / count / this.cellHeight)) * this.columns +
+            Math.min(this.columns - 1, Math.floor(sumX / count / this.cellWidth)) });
+      }
+      const boxes = Array.from({ length: this.frames }, () => ({ left: width, right: 0, top: height, bottom: 0 }));
+      for (const c of components.slice(1)) if (c.count >= 8 && boxes[c.frame]) {
+        const b = boxes[c.frame];
+        b.left = Math.min(b.left, c.left); b.right = Math.max(b.right, c.right);
+        b.top = Math.min(b.top, c.top); b.bottom = Math.max(b.bottom, c.bottom);
+      }
+      if (boxes.some(b => b.right <= b.left || b.bottom <= b.top)) return null;
+      return boxes.map((b, frame) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = b.right - b.left + 1; canvas.height = b.bottom - b.top + 1;
+        const ctx = canvas.getContext('2d'), cel = ctx.createImageData(canvas.width, canvas.height);
+        for (let y = b.top; y <= b.bottom; y++) for (let x = b.left; x <= b.right; x++) {
+          const p = y * width + x, component = components[labels[p]];
+          if (!component || component.count < 8 || component.frame !== frame) continue;
+          const dst = ((y - b.top) * canvas.width + x - b.left) * 4;
+          for (let c = 0; c < 4; c++) cel.data[dst + c] = pixels[p * 4 + c];
+        }
+        ctx.putImageData(cel, 0, 0);
+        return { image: canvas, left: b.left - (frame % this.columns) * this.cellWidth };
+      });
     }
 
     paint(ctx, frame, size, alpha = 1) {
       frame = Math.max(0, Math.min(this.frames - 1, frame));
       if (this.remap) frame = this.remap[frame];
-      const [px, py] = this.pivots[frame] || [.5, .94];
+      const [px, py] = this.pivots[frame] || [.5, .92];
       const w = size * this.scale;
       const h = w * this.cellHeight / this.cellWidth;
       ctx.globalAlpha = alpha;
-      ctx.drawImage(this.image, (frame % this.columns) * this.cellWidth,
-        Math.floor(frame / this.columns) * this.cellHeight, this.cellWidth, this.cellHeight,
-        -px * w, -py * h, w, h);
-      // A weapon may cross the nominal cell boundary without its fighter doing
-      // so. Include only its narrow, explicitly registered continuation region.
-      for (const [x,y,width,height] of this.extensions[frame] || []) {
-        ctx.drawImage(this.image, x * this.cellWidth, y * this.cellHeight,
-          width * this.cellWidth, height * this.cellHeight,
-          (x - frame % this.columns - px) * w,
-          (y - Math.floor(frame / this.columns) - py) * h, width * w, height * h);
-      }
+      if (this.facing < 0) { ctx.save(); ctx.scale(-1, 1); }
+      const cel = this.cels?.[frame];
+      if (cel) {
+        const scale = w / this.cellWidth;
+        ctx.drawImage(cel.image, (cel.left - px * this.cellWidth) * scale, -cel.image.height * scale,
+          cel.image.width * scale, cel.image.height * scale);
+      } else ctx.drawImage(this.image, (frame % this.columns) * this.cellWidth,
+          Math.floor(frame / this.columns) * this.cellHeight, this.cellWidth, this.cellHeight,
+          -px * w, -py * h, w, h);
+      if (this.facing < 0) ctx.restore();
     }
   }
 
@@ -350,43 +288,53 @@
     }
   }
 
+  // Golden Axe's standing slash has four five-update key poses. The painted
+  // redraw adds in-betweens while preserving that 20-update action envelope.
   const clips = {
-    heroAttack: { duration: .76, contact: .38 },
-    enemyAttack: { duration: 1.0, contact: .50 },
-    jump: { duration: .96, launch: .14, land: .78 },
+    heroAttack: { duration: 20 / 60, contact: 5 / 60 },
+    enemyAttack: { duration: 40 / 60, contact: 20 / 60 },
+    jump: { duration: 49 / 60, launch: 2 / 60, land: 47 / 60 },
     heroDeath: { duration: 1.2 },
     enemyDeath: { duration: 1.3 },
   };
 
   function jumpHeight(elapsed) {
     const { launch, land } = clips.jump;
-    if (elapsed < launch || elapsed > land) return 0;
-    return 118 * Math.sin(Math.PI * (elapsed - launch) / (land - launch));
+    if (elapsed <= launch || elapsed >= land) return 0;
+    const t = (elapsed - launch) * 60;
+    // Sum the ROM's -5.5 launch velocity and +0.25 gravity, scaled for our scene.
+    return Math.max(0, (5.5 * t - .125 * t * (t - 1)) * 1.87);
   }
 
   function pose(f, hero) {
+    const motion = hero ? 'hero-motion-v3' : 'enemy-motion-v3';
+    const combat = hero ? 'hero-combat-v3' : 'enemy-combat-v3';
     if (f.hp <= 0) {
       const duration = hero ? clips.heroDeath.duration : clips.enemyDeath.duration;
-      const frame = Math.min(hero ? 3 : 7, Math.floor(f.death / duration * (hero ? 4 : 8)));
-      return { atlas: hero ? 'hero-reactions' : 'enemy-reactions', frame: hero ? frame + 4 : frame };
+      return { atlas: combat, frame: 12 + Math.min(3, Math.floor(f.death / duration * 4)) };
     }
-    if (f.recoil > 0) return { atlas: hero ? 'hero-reactions' : 'enemy-reactions', frame: hero ? 4 : 0 };
+    if (f.recoil > 0) {
+      const progress = clamp(1 - f.recoil / (hero ? .22 : .24));
+      return { atlas: combat, frame: 8 + Math.min(3, Math.floor(progress * 4)) };
+    }
     if (f.attack) {
       const duration = hero ? clips.heroAttack.duration : clips.enemyAttack.duration;
-      return { atlas: hero ? 'hero-attack' : 'enemy-attack', frame: Math.min(7, Math.floor(f.attack.elapsed / duration * 8)) };
+      if (hero) return { atlas: 'hero-actions-v4', frame: 4 + Math.min(3, Math.floor(f.attack.elapsed / duration * 4)) };
+      return { atlas: 'enemy-attack-v4', frame: Math.min(3, Math.floor(f.attack.elapsed / duration * 4)) };
     }
     if (f.jump !== null) {
-      const frame = f.jump < .14 ? 0 : f.jump < .31 ? 1 : f.jump < .76 ? 2 : 3;
-      return { atlas: 'hero-reactions', frame };
+      const frame = f.jump < clips.jump.launch ? 12 : f.jump < .18 ? 13 : f.jump < clips.jump.land ? 14 : 15;
+      return { atlas: motion, frame };
     }
-    if (f.moving) return { atlas: hero ? 'hero-walk' : 'enemy-walk', frame: Math.floor(f.stride * 8) % 8 };
-    if (hero) {
-      const position = ((f.clock % 4.8) / 4.8) * 8;
-      return { atlas: 'hero-idle', frame: Math.floor(position), next: (Math.floor(position) + 1) % 8, blend: smooth(position % 1) };
+    if (f.moving) {
+      return { atlas: hero ? 'hero-walk-v4' : 'enemy-walk-v4', frame: Math.floor(f.stride * 4) % 4 };
     }
-    return { atlas: 'enemy-attack', frame: 0 };
+    // Complete painted poses. No limb segmentation, mesh warping, or ghosted crossfade.
+    const breath = [0, 1, 2, 3, 2, 1];
+    return hero ? { atlas: 'hero-actions-v4', frame: breath[Math.floor(f.clock / .8) % breath.length] } :
+      { atlas: 'enemy-walk-v4', frame: 0 };
   }
 
-  window.AshenAnimation = { Atlas, PaintedRig, LivingBackground, clips, pose, jumpHeight, flowPhase, footPath, solveLeg, decodeChroma, clamp, smooth };
+  window.AshenAnimation = { Atlas, LivingBackground, clips, pose, jumpHeight, flowPhase, decodeChroma, clamp, smooth };
 })();
 

@@ -7,7 +7,7 @@ export default function Home(){useEffect(()=>{
     const script=document.createElement('script');script.src=src;script.onload=()=>resolve();script.onerror=reject;
     scripts.push(script);document.body.appendChild(script);
   });
-  load('/animation.js?v=2').then(()=>{if(!disposed)return load('/game.js?v=2')}).catch(()=>{
+  load('/animation.js?v=4').then(()=>{if(!disposed)return load('/game.js?v=4')}).catch(()=>{
     const button=document.getElementById('start');if(button)button.textContent='UNABLE TO LOAD · PLEASE REFRESH';
   });
   return()=>{disposed=true;scripts.forEach(script=>script.remove());(window as Window & {stopGame?:()=>void}).stopGame?.()};

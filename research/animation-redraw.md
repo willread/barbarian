@@ -1,0 +1,42 @@
+# Whole-body animation redraw
+
+The v3 animation pipeline replaces the segmented PaintedRig with complete painted cels. Each displayed pose is one sprite draw. There are no separately transformed thighs, shins, feet, torsos, or weapons, and no crossfade between different silhouettes.
+
+## Extracted references
+
+The supplied ROM is identified in `golden-axe-mechanics.md`. Local extraction reconstructs the Mega Drive sprite layer from Genesis Plus GX save-state VRAM, CRAM, and the linked sprite attribute table. It decodes 4-bpp tiles, palette selection, tile ordering, and flips; palette index zero remains transparent. This preserves complete assembled figures and excludes scenery.
+
+- Ax Battler: RAM object `0xFFD000`, graphics palette 0, selected animation table `0x03A340`.
+- Equivalent enemy: stage-one horned club soldier, RAM object `0xFFD100`, object type `0x38` (active bit masked), palette 1, animation table `0x071F72` in the sampled state. It supplies the compact guard, cautious approach, charge, and attack body mechanics for our existing armored undead swordsman. It is not claimed to be Golden Axe's skeleton.
+- Hero extraction includes walk, standing slash, and jump samples. Enemy extraction observes 420 emulator updates and captures approach, charge, recovery, and attack states. The local target health is maintained to permit observation.
+- VDP display can lag RAM animation selection; the dedicated walk-key sheet samples after the graphics upload. State-transition sheets label the sampled RAM state, not an assertion that every displayed pose changes on that same update.
+
+Local outputs are in `work/golden-axe/references/`: `ax-battler-reference.png`, `ax-battler-walk-keys.png`, `ax-battler-attack.png`, `ax-battler-jump.png`, and `enemy-reference.png`. Extraction tools and ROM-derived imagery stay in ignored local research storage.
+
+## Original painted assets
+
+The redraw uses the extracted pictures as pose references and the existing `hero.png` / `enemy.png` as identity and material references. The barbarian retains black hair, fur, bronze details, and his axe. The undead retains the skull, horned bronze armor, ragged cape, and sword.
+
+The selected movement and strike assets are direct paintovers of the extracted pose guides:
+
+| Asset | Layout | Used for |
+|---|---|---|
+| `public/art/hero-walk-v4.png` | 4 × 1 | Four original walk key poses, nearly frontal torso and low feet |
+| `public/art/hero-actions-v4.png` | 4 × 2 | Four restrained idle cels; source windup/contact/followthrough/recovery |
+| `public/art/enemy-walk-v4.png` | 4 × 1 | Four original crouched approach poses; frame 0 also supplies guard |
+| `public/art/enemy-attack-v4.png` | 4 × 1 | Original anticipation, rotation, contact, back-facing followthrough |
+| `public/art/hero-motion-v3.png` | 4 × 4 | Last row only: complete-body jump poses |
+| `public/art/hero-combat-v3.png` | 4 × 4 | Last two rows only: hurt and collapse |
+| `public/art/enemy-combat-v3.png` | 4 × 4 | Last two rows only: hurt and collapse |
+
+The four-pose walks retain the source's 40-update hero and 56-update enemy cycles. Extra generated same-leg lifts are not used. More in-between poses require another pose-accurate pass rather than playback of inaccurate candidates. The source camera angle, foot placement and compact silhouette now guide the movement art, although the painted anatomy and equipment are still stylized rather than literally registered to each source joint.
+
+The standing slash uses a 20/60-second envelope, with its contact event aligned to the start of the second painted key. The enemy strike uses 40/60 seconds with contact at its third key. These contact events are adaptations aligned to the redraw, not a completed reverse engineering of the ROM's hitbox activation logic or AI.
+
+At texture load, chroma green is removed and each connected **complete figure** is assigned to its atlas cell. This retains sword/axe overhang across nominal cell boundaries without clipping it or displaying it in another character frame. Each complete cel is drawn once, anchored to the ground. Per-atlas size factors compensate for different illustration framing so the standing body remains similar in size across actions. No limb splitting or separate weapon drawing remains.
+
+The jump visual follows the extracted -5.5 launch / +0.25 gravity trajectory scaled to the existing scene, with the sampled launch and landing transition intervals. This does not claim a complete port of Golden Axe physics; horizontal movement, enemy decisions, and collision rules still contain prototype behavior. Hurt, death, and jump paintings are full-body adaptations, not exact ROM pose traces.
+
+Exact selected prompts, reference paths, source output paths, and project paths are recorded in `painted-animation-prompts.json`. All redraws used the built-in image-generation tool. The actual saved assets use green RGB backgrounds decoded at runtime.
+
+The subtle background animation remains intact. Validation uses the gameplay harness, real-texture offline rendering, artwork inspection, and the production build. The local playable preview was opened for the user's requested live demonstration.
