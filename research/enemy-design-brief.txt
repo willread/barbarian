@@ -1,0 +1,53 @@
+I’d keep them visually related: the remnants of one ancient army, with distinct silhouettes and fighting styles. Tarnished bronze, blackened iron, decayed leather and faded crimson cloth fit the existing painted arena. Their weapons should remain separate from their body animation, as with the hero.
+Bone Soldier — the exposed swordsman
+Appearance: A tall, lean skeleton wearing an incomplete bronze cuirass over scraps of a dark padded tunic. An open helmet leaves its skull readable; one shoulder has armour, the other is bare. A narrow, chipped sword and a torn strip of crimson cloth establish its silhouette. No shield, elaborate horns or oversized equipment.
+Its posture conveys weight: knees slightly bent, sword held forward, torso turned to protect its exposed side. It should look like a trained soldier with a ruined body, rather than a skeleton flailing its limbs.
+Behaviour:
+- Approaches deliberately, moving into the hero’s lane before committing.
+- Raises its sword beside its shoulder, pauses briefly, then steps into a diagonal cut.
+- A connected hit can lead to one slower follow-up. A miss leaves it exposed.
+- When another enemy is attacking, it circles toward an open flank instead of walking into the same spot.
+- After being knocked down, it visibly gathers itself before standing; it cannot attack during the get-up.
+How it feels to fight: This is the enemy the player can confidently overpower. A clean axe combination staggers it, a charge sends it flying, and a sidestep creates an obvious opening. Its danger comes from being overlooked while another opponent occupies your attention.
+Essential animation detail: The sword moves first into a readable preparation pose; the body then drives the cut. Hurt reactions interrupt that movement cleanly. No instant turn-and-hit when the hero passes behind it.
+Shield Revenant — the stubborn defender
+Appearance: A broad, heavily armoured corpse carrying a tall, battered shield and a short chopping sword. A closed bronze helmet has a narrow, dark eye slit. Layered shoulder plates and a low stance make it noticeably wider than the soldier.
+The shield is its defining feature: dark red paint worn down to metal, a large central boss, and old cuts around the rim. Its exposed rear has decaying straps and comparatively little armour, making the vulnerable side visually understandable.
+Behaviour:
+- Advances slowly behind its shield, keeping the hero in front.
+- Blocks ordinary frontal strikes with a strong metal impact and a small backward shove.
+- Turns deliberately rather than instantly. Moving around it should work.
+- To attack, it pulls the shield inward, plants its rear foot, then lunges into a short shield bash.
+- The bash carries it forward far enough that a sidestep exposes its side. It takes a moment to recover its stance.
+- Occasionally follows a successful bash with a short sword cut; never follows a missed bash automatically.
+- A frontal charge makes it brace and slide back. A charge into its exposed side knocks it down.
+How it feels to fight: It creates a positional problem without becoming a damage sponge. Its unguarded body should take roughly ordinary damage. The satisfying moment is drawing out the bash, stepping around it and landing an axe blow before the shield comes back up.
+Essential animation detail: The shield must visibly change between guarding, bracing and bashing. When its protection is unavailable, the pose should make that clear without an icon.
+Axe Marauder — the reckless pursuer
+Appearance: A powerful, living warrior in scavenged armour, contrasting with the undead soldiers. Bare scarred arms, a battered iron half-helm, a ragged fur mantle and a heavy single-bladed axe. Dark leather straps cross the torso; a red sash ties it to the same army.
+Its silhouette is forward-leaning and asymmetric: axe carried low on one side, free hand extended for balance. It is muscular but shorter and more hunched than the hero, with a clearly different face and equipment.
+Behaviour:
+- Closes distance more quickly than the soldier, then briefly settles before attacking.
+- Commits to a two-part combination: a broad horizontal chop followed by an overhead blow.
+- Tracks the hero during preparation, but stops adjusting once each swing begins.
+- Carries momentum through a miss. The overhead finish leaves the axe low and its back exposed.
+- If the hero retreats repeatedly, it can use a short rushing chop, announced by drawing the axe behind its body and leaning forward.
+- Ordinary hits can interrupt its preparation. Once its heavy swing is underway, trading blows becomes risky.
+- It pursues openings aggressively but must still wait for space when another enemy occupies the attack position.
+How it feels to fight: It pressures a player who waits indefinitely. Baiting the combination and punishing the recovery is dependable; charging during its preparation is the aggressive answer. Magic provides an escape when its pressure combines with another enemy.
+Essential animation detail: The second swing needs a distinct preparation, not an immediate reversal of the first. Foot plants and a brief struggle to recover the axe sell its commitment.
+Cairn Champion — the final duel
+Appearance: An imposing armoured warrior, about a head taller than the hero. Ancient bronze plates cover a blackened undercoat; a heavy, torn crimson cloak hangs from one shoulder. A restrained crown-like helmet and a broad, pale face distinguish it from ordinary troops.
+It carries a long-handled executioner’s axe with a substantial, believable steel head. Its stance is upright and economical. Where the marauder looks eager to attack, the champion looks certain it can wait.
+Behaviour: Build the duel around three attacks, each with a different answer.
+1. Advancing cleave. The axe draws back across its body before a forward step and broad horizontal cut. The player can leave the lane or retreat outside its reach, then punish the recovery.
+2. Overhead execution. It raises the axe high and holds the pose briefly before driving it down. The strike hits hard but stays committed to its chosen lane. A miss leaves the head low for a generous counterattack window.
+3. Shoulder check. At close range, it lowers its shoulder and shifts its weight before a short shove. This discourages standing against its body and endlessly attacking, but the preparation must remain visible.
+Between attacks, it walks, repositions and watches the hero. No constant chasing, teleporting or automatic retaliation after every hit.
+At half health, it tears away the loose cloak and changes its combinations: an advancing cleave can lead into an overhead execution. The individual tells stay the same, so the player recognises the moves and learns the new sequence. No summoned enemies.
+How it feels to fight: A short, dangerous exchange of commitments. Ordinary blows cause small reactions; a successful charge into an exposed recovery creates a larger stagger. The boss should survive several good openings, not dozens of repetitions.
+Essential animation detail: Its recovery is as important as its attacks. Show the weight shifting back, the axe being lifted and the guard returning. Those motions tell the player exactly when the opening ends.
+Across all four, I’d enforce one rule: preparation, commitment and recovery must be readable from the body alone. Strong silhouettes and honest animation will provide more variety than extra enemy types.
+
+
+17:25

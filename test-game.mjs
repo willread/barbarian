@@ -15,14 +15,18 @@ vm.runInNewContext(fs.readFileSync('public/mechanics.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/animation.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/hero-rig.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/blood.js','utf8'),sandbox);
+vm.runInNewContext(fs.readFileSync('public/enemies.js','utf8'),sandbox);
+vm.runInNewContext(fs.readFileSync('public/enemy-art.js','utf8'),sandbox);
+vm.runInNewContext(fs.readFileSync('public/enemy-rig.js','utf8'),sandbox);
 let source=fs.readFileSync('public/game.js','utf8');
-source=source.replace('window.ashenAxe = {','window.__test = { get hero(){return hero}, get enemies(){return enemies}, get clock(){return clock}, get blood(){return blood}, get spell(){return spell} }; window.ashenAxe = {');
+source=source.replace('window.ashenAxe = {','window.__test = { damage, get hero(){return hero}, get enemies(){return enemies}, get clock(){return clock}, get blood(){return blood}, get spell(){return spell} }; window.ashenAxe = {');
 vm.runInNewContext(source,sandbox);await new Promise(r=>setImmediate(r));
 const M=sandbox.window.AshenMechanics;
 next(0);
 const step=n=>{for(let i=0;i<n;i++){now+=M.STEP*1000;next(now)}};
 const press=key=>events.keydown({key,repeat:false,preventDefault(){}}),release=key=>events.keyup({key});
 const A=sandbox.window.AshenAnimation,T=sandbox.window.__test,G=sandbox.window.ashenAxe;
+const actualStart=G.start;G.start=()=>{actualStart();T.enemies.forEach(e=>e.kind='legion')};
 assert.equal(tools.size,2);assert.throws(()=>tools.get('start_new_battle').execute({bad:true}));
 assert.equal(tools.get('start_new_battle').execute({}).health,100);
 // Every locomotion pose selects one intact frame from its 4x4 atlas.
@@ -209,4 +213,17 @@ try {
   assert.ok(gore.drops[0].vy<stationary.vy);assert.ok(gore.drops[0].vz>stationary.vz);
   assert.equal(gore.drops[0].z-stationary.z,10*M.SCALE,'airborne hits spray at victim height');
 } finally {Math.random=originalRandom}
+actualStart();
+const E=sandbox.window.AshenEnemies, defender=E.init(T.enemies[0],'shield');
+defender.x=T.hero.x+100;defender.y=T.hero.y;defender.dir=-1;const guardHP=defender.hp;
+T.damage(defender,{damage:2},T.hero);assert.equal(defender.hp,guardHP,'shield intercepts damage in live combat');
+T.hero.x=defender.x+50;T.damage(defender,{damage:4,knock:true,direction:-1},T.hero);
+assert.equal(defender.hp,guardHP-4);assert.ok(defender.down,'rear charge bypasses shield and launches');
+M.init(defender);E.init(defender,'marauder');defender.hp=20;defender.max=20;M.begin(defender,'marauderChop');defender.attack.age=defender.attack.from;
+const committedAttack=defender.attack;T.damage(defender,{damage:2,direction:1},T.hero);
+assert.equal(defender.hp,18);assert.equal(defender.attack,committedAttack,'marauder trades during committed swing');
+T.damage(defender,{damage:4,direction:1,knock:true},T.hero);assert.ok(defender.down);
+actualStart();const plans=new Set();for(let i=0;i<10;i++){actualStart();plans.add(G.status().enemies.map(e=>e.type).join(','))}assert.ok(plans.size>1);
+for(let wave=1;wave<=3;wave++){for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(140)}
+assert.equal(G.status().wave,4);assert.equal(T.enemies.length,1);assert.equal(T.enemies[0].kind,'champion');
 sandbox.window.stopGame();

@@ -6,8 +6,10 @@
   const blood = new window.AshenBlood(W, H);
   const { Atlas, LivingBackground, clips, pose, decodeChroma, clamp, smooth } = window.AshenAnimation;
   const M = window.AshenMechanics;
+  const E = window.AshenEnemies;
+  let encounters = E.plan();
   const { HeroRig, weapons } = window.AshenHeroRig;
-  let heroRig, weaponId = 'axe', weaponAtlas;
+  let heroRig, enemyRig, enemyEquipment, weaponId = 'axe', weaponAtlas;
   const keys = new Set(), pressed = new Set(), atlases = {};
   const bounds = { left: 70, right: W - 70, top: 560, bottom: 755 };
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
@@ -69,10 +71,10 @@
   }
 
   function spawn() {
-    enemies = Array.from({ length: wave === 4 ? 3 : wave + 2 }, (_, i) => {
-      const e = make(i % 2 ? -80 - i * 100 : W + 80 + i * 110, 580 + (i % 3) * 65,
-        wave === 4 && i === 0 ? 32 : wave >= 3 ? 24 : 16);
-      e.dir = -1; e.boss = wave === 4 && i === 0;
+    enemies = encounters[wave-1].map((kind, i) => {
+      const left = wave !== 4 && Math.random() < .5;
+      const e = E.init(make(left ? -80-i*90 : W+80+i*90, wave===4?660:570+Math.random()*150, E.roster[kind].hp),kind);
+      e.dir = left ? 1 : -1;
       return e;
     });
     banner = 2.5; sync();
@@ -83,6 +85,7 @@
     hero = make(470, 660, 100, true); wave = 1; score = 0; kills = 0; magic = 100;
     combo = 0; sparks = []; shake = 0; spell = null; accumulator = 0;
     blood.reset();
+    encounters = E.plan();
     keys.clear(); pressed.clear(); change('playing'); spawn();
   }
 
@@ -96,10 +99,21 @@
   function damage(e, attack, attacker) {
     if (e.hp <= 0) return;
     const isHero = e === hero;
+    if (!isHero && E.block(e, attack, attacker)) {
+      e.x=clamp(e.x,bounds.left,bounds.right);burst(e.x+e.dir*40,e.y-110,8,'#cfbd94');beep(380,.08,'triangle');return;
+    }
     e.hp = Math.max(0, e.hp - attack.damage * (isHero ? 100 / 48 : 1));
     if (!attack.continuous || e.hp <= 0) {
       const impact = { ...e };
-      M.hurt(e, attack, isHero, attacker);
+      const committed = e.kind==='marauder' && e.attack && e.attack.age>=e.attack.from && e.attack.age<=e.attack.to && !attack.knock;
+      const savedAttack = committed ? e.attack : null;
+      const bossRecovery = e.kind==='champion' && (!e.attack || e.attack.age>e.attack.to);
+      const reactionAttack = e.kind==='champion' && !bossRecovery ? {...attack,knock:false} : attack;
+      M.hurt(e, reactionAttack, isHero, attacker);
+      if(e.hp>0 && (committed || (e.kind==='champion'&&!reactionAttack.knock))){
+        e.hurtTicks=committed?0:5;e.recoil=e.hurtTicks*M.STEP;e.stagger=0;e.recovering=0;
+        if(savedAttack)e.attack=savedAttack;
+      }
       // Keep the wound's original height, but inherit the launch just applied.
       blood.hit({ ...impact, down: e.down || impact.down }, attack.direction || 1, e.hp <= 0);
       burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
@@ -186,11 +200,11 @@
     }
     for (const e of enemies) {
       if (e.hp <= 0) continue;
-      const [ex, ey] = M.enemyIntent(e, hero, engaged.has(e.id));
-      if (e.attack) M.stepMotion(e, 0, 0);
+      const [ex, ey] = E.intent(e, hero, engaged.has(e.id));
+      if (e.attack) E.motion(e);
       else if (!e.hurtTicks && !e.down && !e.recovering) {
         // Enemy direction table C5DE: independent half-unit axes; harder types .625.
-        const speed = wave >= 3 ? .625 : .5;
+        const speed = E.roster[e.kind]?.speed || .5;
         e.velocityX = ex * speed; e.velocityY = ey * speed;
         e.x += e.velocityX * M.SCALE; e.y += e.velocityY * M.SCALE;
         e.y = clamp(e.y, bounds.top, bounds.bottom);
@@ -198,11 +212,7 @@
         if (e.moving) e.stride = (e.stride + 1 / 56) % 1;
       }
       const finished = M.tickAttack(e, [hero], damage);
-      if (finished) {
-        if (finished.connected && hero.hp > 0 && !hero.down && e.aiChain < 2 && finished.type !== 'enemyCharge') {
-          e.aiChain++; M.begin(e, e.aiChain === 1 ? 'enemyFollow' : 'enemyFinish');
-        } else { e.aiChain = 0; e.aiRest = 40; }
-      }
+      if (finished) E.finish(e, finished, hero);
       if (phase !== 'playing') break;
     }
     if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.death > clips.enemyDeath.duration + .8)) {
@@ -216,7 +226,7 @@
     const duration = isHero ? clips.heroDeath.duration : clips.enemyDeath.duration;
     const opacity = f.hp <= 0 ? 1 - smooth((f.death - duration - .3) / .55) : 1;
     if (opacity <= 0) return;
-    const p = pose(f, isHero), atlas = atlases[p.atlas];
+    const p = !isHero && f.kind!=='legion' ? E.pose(f) : pose(f, isHero), atlas = atlases[p.atlas];
     if (!atlas) return;
     const size = f.boss ? 345 : 292;
     const height = (f.height || 0) * M.SCALE;
@@ -232,6 +242,7 @@
     ctx.scale(f.dir, 1);
     if (!isHero && f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
     if (isHero && heroRig) heroRig.paint(ctx, p, size, opacity, reducedMotion ? null : f.clock, weaponId);
+    else if (!isHero && f.kind!=='legion' && enemyRig) enemyRig.paint(ctx, f, p, opacity);
     else atlas.paint(ctx, p.frame, size, opacity);
     ctx.restore();
     if (!isHero && f.hp > 0 && f.hp < f.max) {
@@ -339,9 +350,16 @@
     ctx.globalAlpha = 1;
     blood.drawAir(ctx);
     drawSpell();
+    const champion=enemies.find(e=>e.kind==='champion'&&e.hp>0);
+    if(champion && phase!=='title'){
+      ctx.textAlign='center';ctx.font='small-caps 20px Georgia';ctx.fillStyle='#e6d2aa';
+      ctx.fillText(champion.phaseTwo?'Cairn Champion · Unbound':'Cairn Champion',W/2,43);
+      ctx.fillStyle='#160f0e';ctx.fillRect(W/2-210,54,420,8);
+      ctx.fillStyle=champion.phaseTwo?'#ab4935':'#9e7750';ctx.fillRect(W/2-210,54,420*champion.hp/champion.max,8);
+    }
     if (phase === 'playing' && banner > 0) {
       ctx.textAlign = 'center'; ctx.fillStyle = '#f4dfb6'; ctx.font = 'small-caps 36px Georgia';
-      ctx.fillText(wave === 4 ? 'The Warden approaches' : `Wave ${wave} · The Ashen Legion`, W / 2, 190);
+      ctx.fillText(wave === 4 ? 'Cairn Champion · The final duel' : `Wave ${wave} · ${E.roster[encounters[wave-1][0]].name}`, W / 2, 190);
     }
     if (combo > 1 && comboTime > 0 && phase === 'playing') {
       ctx.textAlign = 'right'; ctx.fillStyle = '#ffe0a7'; ctx.font = 'italic 40px Georgia'; ctx.fillText(`${combo} slain`, W - 65, 240);
@@ -395,7 +413,7 @@
   const loadImage = src => new Promise((resolve, reject) => {
     const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src;
   });
-  const names = ['hero-reactions-unarmed-v8', 'hero-walk-unarmed-v8', 'hero-actions-unarmed-v8', 'hero-extra-unarmed-v8', 'hero-close-unarmed-v8', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3'];
+  const names = ['hero-reactions-unarmed-v8', 'hero-walk-unarmed-v8', 'hero-actions-unarmed-v8', 'hero-extra-unarmed-v8', 'hero-close-unarmed-v8', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3', 'enemy-bone-v1', 'enemy-shield-v1', 'enemy-marauder-v1', 'enemy-champion-v1'];
   const atlasConfig = {
     'hero-walk-unarmed-v8': { columns: 4, rows: 1, frames: 4 },
     'hero-actions-unarmed-v8': { columns: 4, rows: 2, frames: 8, breathRegion: [.5,.275,.3,.11] },
@@ -408,6 +426,7 @@
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
+    loadImage('/art/enemy-equipment-v1.png').then(image => { enemyEquipment = new Atlas(decodeChroma(image), {columns:4,rows:1,frames:4}); }),
     loadImage('/art/weapons-v8.png').then(image => { weaponAtlas = new Atlas(decodeChroma(image), { columns: 2, rows: 1, frames: 2 }); }),
     loadImage('/art/storm-strike-v7.png').then(image => { stormTexture = image; }),
     loadImage('/art/valley.png').then(image => { if (running) background = new LivingBackground(image, W, H); }),
@@ -417,6 +436,7 @@
   ]).then(() => {
     if (!running) return;
     heroRig = new HeroRig(atlases, weaponAtlas);
+    enemyRig = new window.AshenEnemyRig(atlases, enemyEquipment, weaponAtlas);
     const idle = atlases['hero-actions-unarmed-v8'];
     if (!reducedMotion && idle.cels?.[0]) for (let i = 0; i < 48; i++) idle.breathingCel(idle.cels[0], i * .1 + .00001);
     ready = true; $('start').disabled = false; $('start').textContent = '⚔  ENTER THE VALLEY   →';
@@ -431,7 +451,8 @@
     background?.dispose(); audio?.close();
   };
   window.ashenAxe = {
-    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), channeling: !!spell, weapon: weaponId, kills }), start,
+    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, magicMax: 100, magicReady: canCast(), channeling: !!spell, weapon: weaponId, kills,
+      enemies:enemies.filter(e=>e.hp>0).map(e=>({type:e.kind,name:E.roster[e.kind].name,health:e.hp,maxHealth:e.max,phaseTwo:!!e.phaseTwo})) }), start,
     pause: () => action('p', true),
   };
 })();
