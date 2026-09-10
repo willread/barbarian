@@ -7,7 +7,7 @@ export default function Home(){useEffect(()=>{
     const script=document.createElement('script');script.src=src;script.onload=()=>resolve();script.onerror=reject;
     scripts.push(script);document.body.appendChild(script);
   });
-  load('/mechanics.js?v=8').then(()=>{if(!disposed)return load('/animation.js?v=8')}).then(()=>{if(!disposed)return load('/hero-rig.js?v=8')}).then(()=>{if(!disposed)return load('/game.js?v=12')}).catch(()=>{
+  load('/mechanics.js?v=8').then(()=>{if(!disposed)return load('/animation.js?v=8')}).then(()=>{if(!disposed)return load('/hero-rig.js?v=8')}).then(()=>{if(!disposed)return load('/game.js?v=13')}).catch(()=>{
     const button=document.getElementById('start');if(button)button.textContent='UNABLE TO LOAD · PLEASE REFRESH';
   });
   return()=>{disposed=true;scripts.forEach(script=>script.remove());(window as Window & {stopGame?:()=>void}).stopGame?.()};
@@ -19,4 +19,4 @@ export default function Home(){useEffect(()=>{
 <div id="overlay" hidden><small id="outcome"/><h2 id="message"/><p id="result"/><button className="primary" id="resume">RESUME BATTLE</button></div>
 <div className="stage-bottom"><small>✧ &nbsp; THE FORGOTTEN KINGDOM</small><div><label className="weapon-choice">WEAPON <select id="weapon" aria-label="Weapon"><option value="axe">Axe</option><option value="sword">Sword</option></select></label><button id="sound" aria-label="Enable sound">SOUND OFF</button><button id="pause" aria-label="Pause battle">Ⅱ</button><button id="full" aria-label="Fullscreen">⛶</button></div></div></div>
 <div className="touch">{[['a','←'],['w','↑'],['s','↓'],['d','→'],['j','ATTACK'],[' ','JUMP'],['k','HOLD MAGIC']].map(([key,label])=><button key={key} data-key={key}>{label}</button>)}</div>
-<footer><div><kbd>W A S D</kbd><p>Move<small>double-tap left/right to run</small></p></div><div><kbd>J</kbd><p>Attack<small>tap after each strike</small></p></div><div><kbd>SPACE</kbd><p>Jump<small>J in air · J + Space: back attack</small></p></div><div><kbd>K</kbd><p>Magic<small>hold to cast · hits refill charge</small></p></div><div><kbd>P</kbd><p>Pause</p></div></footer><div className="footnote"><span>FORGED IN THE AGE OF SWORD & SORCERY</span><span>Headphones recommended ↗</span></div></main>}
+<footer><div><kbd>W A S D</kbd><p>Move<small>double-tap left/right to run</small></p></div><div><kbd>J</kbd><p>Attack<small>tap after each strike</small></p></div><div><kbd>SPACE</kbd><p>Jump<small>J in air · J + Space: back attack</small></p></div><div><kbd>K</kbd><p>Magic<small>hold to cast / break stun · hits refill</small></p></div><div><kbd>P</kbd><p>Pause</p></div></footer><div className="footnote"><span>FORGED IN THE AGE OF SWORD & SORCERY</span><span>Headphones recommended ↗</span></div></main>}

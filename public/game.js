@@ -43,7 +43,7 @@
   }
 
   function canCast() {
-    return phase === 'playing' && magic > 0 && !hero.air && !hero.attack && !hero.hurtTicks && !hero.down && !hero.recovering;
+    return phase === 'playing' && magic > 0 && !hero.air && !hero.attack && !hero.down;
   }
   function syncMagic() {
     const ready = canCast();
@@ -135,14 +135,20 @@
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
     if (keys.has('k') && canCast()) {
+      if (hero.hurtTicks || hero.recovering) {
+        hero.hurtTicks = hero.hurtAge = hero.recovering = hero.recoil = hero.stagger = 0;
+        // Brief protection makes the escape usable against overlapping blows.
+        // It is not renewed by ordinary channeling, and cannot bypass knockdown.
+        hero.invTicks = Math.max(hero.invTicks, 24);
+      }
       spell ??= { age: 0, targets: [] };
       spell.age++;
-      // Fixed-step channel: a full meter lasts 200 ticks (~3.34 seconds).
+      // Prototype: triple damage rate, double drain; full meter lasts ~1.67s.
       // Continuous damage, without restarting stagger, impact flashes or sound.
-      magic = Math.max(0, magic - .5);
+      magic = Math.max(0, magic - 1);
       spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
       for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
-        damage(e, { damage: 1 / 9, knock: false, magic: true, continuous: true, direction: e.x > hero.x ? 1 : -1 }, hero);
+        damage(e, { damage: 1 / 3, knock: false, magic: true, continuous: true, direction: e.x > hero.x ? 1 : -1 }, hero);
       if (magic === 0) spell = null;
     } else spell = null;
     tickActor(hero, dt);
