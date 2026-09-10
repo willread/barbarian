@@ -226,4 +226,18 @@ T.damage(defender,{damage:4,direction:1,knock:true},T.hero);assert.ok(defender.d
 actualStart();const plans=new Set();for(let i=0;i<10;i++){actualStart();plans.add(G.status().enemies.map(e=>e.type).join(','))}assert.ok(plans.size>1);
 for(let wave=1;wave<=3;wave++){for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(140)}
 assert.equal(G.status().wave,4);assert.equal(T.enemies.length,1);assert.equal(T.enemies[0].kind,'champion');
+// Live damage must not cancel the boss's preparation or active swing.
+M.init(defender);E.init(defender,'champion');defender.hp=84;defender.max=84;
+M.begin(defender,'championCleave');const bossStrike=defender.attack;
+for(let i=0;i<8;i++)T.damage(defender,{damage:2,direction:1},T.hero);
+assert.equal(defender.attack,bossStrike);assert.equal(defender.hurtTicks,0);
+T.damage(defender,{damage:4,direction:1,knock:true},T.hero);
+assert.equal(defender.attack,bossStrike);assert.equal(defender.down,null);
+bossStrike.age=bossStrike.to+1;T.damage(defender,{damage:2,direction:1},T.hero);
+assert.equal(defender.attack,null);assert.equal(defender.hurtTicks,12);assert.equal(defender.invTicks,30);
+M.init(defender);E.init(defender,'shield');defender.hp=16;defender.dir=-1;
+T.hero.x=defender.x-50;T.hero.y=defender.y+30;M.begin(defender,'shieldBash');
+T.damage(defender,{damage:4,knock:true,direction:1},T.hero);assert.equal(defender.hp,16);
+defender.attack.age=defender.attack.to+1;
+T.damage(defender,{damage:2,direction:1},T.hero);assert.equal(defender.hp,14);
 sandbox.window.stopGame();

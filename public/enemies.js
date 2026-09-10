@@ -23,9 +23,9 @@
     return order.map((kind,index)=>shuffle([kind,kind,...Array.from({length:index+1},()=>['legion','bone','shield','marauder'][Math.floor(rng()*4)])],rng)).concat([['champion']]);
   }
   function init(e,kind){Object.assign(e,{kind,boss:kind==='champion',turnTicks:0,brace:0,moveIndex:0,retreatTicks:0,phaseTwo:false});return e}
-  function guarding(e){return e.kind==='shield'&&e.hp>0&&!e.attack&&!e.hurtTicks&&!e.down&&!e.recovering&&!e.turnTicks}
+  function guarding(e){return e.kind==='shield'&&e.hp>0&&(!e.attack||(e.attack.bash&&e.attack.age<=e.attack.to))&&!e.hurtTicks&&!e.down&&!e.recovering&&!e.turnTicks}
   function block(e,attack,attacker){
-    if(!guarding(e)||attack.magic||!attacker||(attacker.x-e.x)*e.dir<=0||Math.abs(attacker.y-e.y)>24)return false;
+    if(!guarding(e)||attack.magic||!attacker||(attacker.x-e.x)*e.dir<=0)return false;
     e.x-=e.dir*(attack.knock?35:10);e.brace=14;e.aiRest=Math.max(e.aiRest,12);return true;
   }
   function intent(e,h,engaged){

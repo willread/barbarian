@@ -106,13 +106,16 @@
     if (!attack.continuous || e.hp <= 0) {
       const impact = { ...e };
       const committed = e.kind==='marauder' && e.attack && e.attack.age>=e.attack.from && e.attack.age<=e.attack.to && !attack.knock;
-      const savedAttack = committed ? e.attack : null;
-      const bossRecovery = e.kind==='champion' && (!e.attack || e.attack.age>e.attack.to);
-      const reactionAttack = e.kind==='champion' && !bossRecovery ? {...attack,knock:false} : attack;
+      const bossCommitted = e.kind==='champion' && !e.down && (!e.attack || e.attack.age<=e.attack.to);
+      const savedAttack = committed || bossCommitted ? e.attack : null;
+      const bossRecovery = e.kind==='champion' && e.attack && e.attack.age>e.attack.to;
+      const reactionAttack = bossCommitted ? {...attack,knock:false} : attack;
       M.hurt(e, reactionAttack, isHero, attacker);
-      if(e.hp>0 && (committed || (e.kind==='champion'&&!reactionAttack.knock))){
-        e.hurtTicks=committed?0:5;e.recoil=e.hurtTicks*M.STEP;e.stagger=0;e.recovering=0;
+      if(e.hp>0 && (committed || bossCommitted)){
+        e.hurtTicks=0;e.recoil=e.hurtTicks*M.STEP;e.stagger=0;e.recovering=0;
         if(savedAttack)e.attack=savedAttack;
+      } else if(e.hp>0 && bossRecovery && !reactionAttack.knock){
+        e.hurtTicks=12;e.recoil=12*M.STEP;e.stagger=0;e.aiRest=0;e.invTicks=30;
       }
       // Keep the wound's original height, but inherit the launch just applied.
       blood.hit({ ...impact, down: e.down || impact.down }, attack.direction || 1, e.hp <= 0);
