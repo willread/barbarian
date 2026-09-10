@@ -1,6 +1,17 @@
 'use client';
 import {useEffect} from 'react';
-export default function Home(){useEffect(()=>{const s=document.createElement('script');s.src='/game.js';document.body.appendChild(s);return()=>{s.remove();(window as any).stopGame?.()}},[]);return <main>
+export default function Home(){useEffect(()=>{
+  let disposed=false;
+  const scripts:HTMLScriptElement[]=[];
+  const load=(src:string)=>new Promise<void>((resolve,reject)=>{
+    const script=document.createElement('script');script.src=src;script.onload=()=>resolve();script.onerror=reject;
+    scripts.push(script);document.body.appendChild(script);
+  });
+  load('/animation.js?v=2').then(()=>{if(!disposed)return load('/game.js?v=2')}).catch(()=>{
+    const button=document.getElementById('start');if(button)button.textContent='UNABLE TO LOAD · PLEASE REFRESH';
+  });
+  return()=>{disposed=true;scripts.forEach(script=>script.remove());(window as Window & {stopGame?:()=>void}).stopGame?.()};
+},[]);return <main>
 <header><a href="/">⚔ <b>ASHEN AXE</b></a><span>A SWORD & SORCERY ARCADE</span><small>● &nbsp; SINGLE PLAYER</small></header>
 <section className="heading"><div><small>THE BORDERLANDS</small><h1>Valley of the Fallen</h1></div><span>01 <small>/ THE ASHEN LEGION</small></span></section>
 <div id="stage"><canvas id="game" width="1440" height="810" aria-label="Battle arena. WASD to move, J attack, Space jump, K magic."/><div id="hud" hidden><div><small>KAEL · THE EXILE</small><div className="health"><i id="health"/></div><div id="magic">STORMCALL &nbsp; ◆ ◆ ◆</div></div><div className="score"><small>SCORE</small><strong id="score">000000</strong><small id="wave">WAVE 1 / 4</small></div></div>
