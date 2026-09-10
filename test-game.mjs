@@ -10,11 +10,14 @@ const sandbox={console,Math,Set,Promise,Float32Array,Uint8ClampedArray,AbortCont
   document:{getElementById:element,createElement:()=>({width:444,height:444,getContext:type=>type==='webgl'?null:context}),querySelectorAll:()=>[],modelContext:{registerTool:t=>tools.set(t.name,t)}},
   requestAnimationFrame:f=>(next=f,1),cancelAnimationFrame(){}};
 sandbox.window={addEventListener:(k,f)=>events[k]=f,removeEventListener(){}};
+vm.runInNewContext(fs.readFileSync('public/mechanics.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/animation.js','utf8'),sandbox);
 let source=fs.readFileSync('public/game.js','utf8');
 source=source.replace('window.ashenAxe = {','window.__test = { get hero(){return hero}, get enemies(){return enemies}, get clock(){return clock} }; window.ashenAxe = {');
 vm.runInNewContext(source,sandbox);await new Promise(r=>setImmediate(r));
-const step=n=>{for(let i=0;i<n;i++){now+=16;next(now)}};
+const M=sandbox.window.AshenMechanics;
+next(0);
+const step=n=>{for(let i=0;i<n;i++){now+=M.STEP*1000;next(now)}};
 const press=key=>events.keydown({key,repeat:false,preventDefault(){}}),release=key=>events.keyup({key});
 const A=sandbox.window.AshenAnimation,T=sandbox.window.__test,G=sandbox.window.ashenAxe;
 assert.equal(tools.size,2);assert.throws(()=>tools.get('start_new_battle').execute({bad:true}));
@@ -38,14 +41,49 @@ assert.equal(unpacked.cels[0].image.width,8);assert.equal(unpacked.cels[1].image
 sandbox.document.createElement=createElement;
 for(const period of [3,8,24,48]){const a=A.flowPhase(.7,period),b=A.flowPhase(48+.7,period);assert.ok(Math.abs(a.a-b.a)<1e-12);assert.ok(Math.abs(a.blend-b.blend)<1e-12)}
 assert.equal(A.jumpHeight(0),0);assert.equal(A.jumpHeight(.96),0);assert.ok(A.jumpHeight(.4083)>118);
-// A melee strike cannot damage anything before its painted contact frame.
-T.enemies.forEach((e,i)=>{e.x=i?1300:560;e.y=660;e.cool=100});
-const target=T.enemies[0],initial=target.hp;press('j');assert.equal(target.hp,initial);step(3);assert.equal(target.hp,initial);step(5);assert.ok(target.hp<initial);const after=target.hp;step(8);assert.equal(target.hp,after);
-// Pausing freezes animation clocks as well as health and combat state.
-press('p');const status=G.status(),time=T.clock,actorTime=T.hero.clock;step(100);assert.deepEqual(G.status(),status);assert.equal(T.clock,time);assert.equal(T.hero.clock,actorTime);press('p');
-step(30);press(' ');assert.equal(T.hero.jump,0);step(20);assert.ok(A.jumpHeight(T.hero.jump)>70);step(50);assert.equal(T.hero.jump,null);
-G.start();step(400);press('k');assert.equal(G.status().magic,2);assert.ok(G.status().score>0);step(3500);assert.equal(G.status().phase,'lost');
+// A melee strike cannot damage anything before the traced active window.
+T.enemies.forEach((e,i)=>{e.x=i?1300:610;e.y=660;e.aiRest=1000});
+const target=T.enemies[0],initial=target.hp;
+press('j');step(7);assert.equal(target.hp,initial);step(1);assert.equal(target.hp,initial-2);
+step(10);assert.equal(target.hp,initial-2);assert.equal(T.hero.attack,null);
+// Held attack does not auto-repeat; an early tap is not queued.
+step(20);assert.equal(target.hp,initial-2);release('j');press('j');step(3);release('j');press('j');step(30);
+assert.equal(target.hp,initial-4);assert.equal(T.hero.attack,null);release('j');
+// Pausing freezes actor clocks and discards inputs made while paused.
+press('p');const status=G.status(),time=T.clock,actorTime=T.hero.clock;
+press('d');press('j');step(100);assert.deepEqual(G.status(),status);assert.equal(T.clock,time);assert.equal(T.hero.clock,actorTime);
+press('p');const x=T.hero.x;step(2);assert.equal(T.hero.x,x);assert.equal(T.hero.attack,null);
+press(' ');step(1);release(' ');assert.ok(T.hero.air);step(24);assert.equal(T.hero.height,63.25);step(24);assert.equal(T.hero.jump,null);
+// Display refresh cannot change simulation distance or number of updates.
+for(const fps of [30,60,120,144]) {
+  G.start();T.enemies.forEach(e=>{e.aiRest=100000});press('d');const x=T.hero.x;
+  for(let i=0;i<fps;i++){now+=1000/fps;next(now)}release('d');
+  assert.equal(T.hero.x-x,87*M.SCALE,`one second of movement at ${fps} Hz`);
+}
+// Double tap and charge remain distinct actions; jumping resets run momentum.
+G.start();T.enemies.forEach(e=>{e.aiRest=1000});press('d');step(1);release('d');step(1);press('d');step(8);
+assert.equal(T.hero.velocityX,4);assert.equal(T.hero.running,true);press(' ');step(1);release(' ');
+assert.equal(T.hero.jumpLaunch,7);assert.equal(T.hero.velocityX,0);step(25);assert.ok(T.hero.height>98);
+// Focus loss pauses and releases all held inputs.
+events.blur();const before=G.status();step(20);assert.deepEqual(G.status(),before);press('p');
+G.start();T.enemies.forEach((e,i)=>{e.x=650+i*200;e.y=660;e.aiRest=1000});
+const enemyHP=T.enemies[0].hp;press('k');step(1);release('k');assert.equal(G.status().magic,0);
+const frozenX=T.enemies[0].x;step(265);assert.equal(T.enemies[0].x,frozenX);assert.equal(T.enemies[0].hp,enemyHP);
+step(1);assert.equal(T.enemies[0].hp,enemyHP-8);assert.ok(T.enemies[0].down);
+// An interrupted enemy strike cannot deliver its pending contact event.
+G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:610;e.y=660;e.aiRest=1000});
+const victim=T.enemies[0];M.begin(victim,'enemy');victim.attack.age=21;victim.dir=-1;victim.attack.direction=-1;
+press('j');step(8);release('j');assert.equal(victim.attack,null);assert.equal(G.status().health,100);
+// An unattended battle is winnable by the enemies and can be restarted.
+G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+32*M.SCALE;e.y=660;e.aiRest=i?1000:0});
+step(120);assert.ok(T.hero.hp<=100-8*100/48+1e-8,'enemy follows connected blows with a knockdown finisher');assert.ok(T.hero.down);
+G.start();step(14000);assert.equal(G.status().phase,'lost');
 element('resume').onclick();assert.equal(G.status().health,100);assert.equal(G.status().score,0);
-// A killed enemy cancels its queued contact and uses a complete death sequence.
-T.enemies.forEach((e,i)=>{e.x=i?1300:550;e.y=660;e.cool=100});const victim=T.enemies[0];victim.hp=1;victim.attack={elapsed:A.clips.enemyAttack.contact-.01,direction:-1,connected:false};press('k');const hp=G.status().health;step(20);assert.equal(G.status().health,hp);assert.equal(victim.attack,null);assert.ok(A.pose(victim,false).frame>0);
-console.log('PASS: whole-body gait sequences, single sprite draw, seamless flow, ROM-derived jump, contact timing, pause, magic, defeat, restart and interrupted attacks.');sandbox.window.stopGame();
+// Wave progression and victory are exercised through damage, not phase mutation.
+for(let wave=1;wave<=4;wave++) {
+  for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}
+  step(140);
+}
+assert.equal(G.status().phase,'won');
+console.log('PASS: complete sprites, combat windows, input edges, fixed-step refresh independence, running jumps, pause, magic, interruptions, defeat, restart and victory.');
+sandbox.window.stopGame();

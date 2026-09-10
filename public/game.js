@@ -3,20 +3,22 @@
   const $ = id => document.getElementById(id);
   const canvas = $('game'), ctx = canvas.getContext('2d');
   const W = 1440, H = 810;
-  const { Atlas, LivingBackground, clips, pose, jumpHeight, decodeChroma, clamp, smooth } = window.AshenAnimation;
-  const keys = new Set(), atlases = {};
+  const { Atlas, LivingBackground, clips, pose, decodeChroma, clamp, smooth } = window.AshenAnimation;
+  const M = window.AshenMechanics;
+  const keys = new Set(), pressed = new Set(), atlases = {};
+  const bounds = { left: 70, right: W - 70, top: 560, bottom: 755 };
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
-  let running = true, ready = false, raf, last = 0, clock = 0;
+  let running = true, ready = false, raf, last = null, clock = 0, accumulator = 0, spell = null;
   let phase = 'title', wave = 1, score = 0, kills = 0, magic = 3;
-  let flash = 0, shake = 0, banner = 0, combo = 0, comboTime = 0, hitStop = 0;
+  let flash = 0, shake = 0, banner = 0, combo = 0, comboTime = 0;
   let muted = true, audio, background, sparks = [];
   let nextId = 0;
-  const make = (x, y, hp = 100) => ({
-    id: nextId++, x, y, hp, max: hp, dir: 1, attack: null, cool: 0,
+  const make = (x, y, hp = 100, player = false) => M.init({
+    id: nextId++, x, y, hp, max: hp, player, dir: 1, attack: null, cool: 0,
     recoil: 0, invulnerable: 0, jump: null, moving: false, death: 0,
     stride: 0, clock: Math.random() * 4.8, velocityX: 0, velocityY: 0,
   });
-  let hero = make(910, 718), enemies = [];
+  let hero = make(910, 718, 100, true), enemies = [];
   function beep(freq, duration = .12, type = 'sawtooth') {
     if (muted) return;
     audio ??= new AudioContext(); audio.resume();
@@ -53,7 +55,7 @@
   function spawn() {
     enemies = Array.from({ length: wave === 4 ? 3 : wave + 2 }, (_, i) => {
       const e = make(i % 2 ? -80 - i * 100 : W + 80 + i * 110, 580 + (i % 3) * 65,
-        wave === 4 && i === 0 ? 280 : 55 + wave * 10);
+        wave === 4 && i === 0 ? 32 : wave >= 3 ? 24 : 16);
       e.dir = -1; e.boss = wave === 4 && i === 0;
       return e;
     });
@@ -62,9 +64,9 @@
 
   function start() {
     if (!ready) throw new Error('Artwork is still loading');
-    hero = make(470, 660); wave = 1; score = 0; kills = 0; magic = 3;
-    combo = 0; sparks = []; hitStop = 0; flash = 0; shake = 0;
-    keys.clear(); change('playing'); spawn();
+    hero = make(470, 660, 100, true); wave = 1; score = 0; kills = 0; magic = 3;
+    combo = 0; sparks = []; flash = 0; shake = 0; spell = null; accumulator = 0;
+    keys.clear(); pressed.clear(); change('playing'); spawn();
   }
 
   function burst(x, y, count, color = '#ffc473') {
@@ -74,138 +76,111 @@
     });
   }
 
-  function damage(e, amount, direction) {
+  function damage(e, attack, attacker) {
     if (e.hp <= 0) return;
-    e.hp -= amount;
-    // Recoil cancels the pending strike, including its not-yet-reached contact event.
-    e.recoil = .24; e.attack = null; e.cool = Math.max(e.cool, .45);
-    e.velocityX = direction * 115; e.moving = false;
-    burst(e.x, e.y - 105, 16); shake = 4; hitStop = .035; beep(100);
+    const isHero = e === hero;
+    e.hp = Math.max(0, e.hp - attack.damage * (isHero ? 100 / 48 : 1));
+    M.hurt(e, attack, isHero, attacker);
+    burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
+    shake = attack.knock ? 5 : 2; beep(isHero ? 60 : 100);
+    // No global hit-stop: source action and stagger windows run continuously.
     if (e.hp <= 0) {
-      e.death = 0; kills++; score += e.boss ? 1500 : 250; combo++; comboTime = 2.2;
+      e.death = 0;
+      if (isHero) change('dying');
+      else { kills++; score += e.boss ? 1500 : 250; combo++; comboTime = 2.2; }
     }
     sync();
   }
 
-  function beginAttack(f, isHero) {
-    if (f.hp <= 0 || f.attack || f.recoil > 0 || f.cool > 0) return;
-    f.attack = { elapsed: 0, direction: f.dir, connected: false };
-    f.cool = isHero ? clips.heroAttack.duration + .06 : clips.enemyAttack.duration + .65;
-    f.moving = false; f.velocityX = 0; f.velocityY = 0;
-    if (isHero) beep(230, .15);
-  }
-
   function action(key, on) {
-    if (on) keys.add(key); else keys.delete(key);
-    if (!on) return;
+    key = ({ arrowleft: 'a', arrowright: 'd', arrowup: 'w', arrowdown: 's' })[key] || key;
+    if (!on) { keys.delete(key); return; }
     if (key === 'p') {
-      keys.clear();
+      keys.clear(); pressed.clear(); accumulator = 0;
       if (phase === 'playing') change('paused');
       else if (phase === 'paused') change('playing');
       return;
     }
     if (phase !== 'playing') return;
-    if (key === 'j') beginAttack(hero, true);
-    if (key === ' ' && hero.jump === null && !hero.attack && hero.recoil <= 0) {
-      hero.jump = 0; beep(160, .12, 'sine');
-    }
-    if (key === 'k' && magic > 0 && hero.recoil <= 0) {
-      magic--; flash = 1.1; shake = 10; beep(70, .8);
-      for (const e of enemies) if (e.x > -20 && e.x < W + 20) damage(e, 95, e.x > hero.x ? 1 : -1);
-      burst(hero.x, hero.y - 120, 70, '#b3ebff'); sync();
-    }
-  }
-
-  function tickAttack(f, isHero, dt) {
-    if (!f.attack) return;
-    const attack = f.attack, clip = isHero ? clips.heroAttack : clips.enemyAttack;
-    const previous = attack.elapsed;
-    attack.elapsed += dt;
-    f.dir = attack.direction;
-    if (!attack.connected && previous < clip.contact && attack.elapsed >= clip.contact) {
-      attack.connected = true;
-      if (isHero) {
-        for (const e of enemies) {
-          if (Math.abs(e.y - f.y) < 67 && Math.abs(e.x - f.x) < 167 &&
-              (e.x - f.x) * attack.direction > -20) damage(e, 35 + (combo % 3) * 7, attack.direction);
-        }
-      } else if (hero.hp > 0 && Math.abs(hero.x - f.x) < 131 && Math.abs(hero.y - f.y) < 50 &&
-        (hero.x - f.x) * attack.direction > -20 &&
-        (hero.jump === null || jumpHeight(hero.jump) < 24) && hero.invulnerable <= 0) {
-        hero.hp -= f.boss ? 19 : 9;
-        hero.invulnerable = .8; hero.recoil = .22; hero.attack = null;
-        hero.velocityX = attack.direction * 100;
-        burst(hero.x, hero.y - 110, 12, '#e97b4f'); shake = 5; hitStop = .045; beep(60);
-        if (hero.hp <= 0) { hero.death = 0; hero.jump = null; change('dying'); }
-        sync();
-      }
-    }
-    if (attack.elapsed >= clip.duration) f.attack = null;
+    if (!keys.has(key)) pressed.add(key);
+    keys.add(key);
   }
 
   function tickActor(f, dt) {
     f.clock += dt; f.cool = Math.max(0, f.cool - dt);
-    f.recoil = Math.max(0, f.recoil - dt); f.invulnerable = Math.max(0, f.invulnerable - dt);
-    if (f.hp <= 0) { f.death += dt; f.moving = false; return; }
-    if (f.jump !== null) {
-      f.jump += dt;
-      if (f.jump >= clips.jump.duration) { f.jump = null; burst(f.x, f.y - 3, 5, '#96856c'); }
-    }
+    M.stepReaction(f, f === hero);
+    if (f.down) f.x = clamp(f.x, bounds.left, bounds.right);
+    if (f.hp <= 0) { f.death += dt; f.moving = false; }
   }
 
-  function move(f, dx, dy, speed, dt, isHero) {
-    if (f.attack || f.recoil > 0) {
-      f.moving = false;
-      if (f.recoil > 0) { f.x += f.velocityX * dt; f.velocityX *= Math.exp(-10 * dt); }
-      return;
-    }
-    const length = Math.hypot(dx, dy);
-    if (length > 1) { dx /= length; dy /= length; }
-    // Short acceleration/deceleration makes the weight transfer visible.
-    const ease = 1 - Math.exp(-18 * dt);
-    f.velocityX += (dx * speed - f.velocityX) * ease;
-    f.velocityY += (dy * speed * .55 - f.velocityY) * ease;
-    if (Math.abs(f.velocityX) < .5) f.velocityX = 0;
-    if (Math.abs(f.velocityY) < .5) f.velocityY = 0;
-    const oldX = f.x, oldY = f.y;
-    const crouching = f.jump !== null && (f.jump < clips.jump.launch || f.jump > clips.jump.land);
-    f.x += f.velocityX * dt * (crouching ? .2 : 1);
-    f.y += f.velocityY * dt * (crouching ? .2 : 1);
-    if (isHero) {
-      f.x = clamp(f.x, 70, W - 70); f.y = clamp(f.y, 560, 755);
-    }
-    const distance = Math.hypot(f.x - oldX, (f.y - oldY) * 1.2);
-    f.moving = distance > .08 && f.jump === null;
-    if (speed > 0) f.gaitSpeed = speed;
-    if (f.moving) f.stride = (f.stride + distance / Math.max(1, (f.gaitSpeed || speed) * (isHero ? 40 : 56) / 60)) % 1;
-    if (dx) f.dir = dx > 0 ? 1 : -1;
+  function cast() {
+    if (!magic || hero.air || hero.attack || hero.hurtTicks || hero.down || hero.recovering) return false;
+    spell = { age: 0, power: magic >= 3 ? 8 : 4 };
+    magic = 0; hero.running = false; hero.velocityX = hero.velocityY = 0;
+    hero.moving = false; flash = .3; beep(70, .8); sync(); return true;
   }
 
   function update(dt) {
+    if (!['playing', 'dying', 'title'].includes(phase)) return;
+    if (phase === 'title') { hero.clock += dt; return; }
+    if (spell) {
+      pressed.clear(); spell.age++;
+      // The traced Ax Battler magic sequence freezes actors for 266 updates.
+      flash = .3 + .2 * Math.sin(spell.age / 9);
+      if (spell.age >= 266) {
+        const power = spell.power; spell = null; flash = .8;
+        for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
+          damage(e, { damage: power, knock: true, direction: e.x > hero.x ? 1 : -1 }, hero);
+      }
+      return;
+    }
     tickActor(hero, dt);
     for (const e of enemies) tickActor(e, dt);
     if (phase === 'dying') {
       if (hero.death > clips.heroDeath.duration + .7) change('lost');
-      return;
+      pressed.clear(); return;
     }
-    if (phase !== 'playing') return;
     banner -= dt; comboTime -= dt;
     if (comboTime < 0) combo = 0;
-    const dx = Number(keys.has('d') || keys.has('arrowright')) - Number(keys.has('a') || keys.has('arrowleft'));
-    const dy = Number(keys.has('s') || keys.has('arrowdown')) - Number(keys.has('w') || keys.has('arrowup'));
-    move(hero, dx, dy, 230, dt, true);
-    tickAttack(hero, true, dt);
+    const dx = Number(keys.has('d')) - Number(keys.has('a'));
+    const dy = Number(keys.has('s')) - Number(keys.has('w'));
+    const edge = pressed.has('a') ? -1 : pressed.has('d') ? 1 : 0;
+    if (pressed.has('k') && cast()) { pressed.clear(); return; }
+    if (pressed.has('j') && pressed.has(' ') && !hero.air) M.begin(hero, 'back');
+    else if (pressed.has(' ')) {
+      if (M.startJump(hero)) beep(160, .12, 'sine');
+    } else if (pressed.has('j')) {
+      if (M.begin(hero, M.selectStrike(hero, enemies))) beep(230, .15);
+    }
+    M.stepMotion(hero, dx, dy, edge, bounds);
+    M.tickAttack(hero, enemies, damage);
+    pressed.clear();
+    // Reserve one approach position per side; other fighters wait farther out.
+    const engaged = new Set();
+    for (const side of [-1, 1]) {
+      const candidate = enemies.filter(e => e.hp > 0 && !e.down && Math.sign(e.x - hero.x) === side)
+        .sort((a, b) => Math.abs(a.x - hero.x) - Math.abs(b.x - hero.x))[0];
+      if (candidate) engaged.add(candidate.id);
+    }
     for (const e of enemies) {
       if (e.hp <= 0) continue;
-      const x = hero.x - e.x, y = hero.y - e.y;
-      if (!e.attack && e.recoil <= 0) {
-        e.dir = x < 0 ? -1 : 1;
-        if (Math.abs(x) > 101 || Math.abs(y) > 33) {
-          move(e, Math.abs(x) > 88 ? Math.sign(x) : 0, Math.abs(y) > 12 ? Math.sign(y) : 0,
-            e.boss ? 65 : 80 + wave * 7, dt, false);
-        } else { move(e, 0, 0, 0, dt, false); beginAttack(e, false); }
-      } else move(e, 0, 0, 0, dt, false);
-      tickAttack(e, false, dt);
+      const [ex, ey] = M.enemyIntent(e, hero, engaged.has(e.id));
+      if (e.attack) M.stepMotion(e, 0, 0);
+      else if (!e.hurtTicks && !e.down && !e.recovering) {
+        // Enemy direction table C5DE: independent half-unit axes; harder types .625.
+        const speed = wave >= 3 ? .625 : .5;
+        e.velocityX = ex * speed; e.velocityY = ey * speed;
+        e.x += e.velocityX * M.SCALE; e.y += e.velocityY * M.SCALE;
+        e.y = clamp(e.y, bounds.top, bounds.bottom);
+        e.moving = !!(ex || ey);
+        if (e.moving) e.stride = (e.stride + 1 / 56) % 1;
+      }
+      const finished = M.tickAttack(e, [hero], damage);
+      if (finished) {
+        if (finished.connected && hero.hp > 0 && !hero.down && e.aiChain < 2 && finished.type !== 'enemyCharge') {
+          e.aiChain++; M.begin(e, e.aiChain === 1 ? 'enemyFollow' : 'enemyFinish');
+        } else { e.aiChain = 0; e.aiRest = 40; }
+      }
       if (phase !== 'playing') break;
     }
     if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.death > clips.enemyDeath.duration + .8)) {
@@ -221,11 +196,11 @@
     const p = pose(f, isHero), atlas = atlases[p.atlas];
     if (!atlas) return;
     const size = f.boss ? 345 : 292;
-    const height = f.jump === null ? 0 : jumpHeight(f.jump);
+    const height = (f.height || 0) * M.SCALE;
     ctx.save();
-    ctx.globalAlpha = opacity * (1 - height / 220);
+    ctx.globalAlpha = opacity * Math.max(.2, 1 - height / 500);
     ctx.fillStyle = '#07090680'; ctx.beginPath();
-    ctx.ellipse(f.x, f.y - 2, size * .17 * (1 - height / 330), 10, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.ellipse(f.x, f.y - 2, size * .17 * Math.max(.3, 1 - height / 600), 10, 0, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = opacity;
     ctx.translate(f.x, f.y - height);
     ctx.scale(f.dir, 1);
@@ -279,11 +254,18 @@
 
   function loop(now) {
     if (!running) return;
-    const raw = Math.min(.04, (now - last) / 1000 || .016); last = now;
-    const dt = phase === 'paused' || phase === 'won' || phase === 'lost' ? 0 : raw;
+    const raw = last === null ? 0 : Math.min(.25, Math.max(0, (now - last) / 1000)); last = now;
+    const frozen = ['paused', 'won', 'lost'].includes(phase);
+    const dt = frozen ? 0 : raw;
     clock += dt;
-    if (hitStop > 0) hitStop -= dt;
-    else if (ready) update(dt);
+    if (frozen || !ready) accumulator = 0;
+    else {
+      accumulator += dt;
+      while (accumulator + 1e-10 >= M.STEP) {
+        update(M.STEP); accumulator -= M.STEP;
+        if (['won', 'lost'].includes(phase)) { accumulator = 0; break; }
+      }
+    }
     flash = Math.max(0, flash - dt); shake = Math.max(0, shake - dt * 35);
     render(dt); raf = requestAnimationFrame(loop);
   }
@@ -295,7 +277,7 @@
     }
   };
   const up = event => action(event.key.toLowerCase(), false);
-  const blur = () => { keys.clear(); if (phase === 'playing') change('paused'); };
+  const blur = () => { keys.clear(); pressed.clear(); accumulator = 0; if (phase === 'playing') change('paused'); };
   window.addEventListener('keydown', down); window.addEventListener('keyup', up); window.addEventListener('blur', blur);
   $('start').onclick = start;
   $('resume').onclick = () => phase === 'paused' ? change('playing') : start();
@@ -313,13 +295,16 @@
   const loadImage = src => new Promise((resolve, reject) => {
     const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src;
   });
-  const names = ['hero-motion-v3', 'hero-combat-v3', 'hero-walk-v4', 'hero-actions-v4', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-combat-v3'];
+  const names = ['hero-motion-v3', 'hero-combat-v3', 'hero-walk-v4', 'hero-actions-v4', 'hero-extra-motion-v5', 'hero-close-moves-v5', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3'];
   const atlasConfig = {
     'hero-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .87 },
     'hero-actions-v4': { columns: 4, rows: 2, frames: 8, scale: 1.16 },
     'hero-combat-v3': { scale: 1.2 },
+    'hero-extra-motion-v5': { columns: 4, rows: 3, frames: 12, scale: 1.2 },
+    'hero-close-moves-v5': { columns: 4, rows: 4, frames: 16, scale: 1.2 },
     'enemy-walk-v4': { columns: 4, rows: 1, frames: 4, scale: .88, facing: -1 },
     'enemy-attack-v4': { columns: 4, rows: 1, frames: 4, scale: 1.08, facing: -1 },
+    'enemy-charge-v5': { columns: 4, rows: 1, frames: 4, scale: 1.2, facing: -1 },
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
@@ -341,7 +326,7 @@
     background?.dispose(); audio?.close();
   };
   window.ashenAxe = {
-    status: () => ({ phase, health: hero.hp, wave, score, magic, kills }), start,
+    status: () => ({ phase, health: Math.round(hero.hp), wave, score, magic, kills }), start,
     pause: () => action('p', true),
   };
 })();

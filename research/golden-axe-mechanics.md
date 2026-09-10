@@ -1,5 +1,7 @@
 # Golden Axe Mega Drive: direct code analysis
 
+**Follow-up implemented:** see [ground-combat-implementation.md](ground-combat-implementation.md) for the completed movement/combat tracing, measured fixtures, applied enemy behavior, and explicit adaptation boundaries. The initial findings below are retained as the address map and research history.
+
 Initial findings from the supplied World ROM. This is a mechanics reference for original implementation in Ashen Axe, not a complete reconstruction of the game. Addresses below are ROM offsets / 68000 addresses; RAM addresses are explicitly labeled. Numerical units refer to original game coordinates and simulation updates, before any scaling for our artwork.
 
 ## Identity and method
@@ -58,14 +60,14 @@ Ax Battler's selected animation table is `0x03A340`, confirmed in player RAM. Th
 
 The standing pose selected through offset `0x54` points to `0x03A62C`, with one frame. Our realistic breathing idle can add visual motion while preserving the original gameplay state. More painted in-between frames should sample these animation phases without changing movement speed, action locks, or damage timing.
 
-## What remains unresolved
+## Initial open questions (resolved for the ground-combat adaptation below)
 
 - Attack selection at `0x006F6E` is contextual: it tests target categories and distances, including thresholds `0x1C` and `0x2C`. Those values are not yet verified as universal weapon reach or active hit windows.
 - Exact attack startup, active frames, recovery, combo continuation, hit reactions, and cancellation rules require tracing the selected animation and collision paths.
 - Enemy update dispatch is located, but skeleton-specific identity, AI state transitions, approach distances, and attack scheduling are not yet decoded.
 - Mounted behavior, other heroes, bosses, terrain transitions, PAL behavior, and double-tap boundary cases are outside this initial validated set.
 
-Do not claim full Golden Axe fidelity from these findings alone. First adapt the confirmed movement model with a fixed simulation step and artwork scale; then add combat and AI only as their code paths are decoded and checked.
+The following pass replaces the prototype locomotion and combat with measured rules. This is a ground-combat homage, not a full ROM port; the explicitly excluded systems remain excluded.
 
 ## Local reproduction
 

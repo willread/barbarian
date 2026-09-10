@@ -288,11 +288,11 @@
     }
   }
 
-  // Golden Axe's standing slash has four five-update key poses. The painted
-  // redraw adds in-betweens while preserving that 20-update action envelope.
+  // Gameplay timing comes from mechanics.js. These envelopes remain available
+  // for standalone artwork previews; painted poses follow each live action.
   const clips = {
-    heroAttack: { duration: 20 / 60, contact: 5 / 60 },
-    enemyAttack: { duration: 40 / 60, contact: 20 / 60 },
+    heroAttack: { duration: 18 / 59.92274340431231, contact: 8 / 59.92274340431231 },
+    enemyAttack: { duration: 51 / 59.92274340431231, contact: 29 / 59.92274340431231 },
     jump: { duration: 49 / 60, launch: 2 / 60, land: 47 / 60 },
     heroDeath: { duration: 1.2 },
     enemyDeath: { duration: 1.3 },
@@ -309,24 +309,45 @@
   function pose(f, hero) {
     const motion = hero ? 'hero-motion-v3' : 'enemy-motion-v3';
     const combat = hero ? 'hero-combat-v3' : 'enemy-combat-v3';
+    if (f.down) {
+      const d = f.down;
+      const frame = d.ground ? (f.hp > 0 && d.ground <= 20 ? (d.ground > 10 ? 14 : 13) : 15) : d.vz < 0 ? 13 : 14;
+      return { atlas: combat, frame };
+    }
     if (f.hp <= 0) {
       const duration = hero ? clips.heroDeath.duration : clips.enemyDeath.duration;
       return { atlas: combat, frame: 12 + Math.min(3, Math.floor(f.death / duration * 4)) };
     }
     if (f.recoil > 0) {
-      const progress = clamp(1 - f.recoil / (hero ? .22 : .24));
+      const progress = clamp((f.hurtAge || 0) / (hero ? 11 : 25));
       return { atlas: combat, frame: 8 + Math.min(3, Math.floor(progress * 4)) };
     }
+    if (f.recovering > 0) return { atlas: combat, frame: 11 };
     if (f.attack) {
-      const duration = hero ? clips.heroAttack.duration : clips.enemyAttack.duration;
-      if (hero) return { atlas: 'hero-actions-v4', frame: 4 + Math.min(3, Math.floor(f.attack.elapsed / duration * 4)) };
-      return { atlas: 'enemy-attack-v4', frame: Math.min(3, Math.floor(f.attack.elapsed / duration * 4)) };
+      const a = f.attack, age = a.age || 0;
+      if (a.type === 'charge' || a.type === 'enemyCharge')
+        return hero ? { atlas: 'hero-extra-motion-v5', frame: age < 3 ? 4 : 5 + Math.min(2, Math.floor((age - 3) / 10)) } : { atlas: 'enemy-charge-v5', frame: Math.min(3, Math.floor(age / 9)) };
+      if (a.type === 'air') return { atlas: 'hero-extra-motion-v5', frame: age < 4 ? 8 : age < 7 ? 9 : age < 9 ? 10 : 11 };
+      if (a.type === 'pommel') return { atlas: 'hero-close-moves-v5', frame: age < 7 ? 0 : age < 13 ? 1 : age <= 17 ? 2 : 3 };
+      if (a.type === 'throw') return { atlas: 'hero-close-moves-v5', frame: 4 + Math.min(3, Math.floor(Math.max(0, age - 2) / 14)) };
+      // Cel 9 has a malformed weapon, so it is deliberately excluded.
+      if (a.type === 'back') return { atlas: 'hero-close-moves-v5', frame: age < 27 ? 8 : age <= 32 ? 10 : 11 };
+      if (a.type === 'kick') return { atlas: 'hero-close-moves-v5', frame: age < 8 ? 12 : age < 15 ? 13 : age <= 20 ? 14 : 15 };
+      if (hero) {
+        // Keep the contact silhouette visible throughout the active window.
+        const frame = a.type === 'whiff' ? Math.min(3, Math.floor(Math.max(0, age - 2) / 5)) :
+          age < a.from ? 0 : age <= a.to ? 1 : age < a.ticks - 2 ? 2 : 3;
+        return { atlas: 'hero-actions-v4', frame: 4 + frame };
+      }
+      return { atlas: 'enemy-attack-v4', frame: age < a.from - 8 ? 0 : age < a.from ? 1 : age <= a.to ? 2 : 3 };
     }
     if (f.jump !== null) {
-      const frame = f.jump < clips.jump.launch ? 12 : f.jump < .18 ? 13 : f.jump < clips.jump.land ? 14 : 15;
+      const frame = f.air ? (f.air.age <= 2 ? 12 : f.air.land ? 15 : f.air.vz < 0 ? 13 : 14) :
+        f.jump < clips.jump.launch ? 12 : f.jump < .18 ? 13 : f.jump < clips.jump.land ? 14 : 15;
       return { atlas: motion, frame };
     }
     if (f.moving) {
+      if (hero && f.running) return { atlas: 'hero-extra-motion-v5', frame: Math.floor(f.stride * 4) % 4 };
       return { atlas: hero ? 'hero-walk-v4' : 'enemy-walk-v4', frame: Math.floor(f.stride * 4) % 4 };
     }
     // Complete painted poses. No limb segmentation, mesh warping, or ghosted crossfade.

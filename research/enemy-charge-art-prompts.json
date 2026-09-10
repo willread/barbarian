@@ -1,0 +1,15 @@
+{
+  "tool": "built-in tools.image_gen__imagegen",
+  "mode": "edit",
+  "path": "C:/Users/will/.codex/generated_images/01a0896b-6fff-7672-a932-4f400de0e402/exec-1af994ee-7684-4ea6-b4cc-ef0152d650d0.png",
+  "actualDimensions": [
+    2172,
+    724
+  ],
+  "prompt": "Use case: style-transfer.\nAsset type: pose-locked full-body enemy charge sprite sheet.\nInput image 1 enemy-charge-guide.png is the actual EDIT TARGET. Input image 2 enemy-walk-v4.png is CHARACTER IDENTITY / MATERIAL STYLE ONLY, NOT POSE.\nDirectly paint over image 1, preserving exactly its 1536x512 canvas, four columns by one row, four figures, each existing silhouette, placement, facing and scale. Preserve the generous green padding. All four figures face LEFT in a compact crouched airborne knee-tucked shoulder-charge posture. Torso drives down-left, shoulder ahead, BOTH legs sharply bent and tucked beneath/behind torso toward right, no standing straight legs. Preserve each target figure's exact head, torso, arm, knee, ankle, and foot coordinates and its small vertical difference from neighbors. This is one compact pose sampled four times, not four invented action poses.\nPaint each target sprite into the identical bronze-armored horned skeleton from image 2: visible skull, curved horns, weathered bronze plate and knee guards, segmented gauntlets, bronze boots, dark red tattered cape, rich realistic sword-and-sorcery oil painting. Compress costume and cape around existing compact target silhouette. Pose geometry from image 1 takes priority over walking poses or elongated proportions in image 2.\nReplace the guide's club, held diagonally across chest and pointing upper-right, with ONE SHORT SWORD on the SAME diagonal upper-right axis. Keep hands tucked tightly against chest. Sword remains entirely visible in each cell. Do not point weapon left, and do not copy upright sword from style reference. Each cel must be ONE connected complete full-body skeleton with both legs anatomically connected. \nBackground exactly solid bright chroma green RGB(0,255,0). No ground or shadows, labels, grids, effects, trails, motion streaks, extra figures, detached limbs, extra limbs, duplicate weapons. Change texture and identity only; do not enlarge, center, reposition, stand up, or redesign guide poses.",
+  "references": [
+    "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/enemy-charge-guide.png",
+    "C:/Users/will/Documents/will/barbarian/public/art/enemy-walk-v4.png"
+  ],
+  "inspection": "Four complete connected bronze armored horned skeleton cels facing left, knees bent and tucked for airborne charge, swords diagonal upper-right and tucked across chest, red capes. No upright standing legs. Exact target registration/scale not preserved; actual output dimensions differ from requested 1536x512. Background visually near-green, use chroma threshold. No retries or postprocessing."
+}

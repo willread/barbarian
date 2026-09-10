@@ -28,15 +28,20 @@ The selected movement and strike assets are direct paintovers of the extracted p
 | `public/art/hero-motion-v3.png` | 4 × 4 | Last row only: complete-body jump poses |
 | `public/art/hero-combat-v3.png` | 4 × 4 | Last two rows only: hurt and collapse |
 | `public/art/enemy-combat-v3.png` | 4 × 4 | Last two rows only: hurt and collapse |
+| `public/art/hero-extra-motion-v5.png` | 4 × 3 | Run, compact shoulder charge, jumping attack |
+| `public/art/hero-close-moves-v5.png` | 4 × 4 | Pommel, throw, backward attack, high kick |
+| `public/art/enemy-charge-v5.png` | 4 × 1 | Tucked airborne charge of the source-equivalent soldier |
 
 The four-pose walks retain the source's 40-update hero and 56-update enemy cycles. Extra generated same-leg lifts are not used. More in-between poses require another pose-accurate pass rather than playback of inaccurate candidates. The source camera angle, foot placement and compact silhouette now guide the movement art, although the painted anatomy and equipment are still stylized rather than literally registered to each source joint.
 
-The standing slash uses a 20/60-second envelope, with its contact event aligned to the start of the second painted key. The enemy strike uses 40/60 seconds with contact at its third key. These contact events are adaptations aligned to the redraw, not a completed reverse engineering of the ROM's hitbox activation logic or AI.
+Combat now follows the measured live action windows in `mechanics.js`: a selected normal blow returns at age 18 and is active at ages 8–12; the first enemy blow is active at 29–36 of its 51-update envelope. The corresponding painted contact pose remains visible for the active interval. See `ground-combat-implementation.md` for the contextual moves and evidence.
 
 At texture load, chroma green is removed and each connected **complete figure** is assigned to its atlas cell. This retains sword/axe overhang across nominal cell boundaries without clipping it or displaying it in another character frame. Each complete cel is drawn once, anchored to the ground. Per-atlas size factors compensate for different illustration framing so the standing body remains similar in size across actions. No limb splitting or separate weapon drawing remains.
 
-The jump visual follows the extracted -5.5 launch / +0.25 gravity trajectory scaled to the existing scene, with the sampled launch and landing transition intervals. This does not claim a complete port of Golden Axe physics; horizontal movement, enemy decisions, and collision rules still contain prototype behavior. Hurt, death, and jump paintings are full-body adaptations, not exact ROM pose traces.
+The jump now follows actual fixed-step height and velocity, including the -7 running launch and source air steering. All movement and reach share a 4.5-unit artwork scale. Landing and recovery select complete poses from the live state. Hurt and death paintings remain full-body adaptations; the ground-combat document distinguishes measured physics from adapted AI and collision details.
 
 Exact selected prompts, reference paths, source output paths, and project paths are recorded in `painted-animation-prompts.json`. All redraws used the built-in image-generation tool. The actual saved assets use green RGB backgrounds decoded at runtime.
 
 The subtle background animation remains intact. Validation uses the gameplay harness, real-texture offline rendering, artwork inspection, and the production build. The local playable preview was opened for the user's requested live demonstration.
+
+The v5 sheets use new extracted pose guides and the established painted characters as style references. Exact prompts and source paths are in `hero-mechanics-art-prompts.json` and `enemy-charge-art-prompts.json`; all used built-in image generation. Generated body registration is approximate and normalized at atlas level. Close-move cel 9 has a malformed double-ended weapon and is excluded from playback; the backward attack uses the remaining complete poses. The source run/tackle hides the weapon, so the paintover does too. No body part is animated independently.

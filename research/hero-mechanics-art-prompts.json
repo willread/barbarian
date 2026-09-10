@@ -1,0 +1,34 @@
+{
+  "tool": "built-in tools.image_gen__imagegen",
+  "mode": "edit",
+  "outputs": [
+    {
+      "name": "hero-extra-motion",
+      "path": "C:/Users/will/.codex/generated_images/01a0896b-6fff-7672-a932-4f400de0e402/exec-d990d2d6-74da-4a9d-a82a-498d0bc80fb1.png",
+      "prompt": "Use case: style-transfer.\nAsset type: production full-body game animation sprite sheet.\nInput image 1 is the ACTUAL EDIT TARGET: hero-extra-motion-guide.png. Input image 2 is STYLE / CHARACTER IDENTITY ONLY: hero-actions-v4.png.\nDIRECTLY PAINT OVER IMAGE 1. Output exactly 1536x1536 pixels with its existing 4 columns by 3 rows, 12 complete connected full-body cels. Preserve the target's entire composition and each pose, facing, center, baseline, character height and scale, shoulder/hip angles, hand and foot coordinates, bent joints, silhouette and limb overlap. Do not copy poses from image 2.\nReplace only the low-resolution pixel rendering by rich realistic sword-and-sorcery oil-painted anatomy and the SAME hero identity seen in image 2: muscular tan long-haired dark-haired barbarian, bronze bracers, fur/leather loincloth and belt, brown fur-trimmed boots, ornate double-headed bronze axe where target holds a weapon. Keep body proportions and costume consistent across all 12 cels. Preserve the weapon's hand positions and handle orientation when replacing target sword by axe. Do not add weapons to unarmed running or tackle cels.\nRow 1 (top): preserve all four EXACT different running keys from target.\nRow 2 (middle): preserve running shoulder-charge transition then three compact diagonal shoulder-tackle poses EXACTLY as target; tucked arms and leaning torso, feet at target positions.\nRow 3 (bottom): preserve the four exact jumping-attack keys, including raised knee and overhead windup, raised weapon, then low downward strike and same strike hold. Erase white motion arc marks; paint only the physical weapon in its original orientation.\nBackground must be perfectly solid bright chroma-key green RGB(0,255,0). Keep all existing generous green padding and cell locations. No ground, shadows, labels, grids, motion streaks, effects, extra figures, extra legs, floating limbs or separate limb pieces. Every cel is one complete full-body character. CRITICAL: This is a registered texture/style paintover of the existing sprites, not a redesign of poses or a new composition.",
+      "references": [
+        "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/hero-extra-motion-guide.png",
+        "C:/Users/will/Documents/will/barbarian/public/art/hero-actions-v4.png"
+      ],
+      "actualDimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "name": "hero-close-moves",
+      "path": "C:/Users/will/.codex/generated_images/01a0896b-6fff-7672-a932-4f400de0e402/exec-deb0bd1f-448b-4073-b339-d60691182bdb.png",
+      "prompt": "Use case: style-transfer.\nAsset type: production full-body game animation sprite sheet.\nInput image 1 is the ACTUAL EDIT TARGET: hero-close-moves-guide.png. Input image 2 is STYLE / CHARACTER IDENTITY ONLY: hero-actions-v4.png.\nDIRECTLY PAINT OVER IMAGE 1. Output exactly 1536x2048 pixels with its existing 4 columns by 4 rows, 16 complete connected full-body cels. Preserve the target's entire composition and each pose, facing, center, baseline, character height and scale, shoulder/hip angles, hand and foot coordinates, bent joints, silhouette and limb overlap. Do not copy poses from image 2.\nReplace only the low-resolution pixel rendering by rich realistic sword-and-sorcery oil-painted anatomy and the SAME hero identity seen in image 2: muscular tan long-haired dark-haired barbarian, bronze bracers, fur/leather loincloth and belt, brown fur-trimmed boots, ornate double-headed bronze axe where target holds a weapon. Keep body proportions and costume consistent across all 16 cels. Replace sword with this axe while preserving the hand positions and handle angle. Do not add weapons to bare-hand grapple cels.\nRow 1 (top): four EXACT overhead weapon-pommel close-blow keys; retain the raised hands and downward pommel-contact posture in column 3.\nRow 2: four EXACT grapple/throw arm poses: low reaching crouch then three matching backward-leaning bent-arm throw poses. Whole bodies, no additional held enemy.\nRow 3: four EXACT backward spinning attack keys, already mirrored in this target so final contact points RIGHT. Keep the crossed hands overhead in column 1, back-view raised arms column 2, arms extended right column 3, and recovery column 4. DO NOT re-mirror this row. Erase white motion arcs, leaving only the physical weapon at target orientation.\nRow 4 (bottom): four EXACT contextual heavy finisher keys, preserving the high forward kick in column 3 and other recovery/windup poses.\nBackground must be perfectly solid bright chroma-key green RGB(0,255,0). Keep all existing generous green padding and cell locations. No ground, shadows, labels, grids, motion streaks, effects, extra figures, extra legs, floating limbs or separate limb pieces. Every cel is one complete full-body character. CRITICAL: This is a registered texture/style paintover of the existing sprites, not a redesign of poses or a new composition.",
+      "references": [
+        "C:/Users/will/Documents/will/barbarian/work/golden-axe/references/hero-close-moves-guide.png",
+        "C:/Users/will/Documents/will/barbarian/public/art/hero-actions-v4.png"
+      ],
+      "actualDimensions": [
+        1086,
+        1448
+      ]
+    }
+  ],
+  "inspection": "Both generated sheets contain the correct counts of complete full-body cels with painterly hero identity and requested move families. They are not pixel-registered paintovers: body size and positions shifted from guides. Close-moves back-view spin cel has an extra axe head on opposite end of handle. No retry requested.",
+  "chromaInspection": "Background is near-green rather than exact RGB 0,255,0; top-left extra RGB 16,241,20 and close RGB 16,241,14. Outputs are original built-in images without postprocessing."
+}
