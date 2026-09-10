@@ -228,40 +228,77 @@
     }
   }
 
+  // Seeded, multi-scale fractures: a channel stays rigid between discharges.
+  // New leaders find new paths; the bolt never bends like a waving rope.
+  function lightningChannel(seed, ground) {
+    let state = seed >>> 0;
+    const random = () => { state = (Math.imul(state, 1664525) + 1013904223) >>> 0; return state / 4294967296; };
+    function fracture(a, b, spread, depth) {
+      if (!depth) return [a, b];
+      const mid = [(a[0] + b[0]) / 2 + (random() - .5) * spread, (a[1] + b[1]) / 2];
+      return [...fracture(a, mid, spread * .53, depth - 1).slice(0, -1), ...fracture(mid, b, spread * .53, depth - 1)];
+    }
+    const main = fracture([(random() - .5) * 190, -45], [0, ground], 190, 6);
+    const branches = [];
+    for (let i = 5; i < 57; i += 4 + Math.floor(random() * 3)) {
+      const start = main[i], side = random() < .5 ? -1 : 1;
+      const end = [start[0] + side * (35 + random() * 110), Math.min(ground - 12, start[1] + 65 + random() * 160)];
+      const points = fracture(start, end, 50, 4);
+      branches.push({points, width: .55 + random() * .5});
+      const fork = points[7];
+      branches.push({points: fracture(fork, [fork[0] + side * 45, Math.min(ground - 8, fork[1] + 65)], 24, 3), width: .35});
+    }
+    return {main, branches};
+  }
+
   function drawSpell() {
     if (!spell || !stormTexture) return;
-    // Blend two fully connected painted bolts, keeping the channel continuous.
-    // Small flowing displacements animate the branches without moving the impact.
-    const strength = smooth(spell.age / 6);
+    spell.channels ??= new Map();
+    const elapsed = Math.max(0, spell.age - 1) * M.STEP;
     const cw = stormTexture.width / 4, ch = stormTexture.height / 2;
-    ctx.save(); ctx.globalCompositeOperation = 'screen';
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     for (const target of spell.targets) {
-      const height = (target.y + 100) / .907, width = 345;
-      const baseline = .907;
-      const top = target.y - height * baseline;
-      const blend = reducedMotion ? 0 : .35 + .25 * Math.sin(clock * 4 + target.id);
-      const opacity = strength * (reducedMotion ? .45 : .8);
-      // The painted bolt starts below its source cell edge: overscan places its
-      // actual luminous tip above the canvas, so it enters through the top edge.
-      for (const [frame, weight] of [[2, 1 - blend], [1, blend]]) {
-        if (!weight) continue;
-        ctx.globalAlpha = opacity * weight;
-        for (let sy = 0; sy < ch; sy += 8) {
-          const sh = Math.min(8, ch - sy), v = sy / ch;
-          const taper = clamp((baseline - v) / .2);
-          const flow = reducedMotion ? 0 : taper * (4 * Math.sin(v * 18 - clock * 9 + target.id) + 2 * Math.sin(v * 37 + clock * 13));
-          const y0 = Math.round(top + v * height), y1 = Math.round(top + (sy + sh) / ch * height);
-          ctx.drawImage(stormTexture, frame * cw, sy, cw, sh,
-            target.x - width / 2 + flow, y0, width, y1 - y0);
-        }
+      // 50 ms downward leader, 20 ms upward return stroke, then an energized
+      // after-channel. Damage and meter drain remain continuous while held.
+      const cycle = reducedMotion ? 0 : Math.floor(elapsed / .24);
+      const age = reducedMotion ? Math.min(elapsed, .12) : elapsed - cycle * .24;
+      let entry = spell.channels.get(target.id);
+      if (!entry || entry.cycle !== cycle) {
+        entry = {cycle, previous: entry?.current, current: lightningChannel(target.id * 7919 + cycle * 104729 + 17, target.y)};
+        spell.channels.set(target.id, entry);
       }
-      ctx.globalAlpha = opacity;
-      {
+      const front = -45 + (target.y + 45) * clamp(age / .05);
+      const connected = age >= .05;
+      const surge = connected ? Math.exp(-(age - .05) * 24) : 0;
+      const paint = (channel, alpha, bottom, returnOnly = false) => {
+        ctx.save(); ctx.translate(target.x, 0);
+        ctx.beginPath(); ctx.rect(-300, returnOnly ? target.y - (target.y + 45) * clamp((age - .05) / .02) : -45, 600,
+          returnOnly ? (target.y + 45) * clamp((age - .05) / .02) + 5 : bottom + 45); ctx.clip();
+        const stroke = (points, width, color) => {
+          ctx.beginPath(); ctx.moveTo(...points[0]); for (let i = 1; i < points.length; i++) ctx.lineTo(...points[i]);
+          ctx.lineWidth = width; ctx.strokeStyle = color; ctx.stroke();
+        };
+        ctx.globalAlpha = alpha;
+        ctx.shadowColor = '#bcd7ff'; ctx.shadowBlur = reducedMotion ? 5 : 13;
+        stroke(channel.main, 7, '#9bbfff35');
+        ctx.shadowBlur = 0;
+        stroke(channel.main, 3.5, '#d5e4ff80');
+        for (const branch of channel.branches) stroke(branch.points, branch.width, '#c7d9ef90');
+        stroke(channel.main, returnOnly ? 2.2 : 1.25, '#fffdf0');
+        ctx.restore();
+      };
+      // Residual conduction bridges successive leaders, avoiding on/off casts.
+      if (entry.previous) paint(entry.previous, .2 * (1 - clamp(age / .09)), target.y);
+      paint(entry.current, reducedMotion ? .42 : connected ? .65 : .55, front);
+      if (connected && !reducedMotion) paint(entry.current, .45 * surge, target.y, true);
+      if (connected || entry.previous) {
+        ctx.globalAlpha = reducedMotion ? .2 : .24 + .12 * surge;
+        const h = 210, w = h * cw / ch;
+        ctx.drawImage(stormTexture, cw, ch, cw, ch, target.x - w / 2, target.y - h * .78, w, h);
         ctx.save(); ctx.translate(target.x, target.y); ctx.scale(1, .3);
-        const light = ctx.createRadialGradient(0, 0, 0, 0, 0, 140);
-        light.addColorStop(0, '#ffe6a855'); light.addColorStop(1, '#ffe6a800');
-        ctx.fillStyle = light;
-        ctx.fillRect(-140, -140, 280, 280); ctx.restore();
+        const light = ctx.createRadialGradient(0, 0, 0, 0, 0, 110);
+        light.addColorStop(0, '#dce8ff88'); light.addColorStop(1, '#bedbff00');
+        ctx.fillStyle = light; ctx.fillRect(-110, -110, 220, 220); ctx.restore();
       }
     }
     ctx.restore();
