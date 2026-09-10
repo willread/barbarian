@@ -7,7 +7,7 @@ export default function Home(){useEffect(()=>{
     const script=document.createElement('script');script.src=src;script.onload=()=>resolve();script.onerror=reject;
     scripts.push(script);document.body.appendChild(script);
   });
-  load('/mechanics.js?v=8').then(()=>{if(!disposed)return load('/animation.js?v=8')}).then(()=>{if(!disposed)return load('/hero-rig.js?v=8')}).then(()=>{if(!disposed)return load('/game.js?v=10')}).catch(()=>{
+  load('/mechanics.js?v=8').then(()=>{if(!disposed)return load('/animation.js?v=8')}).then(()=>{if(!disposed)return load('/hero-rig.js?v=8')}).then(()=>{if(!disposed)return load('/game.js?v=11')}).catch(()=>{
     const button=document.getElementById('start');if(button)button.textContent='UNABLE TO LOAD · PLEASE REFRESH';
   });
   return()=>{disposed=true;scripts.forEach(script=>script.remove());(window as Window & {stopGame?:()=>void}).stopGame?.()};

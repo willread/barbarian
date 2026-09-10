@@ -230,18 +230,32 @@
 
   function drawSpell() {
     if (!spell || !stormTexture) return;
-    // Sustain the painted energy column instead of replaying its strike/debris
-    // sequence. A small continuous light variation gives it life without flashes.
+    // Blend two fully connected painted bolts, keeping the channel continuous.
+    // Small flowing displacements animate the branches without moving the impact.
     const strength = smooth(spell.age / 6);
     const cw = stormTexture.width / 4, ch = stormTexture.height / 2;
     ctx.save(); ctx.globalCompositeOperation = 'screen';
-    const displayed = 2;
     for (const target of spell.targets) {
-      const height = 690, width = height * cw / ch;
+      const height = (target.y + 100) / .907, width = 345;
       const baseline = .907;
-      ctx.globalAlpha = strength * (reducedMotion ? .45 : .72 + .025 * Math.sin(clock * 2.4 + target.id));
-      ctx.drawImage(stormTexture, displayed % 4 * cw, Math.floor(displayed / 4) * ch, cw, ch,
-        target.x - width / 2, target.y - height * baseline, width, height);
+      const top = target.y - height * baseline;
+      const blend = reducedMotion ? 0 : .35 + .25 * Math.sin(clock * 4 + target.id);
+      const opacity = strength * (reducedMotion ? .45 : .8);
+      // The painted bolt starts below its source cell edge: overscan places its
+      // actual luminous tip above the canvas, so it enters through the top edge.
+      for (const [frame, weight] of [[2, 1 - blend], [1, blend]]) {
+        if (!weight) continue;
+        ctx.globalAlpha = opacity * weight;
+        for (let sy = 0; sy < ch; sy += 8) {
+          const sh = Math.min(8, ch - sy), v = sy / ch;
+          const taper = clamp((baseline - v) / .2);
+          const flow = reducedMotion ? 0 : taper * (4 * Math.sin(v * 18 - clock * 9 + target.id) + 2 * Math.sin(v * 37 + clock * 13));
+          const y0 = Math.round(top + v * height), y1 = Math.round(top + (sy + sh) / ch * height);
+          ctx.drawImage(stormTexture, frame * cw, sy, cw, sh,
+            target.x - width / 2 + flow, y0, width, y1 - y0);
+        }
+      }
+      ctx.globalAlpha = opacity;
       {
         ctx.save(); ctx.translate(target.x, target.y); ctx.scale(1, .3);
         const light = ctx.createRadialGradient(0, 0, 0, 0, 0, 140);
