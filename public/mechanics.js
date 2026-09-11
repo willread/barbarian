@@ -3,6 +3,7 @@
   // and velocities stay in ROM units until integration into the painted scene.
   const HZ = 59.92274340431231, STEP = 1 / HZ, SCALE = 4.5;
   const approach = (v, target, amount) => v < target ? Math.min(target, v + amount) : Math.max(target, v - amount);
+  const weaponStats={axe:{speed:1.22,damage:1.5,reach:35},sword:{speed:.78,damage:1,reach:48}};
   const attacks = {
     whiff: { ticks: 22, from: 0, to: -1, damage: 0, reach: 43 },
     slash: { ticks: 18, from: 8, to: 12, damage: 2, reach: 43, box: [16,24,-64,40] },
@@ -98,8 +99,8 @@
   function selectStrike(f, targets) {
     if (f.air) return 'air';
     if (f.running) return 'charge';
-    const e = targetInFront(f, targets);
-    if (!e) return 'whiff';
+    const e = targetInFront(f, targets, weaponStats[f.weapon]?.reach || 43);
+    if (!e) return weaponStats[f.weapon] ? 'slash' : 'whiff';
     if (e.stagger >= 2 && e.hurtTicks > 0) {
       const distance = Math.abs(e.x - f.x) / SCALE + 4;
       if (distance < 44) return e.stagger >= 4 ? 'kick' : 'pommel';
@@ -115,6 +116,11 @@
     if (type === 'back') f.dir = direction;
     f.attack = { type, age: 0, elapsed: 0, direction, connected: false, hits: new Set(), ...attacks[type] };
     if (type === 'slash') { f.lastSlash ^= 1; if (!f.lastSlash) f.attack.box = [20,32,-64,40]; }
+    if(f.player && weaponStats[f.weapon] && ['slash','whiff','air','back'].includes(type)){
+      const w=weaponStats[f.weapon],a=f.attack;a.weapon=f.weapon;a.animationRate=1/w.speed;
+      a.ticks=Math.round(a.ticks*w.speed);a.from=Math.round(a.from*w.speed);a.to=type==='whiff'?-1:Math.round(a.to*w.speed);
+      a.damage*=w.damage;a.reach=w.reach;a.box=[0,w.reach,-64,64];
+    }
     if (type !== 'air' && type !== 'charge') f.velocityX = f.velocityY = 0;
     if (type === 'enemyCharge') f.velocityX = direction * 4;
     f.running = false; f.tapDir = 0; f.tapTicks = -1; f.moving = false;

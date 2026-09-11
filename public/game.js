@@ -82,7 +82,7 @@
 
   function start() {
     if (!ready) throw new Error('Artwork is still loading');
-    hero = make(470, 660, 100, true); wave = 1; score = 0; kills = 0; magic = 100;
+    hero = make(470, 660, 100, true); hero.weapon=weaponId; wave = 1; score = 0; kills = 0; magic = 100;
     combo = 0; sparks = []; shake = 0; spell = null; accumulator = 0;
     blood.reset();
     encounters = E.plan();
@@ -200,6 +200,10 @@
       if (M.begin(hero, M.selectStrike(hero, enemies))) beep(230, .15);
     }
     M.stepMotion(hero, spell ? 0 : dx, spell ? 0 : dy, spell ? 0 : edge, bounds);
+    if(hero.attack?.weapon && heroRig){
+      const nextPose=pose({...hero,attack:{...hero.attack,age:hero.attack.age+1}},true);
+      hero.attack.box=heroRig.hitBox(nextPose,hero.attack.weapon)||hero.attack.box;
+    }
     M.tickAttack(hero, enemies, damage);
     pressed.clear();
     // Reserve one approach position per side; other fighters wait farther out.
@@ -254,7 +258,7 @@
     ctx.scale(f.dir, 1);
     if (!isHero && f.electricTicks > 0) ctx.filter = `brightness(${Math.floor(clock*30)%3===0?3.5:1.7}) saturate(.15) drop-shadow(0 0 7px #c6e7ff)`;
     else if (!isHero && f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
-    if (isHero && heroRig) heroRig.paint(ctx, p, size, opacity, reducedMotion ? null : f.clock, weaponId);
+    if (isHero && heroRig) heroRig.paint(ctx, p, size, opacity, reducedMotion ? null : f.clock, f.attack?.weapon || weaponId);
     else if (!isHero && f.kind!=='legion' && enemyRig) enemyRig.paint(ctx, f, p, opacity);
     else atlas.paint(ctx, p.frame, size, opacity);
     ctx.restore();
@@ -416,6 +420,7 @@
   };
   $('weapon').onchange = event => {
     if (Object.hasOwn(weapons, event.target.value)) weaponId = event.target.value;
+    hero.weapon=weaponId;
   };
   $('full').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('stage').requestFullscreen();
   document.querySelectorAll('[data-key]').forEach(button => {

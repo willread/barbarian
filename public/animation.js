@@ -367,7 +367,7 @@
     }
     if (f.recovering > 0) return reaction(11);
     if (f.attack) {
-      const a = f.attack, age = a.age || 0;
+      const a = f.attack, age = (a.age || 0) * (['air','back'].includes(a.type)?(a.animationRate||1):1);
       if (a.type === 'charge' || a.type === 'enemyCharge')
         return hero ? { atlas: 'hero-extra-unarmed-v8', frame: age < 3 ? 4 : 5 + Math.min(2, Math.floor((age - 3) / 10)) } : { atlas: 'enemy-charge-v5', frame: Math.min(3, Math.floor(age / 9)) };
       if (a.type === 'air') return { atlas: 'hero-extra-unarmed-v8', frame: age < 4 ? 8 : age < 7 ? 9 : age < 9 ? 10 : 11 };

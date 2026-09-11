@@ -26,7 +26,7 @@ next(0);
 const step=n=>{for(let i=0;i<n;i++){now+=M.STEP*1000;next(now)}};
 const press=key=>events.keydown({key,repeat:false,preventDefault(){}}),release=key=>events.keyup({key});
 const A=sandbox.window.AshenAnimation,T=sandbox.window.__test,G=sandbox.window.ashenAxe;
-const actualStart=G.start;G.start=()=>{actualStart();T.enemies.forEach(e=>e.kind='legion')};
+const actualStart=G.start;G.start=()=>{actualStart();delete T.hero.weapon;T.enemies.forEach(e=>e.kind='legion')};
 assert.equal(tools.size,2);assert.throws(()=>tools.get('start_new_battle').execute({bad:true}));
 assert.equal(tools.get('start_new_battle').execute({}).health,100);
 // Every locomotion pose selects one intact frame from its 4x4 atlas.
@@ -230,4 +230,9 @@ T.hero.x=defender.x-50;T.hero.y=defender.y+30;M.begin(defender,'shieldBash');
 T.damage(defender,{damage:4,knock:true,direction:1},T.hero);assert.equal(defender.hp,16);
 defender.attack.age=defender.attack.to+1;
 T.damage(defender,{damage:2,direction:1},T.hero);assert.equal(defender.hp,14);
+actualStart();const weaponAttacks={};
+for(const weapon of ['axe','sword']){M.init(T.hero);T.hero.weapon=weapon;M.begin(T.hero,'slash');weaponAttacks[weapon]={...T.hero.attack};}
+assert.ok(weaponAttacks.sword.ticks<weaponAttacks.axe.ticks);
+assert.ok(weaponAttacks.sword.reach>weaponAttacks.axe.reach);
+assert.ok(weaponAttacks.axe.damage>weaponAttacks.sword.damage);
 sandbox.window.stopGame();

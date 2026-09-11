@@ -2,8 +2,8 @@
 (() => {
   const { clamp } = window.AshenAnimation;
   const weapons = {
-    axe: { label: 'Axe', frame: 0, length: 154, grip: .76 },
-    sword: { label: 'Sword', frame: 1, length: 176, grip: .78 },
+    axe: { label: 'Axe', frame: 0, length: 126, grip: .76, width: 1.35 },
+    sword: { label: 'Sword', frame: 1, length: 184, grip: .78, width: 1 },
   };
   // Coordinates use the source cell's pixel dimensions, not the figure bounds.
   // Head length calibrates uniform body scale without stretching crouched poses.
@@ -90,10 +90,17 @@
       return { atlas, key, scale, grip, hand2, angle, size: scale * atlas.cellWidth / atlas.scale };
     }
 
+    hitBox(pose,id) {
+      const l=this.layout(pose),w=weapons[id];if(!l||!w)return null;
+      const tip=[l.grip[0]+Math.sin(l.angle)*w.length*w.grip,l.grip[1]-Math.cos(l.angle)*w.length*w.grip];
+      const r=id==='axe'?17:7;
+      const x=Math.min(l.grip[0],tip[0])-r,y=Math.min(l.grip[1],tip[1])-r;
+      return [x/4.5,(Math.abs(tip[0]-l.grip[0])+r*2)/4.5,y/4.5,(Math.abs(tip[1]-l.grip[1])+r*2)/4.5];
+    }
     paintWeapon(ctx, layout, id, opacity) {
       const spec = weapons[id] || weapons.axe, cel = this.weaponAtlas?.cels?.[spec.frame];
       if (!cel) return;
-      const h = spec.length, w = h * cel.image.width / cel.image.height;
+      const h = spec.length, w = h * cel.image.width / cel.image.height * (spec.width || 1);
       ctx.save(); ctx.globalAlpha = opacity;
       ctx.translate(...layout.grip); ctx.rotate(layout.angle);
       ctx.drawImage(cel.image, -w * .5, -h * spec.grip, w, h);
