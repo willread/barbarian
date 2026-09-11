@@ -46,14 +46,14 @@
   }
 
   function canCast() {
-    return phase === 'playing' && magic > 0 && !hero.air && !hero.attack && !hero.down;
+    return phase === 'playing' && magic >= 100 && !spell && !hero.air && !hero.attack && !hero.down;
   }
   function syncMagic() {
     const ready = canCast();
     $('magic-fill').style.width = magic + '%';
     $('magic-meter').setAttribute('aria-valuenow', String(magic));
-    $('magic-meter').setAttribute('aria-valuetext', `${Math.ceil(magic)} percent. Hold K to channel Stormcall; release to stop. Charge with weapon hits and kills.`);
-    $('magic-state').textContent = spell ? 'CHANNELING' : ready ? 'HOLD K' : magic > 0 ? Math.ceil(magic) + '% · FINISH MOVE' : 'EMPTY · LAND HITS';
+    $('magic-meter').setAttribute('aria-valuetext', `${Math.ceil(magic)} percent. Press K at full charge for a 1.5 second lightning burst. Charge with weapon hits and kills.`);
+    $('magic-state').textContent = spell ? 'STORM ACTIVE' : ready ? 'READY · PRESS K' : magic > 0 ? Math.ceil(magic) + '% · CHARGING' : 'EMPTY · LAND HITS';
     $('magic').setAttribute('data-ready', String(ready));
   }
 
@@ -103,6 +103,10 @@
       e.x=clamp(e.x,bounds.left,bounds.right);burst(e.x+e.dir*40,e.y-110,8,'#cfbd94');beep(380,.08,'triangle');return;
     }
     e.hp = Math.max(0, e.hp - attack.damage * (isHero ? 100 / 48 : 1));
+    if (attack.magic && e.hp > 0) {
+      e.attack=null;e.electricTicks=9;
+      if(!e.down){e.hurtTicks=9;e.recovering=0;e.stagger=0;e.moving=false;e.velocityX=e.velocityY=0;}
+    }
     if (!attack.continuous || e.hp <= 0) {
       const impact = { ...e };
       const committed = e.kind==='marauder' && e.attack && e.attack.age>=e.attack.from && e.attack.age<=e.attack.to && !attack.knock;
@@ -134,7 +138,7 @@
 
   function action(key, on) {
     key = ({ arrowleft: 'a', arrowright: 'd', arrowup: 'w', arrowdown: 's' })[key] || key;
-    if (!on) { keys.delete(key); if (key === 'k') { spell = null; syncMagic(); } return; }
+    if (!on) { keys.delete(key);  return; }
     if (key === 'p') {
       keys.clear(); pressed.clear(); accumulator = 0;
       if (phase === 'playing') change('paused');
@@ -147,6 +151,7 @@
   }
 
   function tickActor(f, dt) {
+    f.electricTicks=Math.max(0,(f.electricTicks||0)-1);
     f.clock += dt; f.cool = Math.max(0, f.cool - dt);
     M.stepReaction(f, f === hero);
     if (f.down) f.x = clamp(f.x, bounds.left, bounds.right);
@@ -157,23 +162,26 @@
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
     blood.step(dt, [hero, ...enemies]);
-    if (keys.has('k') && canCast()) {
+    if (pressed.has('k') && canCast()) {
       if (hero.hurtTicks || hero.recovering) {
         hero.hurtTicks = hero.hurtAge = hero.recovering = hero.recoil = hero.stagger = 0;
         // Brief protection makes the escape usable against overlapping blows.
         // It is not renewed by ordinary channeling, and cannot bypass knockdown.
         hero.invTicks = Math.max(hero.invTicks, 24);
       }
-      spell ??= { age: 0, targets: [] };
+      spell = { age: 0, targets: [] };
+      magic = 0;
+    }
+    if (spell) {
       spell.age++;
-      // Prototype: triple damage rate, double drain; full meter lasts ~1.67s.
-      // Continuous damage, without restarting stagger, impact flashes or sound.
-      magic = Math.max(0, magic - 1);
+      // One full charge buys 90 fixed ticks (about 1.5 seconds).
+      // Damage and electrical interruption persist for the timed burst.
+      
       spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
       for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
         damage(e, { damage: 1 / 3, knock: false, magic: true, continuous: true, direction: e.x > hero.x ? 1 : -1 }, hero);
-      if (magic === 0) spell = null;
-    } else spell = null;
+      if (spell && spell.age >= 90) spell = null;
+    }
     tickActor(hero, dt);
     for (const e of enemies) tickActor(e, dt);
     if (phase === 'dying') {
@@ -243,7 +251,8 @@
     ctx.globalAlpha = opacity;
     ctx.translate(f.x, f.y - height);
     ctx.scale(f.dir, 1);
-    if (!isHero && f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
+    if (!isHero && f.electricTicks > 0) ctx.filter = `brightness(${Math.floor(clock*30)%3===0?3.5:1.7}) saturate(.15) drop-shadow(0 0 7px #c6e7ff)`;
+    else if (!isHero && f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
     if (isHero && heroRig) heroRig.paint(ctx, p, size, opacity, reducedMotion ? null : f.clock, weaponId);
     else if (!isHero && f.kind!=='legion' && enemyRig) enemyRig.paint(ctx, f, p, opacity);
     else atlas.paint(ctx, p.frame, size, opacity);
@@ -285,7 +294,7 @@
     ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     for (const target of spell.targets) {
       // 50 ms downward leader, 20 ms upward return stroke, then an energized
-      // after-channel. Damage and meter drain remain continuous while held.
+      // after-channel. Damage remains continuous throughout the timed burst.
       const cycle = reducedMotion ? 0 : Math.floor(elapsed / .24);
       const age = reducedMotion ? Math.min(elapsed, .12) : elapsed - cycle * .24;
       let entry = spell.channels.get(target.id);
