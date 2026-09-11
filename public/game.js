@@ -14,7 +14,7 @@
   const bounds = { left: 70, right: W - 70, top: 560, bottom: 755 };
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let running = true, ready = false, raf, last = null, clock = 0, accumulator = 0, spell = null;
-  let phase = 'title', wave = 1, score = 0, kills = 0, magic = 100, stormTexture;
+  let phase = 'title', wave = 1, score = 0, kills = 0, magic = 100, stormTexture, hudTexture;
   let shake = 0, banner = 0, combo = 0, comboTime = 0;
   let muted = true, audio, background, sparks = [];
   let nextId = 0;
@@ -61,7 +61,7 @@
     if (next !== 'playing') spell = null;
     phase = next;
     $('title').hidden = next !== 'title';
-    $('hud').hidden = next === 'title';
+    $('hud').hidden = false;
     $('overlay').hidden = !['paused', 'won', 'lost'].includes(next);
     $('outcome').textContent = next === 'paused' ? 'TAKE A BREATH' : next === 'won' ? 'THE VALLEY IS FREE' : 'THE LEGION ENDURES';
     $('message').textContent = next === 'paused' ? 'Battle paused' : next === 'won' ? 'A legend rises.' : 'Even heroes fall.';
@@ -237,6 +237,32 @@
     syncMagic();
   }
 
+  function drawHUD() {
+    if(!hudTexture)return;
+    const h=$('game-hud').getContext('2d');
+    h.save();h.clearRect(0,0,1440,252);h.scale(1440/2172,252/380);
+    h.drawImage(hudTexture,0,0,2172,380,0,0,2172,380);
+    // Reuse the same painted socket for both bars, including identical bevels.
+    h.drawImage(hudTexture,280,80,940,124,280,225,940,124);
+    const gauge=(y,value,colors,glow)=>{
+      const x=300,w=895,height=78;h.save();h.beginPath();h.rect(x,y,w,height);h.clip();
+      const fill=h.createLinearGradient(0,y,0,y+height);colors.forEach((c,i)=>fill.addColorStop(i/(colors.length-1),c));
+      h.fillStyle=fill;h.fillRect(x,y,w*clamp(value/100),height);
+      h.save();h.beginPath();h.rect(x,y,w*clamp(value/100),height);h.clip();h.globalCompositeOperation='soft-light';h.globalAlpha=.6;h.drawImage(hudTexture,300,102,895,78,x,y,w,height);h.restore();
+      h.globalAlpha=.35;h.fillStyle='#fff4d3';h.fillRect(x,y+3,w*clamp(value/100),3);h.restore();
+      if(glow){h.save();h.strokeStyle=`rgba(154,219,255,${reducedMotion?.65:.5+.3*Math.sin(clock*5)})`;h.shadowColor='#63baff';h.shadowBlur=16;h.lineWidth=4;h.strokeRect(x,y,w,height);h.restore();}
+    };
+    gauge(102,hero.hp,['#f59d91','#bf221e','#710807','#a41413'],false);
+    gauge(247,magic,['#d5f5ff','#269bff','#074891','#1585e2'],canCast());
+    const weapon=weapons[weaponId],cel=weaponAtlas?.cels?.[weapon.frame];
+    if(cel){const height=245,width=height*cel.image.width/cel.image.height;h.save();h.translate(1400,193);h.rotate(.5);h.drawImage(cel.image,-width/2,-height/2,width,height);h.restore();}
+    h.textAlign='center';h.textBaseline='middle';h.shadowColor='#000';h.shadowBlur=4;h.shadowOffsetY=3;h.fillStyle='#eedbb0';
+    h.font='bold 32px Georgia';h.fillText('SCORE',1758,83);
+    h.font='bold 78px Georgia';h.fillText(String(score).padStart(6,'0'),1758,182);
+    h.font='bold 33px Georgia';h.fillText(`WAVE ${wave} / 4`,1758,281);
+    h.restore();
+  }
+
   function drawFighter(f, isHero) {
     const duration = isHero ? clips.heroDeath.duration : clips.enemyDeath.duration;
     const opacity = f.hp <= 0 ? 1 - smooth((f.death - duration - .3) / .55) : 1;
@@ -345,6 +371,7 @@
   }
 
   function render(dt) {
+    drawHUD();
     ctx.save(); ctx.clearRect(0, 0, W, H);
     if (!reducedMotion && phase !== 'paused') ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
     if (background) background.draw(ctx, clock, reducedMotion);
@@ -421,7 +448,9 @@
   $('weapon').onchange = event => {
     if (Object.hasOwn(weapons, event.target.value)) weaponId = event.target.value;
     hero.weapon=weaponId;
+    $('weapon').setAttribute('aria-label',`${weaponId} equipped. Activate to change weapon`);
   };
+  $('weapon').onclick=()=>{ $('weapon').onchange({target:{value:weaponId==='axe'?'sword':'axe'}}); };
   $('full').onclick = () => document.fullscreenElement ? document.exitFullscreen() : $('stage').requestFullscreen();
   document.querySelectorAll('[data-key]').forEach(button => {
     button.onpointerdown = event => { button.setPointerCapture(event.pointerId); action(button.dataset.key, true); };
@@ -445,6 +474,7 @@
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
+    loadImage('/art/hud-bronze-v1.png').then(image => { hudTexture = image; }),
     loadImage('/art/enemy-equipment-v1.png').then(image => { enemyEquipment = new Atlas(decodeChroma(image), {columns:4,rows:1,frames:4}); }),
     loadImage('/art/weapons-v8.png').then(image => { weaponAtlas = new Atlas(decodeChroma(image), { columns: 2, rows: 1, frames: 2 }); }),
     loadImage('/art/storm-strike-v7.png').then(image => { stormTexture = image; }),

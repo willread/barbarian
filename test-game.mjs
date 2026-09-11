@@ -235,4 +235,6 @@ for(const weapon of ['axe','sword']){M.init(T.hero);T.hero.weapon=weapon;M.begin
 assert.ok(weaponAttacks.sword.ticks<weaponAttacks.axe.ticks);
 assert.ok(weaponAttacks.sword.reach>weaponAttacks.axe.reach);
 assert.ok(weaponAttacks.axe.damage>weaponAttacks.sword.damage);
+element('weapon').onclick();assert.equal(G.status().weapon,'sword','HUD weapon slot changes equipped weapon');
+element('weapon').onclick();assert.equal(G.status().weapon,'axe');
 sandbox.window.stopGame();
