@@ -132,8 +132,8 @@ G.start();T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(
 element('resume').onclick();assert.equal(G.status().health,100);assert.equal(G.status().score,0);
 // Wave progression and victory are exercised through damage, not phase mutation.
 for(let wave=1;wave<=8;wave++) {
-  for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}
-  step(220);
+  for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}
+  step(300);
 }
 assert.equal(G.status().phase,'won');
 element('weapon').onchange({target:{value:'sword'}});
@@ -209,7 +209,7 @@ const committedAttack=defender.attack;T.damage(defender,{damage:2,direction:1},T
 assert.equal(defender.hp,18);assert.equal(defender.attack,committedAttack,'marauder trades during committed swing');
 T.damage(defender,{damage:4,direction:1,knock:true},T.hero);assert.ok(defender.down);
 actualStart();const plans=new Set();for(let i=0;i<10;i++){actualStart();plans.add(G.status().enemies.map(e=>e.type).join(','))}assert.ok(plans.size>1);
-for(let wave=1;wave<=7;wave++){for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(220)}
+for(let wave=1;wave<=7;wave++){for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}step(300)}
 assert.equal(G.status().wave,8);assert.equal(T.enemies.length,1);assert.equal(T.enemies[0].kind,'champion');
 // Live damage must not cancel the boss's preparation or active swing.
 M.init(defender);E.init(defender,'champion');defender.hp=84;defender.max=84;
@@ -236,7 +236,11 @@ actualStart();const fields=T.field;T.hero.hp=30;fields.time=5;fields.step(M.STEP
 assert.ok(fields.chicken,'scheduled chicken appears');const chicken=fields.chicken;
 T.hero.x=chicken.x-35;T.hero.y=chicken.y;M.begin(T.hero,'slash');T.hero.attack.age=T.hero.attack.from;
 fields.step(M.STEP,2,T.hero);assert.ok(chicken.roast,'weapon hit cooks chicken');
-T.hero.x=chicken.x;fields.step(M.STEP,2,T.hero);assert.equal(T.hero.hp,100);assert.equal(fields.chicken,null);
-actualStart();T.hero.hp=37;for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(220);assert.equal(T.hero.hp,37,'wave transition cannot regenerate health');
+assert.ok(chicken.flight&&chicken.vx>0,'roast inherits the hit direction');for(let i=0;i<100;i++)fields.step(M.STEP,2,T.hero);T.hero.x=chicken.x;fields.step(M.STEP,2,T.hero);assert.equal(T.hero.hp,100);assert.equal(fields.chicken,null);
+actualStart();T.hero.hp=37;for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}step(300);assert.equal(T.hero.hp,37,'wave transition cannot regenerate health');
 T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(420);assert.equal(G.status().phase,'lost');assert.ok(T.hero.down.ground);assert.ok(T.hero.gearDropped);
+
+
+actualStart();const doomed=T.enemies[0];T.damage(doomed,{damage:1000,direction:1,knock:true,magic:true},T.hero);step(2);assert.equal(doomed.burnAge,0,'no burning in flight');step(80);assert.ok(doomed.down.ground&&doomed.burnAge>0,'burn starts after landing');
+
 sandbox.window.stopGame();

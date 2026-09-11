@@ -173,7 +173,7 @@
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
     blood.step(dt, [hero, ...enemies]);aftermath.step(dt,[hero,...enemies]);
-    if(phase==='playing'){const hp=hero.hp;field.step(dt,wave,hero);if(hero.hp!==hp)sync();}
+    if(phase==='playing'){const hp=hero.hp;field.step(dt,wave,hero,blood);if(hero.hp!==hp)sync();}
     if (pressed.has('k') && canCast()) {
       if (hero.hurtTicks || hero.recovering) {
         hero.hurtTicks = hero.hurtAge = hero.recovering = hero.recoil = hero.stagger = 0;
@@ -244,7 +244,7 @@
       if (finished) E.finish(e, finished, hero);
       if (phase !== 'playing') break;
     }
-    if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.death > 3.4)) {
+    if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.burnAge > 3.4)) {
       if (wave === encounters.length) change('won');
       else { wave++; spawn(); }
     }
@@ -290,7 +290,7 @@
 
   function drawFighter(f, isHero) {
     const duration = isHero ? clips.heroDeath.duration : clips.enemyDeath.duration;
-    const opacity = !isHero && f.hp<=0 && f.death>.15+(f.engulf||1)+.6 ? 0 : 1;
+    const opacity = !isHero && f.hp<=0 && f.burnAge>.15+(f.engulf||1)+.6 ? 0 : 1;
     if (opacity <= 0) return;
     const castFrame = spell ? (spell.age<5?0:spell.age<9?1:spell.age<13?2:spell.age<17?3:spell.age<45?4:spell.age<77?5:spell.age<84?6:7) : null;
     const p = isHero && spell && !f.down && !f.hurtTicks ? {atlas:'hero-cast-unarmed-v1',frame:castFrame} : !isHero && f.kind!=='legion' ? E.pose(f) : pose(f, isHero), atlas = atlases[p.atlas];
