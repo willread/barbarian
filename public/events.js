@@ -41,7 +41,7 @@
   }
   ground(ctx){
    for(const s of this.scorches){ctx.save();ctx.translate(s.x,s.y);ctx.scale(1,.32);const g=ctx.createRadialGradient(0,0,s.r*.2,0,0,s.r);g.addColorStop(0,'#120d0bef');g.addColorStop(.6,'#17110dcc');g.addColorStop(1,'#140e0900');ctx.fillStyle=g;ctx.fillRect(-s.r,-s.r,s.r*2,s.r*2);ctx.restore()}
-   for(const d of this.items){ctx.save();ctx.translate(d.x,d.y-d.z);ctx.rotate(d.angle);if(d.ground)ctx.scale(1,.5);const w=d.h*d.image.width/d.image.height;ctx.drawImage(d.image,-w/2,-d.h/2,w,d.h);ctx.restore()}
+   for(const d of this.items){ctx.save();ctx.translate(d.x,d.y-d.z);ctx.rotate(d.angle);const w=d.h*d.image.width/d.image.height;ctx.drawImage(d.image,-w/2,-d.h/2,w,d.h);ctx.restore()}
   }
   body(ctx,f,paint){
    const burn=this.burns.get(f);if(!burn){paint(ctx);return}

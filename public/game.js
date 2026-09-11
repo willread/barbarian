@@ -357,10 +357,19 @@
     spell.origin=start;spell.channels??=new Map();
     const elapsed=(spell.age-17)*M.STEP,cycle=Math.floor(elapsed/.16),age=elapsed-cycle*.16;
     ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';ctx.lineJoin='round';
-    for(const target of spell.targets){
+    // The invocation climbs from the exact weapon tip before the sky answers.
+    if(spell.age<35){
+      spell.upward??=lightningChannel(93417,500);
+      const points=spell.upward.main.map((p,i,a)=>{const t=i/(a.length-1);return [start[0]+(p[0]-spell.upward.main[0][0])*.65,start[1]+(-55-start[1])*t]});
+      const count=Math.max(2,Math.ceil(points.length*clamp((spell.age-16)/3)));
+      ctx.globalAlpha=spell.age<24?1:clamp((35-spell.age)/11);
+      for(const [width,color] of [[12,'#89baff35'],[4,'#bfe2ff99'],[1.7,'#fff9dd']]){ctx.beginPath();ctx.moveTo(...points[0]);for(let i=1;i<count;i++)ctx.lineTo(...points[i]);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
+      ctx.globalAlpha=1;
+    }
+    for(const target of spell.age>=20?spell.targets:[]){
       let entry=spell.channels.get(target.id);
       if(!entry||entry.cycle!==cycle){entry={cycle,current:lightningChannel(target.id*7919+cycle*104729,500)};spell.channels.set(target.id,entry)}
-      const points=entry.current.main.map((p,i,a)=>{const t=i/(a.length-1);return [start[0]+(target.x-start[0])*t+p[0]*.4,start[1]+(target.y-100-start[1])*t]});
+      const points=entry.current.main.map((p,i,a)=>{const t=i/(a.length-1);return [target.x+p[0]*.65,-55+(target.y-100+55)*t]});
       const count=Math.max(2,Math.ceil(points.length*clamp(age/.04)));
       for(const [width,color] of [[8,'#89baff35'],[3,'#bfe2ff99'],[1.3,'#fff9dd']]){ctx.beginPath();ctx.moveTo(...points[0]);for(let i=1;i<count;i++)ctx.lineTo(...points[i]);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
       for(let i=5;i<count-4;i+=9){ctx.beginPath();ctx.moveTo(...points[i]);ctx.lineTo(points[i][0]+(i%2?1:-1)*25,points[i][1]+12);ctx.lineTo(points[i][0]+(i%2?1:-1)*38,points[i][1]+35);ctx.lineWidth=.7;ctx.strokeStyle='#c8e5ff88';ctx.stroke()}
