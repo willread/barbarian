@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Ashen Axe — Valley of the Fallen', description: 'A painted sword-and-sorcery arcade brawler.',
+  title: 'Cairn', description: 'A painted sword-and-sorcery arcade brawler.',
 };
 
 export default function RootLayout({

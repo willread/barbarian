@@ -9,6 +9,7 @@
   // Head length calibrates uniform body scale without stretching crouched poses.
   const key = (head, grip, angle = 0, hand2 = null, behind = false) => ({ head, grip, angle, hand2, behind });
   const sheets = {
+    'hero-pickup-unarmed-v1':{cell:[384,512],frames:[key(52,[139,189]),key(52,[151,199]),key(52,[171,225]),key(52,[171,254]),key(52,[172,205]),key(52,[162,156]),key(52,[128,130]),key(52,[137,129])]},
     'hero-cast-unarmed-v1': { cell:[384,512], frames:[
       key(53,[199,201]),key(53,[239,182]),key(53,[170,129]),key(53,[176,53]),
       key(53,[145,29]),key(53,[155,29]),key(53,[163,74]),key(53,[199,188]),

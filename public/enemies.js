@@ -19,8 +19,8 @@
   });
   const shuffle=(a,rng)=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
   function plan(rng=Math.random){
-    const themes=shuffle(['bone','shield','marauder','bone','shield','marauder','shield'],rng);
-    return themes.map((kind,index)=>shuffle([kind,kind,...Array.from({length:1+Math.floor(index/2)},()=>['bone','shield','marauder'][Math.floor(rng()*3)])],rng)).concat([['champion']]);
+    const themes=shuffle(['legion','bone','shield','marauder','bone','shield','marauder'],rng);
+    return themes.map((kind,index)=>shuffle([kind,kind,...Array.from({length:1+Math.floor(index/2)},()=>['legion','bone','shield','marauder'][Math.floor(rng()*4)])],rng)).concat([['champion']]);
   }
   function init(e,kind){Object.assign(e,{kind,boss:kind==='champion',turnTicks:0,brace:0,moveIndex:0,retreatTicks:0,phaseTwo:false,hopCooldown:90+Math.random()*90,hopTicks:0,thinkTicks:0,tactic:0,rushCooldown:50,variant:'regular',size:1,speedFactor:1});return e}
   function variant(e,rng=Math.random){
@@ -30,7 +30,7 @@
     e.speedFactor=e.variant==='swift'?1.3:e.variant==='brute'?.85:1;
     e.hp=e.max=Math.round(e.hp*(e.variant==='brute'?1.45:e.variant==='swift'?.85:1));return e;
   }
-  function guarding(e){return e.kind==='shield'&&e.hp>0&&(!e.attack||(e.attack.bash&&e.attack.age<=e.attack.to))&&!e.hurtTicks&&!e.down&&!e.recovering&&!e.turnTicks}
+  function guarding(e){if(e.kind!=='shield'||e.hp<=0||e.hurtTicks||e.down||e.recovering||e.turnTicks)return false;const frame=pose(e).frame;return [0,1,2,3,4,15].includes(frame)&&(!e.attack||e.attack.bash&&e.attack.age<e.attack.from);}
   function block(e,attack,attacker){
     if(!guarding(e)||attack.magic||!attacker||(attacker.x-e.x)*e.dir<=0)return false;
     e.x-=e.dir*(attack.knock?35:10);e.brace=14;e.aiRest=Math.max(e.aiRest,12);return true;
@@ -99,7 +99,7 @@
     if(e.down)frame=e.down.ground?(e.hp>0&&e.down.ground<=20?14:13):12;
     else if(e.hp<=0)frame=13;
     else if(e.hurtTicks||e.recovering)frame=11;
-    else if(e.brace)frame=15;
+    else if(e.brace&&(!e.attack||e.attack.age<e.attack.from))frame=15;
     else if(e.turnTicks)frame=2;
     else if(e.attack){const a=e.attack;frame=a.age<a.from?(a.overhead?8:a.bash?15:5):a.age<=a.to?(a.overhead?9:6):(a.overhead?10:7)}
     else if(e.hopTicks)frame=3;

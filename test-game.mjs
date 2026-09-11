@@ -4,15 +4,16 @@ import assert from 'node:assert/strict';
 let next, now=0;
 const elements=new Map(), events={}, tools=new Map();
 const magicButton={dataset:{key:'k'},setPointerCapture(){}};
-const context=new Proxy({createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}}),getImageData:()=>({data:new Uint8ClampedArray(0)})},{get:(o,k)=>o[k]??(()=>{})});
+const context=new Proxy({createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)}),createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}}),getImageData:()=>({data:new Uint8ClampedArray(0)})},{get:(o,k)=>o[k]??(()=>{})});
 const element=id=>{if(!elements.has(id))elements.set(id,{parentElement:{setAttribute(){}},style:{},hidden:false,disabled:id==='start',setAttribute(){},getContext:type=>type==='webgl'?null:context});return elements.get(id)};
-const sandbox={console,Math,Set,Promise,Float32Array,Uint8ClampedArray,AbortController,
+const sandbox={Path2D:class{rect(){}moveTo(){}bezierCurveTo(){}lineTo(){}closePath(){}addPath(){}},console,Math,Set,Promise,Float32Array,Uint8ClampedArray,AbortController,
   Image:class{constructor(){this.width=2048;this.height=2048;this.complete=true;this.naturalWidth=2048}set src(v){queueMicrotask(()=>this.onload())}},
   document:{getElementById:element,createElement:()=>({width:444,height:444,getContext:type=>type==='webgl'?null:context}),querySelectorAll:()=>[magicButton],modelContext:{registerTool:t=>tools.set(t.name,t)}},
   requestAnimationFrame:f=>(next=f,1),cancelAnimationFrame(){}};
 sandbox.window={addEventListener:(k,f)=>events[k]=f,removeEventListener(){}};
 vm.runInNewContext(fs.readFileSync('public/mechanics.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/animation.js','utf8'),sandbox);
+vm.runInNewContext(fs.readFileSync('public/environments.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/hero-rig.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/blood.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/events.js','utf8'),sandbox);
@@ -27,7 +28,7 @@ next(0);
 const step=n=>{for(let i=0;i<n;i++){now+=M.STEP*1000;next(now)}};
 const press=key=>events.keydown({key,repeat:false,preventDefault(){}}),release=key=>events.keyup({key});
 const A=sandbox.window.AshenAnimation,T=sandbox.window.__test,G=sandbox.window.ashenAxe;
-const actualStart=G.start;G.start=()=>{actualStart();delete T.hero.weapon;T.enemies.forEach(e=>{e.kind='legion';e.size=1;e.speedFactor=1})};
+const rawStart=G.start,actualStart=()=>{rawStart();step(230);assert.equal(T.hero.x,720,"walk-on stops at screen center");T.hero.x=470;};G.start=()=>{actualStart();delete T.hero.weapon;T.enemies.forEach(e=>{e.kind='legion';e.size=1;e.speedFactor=1})};
 assert.equal(tools.size,2);assert.throws(()=>tools.get('start_new_battle').execute({bad:true}));
 assert.equal(tools.get('start_new_battle').execute({}).health,100);
 // Every locomotion pose selects one intact frame from its 4x4 atlas.
@@ -128,12 +129,13 @@ press('j');step(8);release('j');assert.equal(victim.attack,null);assert.equal(G.
 // An unattended battle is winnable by the enemies and can be restarted.
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+32*M.SCALE;e.y=660;e.aiRest=i?1000:0});
 step(120);assert.ok(T.hero.hp<=100-8*100/48+1e-8,'enemy follows connected blows with a knockdown finisher');assert.ok(T.hero.down);
-G.start();T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(420);assert.equal(G.status().phase,'lost');
+G.start();T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(100);assert.equal(G.status().phase,'dying','post-game waits for blood wipe');assert.equal(element('overlay').hidden,true);step(440);assert.equal(G.status().phase,'lost');assert.equal(element('overlay').style.background,'transparent');
 element('resume').onclick();assert.equal(G.status().health,100);assert.equal(G.status().score,0);
 // Wave progression and victory are exercised through damage, not phase mutation.
 for(let wave=1;wave<=8;wave++) {
+  T.hero.invTicks=10000;
   for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}
-  step(300);
+  step(1100);
 }
 assert.equal(G.status().phase,'won');
 element('weapon').onchange({target:{value:'sword'}});
@@ -161,7 +163,7 @@ M.hurt(T.hero,{direction:-1,knock:false},true);step(1);
 assert.ok(T.hero.hurtTicks>0,'empty magic cannot break stun');release('k');
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+180;e.y=T.hero.y;e.hp=100;e.aiRest=10000});
 const near=T.enemies[0],far=T.enemies[1];press('k');step(19);assert.equal(near.hp,100);
-step(1);assert.ok(near.hp<100);assert.equal(far.hp,100,'storm has a bounded radius');
+step(1);assert.ok(near.hp<100);assert.ok(far.hp<100,'storm strikes distant on-screen enemies');
 release('k');step(90);assert.ok(Math.abs(near.hp-(100-57*.12))<1e-8,'lower fixed burst damage');
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+20*M.SCALE;e.y=T.hero.y;e.hp=100;e.aiRest=10000});
 M.begin(T.hero,'charge');step(6);
@@ -209,7 +211,7 @@ const committedAttack=defender.attack;T.damage(defender,{damage:2,direction:1},T
 assert.equal(defender.hp,18);assert.equal(defender.attack,committedAttack,'marauder trades during committed swing');
 T.damage(defender,{damage:4,direction:1,knock:true},T.hero);assert.ok(defender.down);
 actualStart();const plans=new Set();for(let i=0;i<10;i++){actualStart();plans.add(G.status().enemies.map(e=>e.type).join(','))}assert.ok(plans.size>1);
-for(let wave=1;wave<=7;wave++){for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}step(300)}
+for(let wave=1;wave<=7;wave++){T.hero.invTicks=10000;for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}step(1100)}
 assert.equal(G.status().wave,8);assert.equal(T.enemies.length,1);assert.equal(T.enemies[0].kind,'champion');
 // Live damage must not cancel the boss's preparation or active swing.
 M.init(defender);E.init(defender,'champion');defender.hp=84;defender.max=84;
@@ -236,11 +238,13 @@ actualStart();const fields=T.field;T.hero.hp=30;fields.time=5;fields.step(M.STEP
 assert.ok(fields.chicken,'scheduled chicken appears');const chicken=fields.chicken;
 T.hero.x=chicken.x-35;T.hero.y=chicken.y;M.begin(T.hero,'slash');T.hero.attack.age=T.hero.attack.from;
 fields.step(M.STEP,2,T.hero);assert.ok(chicken.roast,'weapon hit cooks chicken');
-assert.ok(chicken.flight&&chicken.vx>0,'roast inherits the hit direction');for(let i=0;i<100;i++)fields.step(M.STEP,2,T.hero);T.hero.x=chicken.x;fields.step(M.STEP,2,T.hero);assert.equal(T.hero.hp,100);assert.equal(fields.chicken,null);
-actualStart();T.hero.hp=37;for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}step(300);assert.equal(T.hero.hp,37,'wave transition cannot regenerate health');
-T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(420);assert.equal(G.status().phase,'lost');assert.ok(T.hero.down.ground);assert.ok(T.hero.gearDropped);
+assert.ok(chicken.flight&&chicken.vx>0,'roast inherits the hit direction');for(let i=0;i<100;i++)fields.step(M.STEP,2,T.hero);T.hero.x=chicken.x;T.hero.attack=null;fields.step(M.STEP,2,T.hero);assert.ok(T.hero.pickup,'walking over roast starts pickup animation');assert.equal(T.hero.hp,30,'healing waits for hand contact');for(let i=0;i<36;i++)fields.step(M.STEP,2,T.hero);assert.equal(T.hero.hp,100);assert.equal(fields.chicken,null);
+actualStart();T.hero.hp=37;T.hero.invTicks=10000;for(const e of T.enemies){T.damage(e,{damage:1000,direction:1,knock:true,magic:true},T.hero)}step(1100);assert.equal(T.hero.hp,37,'wave transition cannot regenerate health');
+T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(100);assert.equal(G.status().phase,'dying','post-game waits for blood wipe');assert.equal(element('overlay').hidden,true);step(440);assert.equal(G.status().phase,'lost');assert.equal(element('overlay').style.background,'transparent');assert.ok(T.hero.down.ground);assert.ok(T.hero.gearDropped);
 
 
 actualStart();const doomed=T.enemies[0];T.damage(doomed,{damage:1000,direction:1,knock:true,magic:true},T.hero);step(2);assert.equal(doomed.burnAge,0,'no burning in flight');step(80);assert.ok(doomed.down.ground&&doomed.burnAge>0,'burn starts after landing');
 
+const savedRandom=Math.random;try{for(const [roll,key]of [[.1,'valley'],[.5,'swamp'],[.9,'cinder']]){Math.random=()=>roll;actualStart();assert.equal(G.status().environment,key,'each environment can be selected at wave start');}}finally{Math.random=savedRandom;}
 sandbox.window.stopGame();
+

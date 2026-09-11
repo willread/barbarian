@@ -1,19 +1,45 @@
 'use client';
-import {useEffect} from 'react';
-export default function Home(){useEffect(()=>{
+import {useEffect,useLayoutEffect,useState,useRef} from 'react';
+export default function Home(){
+const [options,setOptions]=useState(false),[sound,setSound]=useState(false),[full,setFull]=useState(false);
+const switching=useRef(false),mounted=useRef(true);
+const departing=useRef<Animation[]>([]);
+useLayoutEffect(()=>{departing.current.forEach(animation=>animation.cancel());departing.current=[];switching.current=false;},[options]);
+const switchMenu=async(next:boolean)=>{
+ if(switching.current||next===options)return;switching.current=true;
+ const menu=document.querySelector(options?'.title-options':'.title-menu');
+ const buttons=Array.from(menu?.querySelectorAll('button')||[]);
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const animations=buttons.map((button,i)=>button.animate([{transform:'translateY(0)',opacity:1},{transform:'translateY(70cqw)',opacity:0}],{duration:reduced?0:260,delay:reduced?0:(buttons.length-1-i)*60+40,easing:'cubic-bezier(.55,0,1,.5)',fill:'forwards'}));
+ departing.current=animations;
+ await Promise.all(animations.map(animation=>animation.finished.catch(()=>{})));
+ if(!mounted.current)return;
+ setOptions(next);
+};
+useEffect(()=>{document.getElementById(options?'option-sound':'start')?.focus();},[options]);
+useEffect(()=>{
+ mounted.current=true;
+ const fullscreen=()=>setFull(!!document.fullscreenElement);
+ document.addEventListener('fullscreenchange',fullscreen);fullscreen();
+ const node=document.getElementById('sound');const observer=new MutationObserver(()=>setSound(node?.textContent==='SOUND ON'));
+ if(node)observer.observe(node,{childList:true,characterData:true,subtree:true});
+ return()=>{mounted.current=false;observer.disconnect();document.removeEventListener('fullscreenchange',fullscreen)};
+},[]);
+useEffect(()=>{
   let disposed=false;
   const scripts:HTMLScriptElement[]=[];
   const load=(src:string)=>new Promise<void>((resolve,reject)=>{
     const script=document.createElement('script');script.src=src;script.onload=()=>resolve();script.onerror=reject;
     scripts.push(script);document.body.appendChild(script);
   });
-  load('/mechanics.js?v=11').then(()=>{if(!disposed)return load('/animation.js?v=9')}).then(()=>{if(!disposed)return load('/hero-rig.js?v=11')}).then(()=>{if(!disposed)return load('/blood.js?v=4')}).then(()=>{if(!disposed)return load('/events.js?v=4')}).then(()=>{if(!disposed)return load('/enemies.js?v=3')}).then(()=>{if(!disposed)return load('/enemy-art.js?v=1')}).then(()=>{if(!disposed)return load('/enemy-rig.js?v=2')}).then(()=>{if(!disposed)return load('/game.js?v=26')}).catch(()=>{
+  load('/mechanics.js?v=11').then(()=>{if(!disposed)return load('/animation.js?v=9')}).then(()=>{if(!disposed)return load('/environments.js?v=3')}).then(()=>{if(!disposed)return load('/hero-rig.js?v=12')}).then(()=>{if(!disposed)return load('/blood.js?v=5')}).then(()=>{if(!disposed)return load('/events.js?v=10')}).then(()=>{if(!disposed)return load('/enemies.js?v=5')}).then(()=>{if(!disposed)return load('/enemy-art.js?v=1')}).then(()=>{if(!disposed)return load('/enemy-rig.js?v=2')}).then(()=>{if(!disposed)return load('/game.js?v=50')}).then(()=>{if(!disposed)return load('/stone-text.js?v=18')}).catch(()=>{
     const button=document.getElementById('start');if(button)button.textContent='UNABLE TO LOAD · PLEASE REFRESH';
   });
-  return()=>{disposed=true;scripts.forEach(script=>script.remove());(window as Window & {stopGame?:()=>void}).stopGame?.()};
+  return()=>{disposed=true;scripts.forEach(script=>script.remove());(window as Window & {stopGame?:()=>void}).stopGame?.();(window as Window & {stopStoneText?:()=>void}).stopStoneText?.()};
 },[]);return <main>
-<div id="stage"><div className="arena"><canvas id="game" width="1440" height="810" aria-label="Battle arena. WASD to move, J attack, Space jump, press K at full charge to cast magic."/><div id="title"><small>STEEL. SORCERY. SURVIVAL.</small><h2>ASHEN<br/><em>AXE</em></h2><p>The old gods are dead.<br/>Their armies are not.</p><button id="start" className="primary" disabled>SUMMONING THE WORLD…</button><span>Seven battles. One final duel.</span></div>
-<div id="overlay" hidden><small id="outcome"/><h2 id="message"/><p id="result"/><button className="primary" id="resume">RESUME BATTLE</button></div>
+<div id="stage"><div className="arena"><canvas id="game" width="1440" height="810" aria-label="Battle arena. WASD to move, J attack, Space jump, press K at full charge to cast magic."/><div id="title" aria-label="Cairn title screen"><h1 className="sr-only">Cairn</h1><nav className="title-menu" aria-label="Main menu" hidden={options}><button id="start" disabled>LOADING…</button><button onClick={()=>switchMenu(true)}>OPTIONS</button></nav><div className="title-options" aria-label="Options" hidden={!options}><button id="option-sound" onClick={()=>document.getElementById('sound')?.click()}>SOUND: {sound?'ON':'OFF'}</button><button onClick={()=>document.getElementById('full')?.click()}>FULLSCREEN: {full?'ON':'OFF'}</button><button id="options-back" onClick={()=>switchMenu(false)}>BACK</button></div></div>
+
+<div id="overlay" role="dialog" aria-labelledby="message" hidden><div className="pause-panel"><small id="outcome"/><h2 id="message"/><p id="result"/><button className="primary" id="resume">RESUME BATTLE</button><div id="pause-actions" hidden><button id="pause-sound">TOGGLE SOUND</button><button id="return-title">RETURN TO TITLE</button><p className="menu-hint">↑ ↓ Choose · Enter Select · Esc Resume</p></div></div></div>
 </div><div id="hud"><canvas id="game-hud" width="1440" height="296" aria-label="Health, mana, current weapon, score and wave"/>
 <div className="sr-only"><div><div className="health"><i id="health"/></div><div id="magic"><b id="magic-state"/><div id="magic-meter" role="progressbar" aria-label="Mana" aria-valuemin={0} aria-valuemax={100} aria-valuenow={100}><i id="magic-fill"/></div></div></div><span id="score"/><span id="wave"/></div>
 <button id="weapon" aria-label="Axe equipped. Activate to equip sword" title="Change weapon"/></div></div>

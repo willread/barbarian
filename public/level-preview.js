@@ -1,0 +1,9 @@
+(()=>{
+const canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d'),names=['valley','swamp','cinder'];
+let selected='swamp',paused=false,lane=false,time=0,last=performance.now(),environments={},camera=0;canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();camera=(e.clientX-r.left)/r.width-.5;});
+const load=src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=src;});
+Promise.all(['valley.png','swamp-concept-v4.png','cinder-concept-v6.png','fluid-smoke-v1.png','fluid-fire-v1.png','cinder-concept-v5.png'].map(f=>load('/art/'+f))).then(images=>{names.forEach((n,i)=>environments[n]=new window.AshenEnvironments.Environment(images[i],n,canvas.width,canvas.height,images[3],images[4],n==='cinder'?images[5]:null));}).catch(()=>document.querySelector('#error').textContent='Could not load the environment artwork.');
+for(const name of names)document.querySelector('#'+name).onclick=()=>{selected=name;for(const n of names)document.querySelector('#'+n).setAttribute('aria-pressed',n===name);document.querySelector('#caption').textContent=name==='cinder'?'Cinder wastes — flowing lava, rising smoke and subtle heat shimmer.':name==='swamp'?'Drowned forest — flowing falls, impact spray, ripples and drifting mist.':'The valley — cascading water, splash spray and drifting mist.';};
+document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Play':'Pause';};document.querySelector('#lane').onclick=e=>{lane=!lane;e.target.setAttribute('aria-pressed',lane);};
+function draw(now){if(!paused)time+=Math.min((now-last)/1000,.1);last=now;const e=environments[selected];if(e)e.draw(ctx,time,false,camera);if(lane){ctx.fillStyle='#bfd27822';ctx.fillRect(0,canvas.height*560/810,canvas.width,canvas.height*195/810);}requestAnimationFrame(draw);}requestAnimationFrame(draw);
+})();

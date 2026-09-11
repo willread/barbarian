@@ -42,7 +42,7 @@
       for(let i=0;i<count;i++) {
         const angle=(Math.random()-.5)*fan,speed=force*(.5+Math.random()*.8);
         this.drops.push({x:f.x+(Math.random()-.5)*18,y:f.y+(Math.random()-.5)*12,z:sourceHeight+(Math.random()-.5)*24,
-          vx:carryX+direction*Math.cos(angle)*speed,vy:carryY+Math.sin(angle)*speed*.6,vz:carryZ+lift+(Math.random()-.5)*100,
+          vx:carryX+direction*Math.cos(angle)*speed,vy:carryY+Math.sin(angle)*speed*.6,vz:carryZ+lift+(Math.random()-.5)*280,
           gravity:launched?.25*units/window.AshenMechanics.STEP:850,drag:launched?0:.8,
           r:(fatal?5:3.5)+Math.random()*(fatal?5:4)});
       }

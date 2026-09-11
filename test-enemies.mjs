@@ -6,14 +6,14 @@ const hero=()=>M.init({id:2,x:620,y:660,hp:100,max:100,dir:-1,player:true});
 let seed=123;const rng=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
 const signatures=new Set();for(let i=0;i<50;i++){
  const p=E.plan(rng);assert.equal(p.length,8);assert.equal(p[7].join(','),'champion');
- for(const k of ['bone','shield','marauder'])assert.ok(p.slice(0,7).flat().includes(k));
+ for(const k of ['legion','bone','shield','marauder'])assert.ok(p.slice(0,7).flat().includes(k));
  assert.equal(p[0].length,3);assert.equal(p[1].length,3);assert.equal(p[2].length,4);signatures.add(JSON.stringify(p));
 }assert.ok(signatures.size>40);
 let e=fighter('shield'),h=hero();
 assert.ok(E.block(e,{damage:2},h));assert.ok(E.block(e,{damage:4,knock:true},h));
 assert.equal(E.block(e,{magic:true},h),false);h.x=e.x-60;assert.equal(E.block(e,{damage:2},h),false);
 E.intent(e,h,true);assert.equal(e.dir,1);assert.equal(E.guarding(e),false);for(let i=0;i<22;i++)E.intent(e,h,true);assert.equal(e.dir,-1);
-e=fighter('shield');h=hero();M.begin(e,'shieldBash');assert.equal(E.guarding(e),true);e.attack.age=e.attack.to+1;assert.equal(E.guarding(e),false);e.attack=null;E.finish(e,{type:'shieldBash',connected:false},h);assert.equal(e.attack,null);
+e=fighter('shield');h=hero();M.begin(e,'shieldBash');assert.equal(E.guarding(e),true);e.attack.age=e.attack.from;assert.equal(E.guarding(e),false,'committed bash is vulnerable');assert.equal(E.block(e,{damage:4,knock:true},h),false,'charge connects when guard drops');e.brace=0;e.attack.age=e.attack.to+1;assert.equal(E.guarding(e),false);e.attack=null;E.finish(e,{type:'shieldBash',connected:false},h);assert.equal(e.attack,null);
 e=fighter('bone');h=hero();M.begin(e,'boneCut');const dir=e.attack.direction;h.x=300;E.intent(e,h,true);assert.equal(e.attack.direction,dir);
 e.attack=null;E.finish(e,{type:'boneCut',connected:false},h);assert.equal(e.attack,null);e.aiRest=0;E.finish(e,{type:'boneCut',connected:true},h);assert.equal(e.attack.type,'boneFollow');
 e=fighter('marauder');h=hero();E.finish(e,{type:'marauderChop',connected:false},h);assert.equal(e.attack.type,'marauderOverhead');assert.ok(e.attack.from>=30);assert.ok(e.attack.ticks-e.attack.to>=35);
