@@ -14,7 +14,7 @@
   const bounds = { left: 70, right: W - 70, top: 560, bottom: 755 };
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let running = true, ready = false, raf, last = null, clock = 0, accumulator = 0, spell = null;
-  let phase = 'title', wave = 1, score = 0, kills = 0, magic = 100, stormTexture, hudTexture;
+  let phase = 'title', wave = 1, score = 0, kills = 0, magic = 100, stormTexture, hudTexture, hudCrests;
   let shake = 0, banner = 0, combo = 0, comboTime = 0;
   let muted = true, audio, background, sparks = [];
   let nextId = 0;
@@ -240,20 +240,23 @@
   function drawHUD() {
     if(!hudTexture)return;
     const h=$('game-hud').getContext('2d');
-    h.save();h.clearRect(0,0,1440,252);h.scale(1440/2172,252/380);
+    h.save();h.clearRect(0,0,1440,296);h.translate(0,44);h.scale(1440/2172,252/380);
+    if(hudCrests)h.drawImage(hudCrests,0,-66,2172,66);
     h.drawImage(hudTexture,0,0,2172,380,0,0,2172,380);
-    // Reuse the same painted socket for both bars, including identical bevels.
-    h.drawImage(hudTexture,280,80,940,124,280,225,940,124);
+    // Center the pair in the stone panel (y40..350), with equal 30px margins.
+    h.drawImage(hudTexture,270,445,970,160,270,55,970,290);
+    h.drawImage(hudTexture,280,80,940,124,280,70,940,110);
+    h.drawImage(hudTexture,280,80,940,124,280,210,940,110);
     const gauge=(y,value,colors,glow)=>{
-      const x=300,w=895,height=78;h.save();h.beginPath();h.rect(x,y,w,height);h.clip();
+      const x=300,w=895,height=69;h.save();h.beginPath();h.rect(x,y,w,height);h.clip();
       const fill=h.createLinearGradient(0,y,0,y+height);colors.forEach((c,i)=>fill.addColorStop(i/(colors.length-1),c));
       h.fillStyle=fill;h.fillRect(x,y,w*clamp(value/100),height);
       h.save();h.beginPath();h.rect(x,y,w*clamp(value/100),height);h.clip();h.globalCompositeOperation='soft-light';h.globalAlpha=.6;h.drawImage(hudTexture,300,102,895,78,x,y,w,height);h.restore();
       h.globalAlpha=.35;h.fillStyle='#fff4d3';h.fillRect(x,y+3,w*clamp(value/100),3);h.restore();
       if(glow){h.save();h.strokeStyle=`rgba(154,219,255,${reducedMotion?.65:.5+.3*Math.sin(clock*5)})`;h.shadowColor='#63baff';h.shadowBlur=16;h.lineWidth=4;h.strokeRect(x,y,w,height);h.restore();}
     };
-    gauge(102,hero.hp,['#f59d91','#bf221e','#710807','#a41413'],false);
-    gauge(247,magic,['#d5f5ff','#269bff','#074891','#1585e2'],canCast());
+    gauge(89.5,hero.hp,['#f59d91','#bf221e','#710807','#a41413'],false);
+    gauge(229.5,magic,['#d5f5ff','#269bff','#074891','#1585e2'],canCast());
     const weapon=weapons[weaponId],cel=weaponAtlas?.cels?.[weapon.frame];
     if(cel){const height=245,width=height*cel.image.width/cel.image.height;h.save();h.translate(1400,193);h.rotate(.5);h.drawImage(cel.image,-width/2,-height/2,width,height);h.restore();}
     h.textAlign='center';h.textBaseline='middle';h.shadowColor='#000';h.shadowBlur=4;h.shadowOffsetY=3;h.fillStyle='#eedbb0';
@@ -474,6 +477,13 @@
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
+    loadImage('/art/hud-bronze-top-extended-v2.png').then(image => {
+      const crest=document.createElement('canvas');crest.width=2172;crest.height=66;const c=crest.getContext('2d');
+      c.drawImage(image,0,0,2172,66,0,0,2172,66);
+      const pixels=c.getImageData(0,0,2172,66),d=pixels.data;
+      for(let i=0;i<d.length;i+=4){const x=(i/4)%2172;d[i+3]=x>110&&x<2062?0:Math.round(255*clamp((d[i]-Math.max(d[i+1],d[i+2])*1.12-6)/18));}
+      c.putImageData(pixels,0,0);hudCrests=crest;
+    }),
     loadImage('/art/hud-bronze-v1.png').then(image => { hudTexture = image; }),
     loadImage('/art/enemy-equipment-v1.png').then(image => { enemyEquipment = new Atlas(decodeChroma(image), {columns:4,rows:1,frames:4}); }),
     loadImage('/art/weapons-v8.png').then(image => { weaponAtlas = new Atlas(decodeChroma(image), { columns: 2, rows: 1, frames: 2 }); }),
