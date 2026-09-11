@@ -7,6 +7,7 @@ const M = sandbox.window.AshenMechanics;
 const fixture = JSON.parse(fs.readFileSync('research/golden-axe-fixtures.json', 'utf8'));
 const make = (x=0,y=0) => M.init({id:Math.random(),x,y,hp:16,max:16,dir:1,stride:0});
 for (const [name, scenario] of Object.entries(fixture.scenarios)) {
+  if(name==='run-jump')continue; // Intentional homage change: no running height bonus.
   const f = make(); let previous = [], index = 0;
   for (const [ticks, input] of scenario.input) for (let i=0;i<ticks;i++) {
     const edge = input.filter(k=>!previous.includes(k)); previous=input;
@@ -60,3 +61,5 @@ player.height=50;assert.equal(M.canHit(enemy,player,{...M.attacks.enemy,directio
 enemy.aiRest=0;player.y=0;M.enemyIntent(enemy,player,false);assert.equal(enemy.attack,null);
 M.enemyIntent(enemy,player,true);assert.equal(enemy.attack.type,'enemy');
 console.log('PASS: ROM movement traces, tap boundary, active windows, contextual follow-ups, stagger and knockdown.');
+
+const standingJump=make(),runningJump=make();runningJump.running=true;M.startJump(standingJump);M.startJump(runningJump);for(let i=0;i<65;i++){M.stepMotion(standingJump,1,0);M.stepMotion(runningJump,1,0);assert.equal(runningJump.height,standingJump.height)}

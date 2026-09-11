@@ -27,7 +27,7 @@
   }
   function startJump(f) {
     if (f.air || f.attack || f.hurtTicks || f.down || f.recovering) return false;
-    f.jumpLaunch = f.running ? 7 : 5.5;
+    f.jumpLaunch = 5.5;
     f.air = { age: 0, launch: f.jumpLaunch, vz: 0 }; f.jump = 0;
     f.velocityX = f.velocityY = 0; f.running = false; return true;
   }

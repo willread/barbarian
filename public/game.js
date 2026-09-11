@@ -248,15 +248,23 @@
     h.drawImage(hudTexture,280,80,940,124,280,70,940,110);
     h.drawImage(hudTexture,280,80,940,124,280,210,940,110);
     const gauge=(y,value,colors,glow)=>{
-      const x=300,w=895,height=69;h.save();h.beginPath();h.rect(x,y,w,height);h.clip();
+      const x=294,w=912,height=90;h.save();h.beginPath();h.rect(x,y,w,height);h.clip();
       const fill=h.createLinearGradient(0,y,0,y+height);colors.forEach((c,i)=>fill.addColorStop(i/(colors.length-1),c));
       h.fillStyle=fill;h.fillRect(x,y,w*clamp(value/100),height);
       h.save();h.beginPath();h.rect(x,y,w*clamp(value/100),height);h.clip();h.globalCompositeOperation='soft-light';h.globalAlpha=.6;h.drawImage(hudTexture,300,102,895,78,x,y,w,height);h.restore();
       h.globalAlpha=.35;h.fillStyle='#fff4d3';h.fillRect(x,y+3,w*clamp(value/100),3);h.restore();
       if(glow){h.save();h.strokeStyle=`rgba(154,219,255,${reducedMotion?.65:.5+.3*Math.sin(clock*5)})`;h.shadowColor='#63baff';h.shadowBlur=16;h.lineWidth=4;h.strokeRect(x,y,w,height);h.restore();}
     };
-    gauge(89.5,hero.hp,['#f59d91','#bf221e','#710807','#a41413'],false);
-    gauge(229.5,magic,['#d5f5ff','#269bff','#074891','#1585e2'],canCast());
+    gauge(81,hero.hp,['#f59d91','#bf221e','#710807','#a41413'],false);
+    gauge(221,magic,['#d5f5ff','#269bff','#074891','#1585e2'],canCast());
+    // Paint the bronze rim LAST. Its aperture masks the liquid's corners.
+    for(const top of [70,210]){
+      h.save();h.beginPath();h.rect(280,top,940,110);
+      const x=298,y=top+17,w=901,b=top+94,c=7;
+      h.moveTo(x+c,y);h.lineTo(x+w-c,y);h.lineTo(x+w,y+c);h.lineTo(x+w,b-c);
+      h.lineTo(x+w-c,b);h.lineTo(x+c,b);h.lineTo(x,b-c);h.lineTo(x,y+c);h.closePath();
+      h.clip('evenodd');h.drawImage(hudTexture,280,80,940,124,280,top,940,110);h.restore();
+    }
     const weapon=weapons[weaponId],cel=weaponAtlas?.cels?.[weapon.frame];
     if(cel){const height=245,width=height*cel.image.width/cel.image.height;h.save();h.translate(1400,193);h.rotate(.5);h.drawImage(cel.image,-width/2,-height/2,width,height);h.restore();}
     h.textAlign='center';h.textBaseline='middle';h.shadowColor='#000';h.shadowBlur=4;h.shadowOffsetY=3;h.fillStyle='#eedbb0';

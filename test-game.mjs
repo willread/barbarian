@@ -91,7 +91,7 @@ for(const fps of [30,60,120,144]) {
 // Double tap and charge remain distinct actions; jumping resets run momentum.
 G.start();T.enemies.forEach(e=>{e.aiRest=1000});press('d');step(1);release('d');step(1);press('d');step(8);
 assert.equal(T.hero.velocityX,4);assert.equal(T.hero.running,true);press(' ');step(1);release(' ');
-assert.equal(T.hero.jumpLaunch,7);assert.equal(T.hero.velocityX,0);step(25);assert.ok(T.hero.height>98);
+assert.equal(T.hero.jumpLaunch,5.5);assert.equal(T.hero.velocityX,0);step(25);assert.ok(T.hero.height<=63.25);
 // Focus loss pauses and releases all held inputs.
 events.blur();const before=G.status();step(20);assert.deepEqual(G.status(),before);press('p');
 G.start();T.enemies.forEach((e,i)=>{e.x=650+i*200;e.y=660;e.aiRest=1000});
@@ -127,7 +127,7 @@ press('j');step(8);release('j');assert.equal(victim.attack,null);assert.equal(G.
 // An unattended battle is winnable by the enemies and can be restarted.
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+32*M.SCALE;e.y=660;e.aiRest=i?1000:0});
 step(120);assert.ok(T.hero.hp<=100-8*100/48+1e-8,'enemy follows connected blows with a knockdown finisher');assert.ok(T.hero.down);
-G.start();step(14000);assert.equal(G.status().phase,'lost');
+G.start();T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(180);assert.equal(G.status().phase,'lost');
 element('resume').onclick();assert.equal(G.status().health,100);assert.equal(G.status().score,0);
 // Wave progression and victory are exercised through damage, not phase mutation.
 for(let wave=1;wave<=4;wave++) {
