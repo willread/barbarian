@@ -62,7 +62,7 @@ main:has(#title:not([hidden]))>.stage-bottom,main:has(#title:not([hidden]))>foot
 #title button:before,#title button:hover:before,#title button:focus-visible:before,#start:before{content:none!important;display:none!important}
 #title button:focus-visible,#overlay button:focus-visible,#overlay[data-phase="paused"] button:focus-visible{outline:none;background-color:transparent}
 #title .title-menu button.stone-label{animation:stone-impact .48s both;transform-origin:50% 85%}
-#title .title-menu button:nth-child(2){animation-delay:.56s}
+#title .title-menu button:nth-child(2){animation-delay:.48s}
 @keyframes stone-impact{
  0%{transform:translateY(-85cqw);animation-timing-function:cubic-bezier(.65,0,1,.5)}
  68%{transform:translateY(0);animation-timing-function:ease-out}
@@ -74,7 +74,7 @@ main:has(#title:not([hidden]))>.stage-bottom,main:has(#title:not([hidden]))>foot
 @media(prefers-reduced-motion:reduce){#title .title-menu button.stone-label{animation:none}}
 
 #title .title-menu{gap:-0px}
-#title .title-menu button.stone-label:first-child{animation-delay:.56s}
+#title .title-menu button.stone-label:first-child{animation-delay:.48s}
 #title .title-menu button.stone-label:nth-child(2){animation-delay:0s;margin-top:-.4cqw}
 
 @font-face{font-family:'Cairn Gothic';src:url('/fonts/grenze-gotisch.ttf') format('truetype');font-weight:100 900;font-display:swap}
@@ -90,8 +90,8 @@ main:has(#title:not([hidden]))>.stage-bottom,main:has(#title:not([hidden]))>foot
 #title .title-options{left:29%;top:47%;padding:0;background:none;border:0;gap:0}
 #title .title-options button{font:900 3.7cqw/1.05 'Anton',sans-serif;letter-spacing:.04em}
 #title .title-options button.stone-label{animation:stone-impact .48s both;transform-origin:50% 85%}
-#title .title-options button.stone-label:nth-child(1){animation-delay:1.12s}
-#title .title-options button.stone-label:nth-child(2){animation-delay:.56s;margin-top:-1.1cqw}
+#title .title-options button.stone-label:nth-child(1){animation-delay:.96s}
+#title .title-options button.stone-label:nth-child(2){animation-delay:.48s;margin-top:-1.1cqw}
 #title .title-options button.stone-label:nth-child(3){animation-delay:0s;margin-top:-1.1cqw}
 @media(prefers-reduced-motion:reduce){#title .title-options button.stone-label{animation:none}}
 
@@ -115,3 +115,15 @@ main:has(#title:not([hidden]))>.stage-bottom,main:has(#title:not([hidden]))>foot
 #title button.stone-selected::after,#overlay button.stone-selected::after{display:none}
 .letter-fire{display:none;position:absolute;left:50%;top:calc(-1 * var(--stone-fire-pad));transform:translateX(-50%);width:var(--stone-width);height:var(--stone-fire-height);pointer-events:none;z-index:0;filter:brightness(1.65) saturate(1.2)}
 .stone-selected>.letter-fire{display:block}
+
+.loading-screen{position:absolute;inset:0;background:#000;z-index:30;display:grid;place-items:center}
+.loading-ring{width:clamp(64px,8cqw,130px);height:auto;filter:drop-shadow(0 3px 2px #000);animation:metal-ring-spin 1.8s linear infinite}
+@keyframes metal-ring-spin{to{transform:rotate(360deg)}}
+#stage[data-loading="true"] #title{visibility:hidden}
+#stage[data-loading="true"] #title button.stone-label{animation:none}
+#title button>.letter-fire{display:none}
+#title button.stone-selected>.letter-fire{display:block;opacity:1}
+@media(prefers-reduced-motion:reduce){.loading-ring{animation-duration:6s}}
+
+.letter-fire{width:var(--stone-fire-width);max-width:none;max-height:none;top:calc((100% - var(--stone-height))/2 - var(--stone-fire-pad));filter:brightness(1.15) saturate(1.1);object-fit:fill}
+
