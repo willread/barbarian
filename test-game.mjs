@@ -149,7 +149,7 @@ M.hurt(T.hero,{direction:-1,knock:false},true);
 const escapeEnemy=T.enemies[0];M.begin(escapeEnemy,'enemy');escapeEnemy.dir=-1;escapeEnemy.attack.direction=-1;escapeEnemy.attack.age=escapeEnemy.attack.from-1;
 press('d');press('k');const escapeX=T.hero.x;step(1);
 assert.equal(T.hero.hurtTicks,0);assert.equal(T.hero.recovering,0);assert.equal(T.hero.hp,100);
-assert.ok(T.hero.x>escapeX);assert.ok(T.hero.invTicks>0);assert.equal(G.status().magic,0);
+assert.equal(T.hero.x,escapeX,'casting plants the hero while enemies keep simulating');assert.ok(T.hero.invTicks>0);assert.equal(G.status().magic,0);
 step(24);assert.equal(T.hero.invTicks,0,'channeling does not refresh escape protection');
 release('d');release('k');
 step(90);M.hurt(T.hero,{direction:-1,knock:true},true);press('k');step(1);

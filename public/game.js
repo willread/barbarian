@@ -199,7 +199,7 @@
     } else if (!spell && pressed.has('j')) {
       if (M.begin(hero, M.selectStrike(hero, enemies))) beep(230, .15);
     }
-    M.stepMotion(hero, dx, dy, edge, bounds);
+    M.stepMotion(hero, spell ? 0 : dx, spell ? 0 : dy, spell ? 0 : edge, bounds);
     M.tickAttack(hero, enemies, damage);
     pressed.clear();
     // Reserve one approach position per side; other fighters wait farther out.
@@ -237,7 +237,8 @@
     const duration = isHero ? clips.heroDeath.duration : clips.enemyDeath.duration;
     const opacity = f.hp <= 0 ? 1 - smooth((f.death - duration - .3) / .55) : 1;
     if (opacity <= 0) return;
-    const p = !isHero && f.kind!=='legion' ? E.pose(f) : pose(f, isHero), atlas = atlases[p.atlas];
+    const castFrame = spell ? (spell.age<5?0:spell.age<9?1:spell.age<13?2:spell.age<17?3:spell.age<45?4:spell.age<77?5:spell.age<84?6:7) : null;
+    const p = isHero && spell && !f.down && !f.hurtTicks ? {atlas:'hero-cast-unarmed-v1',frame:castFrame} : !isHero && f.kind!=='legion' ? E.pose(f) : pose(f, isHero), atlas = atlases[p.atlas];
     if (!atlas) return;
     const size = f.boss ? 345 : 292;
     const height = (f.height || 0) * M.SCALE;
@@ -425,8 +426,9 @@
   const loadImage = src => new Promise((resolve, reject) => {
     const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src;
   });
-  const names = ['hero-reactions-unarmed-v8', 'hero-walk-unarmed-v8', 'hero-actions-unarmed-v8', 'hero-extra-unarmed-v8', 'hero-close-unarmed-v8', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3', 'enemy-bone-v1', 'enemy-shield-v1', 'enemy-marauder-v1', 'enemy-champion-v1'];
+  const names = ['hero-cast-unarmed-v1', 'hero-reactions-unarmed-v8', 'hero-walk-unarmed-v8', 'hero-actions-unarmed-v8', 'hero-extra-unarmed-v8', 'hero-close-unarmed-v8', 'enemy-walk-v4', 'enemy-attack-v4', 'enemy-charge-v5', 'enemy-combat-v3', 'enemy-bone-v1', 'enemy-shield-v1', 'enemy-marauder-v1', 'enemy-champion-v1'];
   const atlasConfig = {
+    'hero-cast-unarmed-v1': { columns:4, rows:2, frames:8 },
     'hero-walk-unarmed-v8': { columns: 4, rows: 1, frames: 4 },
     'hero-actions-unarmed-v8': { columns: 4, rows: 2, frames: 8, breathRegion: [.5,.275,.3,.11] },
     'hero-reactions-unarmed-v8': { columns: 4, rows: 3, frames: 12 },
