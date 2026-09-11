@@ -1,0 +1,17 @@
+- Jump feels useless
+- Shield window feels off
+- Spin attack to clear space
+- 3x levels with unique bosses
+- Per level tuning
+- Better health bar design
+- Analytics including in-depth play session data for tuning
+- Shareware model
+- Trailer
+- Sound
+- Music
+- Promo art
+- Widescreen support
+- Convert to Godot
+- Menu screen
+  - Select weapon
+  - Difficulty
