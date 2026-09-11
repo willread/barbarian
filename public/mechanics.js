@@ -132,6 +132,7 @@
       e.hurtTicks ? [-19,25,-37,37] : e.attack ? [-25,24,-45,45] : [-15,18,-47,47];
     const weapon = a.box || [-4,a.reach+4,-48,a.type === 'air' ? 64 : 48];
     const rectangle = (actor, box, dir) => {
+      box=box.map(v=>v*(actor.size||1));
       const x = actor.x / SCALE + (dir > 0 ? box[0] : -box[0]-box[1]);
       const y = actor.y / SCALE - (actor.height || 0) + box[2];
       return [x,y,x+box[1],y+box[3]];

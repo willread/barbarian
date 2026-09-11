@@ -4,6 +4,8 @@
   const canvas = $('game'), ctx = canvas.getContext('2d');
   const W = 1440, H = 810;
   const blood = new window.AshenBlood(W, H);
+  const aftermath=new window.AshenEvents.Aftermath(),field=new window.AshenEvents.FieldEvents();
+  let fireTexture,smokeTexture,chickenAtlas;
   const { Atlas, LivingBackground, clips, pose, decodeChroma, clamp, smooth } = window.AshenAnimation;
   const M = window.AshenMechanics;
   const E = window.AshenEnemies;
@@ -42,7 +44,7 @@
     $('health').parentElement.setAttribute('aria-label', `Health ${Math.max(0, hero.hp)} of 100`);
     syncMagic();
     $('score').textContent = String(score).padStart(6, '0');
-    $('wave').textContent = `WAVE ${wave} / 4`;
+    $('wave').textContent = `${wave===encounters.length?'FINAL DUEL':'THE VALLEY'}`;
   }
 
   function canCast() {
@@ -52,7 +54,7 @@
     const ready = canCast();
     $('magic-fill').style.width = magic + '%';
     $('magic-meter').setAttribute('aria-valuenow', String(magic));
-    $('magic-meter').setAttribute('aria-valuetext', `${Math.ceil(magic)} percent. Press K at full charge for a 1.5 second lightning burst. Charge with weapon hits and kills.`);
+    $('magic-meter').setAttribute('aria-valuetext', `${Math.ceil(magic)} percent. Press K at full charge for a 1.5 second nearby lightning burst. Charge with weapon hits and kills.`);
     $('magic-state').textContent = spell ? 'STORM ACTIVE' : ready ? 'READY · PRESS K' : magic > 0 ? Math.ceil(magic) + '% · CHARGING' : 'EMPTY · LAND HITS';
     $('magic').setAttribute('data-ready', String(ready));
   }
@@ -62,6 +64,7 @@
     phase = next;
     $('title').hidden = next !== 'title';
     $('hud').hidden = false;
+    $('overlay').style.backdropFilter=next==='lost'?'none':'';
     $('overlay').hidden = !['paused', 'won', 'lost'].includes(next);
     $('outcome').textContent = next === 'paused' ? 'TAKE A BREATH' : next === 'won' ? 'THE VALLEY IS FREE' : 'THE LEGION ENDURES';
     $('message').textContent = next === 'paused' ? 'Battle paused' : next === 'won' ? 'A legend rises.' : 'Even heroes fall.';
@@ -72,19 +75,19 @@
 
   function spawn() {
     enemies = encounters[wave-1].map((kind, i) => {
-      const left = wave !== 4 && Math.random() < .5;
-      const e = E.init(make(left ? -80-i*90 : W+80+i*90, wave===4?660:570+Math.random()*150, E.roster[kind].hp),kind);
-      e.dir = left ? 1 : -1;
+      const left = wave !== encounters.length && Math.random() < .5;
+      const e = E.init(make(left ? -80-i*90 : W+80+i*90, wave===encounters.length?660:570+Math.random()*150, E.roster[kind].hp),kind);
+      E.variant(e);e.dir = left ? 1 : -1;
       return e;
     });
-    banner = 2.5; sync();
+    field.wave();banner = 0; sync();
   }
 
   function start() {
     if (!ready) throw new Error('Artwork is still loading');
     hero = make(470, 660, 100, true); hero.weapon=weaponId; wave = 1; score = 0; kills = 0; magic = 100;
     combo = 0; sparks = []; shake = 0; spell = null; accumulator = 0;
-    blood.reset();
+    blood.reset();aftermath.reset();field.reset();
     encounters = E.plan();
     keys.clear(); pressed.clear(); change('playing'); spawn();
   }
@@ -121,18 +124,26 @@
       } else if(e.hp>0 && bossRecovery && !reactionAttack.knock){
         e.hurtTicks=12;e.recoil=12*M.STEP;e.stagger=0;e.aiRest=0;e.invTicks=30;
       }
+      if(e.hp<=0&&!isHero&&e.down)e.down.vx*=.48;
       // Keep the wound's original height, but inherit the launch just applied.
       blood.hit({ ...impact, down: e.down || impact.down }, attack.direction || 1, e.hp <= 0);
+      if(e.hp<=0&&!isHero)for(let i=0;i<(e.boss?4:1);i++)blood.hit({...impact,down:e.down},attack.direction||1,true);
       burst(e.x, e.y - 105, 12, isHero ? '#e97b4f' : '#ffc473');
       shake = attack.knock ? 5 : 2; beep(isHero ? 60 : 100);
     }
     // No global hit-stop: source action and stagger windows run continuously.
     if (e.hp <= 0) {
       e.death = 0;
+      const gear=[];
+      const add=(cel,h)=>{if(cel)gear.push({image:cel.image,h})};
+      if(isHero)add(weaponAtlas?.cels?.[weapons[weaponId].frame],weapons[weaponId].length);
+      else if(e.kind==='champion')add(weaponAtlas?.cels?.[0],182);
+      else {add(enemyEquipment?.cels?.[e.kind==='bone'?0:e.kind==='shield'?1:2],e.kind==='shield'?108:140);if(e.kind==='shield')add(enemyEquipment?.cels?.[3],158)}
+      aftermath.death(e,gear);
       if (isHero) change('dying');
       else { kills++; score += e.boss ? 1500 : 250; combo++; comboTime = 2.2; }
     }
-    if (!isHero && attacker === hero && !attack.magic) magic = Math.min(100, magic + 12 + (e.hp <= 0 ? 20 : 0));
+    if (!isHero && attacker === hero && !attack.magic) magic = Math.min(100, magic + 6 + (e.hp <= 0 ? 8 : 0));
     sync();
   }
 
@@ -161,7 +172,8 @@
   function update(dt) {
     if (!['playing', 'dying', 'title'].includes(phase)) return;
     if (phase === 'title') { hero.clock += dt; return; }
-    blood.step(dt, [hero, ...enemies]);
+    blood.step(dt, [hero, ...enemies]);aftermath.step(dt,[hero,...enemies]);
+    if(phase==='playing'){const hp=hero.hp;field.step(dt,wave,hero);if(hero.hp!==hp)sync();}
     if (pressed.has('k') && canCast()) {
       if (hero.hurtTicks || hero.recovering) {
         hero.hurtTicks = hero.hurtAge = hero.recovering = hero.recoil = hero.stagger = 0;
@@ -177,15 +189,15 @@
       // One full charge buys 90 fixed ticks (about 1.5 seconds).
       // Damage and electrical interruption persist for the timed burst.
       
-      spell.targets = enemies.filter(e => e.x >= 0 && e.x <= W && e.hp > 0).map(e => ({ id: e.id, x: e.x, y: e.y }));
-      for (const e of enemies) if (e.x >= 0 && e.x <= W && e.hp > 0)
-        damage(e, { damage: 1 / 3, knock: false, magic: true, continuous: true, direction: e.x > hero.x ? 1 : -1 }, hero);
+      spell.targets = enemies.filter(e => inStorm(e)).map(e => ({ id: e.id, x: e.x, y: e.y }));
+      for (const e of enemies) if (spell.age>=20 && spell.age<77 && inStorm(e))
+        damage(e, { damage: .12, knock: false, magic: true, continuous: true, direction: e.x > hero.x ? 1 : -1 }, hero);
       if (spell && spell.age >= 90) spell = null;
     }
     tickActor(hero, dt);
     for (const e of enemies) tickActor(e, dt);
     if (phase === 'dying') {
-      if (hero.death > clips.heroDeath.duration + .7) change('lost');
+      if (hero.death > 2.2 && hero.down?.ground) change('lost');
       pressed.clear(); return;
     }
     banner -= dt; comboTime -= dt;
@@ -216,23 +228,25 @@
     for (const e of enemies) {
       if (e.hp <= 0) continue;
       const [ex, ey] = E.intent(e, hero, engaged.has(e.id));
+      if(e.roarPending){e.roarPending=false;roar();}
       if (e.attack) E.motion(e);
       else if (!e.hurtTicks && !e.down && !e.recovering) {
         // Enemy direction table C5DE: independent half-unit axes; harder types .625.
-        const speed = E.roster[e.kind]?.speed || .5;
+        const speed = (E.roster[e.kind]?.speed || .5)*(e.speedFactor||1);
         e.velocityX = ex * speed; e.velocityY = ey * speed;
         e.x += e.velocityX * M.SCALE; e.y += e.velocityY * M.SCALE;
         e.y = clamp(e.y, bounds.top, bounds.bottom);
         e.moving = !!(ex || ey);
         if (e.moving) e.stride = (e.stride + 1 / 56) % 1;
       }
+      e.x=clamp(e.x,-180,W+180);
       const finished = M.tickAttack(e, [hero], damage);
       if (finished) E.finish(e, finished, hero);
       if (phase !== 'playing') break;
     }
-    if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.death > clips.enemyDeath.duration + .8)) {
-      if (wave === 4) change('won');
-      else { wave++; hero.hp = Math.min(100, hero.hp + 20); spawn(); }
+    if (phase === 'playing' && enemies.every(e => e.hp <= 0 && e.death > 3.4)) {
+      if (wave === encounters.length) change('won');
+      else { wave++; spawn(); }
     }
     syncMagic();
   }
@@ -270,13 +284,13 @@
     h.textAlign='center';h.textBaseline='middle';h.shadowColor='#000';h.shadowBlur=4;h.shadowOffsetY=3;h.fillStyle='#eedbb0';
     h.font='bold 32px Georgia';h.fillText('SCORE',1758,83);
     h.font='bold 78px Georgia';h.fillText(String(score).padStart(6,'0'),1758,182);
-    h.font='bold 33px Georgia';h.fillText(`WAVE ${wave} / 4`,1758,281);
+    h.font='bold 33px Georgia';h.fillText(`${wave===encounters.length?'FINAL DUEL':'THE VALLEY'}`,1758,281);
     h.restore();
   }
 
   function drawFighter(f, isHero) {
     const duration = isHero ? clips.heroDeath.duration : clips.enemyDeath.duration;
-    const opacity = f.hp <= 0 ? 1 - smooth((f.death - duration - .3) / .55) : 1;
+    const opacity = !isHero && f.hp<=0 && f.death>.15+(f.engulf||1)+.6 ? 0 : 1;
     if (opacity <= 0) return;
     const castFrame = spell ? (spell.age<5?0:spell.age<9?1:spell.age<13?2:spell.age<17?3:spell.age<45?4:spell.age<77?5:spell.age<84?6:7) : null;
     const p = isHero && spell && !f.down && !f.hurtTicks ? {atlas:'hero-cast-unarmed-v1',frame:castFrame} : !isHero && f.kind!=='legion' ? E.pose(f) : pose(f, isHero), atlas = atlases[p.atlas];
@@ -292,12 +306,15 @@
     ctx.fillStyle = shadow; ctx.fillRect(-radius, -radius, radius * 2, radius * 2); ctx.restore();
     ctx.globalAlpha = opacity;
     ctx.translate(f.x, f.y - height);
-    ctx.scale(f.dir, 1);
+    ctx.scale(f.dir*(f.size||1), f.size||1);
     if (!isHero && f.electricTicks > 0) ctx.filter = `brightness(${Math.floor(clock*30)%3===0?3.5:1.7}) saturate(.15) drop-shadow(0 0 7px #c6e7ff)`;
     else if (!isHero && f.invulnerable > 0 && f.hp > 0 && Math.floor(f.invulnerable * 16) % 2) ctx.filter = 'brightness(1.25)';
-    if (isHero && heroRig) heroRig.paint(ctx, p, size, opacity, reducedMotion ? null : f.clock, f.attack?.weapon || weaponId);
-    else if (!isHero && f.kind!=='legion' && enemyRig) enemyRig.paint(ctx, f, p, opacity);
-    else atlas.paint(ctx, p.frame, size, opacity);
+    const paint=g=>{
+      if(isHero&&heroRig)heroRig.paint(g,p,size,opacity,reducedMotion?null:f.clock,f.gearDropped?'none':f.attack?.weapon||weaponId);
+      else if(!isHero&&f.kind!=='legion'&&enemyRig)enemyRig.paint(g,f,p,opacity);
+      else atlas.paint(g,p.frame,size,opacity);
+    };
+    if(!isHero&&f.hp<=0)aftermath.body(ctx,f,paint);else paint(ctx);
     ctx.restore();
     if (!isHero && f.hp > 0 && f.hp < f.max) {
       ctx.fillStyle = '#180e0c'; ctx.fillRect(f.x - 35, f.y - size + 20, 70, 4);
@@ -328,55 +345,25 @@
     return {main, branches};
   }
 
+  function inStorm(e){return e.hp>0 && Math.hypot(e.x-hero.x,(e.y-hero.y)*3)<420;}
+  function roar(){
+    if(muted)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();const n=audio.createBuffer(1,audio.sampleRate*.45,audio.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.sin(i/audio.sampleRate*85*Math.PI*2);const s=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain();s.buffer=n;filter.type='lowpass';filter.frequency.value=700;gain.gain.setValueAtTime(.17,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.45);s.connect(filter);filter.connect(gain);gain.connect(audio.destination);s.start()}catch{}
+  }
   function drawSpell() {
-    if (!spell || !stormTexture) return;
-    spell.channels ??= new Map();
-    const elapsed = Math.max(0, spell.age - 1) * M.STEP;
-    const cw = stormTexture.width / 4, ch = stormTexture.height / 2;
-    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    for (const target of spell.targets) {
-      // 50 ms downward leader, 20 ms upward return stroke, then an energized
-      // after-channel. Damage remains continuous throughout the timed burst.
-      const cycle = reducedMotion ? 0 : Math.floor(elapsed / .24);
-      const age = reducedMotion ? Math.min(elapsed, .12) : elapsed - cycle * .24;
-      let entry = spell.channels.get(target.id);
-      if (!entry || entry.cycle !== cycle) {
-        entry = {cycle, previous: entry?.current, current: lightningChannel(target.id * 7919 + cycle * 104729 + 17, target.y)};
-        spell.channels.set(target.id, entry);
-      }
-      const front = -45 + (target.y + 45) * clamp(age / .05);
-      const connected = age >= .05;
-      const surge = connected ? Math.exp(-(age - .05) * 24) : 0;
-      const paint = (channel, alpha, bottom, returnOnly = false) => {
-        ctx.save(); ctx.translate(target.x, 0);
-        ctx.beginPath(); ctx.rect(-300, returnOnly ? target.y - (target.y + 45) * clamp((age - .05) / .02) : -45, 600,
-          returnOnly ? (target.y + 45) * clamp((age - .05) / .02) + 5 : bottom + 45); ctx.clip();
-        const stroke = (points, width, color) => {
-          ctx.beginPath(); ctx.moveTo(...points[0]); for (let i = 1; i < points.length; i++) ctx.lineTo(...points[i]);
-          ctx.lineWidth = width; ctx.strokeStyle = color; ctx.stroke();
-        };
-        ctx.globalAlpha = alpha;
-        ctx.shadowColor = '#bcd7ff'; ctx.shadowBlur = reducedMotion ? 5 : 13;
-        stroke(channel.main, 7, '#9bbfff35');
-        ctx.shadowBlur = 0;
-        stroke(channel.main, 3.5, '#d5e4ff80');
-        for (const branch of channel.branches) stroke(branch.points, branch.width, '#c7d9ef90');
-        stroke(channel.main, returnOnly ? 2.2 : 1.25, '#fffdf0');
-        ctx.restore();
-      };
-      // Residual conduction bridges successive leaders, avoiding on/off casts.
-      if (entry.previous) paint(entry.previous, .2 * (1 - clamp(age / .09)), target.y);
-      paint(entry.current, reducedMotion ? .42 : connected ? .65 : .55, front);
-      if (connected && !reducedMotion) paint(entry.current, .45 * surge, target.y, true);
-      if (connected || entry.previous) {
-        ctx.globalAlpha = reducedMotion ? .2 : .24 + .12 * surge;
-        const h = 210, w = h * cw / ch;
-        ctx.drawImage(stormTexture, cw, ch, cw, ch, target.x - w / 2, target.y - h * .78, w, h);
-        ctx.save(); ctx.translate(target.x, target.y); ctx.scale(1, .3);
-        const light = ctx.createRadialGradient(0, 0, 0, 0, 0, 110);
-        light.addColorStop(0, '#dce8ff88'); light.addColorStop(1, '#bedbff00');
-        ctx.fillStyle = light; ctx.fillRect(-110, -110, 220, 220); ctx.restore();
-      }
+    if(!spell||spell.age<17||spell.age>=77)return;
+    const cast={atlas:'hero-cast-unarmed-v1',frame:spell.age<45?4:5},l=heroRig.layout(cast);
+    if(!l)return;const weapon=weapons[weaponId];
+    const start=[hero.x+(l.grip[0]+Math.sin(l.angle)*weapon.length*weapon.grip)*hero.dir,hero.y+l.grip[1]-Math.cos(l.angle)*weapon.length*weapon.grip];
+    spell.origin=start;spell.channels??=new Map();
+    const elapsed=(spell.age-17)*M.STEP,cycle=Math.floor(elapsed/.16),age=elapsed-cycle*.16;
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';ctx.lineJoin='round';
+    for(const target of spell.targets){
+      let entry=spell.channels.get(target.id);
+      if(!entry||entry.cycle!==cycle){entry={cycle,current:lightningChannel(target.id*7919+cycle*104729,500)};spell.channels.set(target.id,entry)}
+      const points=entry.current.main.map((p,i,a)=>{const t=i/(a.length-1);return [start[0]+(target.x-start[0])*t+p[0]*.4,start[1]+(target.y-100-start[1])*t]});
+      const count=Math.max(2,Math.ceil(points.length*clamp(age/.04)));
+      for(const [width,color] of [[8,'#89baff35'],[3,'#bfe2ff99'],[1.3,'#fff9dd']]){ctx.beginPath();ctx.moveTo(...points[0]);for(let i=1;i<count;i++)ctx.lineTo(...points[i]);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
+      for(let i=5;i<count-4;i+=9){ctx.beginPath();ctx.moveTo(...points[i]);ctx.lineTo(points[i][0]+(i%2?1:-1)*25,points[i][1]+12);ctx.lineTo(points[i][0]+(i%2?1:-1)*38,points[i][1]+35);ctx.lineWidth=.7;ctx.strokeStyle='#c8e5ff88';ctx.stroke()}
     }
     ctx.restore();
   }
@@ -390,7 +377,7 @@
     const shade = ctx.createLinearGradient(0, 0, 0, H);
     shade.addColorStop(0, '#080b0f77'); shade.addColorStop(.3, '#080b0f00'); shade.addColorStop(1, '#080b0f44');
     ctx.fillStyle = shade; ctx.fillRect(0, 0, W, H);
-    blood.drawGround(ctx);
+    blood.drawGround(ctx);aftermath.ground(ctx);
     if (phase === 'title') drawFighter(hero, true);
     else [...enemies, hero].sort((a, b) => a.y - b.y).forEach(f => drawFighter(f, f === hero));
     if (!reducedMotion) for (let i = 0; i < 20; i++) {
@@ -403,7 +390,9 @@
       return s.life > 0;
     });
     ctx.globalAlpha = 1;
-    blood.drawAir(ctx);
+    field.draw(ctx,chickenAtlas);
+    for(const e of enemies)if(e.hp<=0)aftermath.flames(ctx,e,fireTexture,smokeTexture);
+    aftermath.sparks(ctx);blood.drawAir(ctx);
     drawSpell();
     const champion=enemies.find(e=>e.kind==='champion'&&e.hp>0);
     if(champion && phase!=='title'){
@@ -412,13 +401,6 @@
       ctx.fillStyle='#160f0e';ctx.fillRect(W/2-210,54,420,8);
       ctx.fillStyle=champion.phaseTwo?'#ab4935':'#9e7750';ctx.fillRect(W/2-210,54,420*champion.hp/champion.max,8);
     }
-    if (phase === 'playing' && banner > 0) {
-      ctx.textAlign = 'center'; ctx.fillStyle = '#f4dfb6'; ctx.font = 'small-caps 36px Georgia';
-      ctx.fillText(wave === 4 ? 'Cairn Champion · The final duel' : `Wave ${wave} · ${E.roster[encounters[wave-1][0]].name}`, W / 2, 190);
-    }
-    if (combo > 1 && comboTime > 0 && phase === 'playing') {
-      ctx.textAlign = 'right'; ctx.fillStyle = '#ffe0a7'; ctx.font = 'italic 40px Georgia'; ctx.fillText(`${combo} slain`, W - 65, 240);
-    }
     ctx.restore();
   }
 
@@ -426,7 +408,7 @@
     if (!running) return;
     const raw = last === null ? 0 : Math.min(.25, Math.max(0, (now - last) / 1000)); last = now;
     const frozen = ['paused', 'won', 'lost'].includes(phase);
-    const dt = frozen ? 0 : raw;
+    const dt = frozen ? 0 : raw*(phase==='dying'&&hero.death<1.3?.3:1);
     clock += dt;
     if (frozen || !ready) accumulator = 0;
     else {
@@ -485,6 +467,9 @@
     'enemy-combat-v3': { scale: 1.07 },
   };
   Promise.all([
+    loadImage('/art/fluid-fire-v1.png').then(i=>fireTexture=i),
+    loadImage('/art/fluid-smoke-v1.png').then(i=>smokeTexture=i),
+    loadImage('/art/chicken-v1.png').then(i=>{const c=decodeChroma(i),g=c.getContext('2d'),p=g.getImageData(0,0,c.width,c.height),d=p.data;for(let n=0;n<d.length;n+=4){const chroma=d[n]-Math.min(d[n+1],d[n+2]);d[n+3]*=clamp((chroma-7)/18)}g.putImageData(p,0,0);chickenAtlas=new Atlas(c,{columns:4,rows:3,frames:12})}),
     loadImage('/art/hud-bronze-top-extended-v2.png').then(image => {
       const crest=document.createElement('canvas');crest.width=2172;crest.height=66;const c=crest.getContext('2d');
       c.drawImage(image,0,0,2172,66,0,0,2172,66);
@@ -528,7 +513,7 @@
   const context = document.modelContext, lifecycle = new AbortController();
   if (context?.registerTool) for (const [name, description, execute, readOnly] of [
     ['get_battle_status', 'Read the current battle health, wave, score and magic.', () => window.ashenAxe.status(), true],
-    ['start_new_battle', 'Restart the four-wave battle, resetting score and health.', () => {
+    ['start_new_battle', 'Restart the eight-encounter battle, resetting score and health.', () => {
       window.ashenAxe.start(); return window.ashenAxe.status();
     }, false],
   ]) {

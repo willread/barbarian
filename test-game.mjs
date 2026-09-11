@@ -15,18 +15,19 @@ vm.runInNewContext(fs.readFileSync('public/mechanics.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/animation.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/hero-rig.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/blood.js','utf8'),sandbox);
+vm.runInNewContext(fs.readFileSync('public/events.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/enemies.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/enemy-art.js','utf8'),sandbox);
 vm.runInNewContext(fs.readFileSync('public/enemy-rig.js','utf8'),sandbox);
 let source=fs.readFileSync('public/game.js','utf8');
-source=source.replace('window.ashenAxe = {','window.__test = { damage, get hero(){return hero}, get enemies(){return enemies}, get clock(){return clock}, get blood(){return blood}, get spell(){return spell} }; window.ashenAxe = {');
+source=source.replace('window.ashenAxe = {','window.__test = { damage, get hero(){return hero}, get enemies(){return enemies}, get clock(){return clock}, get blood(){return blood}, get spell(){return spell}, get field(){return field}, get aftermath(){return aftermath} }; window.ashenAxe = {');
 vm.runInNewContext(source,sandbox);await new Promise(r=>setImmediate(r));
 const M=sandbox.window.AshenMechanics;
 next(0);
 const step=n=>{for(let i=0;i<n;i++){now+=M.STEP*1000;next(now)}};
 const press=key=>events.keydown({key,repeat:false,preventDefault(){}}),release=key=>events.keyup({key});
 const A=sandbox.window.AshenAnimation,T=sandbox.window.__test,G=sandbox.window.ashenAxe;
-const actualStart=G.start;G.start=()=>{actualStart();delete T.hero.weapon;T.enemies.forEach(e=>e.kind='legion')};
+const actualStart=G.start;G.start=()=>{actualStart();delete T.hero.weapon;T.enemies.forEach(e=>{e.kind='legion';e.size=1;e.speedFactor=1})};
 assert.equal(tools.size,2);assert.throws(()=>tools.get('start_new_battle').execute({bad:true}));
 assert.equal(tools.get('start_new_battle').execute({}).health,100);
 // Every locomotion pose selects one intact frame from its 4x4 atlas.
@@ -98,9 +99,9 @@ G.start();T.enemies.forEach((e,i)=>{e.x=650+i*200;e.y=660;e.aiRest=1000});
 const enemyHP=T.enemies[0].hp, castX=T.hero.x, enemyClock=T.enemies[0].clock;
 press('d');press('k');step(5);release('k');release('d');
 assert.equal(G.status().magic,0);assert.equal(G.status().channeling,true);
-assert.ok(T.enemies[0].hurtTicks>0);assert.ok(T.enemies[0].electricTicks>0);
+assert.equal(T.enemies[0].hurtTicks,0,'no damage before raised weapon');step(15);assert.ok(T.enemies[0].hurtTicks>0);assert.ok(T.enemies[0].electricTicks>0);
 assert.equal(T.enemies[0].attack,null);
-step(84);assert.equal(G.status().channeling,true);
+step(69);assert.equal(G.status().channeling,true);
 step(1);assert.equal(G.status().channeling,false,'burst ends after 90 ticks');
 press('k');step(1);release('k');assert.equal(G.status().channeling,false,'empty meter cannot cast');
 G.start();T.enemies.forEach(e=>e.aiRest=10000);
@@ -111,15 +112,15 @@ step(84);assert.equal(G.status().channeling,false);
 G.start();T.enemies.forEach(e=>{e.x=-100;e.aiRest=10000});
 press('k');step(200);release('k');
 const chargingTarget=T.enemies[0];
-for(let i=0;i<9;i++) {
+for(let i=0;i<17;i++) {
   M.init(chargingTarget);chargingTarget.hp=1000;chargingTarget.x=T.hero.x+30*M.SCALE;chargingTarget.y=T.hero.y;chargingTarget.aiRest=10000;
   press('j');step(8);release('j');step(10);
-  assert.equal(G.status().magic,Math.min(100,(i+1)*12));
+  assert.equal(G.status().magic,Math.min(100,(i+1)*6));
 }
 assert.equal(G.status().magicReady,true);assert.ok(element('magic-state').textContent.endsWith('PRESS K'));
 chargingTarget.x=-100;press('k');step(200);release('k');
 M.init(chargingTarget);chargingTarget.hp=1;chargingTarget.x=T.hero.x+30*M.SCALE;chargingTarget.y=T.hero.y;chargingTarget.aiRest=10000;
-press('j');step(8);release('j');assert.equal(G.status().magic,32,'connected kill gives 12 + 20');step(10);
+press('j');step(8);release('j');assert.equal(G.status().magic,14,'connected kill gives 12 + 20');step(10);
 // An interrupted enemy strike cannot deliver its pending contact event.
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:610;e.y=660;e.aiRest=1000});
 const victim=T.enemies[0];M.begin(victim,'enemy');victim.attack.age=21;victim.dir=-1;victim.attack.direction=-1;
@@ -127,12 +128,12 @@ press('j');step(8);release('j');assert.equal(victim.attack,null);assert.equal(G.
 // An unattended battle is winnable by the enemies and can be restarted.
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+32*M.SCALE;e.y=660;e.aiRest=i?1000:0});
 step(120);assert.ok(T.hero.hp<=100-8*100/48+1e-8,'enemy follows connected blows with a knockdown finisher');assert.ok(T.hero.down);
-G.start();T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(180);assert.equal(G.status().phase,'lost');
+G.start();T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(420);assert.equal(G.status().phase,'lost');
 element('resume').onclick();assert.equal(G.status().health,100);assert.equal(G.status().score,0);
 // Wave progression and victory are exercised through damage, not phase mutation.
-for(let wave=1;wave<=4;wave++) {
+for(let wave=1;wave<=8;wave++) {
   for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}
-  step(140);
+  step(220);
 }
 assert.equal(G.status().phase,'won');
 element('weapon').onchange({target:{value:'sword'}});
@@ -158,16 +159,10 @@ G.start();T.enemies.forEach(e=>{e.x=-100;e.aiRest=10000});press('k');step(99);
 assert.equal(G.status().magic,0);step(1);assert.equal(G.status().magic,0);
 M.hurt(T.hero,{direction:-1,knock:false},true);step(1);
 assert.ok(T.hero.hurtTicks>0,'empty magic cannot break stun');release('k');
-G.start();T.enemies.forEach((e,i)=>{e.x=700+i*200;e.aiRest=10000});
-const leaderBounds=[];context.rect=(x,y,w,h)=>{if(x===-300&&w===600)leaderBounds.push({y,h})};
-press('k');step(1);
-const firstChannel=T.spell.channels.get(T.enemies[0].id).current;
-assert.ok(leaderBounds.every(b=>b.h<T.enemies[0].y),'leader initially appears only at the sky');
-assert.equal(firstChannel.main.at(-1)[0],0);assert.equal(firstChannel.main.at(-1)[1],T.enemies[0].y);
-assert.ok(firstChannel.main[0][1]<0);assert.ok(firstChannel.branches.length>10);
-step(3);assert.equal(T.spell.channels.get(T.enemies[0].id).current,firstChannel,'return stroke follows the established path');
-step(14);assert.notEqual(T.spell.channels.get(T.enemies[0].id).current,firstChannel,'held channel rapidly creates new branches');
-release('k');assert.ok(T.spell);step(90);assert.equal(T.spell,null);
+G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+180;e.y=T.hero.y;e.hp=100;e.aiRest=10000});
+const near=T.enemies[0],far=T.enemies[1];press('k');step(19);assert.equal(near.hp,100);
+step(1);assert.ok(near.hp<100);assert.equal(far.hp,100,'storm has a bounded radius');
+release('k');step(90);assert.ok(Math.abs(near.hp-(100-57*.12))<1e-8,'lower fixed burst damage');
 G.start();T.enemies.forEach((e,i)=>{e.x=i?1300:T.hero.x+20*M.SCALE;e.y=T.hero.y;e.hp=100;e.aiRest=10000});
 M.begin(T.hero,'charge');step(6);
 assert.ok(T.enemies[0].down,'charge launches the enemy');
@@ -214,8 +209,8 @@ const committedAttack=defender.attack;T.damage(defender,{damage:2,direction:1},T
 assert.equal(defender.hp,18);assert.equal(defender.attack,committedAttack,'marauder trades during committed swing');
 T.damage(defender,{damage:4,direction:1,knock:true},T.hero);assert.ok(defender.down);
 actualStart();const plans=new Set();for(let i=0;i<10;i++){actualStart();plans.add(G.status().enemies.map(e=>e.type).join(','))}assert.ok(plans.size>1);
-for(let wave=1;wave<=3;wave++){for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(140)}
-assert.equal(G.status().wave,4);assert.equal(T.enemies.length,1);assert.equal(T.enemies[0].kind,'champion');
+for(let wave=1;wave<=7;wave++){for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(220)}
+assert.equal(G.status().wave,8);assert.equal(T.enemies.length,1);assert.equal(T.enemies[0].kind,'champion');
 // Live damage must not cancel the boss's preparation or active swing.
 M.init(defender);E.init(defender,'champion');defender.hp=84;defender.max=84;
 M.begin(defender,'championCleave');const bossStrike=defender.attack;
@@ -237,4 +232,11 @@ assert.ok(weaponAttacks.sword.reach>weaponAttacks.axe.reach);
 assert.ok(weaponAttacks.axe.damage>weaponAttacks.sword.damage);
 element('weapon').onclick();assert.equal(G.status().weapon,'sword','HUD weapon slot changes equipped weapon');
 element('weapon').onclick();assert.equal(G.status().weapon,'axe');
+actualStart();const fields=T.field;T.hero.hp=30;fields.time=5;fields.step(M.STEP,2,T.hero);
+assert.ok(fields.chicken,'scheduled chicken appears');const chicken=fields.chicken;
+T.hero.x=chicken.x-35;T.hero.y=chicken.y;M.begin(T.hero,'slash');T.hero.attack.age=T.hero.attack.from;
+fields.step(M.STEP,2,T.hero);assert.ok(chicken.roast,'weapon hit cooks chicken');
+T.hero.x=chicken.x;fields.step(M.STEP,2,T.hero);assert.equal(T.hero.hp,100);assert.equal(fields.chicken,null);
+actualStart();T.hero.hp=37;for(const e of T.enemies){e.hp=0;M.hurt(e,{direction:1,knock:true},false)}step(220);assert.equal(T.hero.hp,37,'wave transition cannot regenerate health');
+T.damage(T.hero,{damage:48,direction:1,knock:true},T.enemies[0]);step(420);assert.equal(G.status().phase,'lost');assert.ok(T.hero.down.ground);assert.ok(T.hero.gearDropped);
 sandbox.window.stopGame();

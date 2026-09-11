@@ -14,6 +14,7 @@
       if(f.kind==='shield'&&p.frame===6&&!f.attack?.bash)[right,left]=[left,right];
       const hand=point(right),shieldHand=left&&point(left),size=scale*atlas.cellWidth/atlas.scale;
       const blade=(back=false)=>{
+        if(f.gearDropped)return;
         ctx.save();ctx.translate(...hand);ctx.rotate(angles[p.frame]*Math.PI/180);
         if(f.kind==='champion'){
           const w=this.heroWeapons.cels?.[0];if(w){const h=182;ctx.drawImage(w.image,-h*w.image.width/w.image.height*.5,-h*.76,h*w.image.width/w.image.height,h)}
@@ -25,6 +26,7 @@
         ctx.restore();
       };
       const shield=()=>{
+        if(f.gearDropped)return;
         const w=this.equipment.cels?.[3];if(!w||!shieldHand)return;
         const down=!!f.down;const angle=down?1.2:f.brace?-.23:f.attack?.bash&&p.frame===6?-.3:0;
         ctx.save();ctx.translate(...shieldHand);ctx.rotate(angle);

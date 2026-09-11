@@ -98,6 +98,7 @@
       return [x/4.5,(Math.abs(tip[0]-l.grip[0])+r*2)/4.5,y/4.5,(Math.abs(tip[1]-l.grip[1])+r*2)/4.5];
     }
     paintWeapon(ctx, layout, id, opacity) {
+      if(id==='none')return;
       const spec = weapons[id] || weapons.axe, cel = this.weaponAtlas?.cels?.[spec.frame];
       if (!cel) return;
       const h = spec.length, w = h * cel.image.width / cel.image.height * (spec.width || 1);
