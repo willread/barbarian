@@ -7,11 +7,14 @@ uniform float hit_glow=0.0;
 void fragment(){
  vec4 c=texture(TEXTURE,UV)*COLOR;
  if(burn_age>0.0){
-  float phase=clamp((burn_age-.15-engulf)/.6,0.,1.);
-  vec2 p=UV*128.;
-  float n=.5+.17*sin(p.x*.19+seed)*cos(p.y*.16)+.16*sin(p.x*.49+p.y*.27)+.1*cos(p.y*.81-p.x*.7+seed);
-  c.rgb*=1.-clamp((burn_age-.4)/1.1,0.,1.)*.78;
-  if(phase>0.){c.a*=step(phase,n);if(n-phase<.035)c.rgb=vec3(1.,.39,.047);}
+  // Consume from the top toward the feet; noise only roughens the burn front.
+  float phase=clamp((burn_age-.15)/(engulf+.6),0.,1.);
+  float edge=UV.y+.018*sin(UV.x*39.+seed)+.009*sin(UV.x*83.-seed);
+  float front=mix(-.04,1.04,phase);
+  c.rgb*=1.-clamp(burn_age/(engulf+.6),0.,1.)*.78;
+  c.a*=smoothstep(front-.012,front+.012,edge);
+  float ember=(1.-smoothstep(.008,.045,abs(edge-front)))*step(front,edge);
+  c.rgb=mix(c.rgb,vec3(1.,.24,.025),ember);
   if(phase>=1.)c.a=0.;
  }
  c.rgb*=1.+hit_glow*2.2;

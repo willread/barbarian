@@ -40,8 +40,6 @@ func update_burn(age: float,engulf: float):
 	var end=.15+engulf+.6
 	fire.emitting=age>0 and age<end
 	fire.strength=1.8*(1.-smoothstep(end-.6,end,age))
-	fire.interior=smoothstep(.08,.55,age)
-	var consumed=smoothstep(end-.65,end+.35,age)
-	fire.scale=Vector2(lerpf(1.,.4,consumed),lerpf(1.,.4,consumed))
-	fire.position=anchor*(Vector2.ONE-fire.scale)
+	# The live body mask recedes downward; never scale or move the flame field.
+	fire.interior=1.0
 	fire.opacity=1.-smoothstep(end-.2,finished_at(engulf),age)

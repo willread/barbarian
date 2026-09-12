@@ -32,7 +32,7 @@ void fragment(){
  float edge=max(length(normal),nearby-mask_at(p));
  float patches=noise(p*.16+vec2(clock*.7,-clock*1.8));
  float flicker=.12+1.25*smoothstep(.27,.76,patches);
- float fuel=max(smoothstep(.04,.5,edge),mask_at(p)*interior*.6*smoothstep(.2,.7,patches));
+ float fuel=max(smoothstep(.04,.5,edge),mask_at(p)*interior*(.55+.25*patches));
  float source=fuel*flicker*strength*(emitting?1.:0.);
  heat=max(heat-delta*(1.05+.95*noise(q*1.9)),source);
  float boundary=smoothstep(0.,12.,min(min(p.x,domain.x-p.x),min(p.y,domain.y-p.y)));
