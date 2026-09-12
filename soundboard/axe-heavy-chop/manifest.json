@@ -1,0 +1,41 @@
+{
+  "reference": "axe-1 / Heavy chop",
+  "jobs": [
+    {
+      "id": "axe-5",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Heavy chop - tighter",
+      "description": "A compact deep chop with a shorter air burst.",
+      "prompt": "A large heavy axe swings downward once. Short deep FWOOM of displaced air, dense lower-mid body, tight accelerating onset and abrupt stop. Compact and weighty, less airy than a sword. No collision, impact, whistle, multiple swings or sustained wind. Isolated dark fantasy game sound, close dry recording.",
+      "duration": 0.8
+    },
+    {
+      "id": "axe-6",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Heavy chop - darker",
+      "description": "A darker, bassier version with subdued treble.",
+      "prompt": "One large axe makes a powerful descending swing. A short dark FWUM of displaced air with thick bass and low-mid weight, softly gritty edge and a decisive short end. Actual heavy blade moving through air, not an impact. No bright whistle, clang, explosion, voice or long wind. Close dry dark fantasy effect.",
+      "duration": 0.8
+    },
+    {
+      "id": "axe-7",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Heavy chop - rougher",
+      "description": "The same low swing with a coarse rushing edge.",
+      "prompt": "A massive axe swings downward once. Brief deep FWOOM with dense low-mid air displacement and a coarse dry rushing texture around it. Single heavy accelerating chop, abruptly ending. No contact, chopping wood, flesh, sword whistle, metal ringing, music or repeated swings. Close dark fantasy game recording.",
+      "duration": 0.8
+    },
+    {
+      "id": "axe-8",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Heavy chop - weightier",
+      "description": "A slightly broader low chop that still ends cleanly.",
+      "prompt": "One weighty battle axe sweeps down through air. Short low FWOOM, a rounded heavy pressure pulse with dense lower-mid body, slight acceleration then a clean clipped end. Substantial physical blade mass without a hit sound. No sub-bass explosion, impact, high whistle, broad wind ambience, voice or music. Close dry recording.",
+      "duration": 0.8
+    }
+  ]
+}
