@@ -49,5 +49,16 @@ func _init():
 	var hits=[]
 	for i in 45:m.tick_attack(spinner,targets,func(e,a,_h):hits.append([e.id,a.direction]))
 	assert(hits==[[2,-1],[3,1]],"Spin must hit once per side and exclude distant lanes")
+	var brute=m.make(9,800,660,100)
+	brute.size=1.18
+	assert(ai.heavy(brute))
+	brute.size=.9
+	assert(not ai.heavy(brute))
+	var runner=m.make(10,720,660,100,true)
+	m.begin(runner,"charge")
+	m.rebound_charge(runner,1)
+	assert(runner.attack.is_empty() and runner.hurtTicks==24 and runner.hp==100)
+	for i in 5:m.reaction(runner)
+	assert(runner.x<700 and runner.hurtTicks>0,"Rebound moves backward while stunned")
 	print("CAIRN_MOVES_OK: shield opening, dive startup/momentum/recovery, weapon distinction, spin sides/once/lane")
 	quit()

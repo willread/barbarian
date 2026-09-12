@@ -323,6 +323,12 @@ func can_cast() -> bool:
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
 	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
+	if attacker.player and not f.player and a.get("type","")=="charge" and e_ai.heavy(f):
+		m.rebound_charge(attacker,int(a.direction))
+		burst((f.x+attacker.x)*.5,f.y-105,7,Color("b7a58c"))
+		hit_stop=.055
+		shake=4
+		return
 	if not f.player and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
@@ -503,7 +509,7 @@ func tick(dt: float):
 			f.x+=f.velocityX*m.SCALE
 			f.y=clamp(f.y+f.velocityY*m.SCALE,560,755)
 			f.moving=intent!=Vector2.ZERO
-			if f.moving: f.stride=fmod(f.stride+1.0/56,1)
+			if f.moving: f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
 		f.x=clamp(f.x,-180,1620)
 		var finished=m.tick_attack(f,[hero],damage)
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)

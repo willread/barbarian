@@ -19,13 +19,18 @@ func plan() -> Array:
 	return result
 
 func variant(e: Dictionary):
-	if e.boss: return
+	if e.boss:
+		e.speedFactor=.75
+		return
 	var roll=randf()
 	e.variant="brute" if roll<.18 else ("swift" if roll<.4 else "regular")
 	e.size=1.18 if e.variant=="brute" else (.9 if e.variant=="swift" else 1.0)
-	e.speedFactor=1.3 if e.variant=="swift" else (.85 if e.variant=="brute" else 1.0)
+	e.speedFactor=1.35 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))
 	e.max=e.hp
+
+static func heavy(e: Dictionary) -> bool:
+	return e.boss or e.size>=1.15
 
 static func guard_open(e: Dictionary) -> bool:
 	return e.kind=="shield" and not e.attack.is_empty() and e.attack.age>=e.attack.from-6

@@ -14,7 +14,7 @@ func _init(data: Dictionary = {}):
 
 func make(id: int, x: float, y: float, hp: float, player: bool = false) -> Dictionary:
 	return {"id":id,"x":x,"y":y,"hp":hp,"max":hp,"player":player,"dir":1,"weapon":"axe","kind":"legion","boss":false,"size":1.0,"speedFactor":1.0,"variant":"regular",
-	"holdTicks":0,"spinUsed":false,"diveUsed":false,"diveHit":false,"diveAge":0,
+	"chargeRebound":0.0,"holdTicks":0,"spinUsed":false,"diveUsed":false,"diveHit":false,"diveAge":0,
 	"velocityX":0.0,"velocityY":0.0,"running":false,"runDir":0,"tapDir":0,"tapTicks":-1,"air":{},"height":0.0,"jump":null,"jumpLaunch":5.5,"stagger":0,"hurtTicks":0,"hurtAge":0,"down":{},"recovering":0,"invTicks":0,"attack":{},"lastSlash":0,"aiClock":0,"aiRest":0,"aiChain":0,"aiChargeRest":0,"aiDx":0,"aiDy":0,"moving":false,"stride":0.0,"clock":randf()*4.8,"death":0.0,"recoil":0.0,"hitGlow":0.0,"electricTicks":0,"pickup":{},"gearDropped":false,"burnAge":0.0,"engulf":1.0,"burnSeed":randf()*100,"burnPoints":[],"scorched":false,"trail":0.0,"bootDistance":0.0,"bootCoat":0.0,"bootSide":1,"bootPos":Vector2(x,y),"turnTicks":0,"brace":0,"moveIndex":0,"phaseTwo":false,"hopCooldown":90+randf()*90,"hopTicks":0,"thinkTicks":0,"tactic":0.0,"rushCooldown":50,"rushCombo":false}
 
 func standing(f: Dictionary) -> bool:
@@ -203,6 +203,7 @@ func tick_attack(f: Dictionary, targets: Array, hit: Callable) -> Dictionary:
 				var strike=a.duplicate()
 				if a.get("spin",false):strike.direction=1 if e.x>=f.x else -1
 				hit.call(e,strike,f)
+				if f.attack.is_empty():return {}
 	if a.age>=a.ticks:
 		f.attack={}
 		if f.air.is_empty(): f.height=0.0
@@ -232,7 +233,19 @@ func hurt(f: Dictionary, a: Dictionary):
 		if f.player: f.recovering=65
 	f.recoil=f.hurtTicks*STEP
 
+func rebound_charge(f: Dictionary, direction: int):
+	hurt(f,{"direction":-direction,"knock":false})
+	f.hurtTicks=24
+	f.recovering=8
+	f.recoil=24*STEP
+	f.chargeRebound=-direction*3.2
+	f.spinUsed=true
+
 func reaction(f: Dictionary):
+	if abs(f.chargeRebound)>.02:
+		f.x=clampf(f.x+f.chargeRebound*SCALE,35,1405)
+		f.chargeRebound*=.84
+	else:f.chargeRebound=0.0
 	for key in ["invTicks","aiRest","aiChargeRest"]:
 		if f[key]>0: f[key]-=1
 	if not f.down.is_empty():
