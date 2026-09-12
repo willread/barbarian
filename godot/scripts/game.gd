@@ -347,6 +347,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
 	if attacker.player and not f.player and a.get("type","")=="charge" and e_ai.heavy(f):
 		m.rebound_charge(attacker,int(a.direction))
+		audio.play("resist",-4)
 		burst((f.x+attacker.x)*.5,f.y-105,7,Color("b7a58c"))
 		hit_stop=.055
 		shake=4
@@ -354,7 +355,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if not f.player and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
-		beep(380,.08)
+		audio.play("resist",-4)
 		return
 	if a.get("dive",false):
 		if not attacker.diveHit:
@@ -392,6 +393,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		if boss_committed: reaction.knock=false
 		if not a.get("no_stun",false) or f.hp<=0:m.hurt(f,reaction)
 		if f.hp>0 and (committed or boss_committed):
+			audio.play("resist",-4)
 			f.hurtTicks=0
 			f.recoil=0
 			f.stagger=0

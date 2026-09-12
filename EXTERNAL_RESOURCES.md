@@ -85,3 +85,6 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 
 ### Magic invocation shout (2026-09-12)
 - Four ElevenLabs human battle-shout performances with natural echo; sources and exact prompts in `soundboard/magic-shout/`, generator `tools/audio/magic-shout.mjs`. Default `godot/audio/magic_shout.ogg`, F8 alternatives `magic_shout-1` through `magic_shout-4`. Shout starts at cast tick 13 as the weapon rises, before lightning at tick 20.
+
+### Block/resistance thud (2026-09-12)
+- Four ElevenLabs deep dull impact options; exact prompts and sources in `soundboard/resist-thud/`, generator `tools/audio/resist-thud.mjs`. Default `godot/audio/resist.ogg`. Used for shield blocks, heavy-enemy charge resistance, and committed enemy reactions.

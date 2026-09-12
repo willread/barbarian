@@ -96,3 +96,5 @@ Press F8 to open the hidden soundboard. The game pauses; click any option to aud
 Every sound-lab group also offers **No sound**, saved like other choices. Footsteps (both surfaces) and bow draws start disabled; existing profiles receive this default once, after which explicit sound-lab choices are respected.
 
 Footsteps and bow draws have now been removed from runtime playback and the sound lab (assets retained). Ground and character arrow contacts share Arrow hit. Jump slam landing uses a thunderous boom with four new choices.
+
+Sound lab now includes per-event game-volume trim (-30 to +6 dB) with a reset button, persisted alongside choices. Preview volume remains separate; previews also apply the selected event trim. Blocked/resisted attacks share the Resist sound.

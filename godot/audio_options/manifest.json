@@ -1185,6 +1185,42 @@
       "description": "A bassy, commanding cry with a long stone echo.",
       "prompt": "One deep adult male warrior releases a mighty OAAAH invocation. Loud resonant chest voice, rough natural throat, decisive voiced ending. A spacious ancient stone hall echoes the cry into silence. No words, growling creature, musical tones or weapons.",
       "duration": 2.6
+    },
+    {
+      "id": "resist-1",
+      "group": "resist",
+      "label": "Blocked / resisted attack",
+      "name": "Dead weight",
+      "description": "A deep, deadened body thud.",
+      "prompt": "One heavy fist strikes an immovable dense padded stone surface. A deep dull THUD with a compact chesty low end and soft blunt attack. Stops quickly, no airy swoosh, sharp crack, metallic ringing, voice or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "resist-2",
+      "group": "resist",
+      "label": "Blocked / resisted attack",
+      "name": "Iron resistance",
+      "description": "A muffled low knock against heavy armor.",
+      "prompt": "One powerful blow is stopped by thick padded iron armor. Low blunt DUNK with a tiny leather creak, dense dark body and very short decay. No sword swing, bright metal clang, wind or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "resist-3",
+      "group": "resist",
+      "label": "Blocked / resisted attack",
+      "name": "Stone wall",
+      "description": "A bassy compact impact with a dry grit edge.",
+      "prompt": "One heavy object hits a massive unyielding stone wall. Short deep DOOM-thud, muffled hard contact and tiny grit at the end. Firm resistance, not an explosion. No whoosh, ring, voices or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "resist-4",
+      "group": "resist",
+      "label": "Blocked / resisted attack",
+      "name": "Heavy stop",
+      "description": "A soft-edged thump with low resonance.",
+      "prompt": "One crushing strike is stopped dead against a huge solid body. Round low THUMP, thick dark chest resonance, rapid damped decay. No wet flesh detail, bone crack, blade swoosh, metallic ring or music.",
+      "duration": 0.65
     }
   ]
 }

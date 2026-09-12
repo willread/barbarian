@@ -1,9 +1,10 @@
 extends Node
-const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
+const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}
 var choices: Dictionary={}
+var volumes: Dictionary={}
 var voices: Array=[]
 var tracks: Array=[]
 var gates: Dictionary={}
@@ -24,6 +25,8 @@ func setup(source: Node2D):
 	if saved.load("user://soundboard.cfg")==OK:
 		for id in saved.get_section_keys("choices"):
 			set_variant(id,saved.get_value("choices",id),false)
+	if saved.has_section("volumes"):
+		for id in saved.get_section_keys("volumes"):volumes[id]=clampf(float(saved.get_value("volumes",id)), -30,6)
 	for i in 16:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
@@ -50,9 +53,16 @@ func set_variant(id: String,variant: String,persist: bool=true):
 		if track.stream:track.stream.loop=true
 	if persist:save_choices()
 
+func set_volume(id: String,db: float,persist: bool=true):
+	volumes[id]=clampf(db,-30,6)
+	for voice in voices:
+		if voice.get_meta("sound_id","")==id:voice.volume_db=voice.get_meta("base_db",-4)+volumes[id]
+	if persist:save_choices()
+
 func save_choices():
 	var saved=ConfigFile.new()
 	for key in choices:saved.set_value("choices",key,choices[key])
+	for key in volumes:saved.set_value("volumes",key,volumes[key])
 	saved.set_value("settings","quiet_foley",true)
 	saved.save("user://soundboard.cfg")
 
@@ -64,7 +74,9 @@ func play(id: String,db: float=-4,pitch: float=1.0):
 	for voice in voices:
 		if not voice.playing:
 			voice.stream=clips[id]
-			voice.volume_db=db
+			voice.set_meta("sound_id",id)
+			voice.set_meta("base_db",db)
+			voice.volume_db=db+volumes.get(id,0.0)
 			voice.pitch_scale=pitch*randf_range(.965,1.035)
 			voice.play()
 			return
@@ -75,7 +87,7 @@ func _process(dt: float):
 	for i in tracks.size():
 		var track=tracks[i]
 		var selected=(game.phase=="title")== (i==0)
-		var target=-10.0 if audible and selected else -60.0
+		var target=-10.0+volumes.get("music_menu" if i==0 else "music_game",0.0) if audible and selected else -60.0
 		if game.phase in ["paused","dying","lost","won"]:target-=8
 		track.volume_db=move_toward(track.volume_db,target,dt*35)
 		if audible and selected and track.stream and not track.playing:track.play()

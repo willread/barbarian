@@ -6,6 +6,8 @@ var preview: AudioStreamPlayer
 var previous_pause=false
 var buttons: Dictionary={}
 var opened=false
+var preview_base=-8.0
+var preview_id=""
 func _ready():
 	layer=100
 	process_mode=Node.PROCESS_MODE_ALWAYS
@@ -45,7 +47,9 @@ func _ready():
 	volume.max_value=0
 	volume.value=-8
 	volume.tooltip_text="Preview volume (does not alter game mix)"
-	volume.value_changed.connect(func(value):preview.volume_db=value)
+	volume.value_changed.connect(func(value):
+		preview_base=value
+		preview.volume_db=preview_base+audio.volumes.get(preview_id,0.0))
 	tools.add_child(volume)
 	var search=LineEdit.new()
 	search.placeholder_text="Filter sounds…"
@@ -73,6 +77,27 @@ func _ready():
 			heading.text=groups[group][0].label
 			heading.add_theme_font_size_override("font_size",22)
 			box.add_child(heading)
+			var mix=HBoxContainer.new()
+			box.add_child(mix)
+			var level=Label.new()
+			level.custom_minimum_size.x=170
+			level.text="Game volume: %+.0f dB"%audio.volumes.get(id,0.0)
+			mix.add_child(level)
+			var gain=HSlider.new()
+			gain.min_value=-30
+			gain.max_value=6
+			gain.step=1
+			gain.value=audio.volumes.get(id,0.0)
+			gain.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			mix.add_child(gain)
+			gain.value_changed.connect(func(value):
+				audio.set_volume(id,value)
+				level.text="Game volume: %+.0f dB"%value
+				if preview_id==id:preview.volume_db=preview_base+value)
+			var reset=Button.new()
+			reset.text="Reset level"
+			reset.pressed.connect(func():gain.value=0)
+			mix.add_child(reset)
 			buttons[id]=[]
 			var original=Button.new()
 			original.text="Original game sound"
@@ -107,6 +132,8 @@ func choose(id: String,variant: String):
 	audio.set_variant(id,variant)
 	refresh()
 	preview.stop()
+	preview_id=id
+	preview.volume_db=preview_base+audio.volumes.get(id,0.0)
 	preview.stream=audio.clips[id]
 	if preview.stream:preview.play()
 func toggle():
