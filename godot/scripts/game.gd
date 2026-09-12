@@ -1,6 +1,6 @@
 extends Node2D
 # Global combat tuning: scales all incoming damage, for player and enemies.
-@export_range(0.0, 3.0, 0.05) var damage_multiplier: float = 0.5
+@export_range(0.0, 3.0, 0.05) var damage_multiplier: float = 0.65
 const MScript=preload("res://scripts/mechanics.gd")
 const EScript=preload("res://scripts/enemies.gd")
 const ArtScript=preload("res://scripts/art.gd")
