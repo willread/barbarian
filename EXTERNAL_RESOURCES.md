@@ -118,3 +118,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 
 - Hero grab/toss/swallow: imagegen-derived `asset-sources/art/hero-eat-v1.png`, color-matched using the existing hero pickup sheet as reference. Runtime frames prepared by `tools/godot/bake-eat.mjs`.
 - Gulp: ElevenLabs text-to-sound v2, generated with `tools/audio/gulp.mjs`; prompt retained in `godot/audio/gulp-prompt.json`.
+
+- Weapon concept board: studies/weapons/armory-v1.png, built-in imagegen using the existing weapons-v8.png as reference. Design only; twelve rigid one-handed weapon concepts.
