@@ -28,4 +28,10 @@ Enable **Edit geometry**, choose a shape, and drag its handles. Double-click an 
 
 Geometry autosaves in this browser per screen. Export level JSON to preserve a portable copy and give it to the agent for incorporation in the source manifest. Import JSON restores that geometry. Browser saves do not modify repository files. Reset to source is undoable.
 
-For targeted regeneration, select the region, enter instructions, and Export region request. The JSON contains the complete edited level, selected polygon and a black/white PNG mask. Give that file to the agent; generation is intentionally not automatic. Preview edits affect existing motion masks immediately and do not regenerate artwork. Historical V1/V2 frame-loop descriptions above refer to archived approaches; current V4 uses masked texture flow.
+For targeted regeneration, Export level JSON and give the file to the agent with the regions to regenerate. The tool only previews animation and edits geometry.
+
+
+## V5 approved geometry and baked loops
+Uses the exact user export saved as citadel-01-v5/approved-masks.json, including the revised walkable outline. Waterfall and fire are baked into separate 60-frame atlases at 30 fps, with a two-second periodic advection cycle. This is a bake of texture flow, not regenerated AI art or hand-drawn fluid frames. The original painting stays fixed. Water uses the polygon directly without rock exclusions or colour-based exclusions. Fire motion uses its supplied flame polygon, with brightness variation in the broader glow polygon.
+
+Rebuild: `node tools/godot/bake-background-study.mjs [edited-json]`. Adjacent-frame interpolation can be disabled. The loop renderer compares t=0 and t=2 when loaded; this checks periodicity, not visual quality. Masks may be narrowed in preview; expanding beyond baked coverage requires another bake. Source V4 remains available for comparison. No image generation service or new external resource was used for this iteration.
