@@ -25,6 +25,7 @@ var encounters: Array=[]
 var gear: Array=[]
 var scorches: Array=[]
 var sparks: Array=[]
+var landing_impacts: Array=[]
 var chicken: Dictionary={}
 var chicken_node: Node2D
 var used_chickens: Array=[]
@@ -245,6 +246,9 @@ func clear_world():
 	enemies.clear()
 	scorches.clear()
 	sparks.clear()
+	for impact in landing_impacts:
+		if is_instance_valid(impact):impact.queue_free()
+	landing_impacts.clear()
 	blood.reset()
 
 func start_game():
@@ -467,7 +471,13 @@ func tick(dt: float):
 	if hero.holdTicks>=21 and not hero.spinUsed and hero.air.is_empty() and spell<0 and hero.pickup.is_empty():
 		if m.begin(hero,"spin"):hero.spinUsed=true
 	var busy=spell>=0 or not hero.pickup.is_empty()
+	var was_diving=hero.diveUsed and not hero.air.is_empty() and hero.air.land==0
 	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true)
+	if was_diving and not hero.air.is_empty() and hero.air.land>0:
+		var impact=preload("res://scripts/landing_impact.gd").new()
+		arena_clip.add_child(impact)
+		impact.setup(Vector2(hero.x,hero.y),hero.weapon=="axe")
+		landing_impacts.append(impact)
 	if hero.attack.has("weapon") and not hero.attack.get("dive",false):
 		var temp=hero.duplicate()
 		temp.attack=hero.attack.duplicate()
@@ -560,6 +570,8 @@ func _process(raw: float):
 		if flame_views.has(f.id):
 			flame_views[f.id].z_index=int(f.y)*2+1
 			flame_views[f.id].queue_redraw()
+	landing_impacts=landing_impacts.filter(func(impact):return is_instance_valid(impact))
+	for impact in landing_impacts:impact.advance(dt)
 	for s in sparks:
 		s.life-=dt
 		s.x+=s.vx*dt
