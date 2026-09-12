@@ -34,6 +34,7 @@ var phase="title"
 var options=false
 var settings_page=""
 var music_enabled=true
+var voice_enabled=true
 var master_volume=100
 var loading_menu=false
 var muted=false
@@ -137,6 +138,7 @@ func _ready():
 	if settings.load("user://settings.cfg")==OK:
 		muted=settings.get_value("audio","muted",false)
 		music_enabled=settings.get_value("audio","music",true)
+		voice_enabled=settings.get_value("audio","voice",true)
 		master_volume=clampi(settings.get_value("audio","volume",100),0,100)
 	apply_settings(false)
 	var soundboard=preload("res://scripts/soundboard.gd").new()
@@ -267,6 +269,11 @@ func menu_action(label: String):
 			music_enabled=not music_enabled
 			apply_settings()
 			refresh_settings(1)
+		"VOICE: ON","VOICE: OFF":
+			voice_enabled=not voice_enabled
+			if not voice_enabled:hero_voice.reset()
+			apply_settings()
+			refresh_settings(2)
 		"FULLSCREEN: ON","FULLSCREEN: OFF":
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
 			refresh_settings(0)
@@ -285,7 +292,7 @@ func menu_action(label: String):
 			change_phase("title")
 
 func option_labels() -> Array:
-	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOLUME: %d"%master_volume,"BACK"]
+	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
 	return ["SOUND","DISPLAY","BACK"]
 
@@ -300,6 +307,7 @@ func apply_settings(persist: bool=true):
 		var config=ConfigFile.new()
 		config.set_value("audio","muted",muted)
 		config.set_value("audio","music",music_enabled)
+		config.set_value("audio","voice",voice_enabled)
 		config.set_value("audio","volume",master_volume)
 		config.save("user://settings.cfg")
 
@@ -761,10 +769,10 @@ func _input(event: InputEvent):
 			return
 	if phase in ["title","paused","lost","won"]:
 		if phase=="paused" and pause_cover<.8: return
-		if options and settings_page=="sound" and menu.selected==2 and not menu.switching and event is InputEventKey and event.pressed and event.keycode in [KEY_LEFT,KEY_RIGHT]:
+		if options and settings_page=="sound" and menu.selected==3 and not menu.switching and event is InputEventKey and event.pressed and event.keycode in [KEY_LEFT,KEY_RIGHT]:
 			master_volume=clampi(master_volume+(-1 if event.keycode==KEY_LEFT else 1),0,100)
 			apply_settings()
-			refresh_settings(2)
+			refresh_settings(3)
 			return
 		menu.handle(event)
 		return

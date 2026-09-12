@@ -71,6 +71,7 @@ func save_choices():
 	saved.save("user://soundboard.cfg")
 
 func play(id: String,db: float=-4,pitch: float=1.0):
+	if game.get("voice_enabled")==false and id in ["hero_effort","hero_pain","magic_shout","roar","death"]:return
 	if not unlocked or game.muted or clips.get(id)==null:return
 	if game.get("hero_voice") and game.hero_voice.player.playing:
 		if id=="hero_effort":return
@@ -99,6 +100,9 @@ func _process(dt: float):
 		track.volume_db=move_toward(track.volume_db,target,dt*35)
 		if audible and selected and track.stream and not track.playing:track.play()
 		if track.volume_db<=-59 and track.playing:track.stop()
+	if game.get("voice_enabled")==false:
+		for voice in voices:
+			if voice.get_meta("sound_id","") in ["hero_effort","hero_pain","magic_shout","roar","death"]:voice.stop()
 	if game.muted:
 		for voice in voices:voice.stop()
 	if game.phase=="paused":return

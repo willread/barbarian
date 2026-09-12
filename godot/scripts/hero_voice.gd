@@ -44,7 +44,7 @@ func _process(dt):
 	previous_hp=game.hero.hp
 	if game.phase not in ["playing","dying"] or game.hero.hp<=0:
 		player.stop();active="";pending.clear();return
-	if game.muted:player.stop();active="";pending.clear();return
+	if game.muted or not game.voice_enabled:player.stop();active="";pending.clear();return
 	glance_time-=dt
 	if glance_time<=0:
 		glance=randi_range(1,2) if glance==0 else 0

@@ -7,7 +7,7 @@ func check():
 	var menu=load("res://scripts/menu.gd").new()
 	root.add_child(menu)
 	menu.setup(art)
-	for labels in [["SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
+	for labels in [["SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOICE: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
 		menu.show_items(labels,true,false)
 		assert(menu.items.size()==labels.size())
 		for item in menu.items:assert(item.face.texture!=null)
@@ -15,7 +15,7 @@ func check():
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/settings-"+str(labels.size())+".png")
-	for labels in [["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],["SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
+	for labels in [["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],["SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOICE: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
 		menu.show_items(labels,false,false)
 		for viewport in [Vector2(1440,810),Vector2(810,1440),Vector2(1920,810)]:
 			menu.layout_screen(viewport,false)
