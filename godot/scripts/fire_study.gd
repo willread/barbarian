@@ -4,7 +4,7 @@ var art: CairnArt
 var fires: Array=[]
 var faces: Array=[]
 var selected=0
-var strength=1.0
+var strength=0.6
 var dark=false
 func _ready():
 	get_window().content_scale_size=Vector2i(1440,810)
@@ -16,7 +16,7 @@ func _ready():
 		add_child(group)
 		var fire=Fire.new()
 		group.add_child(fire)
-		fire.setup(art.texture("menu-"+meta.id+"-fuel.png"),meta)
+		fire.setup(art.texture("menu-"+meta.id+"-fuel.png"),Vector2(meta.fw,meta.fh),Vector2(-meta.fw*.5,-meta.pad))
 		fires.append(fire)
 		var face=Sprite2D.new()
 		face.centered=false
@@ -24,7 +24,7 @@ func _ready():
 		face.position=Vector2(-meta.width*.5,0)
 		face.scale=Vector2(meta.width,meta.height)/face.texture.get_size()
 		group.add_child(face)
-		fire.heat_face(face,meta)
+		fire.heat_face(face,Rect2(face.position,Vector2(meta.width,meta.height)))
 		faces.append(face)
 	select(0)
 	if "--study-capture" in OS.get_cmdline_user_args(): capture.call_deferred()

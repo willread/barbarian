@@ -51,3 +51,11 @@ Visual effects use Godot shaders and are not pixel-identical to Canvas/WebGL ble
 Open http://localhost:3001/?fire-study to review the isolated BEGIN / OPTIONS effect without changing the shipping menu. Up/down or hover selects the burning word, left/right adjusts heat input, and B toggles the painting/black background. Native equivalent: run Godot with -- --fire-study.
 
 The prototype stores velocity and temperature in a small persistent SubViewport. Letter-edge emission feeds a buoyant, curl-driven advection field; a separate shader maps temperature to dark red, orange and small ivory cores. Selection stops emission and lets residual heat dissipate. It uses Compatibility rendering and no compute shaders.
+
+Both studies default to intensity 0.6. Open http://localhost:3001/?enemy-fire-study for a looping grounded-corpse burn. Up/down cycles all five enemy types, Space restarts, and left/right adjusts intensity. This is an isolated replacement candidate; production enemy deaths retain their existing effect. The corpse's live dissolving alpha drives emission, so flames follow its remaining edges. Ignition starts after the grounded pose, and emission tapers before the body disappears.
+
+### Reusing contour fire
+
+`ContourFire.setup(mask, source_size, origin, with_heat)` accepts any static Texture2D or live ViewportTexture. Size and origin describe the mask in local pixels, independent of menu metadata. Parent the effect with the object to inherit its position, scale and depth. A 32-pixel simulation margin surrounds the source. Set `strength` and `emitting` to control fuel; stopping emission allows existing flames to dissipate. `restart()` clears simulation history and randomizes its noise phase.
+
+For optional warm/cooling edges, enable `with_heat` and call `heat_face(sprite, local_rect)`. This assigns the heat material, so callers with an existing body material should compose their own response or disable this pass. Enemy study disables the extra thermal viewport and uses the existing burn-away material on a live mask instead. Free the component with its owner after residual fire has cooled; cost scales with mask area and number of simultaneous effects.
