@@ -310,6 +310,14 @@ func begin_walk(kind: String):
 	spell=-1
 	hero.attack={}
 	hero.air={}
+	hero.jump=null
+	hero.diveUsed=false
+	hero.diveHit=false
+	hero.diveAge=0
+	hero.holdTicks=0
+	hero.spinUsed=false
+	hero.chargeRebound=0.0
+	hero.stagger=0
 	hero.down={}
 	hero.pickup={}
 	hero.hurtTicks=0
@@ -1085,7 +1093,17 @@ func integration_test():
 	assert(not hero.pickup.is_empty())
 	for i in 36: step_chicken(m.STEP)
 	assert(hero.hp==100 and chicken.is_empty())
+	# A final enemy can finish burning while the player is still diving.
+	hero.recovering=0
+	hero.attack={}
+	assert(m.start_jump(hero))
+	m.motion(hero,1,0)
+	assert(m.begin(hero,"air"))
+	begin_walk("exit")
+	assert(hero.jump==null and hero.air.is_empty() and not hero.diveUsed)
+	assert(art.pose(hero)[0]=="hero-walk-unarmed-v8","Wave exit must use walk pose after a dive")
 	begin_walk("enter")
+	assert(art.pose(hero)[0]=="hero-walk-unarmed-v8")
 	for i in 180: tick(m.STEP)
 	assert(hero.x==720 and stage_walk=="")
 	change_phase("paused")
