@@ -9,6 +9,9 @@ var ink: Node2D
 var pending: Array=[]
 func _ready():
 	z_index=-10
+	var ground_material=ShaderMaterial.new()
+	ground_material.shader=preload("res://shaders/ground_blood.gdshader")
+	material=ground_material
 	floor_viewport=SubViewport.new()
 	floor_viewport.size=Vector2i(1440,810)
 	floor_viewport.disable_3d=true

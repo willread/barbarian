@@ -354,6 +354,7 @@ func begin_walk(kind: String):
 	hero.attack={}
 	hero.air={}
 	hero.jump=null
+	hero.arrowKick={}
 	hero.diveUsed=false
 	hero.diveHit=false
 	hero.diveAge=0
@@ -410,6 +411,8 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	f.hp=max(0,f.hp-a.damage*(100.0/48 if f.player else 1))
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
+	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
+		f.arrowKick={"age":0.0,"offset":0.0,"direction":a.direction}
 	if a.get("magic",false) and f.hp>0:
 		f.attack={}
 		f.electricTicks=9
@@ -497,6 +500,15 @@ func resolve_slam(origin: Vector2,strike: Dictionary):
 
 
 func tick_actor(f: Dictionary,dt: float):
+	if not f.get("arrowKick",{}).is_empty():
+		var kick=f.arrowKick
+		kick.age=minf(.18,kick.age+dt)
+		var t=kick.age/.18
+		var offset=(sin(t*PI)*11*exp(-t*.8)+4*t)*kick.direction
+		f.x=clampf(f.x+offset-kick.offset,70,1370)
+		kick.offset=offset
+		if t>=1:f.arrowKick={}
+
 	var push=f.get("slamPush",Vector2.ZERO)
 	if push.length_squared()>1:
 		f.x=clamp(f.x+push.x*dt,70,1370)
@@ -578,11 +590,10 @@ func tick(dt: float):
 	if was_diving and not hero.air.is_empty() and hero.air.land>0:
 		var impact=preload("res://scripts/landing_impact.gd").new()
 		arena_clip.add_child(impact)
-		var contact=art.weapon_tip(hero,art.pose(hero))
-		# Project the weapon tip onto the landing plane, preserving weapon reach and facing.
-		impact.setup(Vector2(contact.x,hero.y),hero.weapon=="axe")
+		var contact=Vector2(hero.x,hero.y) # Shared player landing origin for visuals and combat.
+		impact.setup(contact,hero.weapon=="axe")
 		landing_impacts.append(impact)
-		if landing_strike.get("dive",false):resolve_slam(Vector2(contact.x,hero.y),landing_strike)
+		if landing_strike.get("dive",false):resolve_slam(contact,landing_strike)
 		audio.play("landing",-4)
 	if hero.attack.has("weapon") and not hero.attack.get("dive",false):
 		var temp=hero.duplicate()
