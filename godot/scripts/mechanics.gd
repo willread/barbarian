@@ -180,6 +180,7 @@ func rect(f: Dictionary, box: Array, direction: int) -> Rect2:
 	return Rect2(f.x/SCALE+(b[0] if direction>0 else -b[0]-b[1]),f.y/SCALE-f.height+b[2],b[1],b[3])
 
 func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
+	if a.get("dive",false):return false # Slam damage is resolved once, at ground contact.
 	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=a.get("lane",8*SCALE): return false
 	var body=[-15,18,-47,47]
 	if e.player:

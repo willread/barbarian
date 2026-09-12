@@ -435,7 +435,30 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 func burst(x: float,y: float,count: int,color: Color):
 	for i in count: sparks.append({"x":x,"y":y,"vx":(randf()-.5)*460,"vy":(randf()-.65)*390,"life":.3+randf()*.4,"color":color})
 
+func resolve_slam(origin: Vector2,strike: Dictionary):
+	var ordered=enemies.duplicate()
+	ordered.sort_custom(func(a,b):return abs(a.x-origin.x)<abs(b.x-origin.x))
+	for enemy in ordered:
+		if enemy.hp<=0:continue
+		var delta=Vector2(enemy.x,enemy.y)-origin
+		if abs(delta.x)<(100 if hero.weapon=="axe" else 125) and abs(delta.y)<38 and enemy.down.is_empty() and not enemy.invTicks:
+			var blow=strike.duplicate()
+			blow.direction=1 if delta.x>=0 else -1
+			damage(enemy,blow,hero)
+		# The pressure wave moves nearby bodies without requiring damage or stagger.
+		var distance=Vector2(delta.x,delta.y*2.4).length()
+		if distance<300:
+			var outward=delta.normalized() if delta.length()>1 else Vector2(hero.dir,0)
+			enemy.slamPush=outward*pow(1.0-distance/300.0,1.2)*500.0
+	hero.recovering=(8 if hero.diveHit else 24) if hero.weapon=="axe" else (6 if hero.diveHit else 19)
+
+
 func tick_actor(f: Dictionary,dt: float):
+	var push=f.get("slamPush",Vector2.ZERO)
+	if push.length_squared()>1:
+		f.x=clamp(f.x+push.x*dt,70,1370)
+		f.y=clamp(f.y+push.y*dt,560,755)
+		f.slamPush=push*exp(-dt*7.0)
 	f.hitGlow=max(0,f.hitGlow-dt)
 	f.electricTicks=max(0,f.electricTicks-1)
 	f.clock+=dt
@@ -507,6 +530,7 @@ func tick(dt: float):
 		if m.begin(hero,"spin"):hero.spinUsed=true
 	var busy=spell>=0 or not hero.pickup.is_empty()
 	var was_diving=hero.diveUsed and not hero.air.is_empty() and hero.air.land==0
+	var landing_strike=hero.attack.duplicate() if was_diving else {}
 	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true)
 	if was_diving and not hero.air.is_empty() and hero.air.land>0:
 		var impact=preload("res://scripts/landing_impact.gd").new()
@@ -515,6 +539,7 @@ func tick(dt: float):
 		# Project the weapon tip onto the landing plane, preserving weapon reach and facing.
 		impact.setup(Vector2(contact.x,hero.y),hero.weapon=="axe")
 		landing_impacts.append(impact)
+		if landing_strike.get("dive",false):resolve_slam(Vector2(contact.x,hero.y),landing_strike)
 		audio.play("landing",-4)
 	if hero.attack.has("weapon") and not hero.attack.get("dive",false):
 		var temp=hero.duplicate()
@@ -1241,6 +1266,23 @@ func moves_test():
 	guard.attack.age=guard.attack.from-6
 	damage(guard,dive.duplicate(),hero)
 	assert(guard.hp<20 and not guard.down.is_empty() and hero.diveHit and hit_stop>0,"Exposed shield must be flattened")
+	var near=m.make(900,780,650,30)
+	var fringe=m.make(901,910,650,30)
+	var distant=m.make(902,1150,650,30)
+	enemies=[near,fringe,distant]
+	hero.diveHit=false
+	hero.x=720
+	hero.y=650
+	hero.height=25
+	assert(not m.can_hit(hero,near,{"dive":true}),"Dive must not connect while airborne")
+	hero.height=0
+	resolve_slam(Vector2(760,650),{"dive":true,"damage":4.5,"knock":true,"direction":1})
+	assert(near.hp<30 and fringe.hp==30 and distant.hp==30)
+	assert(near.slamPush.length()>fringe.slamPush.length() and fringe.slamPush.length()>0)
+	assert(not distant.has("slamPush"))
+	var old_x=fringe.x
+	tick_actor(fringe,m.STEP)
+	assert(fringe.x>old_x,"Undamaged enemy should move with the pressure wave")
 	print("CAIRN_HOLD_OK: instant slash, hold transition, interruption protection, release-to-rearm")
 	get_tree().quit()
 
