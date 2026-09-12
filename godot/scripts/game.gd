@@ -221,7 +221,7 @@ func change_phase(next: String):
 
 		options=false
 		settings_page=""
-		menu.show_items(["BEGIN","OPTIONS","QUIT TO DESKTOP"])
+		menu.show_items(["BEGIN","OPTIONS","QUIT"])
 	else:
 
 		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],false)
@@ -250,7 +250,7 @@ func menu_action(label: String):
 			else:
 				options=false
 				settings_page=""
-				menu.switch_items(["BEGIN","OPTIONS","QUIT TO DESKTOP"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],phase=="title")
+				menu.switch_items(["BEGIN","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],phase=="title")
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
 			apply_settings()
@@ -263,7 +263,7 @@ func menu_action(label: String):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
 			refresh_settings(0)
 		"RETURN TO BATTLE": change_phase("playing")
-		"QUIT TO DESKTOP":
+		"QUIT":
 			if OS.has_feature("web"):
 				JavaScriptBridge.eval("window.close(); setTimeout(() => alert('You can close this tab to quit Cairn.'), 100);")
 			else: get_tree().quit()

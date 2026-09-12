@@ -26,7 +26,7 @@ let stone=fs.readFileSync('tools/asset-bake-source/stone-text.js','utf8');stone=
 const fakeDoc={documentElement:{dataset:{}},createElement:()=>{const c=createCanvas(1,1);c.setAttribute=()=>{};return c;}};
 const sc={window:{},document:fakeDoc,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};vm.createContext(sc);vm.runInContext(stone,sc);
 manifest.menu=manifest.menu||{};
-const labels=['BEGIN','OPTIONS','SOUND','DISPLAY','MUSIC: ON','MUSIC: OFF',...Array.from({length:101},(_,i)=>`VOLUME: ${i}`),'SOUND: ON','SOUND: OFF','FULLSCREEN: ON','FULLSCREEN: OFF','BACK','RETURN TO BATTLE','QUIT TO TITLE','QUIT TO DESKTOP','RISE AGAIN','THE BATTLE WAITS.','EVEN HEROES FALL.','A LEGEND RISES.'];
+const labels=['BEGIN','OPTIONS','SOUND','DISPLAY','MUSIC: ON','MUSIC: OFF',...Array.from({length:101},(_,i)=>`VOLUME: ${i}`),'SOUND: ON','SOUND: OFF','FULLSCREEN: ON','FULLSCREEN: OFF','BACK','RETURN TO BATTLE','QUIT TO TITLE','QUIT','RISE AGAIN','THE BATTLE WAITS.','EVEN HEROES FALL.','A LEGEND RISES.'];
 for(const label of labels.slice((Number(process.env.MENU_BATCH)-1)*8,Number(process.env.MENU_BATCH)*8)){
  if(manifest.menu[label]&&fs.existsSync(path.join(out,`menu-${manifest.menu[label].id}.png`))&&fs.existsSync(path.join(out,`menu-${manifest.menu[label].id}-fuel.png`)))continue;
  const el={textContent:label,getClientRects:()=>[1],dataset:{},computed:{fontSize:'75',letterSpacing:'3'},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};sc.window.bakeStone(el);const r=el._stoneFrames,id=label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'');

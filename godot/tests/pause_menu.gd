@@ -29,6 +29,6 @@ func check():
 	assert(game.phase=="playing" and game.pause_cover==0.0)
 	game.change_phase("paused")
 	game.menu_action("QUIT TO TITLE")
-	assert(game.phase=="title" and game.menu.items[2].label=="QUIT TO DESKTOP")
+	assert(game.phase=="title" and game.menu.items[2].label=="QUIT")
 	print("CAIRN_PAUSE_OK: skull closure, nested centered options, resume and quit to title")
 	quit()

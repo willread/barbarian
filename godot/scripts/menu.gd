@@ -26,7 +26,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		var label=labels[i]
 		var meta=art.data.menu[label]
 		var group=Node2D.new()
-		var y=top+i*(meta.height*size-(20.16 if not options else 15.84))
+		var y=top+i*(meta.height*size-(20.16 if not options else 15.84))*.75
 		group.position=Vector2(center,y)
 		add_child(group)
 		var fire=ContourFire.new()

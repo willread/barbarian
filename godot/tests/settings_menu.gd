@@ -26,7 +26,7 @@ func check():
 			assert(bounds.get_center().distance_to(viewport*.5)<.01)
 			assert(bounds.position.x>=0 and bounds.end.x<=viewport.x)
 			assert(bounds.position.y>=0 and bounds.end.y<=viewport.y)
-	assert(art.data.menu.has("QUIT TO DESKTOP"))
+	assert(art.data.menu.has("QUIT"))
 	menu.free()
 	print("CAIRN_SETTINGS_OK: nested menus and 101 distinct stone volume labels")
 	quit()
