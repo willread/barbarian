@@ -85,3 +85,7 @@ The splash crossfades to the original clean white artwork in maximum-force-refer
 Menu reveal waits for all packaged PNG assets to be cached, a submitted Godot frame, and decoded browser splash images. The six-second splash is a minimum; slow loading extends it. Menu drop animations wait behind the loading cover.
 
 Skeleton archers appear in pre-boss encounter plans: 6 HP, retreat inside 310px, fire within 650px, 0.5s visible draw, roughly 18 player-health damage per arrow. Ballistic arrows sweep for torso collisions, emit blood through normal damage, attach briefly, and expire one second after player/ground impact. `--archer-test` checks ranged behavior and projectile lifecycle.
+
+## Generated audio
+26 dry ElevenLabs effects and two instrumental deep-guitar music tracks are in `audio/`. Runtime uses normalized Ogg files; original MP3s are excluded from exports. Menu/game tracks crossfade when phases change and have baked loop joins. Music ducks while paused or after death. SOUND controls all audio. Browsers unlock playback after the first key or click; native builds start automatically.
+`tools/audio/generate.mjs` reads the gitignored root `.env.local` locally and skips already-generated clips; `tools/audio/prepare.py` trims leading silence, normalizes and prepares Ogg loops. Prompts are recorded in `godot/audio/generation-manifest.json`. No API requests or keys are present in the shipped game.

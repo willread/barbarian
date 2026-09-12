@@ -33,7 +33,7 @@ var used_chickens: Array=[]
 var phase="title"
 var options=false
 var loading_menu=false
-var muted=true
+var muted=false
 var weapon="axe"
 var wave=1
 var score=0
@@ -58,7 +58,7 @@ var font: Font
 var serif: Font
 var skull_node: Sprite2D
 var heat_node: ColorRect
-var sound_player: AudioStreamPlayer
+var audio: Node
 var scenery_shade: Node2D
 var arena_clip: Control
 var screen_backdrop: Node2D
@@ -120,8 +120,9 @@ func _ready():
 		scenery_shade.draw_polygon(PackedVector2Array([Vector2(0,0),Vector2(1440,0),Vector2(1440,243),Vector2(0,243)]),PackedColorArray([dark,dark,clear,clear]))
 		scenery_shade.draw_polygon(PackedVector2Array([Vector2(0,243),Vector2(1440,243),Vector2(1440,810),Vector2(0,810)]),PackedColorArray([clear,clear,bottom,bottom])))
 	add_child(scenery_shade)
-	sound_player=AudioStreamPlayer.new()
-	add_child(sound_player)
+	audio=preload("res://scripts/audio.gd").new()
+	add_child(audio)
+	audio.setup(self)
 	blood=BloodScript.new()
 	add_child(blood)
 	ground_fx=Node2D.new()
@@ -147,6 +148,7 @@ func _ready():
 	menu.top_level=true
 	menu.setup(art)
 	menu.activated.connect(menu_action)
+	menu.sound_requested.connect(func(id):audio.play(id,-8))
 	skull_node=Sprite2D.new()
 	skull_node.texture=art.texture("skull-mask.png")
 	skull_node.centered=false
@@ -305,6 +307,7 @@ func spawn_wave():
 
 func begin_walk(kind: String):
 	stage_walk=kind
+	if audio:audio.play("transition",-14)
 	keys.clear()
 	pressed.clear()
 	spell=-1
@@ -402,13 +405,15 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
 		burst(f.x,f.y-105,12,Color("e97b4f") if f.player else Color("ffc473"))
 		shake=7 if a.get("dive",false) else (5 if a.get("knock",false) else 2)
-		beep(60 if f.player else 100,.12)
+		audio.play("arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "bone" if f.kind in ["bone","archer"] else "heavy_hit" if a.get("knock",false) else "flesh")
+		if f.player and not a.get("no_stun",false):audio.play("hero_pain",-6)
 	if f.hp<=0:
 		f.death=0
 		f.burnAge=0
 		f.engulf=.8+randf()*.5
 		drop_gear(f)
 		if f.player:
+			audio.play("death",-4)
 			stage_walk=""
 			spell=-1
 			change_phase("dying")
@@ -504,6 +509,7 @@ func tick(dt: float):
 		# Project the weapon tip onto the landing plane, preserving weapon reach and facing.
 		impact.setup(Vector2(contact.x,hero.y),hero.weapon=="axe")
 		landing_impacts.append(impact)
+		audio.play("landing",-4)
 	if hero.attack.has("weapon") and not hero.attack.get("dive",false):
 		var temp=hero.duplicate()
 		temp.attack=hero.attack.duplicate()
@@ -537,6 +543,7 @@ func tick(dt: float):
 			arena_clip.add_child(arrow)
 			arrow.setup(self,f)
 			arrows.append(arrow)
+			audio.play("bow_release",-8)
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)
 		if phase!="playing": break
 	e_ai.separate(enemies)
@@ -624,6 +631,7 @@ func _process(raw: float):
 
 func _input(event: InputEvent):
 	if loading_menu:return
+	if event is InputEventKey or event is InputEventMouseButton:audio.unlocked=true
 	if event is InputEventKey:
 		var code=event.keycode
 		if event.pressed and not event.echo and code in [KEY_ESCAPE,KEY_P]:
@@ -758,6 +766,7 @@ func step_chicken(dt: float):
 		p.age+=dt
 		if p.age>=.28 and not p.collected:
 			p.collected=true
+			audio.play("pickup",-6)
 			hero.hp=hero.max
 		if p.collected:
 			c.x=hero.x+hero.dir*52
@@ -812,6 +821,7 @@ func step_chicken(dt: float):
 		if not a.is_empty() and a.age>=a.from and a.age<=a.to and abs(c.y-hero.y)<32:
 			var reach=(a.box[0]+a.box[1] if a.has("box") else a.reach)*4.5
 			if (c.x-hero.x)*a.direction> -15 and (c.x-hero.x)*a.direction<reach+26:
+				audio.play("chicken_hit",-5)
 				c.roast=true
 				c.age=0
 				c.height=10
@@ -962,23 +972,14 @@ func draw_overlay():
 func _draw():
 	pass
 
-func beep(frequency: float,duration: float):
-	if muted: return
-	var rate=22050
-	var bytes=PackedByteArray()
-	bytes.resize(int(rate*duration)*2)
-	var phase_value=0.0
-	for i in bytes.size()/2:
-		var progress=float(i)/(bytes.size()/2)
-		phase_value+=frequency*pow(.35,progress)/rate
-		var sample=(fmod(phase_value,1)*2-1)*.035*pow(.001/.035,progress)
-		bytes.encode_s16(i*2,int(sample*32767))
-	var stream=AudioStreamWAV.new()
-	stream.format=AudioStreamWAV.FORMAT_16_BITS
-	stream.mix_rate=rate
-	stream.data=bytes
-	sound_player.stream=stream
-	sound_player.play()
+func beep(frequency: float,_duration: float):
+	if not audio:return
+	if frequency==380:audio.play("shield",-4)
+	elif frequency==230:
+		audio.play("sword" if hero.weapon=="sword" else "axe",-5)
+		audio.play("hero_effort",-13)
+	elif frequency==160:audio.play("hero_effort",-12)
+	else:audio.play("menu_select",-12)
 
 func smoke_test():
 	start_game()

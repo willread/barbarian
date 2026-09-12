@@ -1,0 +1,284 @@
+{
+  "provider": "ElevenLabs",
+  "date": "2026-09-12T04:23:30.463Z",
+  "jobs": [
+    {
+      "id": "sword",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One fast steel sword swing through air, narrow sharp whoosh.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "axe",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One forceful heavy axe swing through air, broad low whoosh.",
+        "duration_seconds": 0.8,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "flesh",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One sword striking flesh: solid short thud with wet cutting detail.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "heavy_hit",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One heavy axe chop into flesh, dense low impact with brief wet tearing.",
+        "duration_seconds": 0.9,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "bone",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One hard strike breaking dry bone, brittle crack with fragments.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "shield",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail.",
+        "duration_seconds": 0.8,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "body_fall",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Heavy human body falls onto stone, solid thump and leather equipment settling.",
+        "duration_seconds": 1,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "foot_stone",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One heavy leather boot footstep on gritty stone.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "foot_earth",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One heavy leather boot footstep on dry packed earth.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "landing",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering.",
+        "duration_seconds": 1.1,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "bow_draw",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "bow_release",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "arrow_hit",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Arrow punctures flesh, tight dry puncture and tiny wet thud.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "arrow_ground",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Iron arrowhead hits gritty stone and wooden shaft vibrates briefly.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "hero_effort",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One deep adult male warrior effort grunt, nonverbal, forceful breath, no words.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "hero_pain",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "roar",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words.",
+        "duration_seconds": 1.2,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "death",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. One deep male warrior final strained death cry and expelled breath, no words.",
+        "duration_seconds": 1.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "lightning",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Violent natural lightning crack, branching electrical snaps and short deep thunder body.",
+        "duration_seconds": 1.8,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "fire",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers.",
+        "duration_seconds": 2.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "chicken",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. A real chicken making two brief natural clucks, close isolated farm animal recording, no background.",
+        "duration_seconds": 0.9,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "chicken_hit",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. A real startled chicken gives one short squawk with a wing flutter, no background.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "pickup",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance.",
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "menu_land",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Massive carved stone slab lands heavily, compact bass thunk, gritty scrape and settling chips.",
+        "duration_seconds": 0.8,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "menu_select",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Small heavy stone sliding a few centimeters, short coarse scrape and low knock.",
+        "duration_seconds": 0.5,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "transition",
+      "endpoint": "sound-generation",
+      "body": {
+        "text": "Dark sword-and-sorcery action game. Realistic close dry Foley, worn natural materials, weighty but not exaggerated. No music, no voices or background noise unless specified. One isolated event, immediate onset, short natural decay. Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices.",
+        "duration_seconds": 1.2,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      }
+    },
+    {
+      "id": "music_menu",
+      "endpoint": "music",
+      "body": {
+        "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY down-tuned baritone guitars, thick low-register distorted riffs, powerful distorted bass doubling riffs, natural heavy drums. Guitars dominate. No vocals, no choir, no synthesizer lead, no bright shrill solo. Cohesive D minor mood, ominous ancient battlefield. Steady repeating arrangement designed as a seamless game loop, no intro or ending, start and end on compatible downbeats. Slow crushing doom-metal groove at 80 BPM, spacious weighty half-time drums, memorable low four-note motif. Brooding anticipation.",
+        "music_length_ms": 60000,
+        "force_instrumental": true
+      }
+    },
+    {
+      "id": "music_game",
+      "endpoint": "music",
+      "body": {
+        "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY down-tuned baritone guitars, thick low-register distorted riffs, powerful distorted bass doubling riffs, natural heavy drums. Guitars dominate. No vocals, no choir, no synthesizer lead, no bright shrill solo. Cohesive D minor mood, ominous ancient battlefield. Steady repeating arrangement designed as a seamless game loop, no intro or ending, start and end on compatible downbeats. Driving palm-muted low guitar groove at 120 BPM, relentless heavy drums, dark heroic low four-note motif. Energetic battle backing with room for combat sound effects.",
+        "music_length_ms": 60000,
+        "force_instrumental": true
+      }
+    }
+  ]
+}

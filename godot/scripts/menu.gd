@@ -1,5 +1,6 @@
 extends Node2D
 signal activated(label: String)
+signal sound_requested(id: String)
 var art: CairnArt
 var items: Array=[]
 var selected=0
@@ -45,6 +46,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 			var tween=create_tween()
 			tween.tween_interval((labels.size()-1-i)*.24)
 			tween.tween_property(group,"position:y",y,.3264).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tween.tween_callback(func():sound_requested.emit("menu_land"))
 			tween.tween_property(group,"position:y",y+2.6,.024)
 			tween.tween_property(group,"position:y",y-4.9,.048).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 			tween.tween_property(group,"position:y",y,.0816).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -69,7 +71,9 @@ func select(index: int, shake: bool=true):
 	selected=posmod(index,items.size())
 	for i in items.size():
 		items[i].fire.emitting=i==selected
-	if shake: quake()
+	if shake:
+		quake()
+		sound_requested.emit("menu_select")
 
 func quake():
 	if items.is_empty(): return
@@ -80,6 +84,7 @@ func quake():
 func activate():
 	if switching or items.is_empty(): return
 	quake()
+	sound_requested.emit("menu_land")
 	activated.emit(items[selected].label)
 
 func handle(event: InputEvent):

@@ -1,0 +1,142 @@
+[
+  {
+    "file": "arrow_ground.ogg",
+    "source_duration": 0.522449,
+    "bytes": 8765
+  },
+  {
+    "file": "arrow_hit.ogg",
+    "source_duration": 0.522449,
+    "bytes": 8290
+  },
+  {
+    "file": "axe.ogg",
+    "source_duration": 0.835918,
+    "bytes": 11393
+  },
+  {
+    "file": "body_fall.ogg",
+    "source_duration": 1.044898,
+    "bytes": 11826
+  },
+  {
+    "file": "bone.ogg",
+    "source_duration": 0.731429,
+    "bytes": 10353
+  },
+  {
+    "file": "bow_draw.ogg",
+    "source_duration": 0.731429,
+    "bytes": 10333
+  },
+  {
+    "file": "bow_release.ogg",
+    "source_duration": 0.522449,
+    "bytes": 9078
+  },
+  {
+    "file": "chicken.ogg",
+    "source_duration": 0.914286,
+    "bytes": 11892
+  },
+  {
+    "file": "chicken_hit.ogg",
+    "source_duration": 0.731429,
+    "bytes": 9770
+  },
+  {
+    "file": "death.ogg",
+    "source_duration": 1.515102,
+    "bytes": 18092
+  },
+  {
+    "file": "fire.ogg",
+    "source_duration": 2.507755,
+    "bytes": 24122
+  },
+  {
+    "file": "flesh.ogg",
+    "source_duration": 0.731429,
+    "bytes": 10290
+  },
+  {
+    "file": "foot_earth.ogg",
+    "source_duration": 0.522449,
+    "bytes": 8656
+  },
+  {
+    "file": "foot_stone.ogg",
+    "source_duration": 0.522449,
+    "bytes": 8791
+  },
+  {
+    "file": "heavy_hit.ogg",
+    "source_duration": 0.914286,
+    "bytes": 11762
+  },
+  {
+    "file": "hero_effort.ogg",
+    "source_duration": 0.522449,
+    "bytes": 8888
+  },
+  {
+    "file": "hero_pain.ogg",
+    "source_duration": 0.731429,
+    "bytes": 10313
+  },
+  {
+    "file": "landing.ogg",
+    "source_duration": 1.123265,
+    "bytes": 13513
+  },
+  {
+    "file": "lightning.ogg",
+    "source_duration": 1.802449,
+    "bytes": 19604
+  },
+  {
+    "file": "menu_land.ogg",
+    "source_duration": 0.835918,
+    "bytes": 11848
+  },
+  {
+    "file": "menu_select.ogg",
+    "source_duration": 0.522449,
+    "bytes": 8615
+  },
+  {
+    "file": "music_game.ogg",
+    "source_duration": 60.029375,
+    "bytes": 1124083
+  },
+  {
+    "file": "music_menu.ogg",
+    "source_duration": 60.029375,
+    "bytes": 1088181
+  },
+  {
+    "file": "pickup.ogg",
+    "source_duration": 0.731429,
+    "bytes": 10466
+  },
+  {
+    "file": "roar.ogg",
+    "source_duration": 1.227755,
+    "bytes": 13920
+  },
+  {
+    "file": "shield.ogg",
+    "source_duration": 0.835918,
+    "bytes": 11399
+  },
+  {
+    "file": "sword.ogg",
+    "source_duration": 0.731429,
+    "bytes": 9973
+  },
+  {
+    "file": "transition.ogg",
+    "source_duration": 1.227755,
+    "bytes": 14054
+  }
+]

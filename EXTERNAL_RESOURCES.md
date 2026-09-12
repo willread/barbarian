@@ -67,3 +67,6 @@ Built-in ImageGen created `godot/art/archer-source.png` and the chroma-key edit 
 Archer quiver-reach pose: built-in ImageGen, `godot/art/archer-quiver-source.png`, baked as `archer-8.png`. Prompt: same green-frock skeleton, right-facing, bow lowered, right hand reaching behind shoulder to grasp an arrow in quiver; flat magenta key background.
 
 Spin color correction: built-in ImageGen edit saved as `godot/art/hero-spin-neutral-source.png`, referenced the normal hero atlas. Prompt: preserve exact sheet layout, poses and wrist/foot registration; replace red/orange skin with neutral tan, cream highlights, umber leather and muted bronze matching the normal hero; keep green key background. Re-baked into existing spin cels.
+
+### ElevenLabs audio (2026-09-11)
+Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_sound_v2`) and two instrumental music compositions (default Music API model). Source MP3s, playback Oggs, and complete prompts/settings are under `godot/audio/`. User direction: deep bassy distorted guitars, dark sword-and-sorcery; menu doom groove, faster combat groove. Audio is subject to the account's applicable ElevenLabs terms. Processing uses FFmpeg loudness normalization and loop crossfades. Credentials remain in ignored `.env.local` and are never included in assets or exports.
