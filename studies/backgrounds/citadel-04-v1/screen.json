@@ -1,0 +1,207 @@
+{
+  "id": "citadel-04-v1",
+  "title": "The crownless keep — World 1 / Screen 4",
+  "status": "First pass — composition and masks for review",
+  "biome": "citadel",
+  "size": [
+    1280,
+    720
+  ],
+  "frames": [
+    "base.png"
+  ],
+  "regions": [
+    {
+      "name": "Left keep brazier",
+      "fps": 30,
+      "polygon": [
+        [
+          0.122,
+          0.456
+        ],
+        [
+          0.143,
+          0.433
+        ],
+        [
+          0.171,
+          0.438
+        ],
+        [
+          0.189,
+          0.469
+        ],
+        [
+          0.19,
+          0.52
+        ],
+        [
+          0.176,
+          0.545
+        ],
+        [
+          0.14,
+          0.541
+        ],
+        [
+          0.12,
+          0.507
+        ]
+      ],
+      "motion_polygon": [
+        [
+          0.154,
+          0.497
+        ],
+        [
+          0.155,
+          0.486
+        ],
+        [
+          0.158,
+          0.477
+        ],
+        [
+          0.16,
+          0.481
+        ],
+        [
+          0.163,
+          0.49
+        ],
+        [
+          0.165,
+          0.497
+        ]
+      ],
+      "animation": {
+        "atlas": "brazier-1.png",
+        "rect": [
+          153,
+          311,
+          92,
+          83
+        ],
+        "columns": 8,
+        "count": 60,
+        "fps": 30
+      }
+    },
+    {
+      "name": "Right keep brazier",
+      "fps": 30,
+      "polygon": [
+        [
+          0.814,
+          0.458
+        ],
+        [
+          0.832,
+          0.435
+        ],
+        [
+          0.853,
+          0.438
+        ],
+        [
+          0.876,
+          0.47
+        ],
+        [
+          0.878,
+          0.524
+        ],
+        [
+          0.856,
+          0.543
+        ],
+        [
+          0.822,
+          0.536
+        ],
+        [
+          0.806,
+          0.51
+        ]
+      ],
+      "motion_polygon": [
+        [
+          0.836,
+          0.497
+        ],
+        [
+          0.838,
+          0.486
+        ],
+        [
+          0.841,
+          0.477
+        ],
+        [
+          0.843,
+          0.485
+        ],
+        [
+          0.847,
+          0.492
+        ],
+        [
+          0.848,
+          0.498
+        ]
+      ],
+      "animation": {
+        "atlas": "brazier-2.png",
+        "rect": [
+          1031,
+          313,
+          94,
+          79
+        ],
+        "columns": 8,
+        "count": 60,
+        "fps": 30
+      }
+    }
+  ],
+  "walkable": {
+    "polygon": [
+      [
+        0,
+        0.65
+      ],
+      [
+        1,
+        0.65
+      ],
+      [
+        1,
+        0.874
+      ],
+      [
+        0.913,
+        0.921
+      ],
+      [
+        0.199,
+        0.921
+      ],
+      [
+        0.105,
+        0.887
+      ],
+      [
+        0,
+        0.864
+      ]
+    ],
+    "description": "Continuous flat fighting floor; rear architecture and foreground rubble excluded."
+  },
+  "foreground": [],
+  "notes": "First-pass localized fire/glow loops, 60 frames / two seconds. Painting and banners stay fixed. Review composition, flame boundaries and walkable outline. Baked texture flow, not newly generated fluid frames. Foreground masks omitted: rubble is outside the walk area.",
+  "composition_review": {
+    "status": "first-pass",
+    "actor_height_fraction": 0.22,
+    "boss_arena": true
+  }
+}

@@ -15,6 +15,20 @@
           "id": "citadel-02-v1",
           "name": "The breached gate",
           "status": "first-pass"
+        },
+        {
+          "order": 3,
+          "id": "citadel-03-v1",
+          "name": "The silent foundry",
+          "status": "first-pass",
+          "boss_arena": false
+        },
+        {
+          "order": 4,
+          "id": "citadel-04-v1",
+          "name": "The crownless keep",
+          "status": "first-pass",
+          "boss_arena": true
         }
       ]
     }

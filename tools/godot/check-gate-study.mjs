@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createCanvas,loadImage,Image} from '@napi-rs/canvas';
 import {createBakedLoops} from '../../studies/backgrounds/baked-loops.js';
 globalThis.document={createElement:()=>createCanvas(1280,720)};globalThis.Image=Image;
-const dir='studies/backgrounds/citadel-02-v1/',m=JSON.parse(fs.readFileSync(dir+'screen.json'));
+const dir=(process.argv[2]||'studies/backgrounds/citadel-02-v1')+'/',m=JSON.parse(fs.readFileSync(dir+'screen.json'));
 const flow=await createBakedLoops(await loadImage(dir+'base.png'),m.regions,1280,720,dir);
 assert.equal(flow.checkLoop(),0);
 const first=flow.render(0).getContext('2d').getImageData(0,0,1280,720).data;
