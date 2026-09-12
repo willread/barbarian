@@ -43,7 +43,8 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		face.scale=Vector2(meta.width,meta.height)*size/face.texture.get_size()
 		group.add_child(face)
 		if label in LOCKED:group.modulate=Color(1,1,1,.35)
-		fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
+		# Locked text uses the ordinary sprite material so inherited alpha is respected.
+		if label not in LOCKED:fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})
 		if animate:
 			group.position.y=y-1224
@@ -86,7 +87,11 @@ func quake():
 	for x in [-2,2,-1.5,1,-.5,0]: tween.tween_property(item.node,"position:x",item.x+x,.035)
 
 func activate():
-	if switching or items.is_empty() or items[selected].label in LOCKED: return
+	if switching or items.is_empty(): return
+	if items[selected].label in LOCKED:
+		quake()
+		sound_requested.emit("resist")
+		return
 	quake()
 	sound_requested.emit("menu_activate")
 	activated.emit(items[selected].label)
