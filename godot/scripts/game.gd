@@ -834,7 +834,7 @@ func draw_hud():
 func draw_overlay():
 	if phase=="title":
 		var tall=screen_size.y>1200
-		var width=min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66)
+		var width=(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6
 		var size=title_logo.get_size()*width/title_logo.get_width()
 		var center=screen_size.x*.5 if tall else screen_size.x*.32
 		overlay.draw_texture_rect(title_logo,Rect2(Vector2(center-size.x*.5,screen_size.y*.1),size),false)
