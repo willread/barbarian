@@ -1037,6 +1037,11 @@ func draw_hud():
 		var top=70+i*140
 		var value=displayed_health if i==0 else displayed_mana
 		var colors=[Color("bf221e"),Color("710807")] if i==0 else [Color("269bff"),Color("074891")]
+		# Readiness persists through attacks and jumps; pulse the visible fill, not just its frame.
+		if i==1 and magic>=100:
+			var pulse=(.5+.5*sin(clock*TAU*1.5))*.65
+			colors[0]=colors[0].lerp(Color("d5f4ff"),pulse)
+			colors[1]=colors[1].lerp(Color("68caff"),pulse)
 		# One solid polygon survives downscaling; one-pixel scanlines can vanish in WebGL.
 		var fill_width=901*clamp(value/100.,0.,1.)
 		if fill_width>0:
@@ -1047,7 +1052,7 @@ func draw_hud():
 			var bevel=min(7.,fill_width*.5)
 			var points=PackedVector2Array([Vector2(left+bevel,upper),Vector2(right-bevel,upper),Vector2(right,upper+bevel),Vector2(right,lower-bevel),Vector2(right-bevel,lower),Vector2(left+bevel,lower),Vector2(left,lower-bevel),Vector2(left,upper+bevel)])
 			hud.draw_polygon(points,PackedColorArray([colors[0],colors[0],colors[0],colors[1],colors[1],colors[1],colors[1],colors[0]]))
-		if i==1 and can_cast(): hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
+		if i==1 and magic>=100: hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
 	var spec=art.data.weapons[weapon]
 	var cel=art.data.atlases["weapons-v8"].cels[int(spec.frame)]
 	hud.draw_set_transform(Vector2(1400*s+extra,810+193*252.0/380),.5,Vector2(s,252.0/380))
