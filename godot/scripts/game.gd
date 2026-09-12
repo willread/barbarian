@@ -32,6 +32,9 @@ var chicken_node: Node2D
 var used_chickens: Array=[]
 var phase="title"
 var options=false
+var settings_page=""
+var music_enabled=true
+var master_volume=100
 var loading_menu=false
 var muted=false
 var weapon="axe"
@@ -123,6 +126,12 @@ func _ready():
 	audio=preload("res://scripts/audio.gd").new()
 	add_child(audio)
 	audio.setup(self)
+	var settings=ConfigFile.new()
+	if settings.load("user://settings.cfg")==OK:
+		muted=settings.get_value("audio","muted",false)
+		music_enabled=settings.get_value("audio","music",true)
+		master_volume=clampi(settings.get_value("audio","volume",100),0,100)
+	apply_settings(false)
 	var soundboard=preload("res://scripts/soundboard.gd").new()
 	soundboard.audio=audio
 	add_child(soundboard)
@@ -200,10 +209,11 @@ func change_phase(next: String):
 	if phase=="title":
 
 		options=false
+		settings_page=""
 		menu.show_items(["BEGIN","OPTIONS"])
 	else:
 
-		if phase=="paused": menu.show_items(["RESUME BATTLE","SOUND: OFF" if muted else "SOUND: ON","RETURN TO TITLE"],false)
+		if phase=="paused": menu.show_items(["RESUME BATTLE","OPTIONS","RETURN TO TITLE"],false)
 		if phase in ["lost","won"]: menu.show_items(["RISE AGAIN"],false)
 	for view in views.values(): view.visible=phase!="title"
 	hud.visible=phase!="title"
@@ -217,19 +227,30 @@ func menu_action(label: String):
 		"BEGIN","RISE AGAIN": start_game()
 		"OPTIONS":
 			options=true
+			settings_page="root"
+			menu.switch_items(option_labels())
+		"SOUND","DISPLAY":
+			settings_page=label.to_lower()
 			menu.switch_items(option_labels())
 		"BACK":
-			options=false
-			menu.switch_items(["BEGIN","OPTIONS"])
+			if settings_page in ["sound","display"]:
+				settings_page="root"
+				menu.switch_items(option_labels())
+			else:
+				options=false
+				settings_page=""
+				menu.switch_items(["BEGIN","OPTIONS"] if phase=="title" else ["RESUME BATTLE","OPTIONS","RETURN TO TITLE"])
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
-			beep(280,.2)
-			menu.show_items(option_labels() if phase=="title" else ["RESUME BATTLE","SOUND: OFF" if muted else "SOUND: ON","RETURN TO TITLE"],phase=="title",false)
-			menu.select(0 if phase=="title" else 1,false)
+			apply_settings()
+			refresh_settings(0)
+		"MUSIC: ON","MUSIC: OFF":
+			music_enabled=not music_enabled
+			apply_settings()
+			refresh_settings(1)
 		"FULLSCREEN: ON","FULLSCREEN: OFF":
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
-			menu.show_items(option_labels(),true,false)
-			menu.select(1,false)
+			refresh_settings(0)
 		"RESUME BATTLE": change_phase("playing")
 		"RETURN TO TITLE":
 			clear_world()
@@ -239,7 +260,23 @@ func menu_action(label: String):
 			change_phase("title")
 
 func option_labels() -> Array:
-	return ["SOUND: OFF" if muted else "SOUND: ON","FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
+	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOLUME: %d"%master_volume,"BACK"]
+	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
+	return ["SOUND","DISPLAY","BACK"]
+
+func refresh_settings(index: int):
+	menu.show_items(option_labels(),phase=="title",false)
+	menu.select(index,false)
+
+func apply_settings(persist: bool=true):
+	AudioServer.set_bus_volume_db(0,linear_to_db(master_volume/100.0) if master_volume>0 else -80)
+	AudioServer.set_bus_mute(0,master_volume==0)
+	if persist:
+		var config=ConfigFile.new()
+		config.set_value("audio","muted",muted)
+		config.set_value("audio","music",music_enabled)
+		config.set_value("audio","volume",master_volume)
+		config.save("user://settings.cfg")
 
 func clear_world():
 	for view in views.values(): view.queue_free()
@@ -668,11 +705,17 @@ func _input(event: InputEvent):
 	if event is InputEventKey:
 		var code=event.keycode
 		if event.pressed and not event.echo and code in [KEY_ESCAPE,KEY_P]:
-			if phase=="playing": change_phase("paused")
+			if options:menu_action("BACK")
+			elif phase=="playing": change_phase("paused")
 			elif phase=="paused": change_phase("playing")
 			elif phase=="title" and options: menu_action("BACK")
 			return
 	if phase in ["title","paused","lost","won"]:
+		if options and settings_page=="sound" and menu.selected==2 and not menu.switching and event is InputEventKey and event.pressed and event.keycode in [KEY_LEFT,KEY_RIGHT]:
+			master_volume=clampi(master_volume+(-1 if event.keycode==KEY_LEFT else 1),0,100)
+			apply_settings()
+			refresh_settings(2)
+			return
 		menu.handle(event)
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
