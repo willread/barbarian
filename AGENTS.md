@@ -10,3 +10,5 @@
 - On this machine, Godot tooling, imports and exports live on E:/Cairn-build-tools because C: had insufficient space. Do not delete unrelated files to make room.
 
 - Never commit `.env` files or credentials. Never print their values. Keep `core.hooksPath=.githooks` enabled; the pre-commit guard blocks environment files and locally configured secrets in staged content.
+
+- Keep a single Windows build at E:/Cairn-build-tools/build/windows/Cairn.exe. If the executable is locked, ask the user to close it; do not create alternate build folders.

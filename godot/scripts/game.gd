@@ -1067,7 +1067,7 @@ func draw_hud():
 			hud.draw_polygon(points,PackedColorArray([colors[0],colors[0],colors[0],colors[1],colors[1],colors[1],colors[1],colors[0]]))
 		if i==1 and magic>=100: hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
 	hud.draw_set_transform(Vector2.ZERO)
-	hero_voice.draw_portrait(hud,Rect2(1400*s+extra-80,810+46,160,160))
+	hero_voice.draw_portrait(hud,Rect2(1400*s+extra-80,810+46,160,180))
 	hud.draw_set_transform(Vector2.ZERO)
 	center_text(hud,"SCORE",Vector2(1758*s+extra,810+83*252.0/380),22,Color("eedbb0"))
 	center_text(hud,"%06d"%score,Vector2(1758*s+extra,810+182*252.0/380),52,Color("eedbb0"))

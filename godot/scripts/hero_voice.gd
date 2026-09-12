@@ -76,4 +76,5 @@ func draw_portrait(canvas: Node2D,rect: Rect2):
 		var energy=line.envelope[index]
 		column=0 if energy<.08 else 4 if energy<.5 else 5
 	var cell=atlas.get_size()/Vector2(6,4)
-	canvas.draw_texture_rect_region(atlas,rect,Rect2(Vector2(column,row)*cell,cell))
+	var crop=Vector2(cell.y*rect.size.x/rect.size.y,cell.y)
+	canvas.draw_texture_rect_region(atlas,rect,Rect2(Vector2(column,row)*cell+Vector2((cell.x-crop.x)*.5,0),crop))
