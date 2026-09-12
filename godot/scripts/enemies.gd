@@ -20,12 +20,16 @@ func plan() -> Array:
 	var result: Array=[]
 	var pool=["bone","legion"]
 	var previous=""
+	var seen: Array=[]
 	var costs={"bone":1,"legion":2,"shield":3,"archer":3,"marauder":3}
 	for screen in 4:
 		if screen>0:pool.append(unlock_order[screen-1])
 		for local_wave in 3:
 			var focus=pool.pick_random()
 			if focus==previous:focus=pool[(pool.find(focus)+1+randi()%(pool.size()-1))%pool.size()]
+			# Guarantee unlocked types by the area end, preserving random mixes otherwise.
+			var missing=pool.filter(func(kind):return kind not in seen)
+			if local_wave==2 and not missing.is_empty():focus=missing.pick_random()
 			previous=focus
 			var budget=6+screen*3+local_wave+randi_range(0,2)
 			var encounter: Array=[focus]
@@ -37,6 +41,8 @@ func plan() -> Array:
 				var kind=choices.pick_random()
 				encounter.append(kind)
 				budget-=costs[kind]
+			for kind in encounter:
+				if kind not in seen:seen.append(kind)
 			encounter.shuffle()
 			result.append(encounter)
 			wave_variants.append([] if screen<2 else ([variant_order[0]] if screen==2 else variant_order.duplicate()))

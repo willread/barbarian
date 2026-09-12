@@ -57,5 +57,22 @@ func check():
 		game.enemies[0].hp=0
 		game.step_reinforcements(5.0)
 		assert(game.enemies.filter(func(enemy):return enemy.hp>0).size()==area-1)
+	for run in 300:
+		var encounters=game.e_ai.plan()
+		var seen=[]
+		for encounter in encounters:
+			for kind in encounter:
+				if kind not in seen:seen.append(kind)
+		for kind in ["bone","legion","shield","archer","marauder","champion"]:assert(kind in seen)
+	game.wave=10
+	game.enemies.clear()
+	game.pending_enemies=["bone","bone","bone","bone","bone","bone"]
+	for attempt in 6:game.spawn_encounter_enemy()
+	assert(game.enemies.size()==4 and game.pending_enemies.size()==2)
+	game.step_reinforcements(10.)
+	assert(game.enemies.size()==4)
+	game.enemies[0].hp=0
+	game.step_reinforcements(10.)
+	assert(game.enemies.size()==5 and game.pending_enemies.size()==1)
 	print("CAIRN_CHAPTER_OK: selection, locked chapters, ordered screens, walk limits and final boss")
 	quit()
