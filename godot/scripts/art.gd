@@ -3,10 +3,12 @@ extends RefCounted
 var data: Dictionary
 var textures: Dictionary={}
 var armory: Dictionary={}
+var holiday_anchors: Dictionary={}
 const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
+	holiday_anchors=JSON.parse_string(FileAccess.get_file_as_string("res://art/holiday-anchors.json"))
 	armory=JSON.parse_string(FileAccess.get_file_as_string("res://art/armory.json"))
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
@@ -80,6 +82,9 @@ func layout(p: Array) -> Dictionary:
 	return {"atlas":atlas,"cel":cel,"rig":rig}
 
 func weapon_data(f: Dictionary) -> Dictionary:
+	if f.get("holiday", "off")=="christmas":
+		var tex=texture("../art/holiday-candy.png")
+		return {"file":"../art/holiday-candy.png","width":tex.get_width(),"height":tex.get_height(),"length":126.,"grip":.82,"pivot":.2}
 	var skin=f.get("weapon_skin","")
 	if f.weapon=="axe" and armory.has(skin):return armory[skin]
 	return data.weapons[f.weapon]
@@ -161,3 +166,14 @@ func draw_equipment(node: Node2D,index: int,height: float):
 	var grip=data.enemyArt.equipment.grips[index]
 	var s=height/cel.height
 	node.draw_texture_rect(texture(cel.file),Rect2((cel.left-grip[0]*atlas.cellWidth)*s,(cel.top-grip[1]*atlas.cellHeight)*s,cel.width*s,height),false)
+
+func paint_holiday(node: Node2D,f: Dictionary,p: Array):
+	if not f.player or f.get("holiday","off")=="off":return
+	if not holiday_anchors.has(p[0]):return
+	var xy=holiday_anchors[p[0]][int(p[1])]
+	var head=Vector2(xy[0],xy[1])
+	var santa=f.holiday=="christmas"
+	if not santa:head+=Vector2(18,-4)
+	var tex=texture("../art/holiday-santa.png" if santa else "../art/holiday-pumpkin.png")
+	var size=Vector2(65,48) if santa else Vector2(64,66)
+	node.draw_texture_rect(tex,Rect2(head-Vector2(size.x*.56,size.y*.92 if santa else size.y*.53),size),false)

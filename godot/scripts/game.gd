@@ -9,6 +9,9 @@ const EnvironmentView=preload("res://scripts/environment.gd")
 const BloodScript=preload("res://scripts/blood.gd")
 const MenuScript=preload("res://scripts/menu.gd")
 const DeathWipe=preload("res://scripts/death_wipe.gd")
+var combo=CairnCombo.new()
+var holiday="off"
+var score_panel: Node2D
 var art: CairnArt
 var m: CairnMechanics
 var e_ai: CairnEnemies
@@ -147,6 +150,8 @@ func _ready():
 		music_enabled=settings.get_value("audio","music",true)
 		voice_enabled=settings.get_value("audio","voice",true)
 		master_volume=clampi(settings.get_value("audio","volume",100),0,100)
+		holiday=settings.get_value("game","holiday","off")
+		if holiday not in ["off","christmas","halloween"]:holiday="off"
 		weapon_skin=settings.get_value("game","weapon","gravecleaver")
 		if weapon_skin not in WEAPON_CHOICES:weapon_skin="gravecleaver"
 	weapon="sword" if weapon_skin=="sword" else "axe"
@@ -169,6 +174,9 @@ func _ready():
 	hud.draw.connect(draw_hud)
 	add_child(hud)
 	hud.top_level=true
+	score_panel=preload("res://scripts/score_panel.gd").new()
+	score_panel.game=self
+	hud.add_child(score_panel)
 	overlay=Node2D.new()
 	overlay.z_index=2000
 	overlay.draw.connect(draw_overlay)
@@ -228,6 +236,7 @@ func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 
 func change_phase(next: String):
 	if next=="dying":
+		combo.reset()
 		audio.stop_gameplay()
 		hero_voice.reset()
 	if next=="paused":
@@ -260,6 +269,10 @@ func change_phase(next: String):
 	responsive_layout()
 
 func menu_action(label: String):
+	if label.begins_with("HOLIDAY: "):
+		cycle_holiday(1)
+		refresh_settings(1)
+		return
 	if label.begins_with("WEAPON: "):
 		cycle_weapon(1)
 		refresh_settings(0)
@@ -324,7 +337,7 @@ func menu_action(label: String):
 func option_labels() -> Array:
 	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
-	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"BACK"]
+	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"HOLIDAY: "+holiday.to_upper(),"BACK"]
 	return ["GAME","SOUND","DISPLAY","BACK"]
 
 func refresh_settings(index: int):
@@ -337,6 +350,7 @@ func apply_settings(persist: bool=true):
 	if persist:
 		var config=ConfigFile.new()
 		config.set_value("game","weapon",weapon_skin)
+		config.set_value("game","holiday",holiday)
 		config.set_value("audio","muted",muted)
 		config.set_value("audio","music",music_enabled)
 		config.set_value("audio","voice",voice_enabled)
@@ -372,8 +386,10 @@ func start_game():
 	hero=make_actor(-140,660,100,true)
 	hero.weapon=weapon
 	hero["weapon_skin"]=weapon_skin
+	hero["holiday"]=holiday
 	wave=1
 	score=0
+	combo.reset()
 	kills=0
 	magic=0
 	spell=-1
@@ -508,6 +524,11 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
 	var previous_hp=f.hp
 	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
+	if f.hp<previous_hp:
+		if f.player:combo.reset()
+		elif attacker.player and not a.get("magic",false):
+			combo.hit()
+			score+=10*combo.multiplier()
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
@@ -570,8 +591,8 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			responsive_layout()
 		else:
 			kills+=1
-			score+=1500 if f.boss else 250
-	if not f.player and attacker.player and not a.get("magic",false): magic=min(100,magic+6+(8 if f.hp<=0 else 0))
+			score+=(1500 if f.boss else 250)*combo.multiplier()
+	if not f.player and attacker.player and not a.get("magic",false): magic=min(100,magic+(6+(8 if f.hp<=0 else 0))*combo.mana_multiplier())
 
 func burst(x: float,y: float,count: int,color: Color):
 	for i in count: sparks.append({"x":x,"y":y,"vx":(randf()-.5)*460,"vy":(randf()-.65)*390,"life":.3+randf()*.4,"color":color})
@@ -646,6 +667,7 @@ func tick(dt: float):
 	arrows=arrows.filter(func(arrow):return is_instance_valid(arrow))
 	for arrow in arrows:arrow.advance(dt)
 	if phase=="playing":
+		hero.hp=minf(hero.max,hero.hp+combo.advance(dt))
 		step_chicken(dt)
 		step_reinforcements(dt)
 	if pressed.has(KEY_K) and can_cast():
@@ -862,9 +884,10 @@ func _input(event: InputEvent):
 			apply_settings()
 			refresh_settings(3)
 			return
-		if options and settings_page=="game" and menu.selected==0 and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
-			cycle_weapon(-1 if event.keycode==KEY_LEFT else 1)
-			refresh_settings(0)
+		if options and settings_page=="game" and menu.selected in [0,1] and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
+			if menu.selected==0:cycle_weapon(-1 if event.keycode==KEY_LEFT else 1)
+			else:cycle_holiday(-1 if event.keycode==KEY_LEFT else 1)
+			refresh_settings(menu.selected)
 			return
 		menu.handle(event)
 		return
@@ -881,11 +904,18 @@ func _input(event: InputEvent):
 			if not keys.has(code): pressed[code]=true
 			keys[code]=true
 
+func cycle_holiday(direction: int):
+	var modes=["off","christmas","halloween"]
+	holiday=modes[posmod(modes.find(holiday)+direction,3)]
+	hero["holiday"]=holiday
+	apply_settings()
+
 func cycle_weapon(direction: int):
 	weapon_skin=WEAPON_CHOICES[posmod(WEAPON_CHOICES.find(weapon_skin)+direction,WEAPON_CHOICES.size())]
 	weapon="sword" if weapon_skin=="sword" else "axe"
 	hero.weapon=weapon
 	hero["weapon_skin"]=weapon_skin
+	hero["holiday"]=holiday
 	apply_settings()
 
 func toggle_weapon():
@@ -1198,9 +1228,8 @@ func draw_hud():
 	hud.draw_set_transform(Vector2.ZERO)
 	hero_voice.draw_portrait(hud,Rect2(1400*s+extra-80,810+46,160,180))
 	hud.draw_set_transform(Vector2.ZERO)
-	center_text(hud,"SCORE",Vector2(1758*s+extra,810+83*252.0/380),22,Color("eedbb0"))
-	center_text(hud,"%06d"%score,Vector2(1758*s+extra,810+182*252.0/380),52,Color("eedbb0"))
-	center_text(hud,"FINAL DUEL" if wave==encounters.size() else "THE CITADEL",Vector2(1758*s+extra,810+281*252.0/380),22,Color("eedbb0"))
+	score_panel.position=Vector2(1758*s+extra,830)
+	score_panel.queue_redraw()
 
 func draw_overlay():
 	if phase=="title":

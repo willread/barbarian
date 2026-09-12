@@ -13,3 +13,5 @@ Variant tuning: swift enemies are 72% normal size, move at 165% speed, retain 85
 Opening aqueduct population limits count the entire wave, including reinforcements: exactly two enemies in wave 1, at most three in wave 2, and at most four in wave 3. Later areas retain their existing budgets and active caps.
 
 Global damage tuning: `game.gd` exposes `damage_multiplier` in the Godot Inspector, default 0.5 (50% less damage). This applies at the shared damage handler to player and enemy attacks, arrows, charge, slam, and lightning, after retaining weapon and variant differences. Healing is unchanged.
+
+Combo baseline: every three successful non-magic hits raises the multiplier, capped at 8x. Hits score 10 times the multiplier; kills award their existing bonus times the multiplier. Mana gain adds 20% per tier above 1x. Five seconds without a hit expires the combo; taking damage clears it. At 5x and above, health restores at 1.5 points/second while the combo remains active. Pauses and area walk transitions freeze the timer. Tuning is in `godot/scripts/combo.gd`.
