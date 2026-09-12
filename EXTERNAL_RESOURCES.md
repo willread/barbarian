@@ -88,3 +88,6 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 
 ### Block/resistance thud (2026-09-12)
 - Four ElevenLabs deep dull impact options; exact prompts and sources in `soundboard/resist-thud/`, generator `tools/audio/resist-thud.mjs`. Default `godot/audio/resist.ogg`. Used for shield blocks, heavy-enemy charge resistance, and committed enemy reactions.
+
+### Short human magic shouts (2026-09-12)
+- Regenerated all four invocation shouts with ElevenLabs at 1.3 seconds, requesting one 400–500ms human syllable and a brief diffuse echo. Exact prompts and original generations: `soundboard/magic-shout-short/`; generator: `tools/audio/magic-shout-short.mjs`. Replaces existing magic_shout option IDs and default Ogg, preserving sound-lab volume/selection settings.
