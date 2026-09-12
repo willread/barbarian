@@ -318,7 +318,7 @@ func can_cast() -> bool:
 
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
-	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=26:return
+	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
 	if not f.player and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))

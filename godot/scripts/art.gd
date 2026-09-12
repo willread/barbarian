@@ -14,7 +14,7 @@ func texture(file: String) -> Texture2D:
 	return textures[file]
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
-	if f.player and f.attack.get("spin",false):return ["hero-spin",min(7,int(max(0,f.attack.age-2)/3.0))]
+	if f.player and f.attack.get("spin",false):return ["hero-spin",min(15,int(max(0,f.attack.age-2)/2.0))%8]
 	if f.player and f.diveUsed and not f.air.is_empty():return ["hero-extra-unarmed-v8",8 if f.diveAge<2 else 9 if f.diveAge<4 else 10 if f.weapon=="axe" else 11]
 	if f.player and not f.pickup.is_empty() and f.down.is_empty() and not f.hurtTicks: return ["hero-pickup-unarmed-v1",min(7,int(f.pickup.age/.0725))]
 	if f.player and spell>=0 and f.down.is_empty() and not f.hurtTicks:
@@ -92,7 +92,8 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	if f.player and p==["hero-actions-unarmed-v8",0] and f.attack.is_empty() and not f.moving: file="hero-idle-%d.png"%int(fmod(f.clock,4.8)/4.8*48)
 	var facing=l.atlas.facing
 	node.draw_set_transform(Vector2.ZERO,0,Vector2(facing,1))
-	node.draw_texture_rect(texture(file),rect,false)
+	# The generated spin cels are warmer than the core body atlas.
+	node.draw_texture_rect(texture(file),rect,false,Color(.84,.96,1.0) if p[0]=="hero-spin" else Color.WHITE)
 	node.draw_set_transform(Vector2.ZERO)
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):

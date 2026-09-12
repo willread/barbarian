@@ -138,7 +138,7 @@ func begin(f: Dictionary, type: String) -> bool:
 	if type=="air" and (f.air.is_empty() or f.diveUsed or (f.air.land>0 if combat_extensions else (f.air.vz>=0 and f.height<24))): return false
 	var direction=-f.dir if type=="back" else f.dir
 	if type=="back": f.dir=direction
-	var a=attacks[type].duplicate(true) if type!="spin" else {"ticks":40,"from":3,"to":26,"damage":1.2,"reach":48,"knock":true,"box":[-48,96,-47,47],"spin":true,"push":4.2}
+	var a=attacks[type].duplicate(true) if type!="spin" else {"ticks":44,"from":3,"to":33,"damage":1.2,"reach":48,"knock":true,"box":[-48,96,-47,47],"spin":true,"push":4.2}
 	a.merge({"type":type,"age":0,"elapsed":0.0,"direction":direction,"connected":false,"hits":[],"animationRate":1.0},true)
 	f.attack=a
 	if type=="slash":

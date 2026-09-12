@@ -38,6 +38,13 @@ func _init():
 	assert(sword.attack.from==2 and sword.attack.box[1]>hero.attack.box[1] and sword.attack.damage<axe_damage)
 	var spinner=m.make(1,720,660,100,true)
 	assert(m.begin(spinner,"spin"))
+	var art=CairnArt.new()
+	var frames=[]
+	for age in range(2,34,2):
+		spinner.attack.age=age
+		frames.append(art.pose(spinner)[1])
+	assert(frames==[0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7],"Two complete faster rotations")
+	spinner.attack.age=0
 	var targets=[m.make(2,620,660,100),m.make(3,820,660,100),m.make(4,730,710,100)]
 	var hits=[]
 	for i in 45:m.tick_attack(spinner,targets,func(e,a,_h):hits.append([e.id,a.direction]))
