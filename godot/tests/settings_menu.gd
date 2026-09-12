@@ -30,7 +30,7 @@ func check():
 		assert(art.data.menu.has("WEAPON: "+skin.replace("_"," ").to_upper()))
 		var f={"weapon":"axe","weapon_skin":skin}
 		var w=art.weapon_data(f)
-		assert(w.length>=150 and w.length<=180 and w.pivot>0 and w.pivot<1)
+		assert(w.length>=108 and w.length<=140 and w.pivot>0 and w.pivot<1)
 		assert(art.texture(w.file)!=null)
 	assert(art.data.menu.has("QUIT"))
 	menu.free()
