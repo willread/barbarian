@@ -289,8 +289,7 @@ func menu_action(label: String):
 			apply_settings()
 			refresh_settings(2)
 		"FULLSCREEN: ON","FULLSCREEN: OFF":
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
-			refresh_settings(0)
+			toggle_fullscreen()
 		"RETURN TO BATTLE": change_phase("playing")
 		"QUIT":
 			if OS.has_feature("web"):
@@ -808,7 +807,16 @@ func _process(raw: float):
 	overlay.queue_redraw()
 	queue_redraw()
 
+func toggle_fullscreen():
+	var fullscreen=DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN,DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fullscreen else DisplayServer.WINDOW_MODE_FULLSCREEN)
+	if options and settings_page=="display":refresh_settings(0)
+
 func _input(event: InputEvent):
+	if event is InputEventKey and event.alt_pressed and event.keycode in [KEY_ENTER,KEY_KP_ENTER]:
+		if event.pressed and not event.echo:toggle_fullscreen()
+		get_viewport().set_input_as_handled()
+		return
 	if loading_menu:return
 	if event is InputEventKey or event is InputEventMouseButton:audio.unlocked=true
 	if event is InputEventKey:
