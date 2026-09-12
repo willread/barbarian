@@ -30,9 +30,9 @@ func _process(dt: float):
 	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
 	logo.position=screen*.5
 	logo.scale=Vector2.ONE*ratio
-	logo_material.set_shader_parameter("blend",smoothstep(1.5,1.95,elapsed))
+	logo_material.set_shader_parameter("blend",smoothstep(2.0,3.2,elapsed))
 	queue_redraw()
-	if elapsed>=3.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
+	if elapsed>=4.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
 		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get("res://main.tscn"))
 func _draw():
 	if not picture:return
@@ -40,7 +40,7 @@ func _draw():
 	var cover=max(screen.x/backdrop.get_width(),screen.y/backdrop.get_height())
 	var bg=backdrop.get_size()*cover
 	draw_texture_rect(backdrop,Rect2((screen-bg)*.5,bg),false)
-	var blend=smoothstep(1.5,1.95,elapsed)
+	var blend=smoothstep(2.0,3.2,elapsed)
 	draw_rect(Rect2(Vector2.ZERO,screen),Color(0,0,0,blend))
 	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)
 	var center=screen-Vector2.ONE*(radius+32.)

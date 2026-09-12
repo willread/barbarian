@@ -61,16 +61,16 @@ The menu study defaults to intensity 0.6; the enemy study defaults to 1.8 (three
 For optional warm/cooling edges, enable `with_heat` and call `heat_face(sprite, local_rect)`. This assigns the heat material, so callers with an existing body material should compose their own response or disable this pass. Enemy study disables the extra thermal viewport and uses the existing burn-away material on a live mask instead. Free the component with its owner after residual fire has cooled; cost scales with mask area and number of simultaneous effects.
 
 ## Opening studio splash
-Maximum Force artwork uses a proportional, contained crop of the supplied photorealistic panel. Browser shell displays it during engine loading for at least three seconds, with a bottom-right padded metal ring. Windows uses boot.tscn with the same minimum and aspect-aware layout. The original Cairn menu follows the splash. Export post-processing copies the artwork next to the web shell.
+Maximum Force artwork uses a proportional, contained crop of the supplied photorealistic panel. Browser shell displays it during engine loading for at least four seconds, with a bottom-right padded metal ring. Windows uses boot.tscn with the same minimum and aspect-aware layout. The original Cairn menu follows the splash. Export post-processing copies the artwork next to the web shell.
 
 ## Responsive presentation
-- Studio splash: independent cover background, contained transparent logo, viewport-anchored spinner; three-second minimum remains.
+- Studio splash: independent cover background, contained transparent logo, viewport-anchored spinner; four-second minimum remains.
 - Cairn title: cover background and transparent logo; menu anchors shift to center in portrait. Mouse coordinates are converted to menu-local space after layout transforms.
 - Combat: original 1440x810 arena is uniformly fitted and clipped, preserving all ROM movement/hit distances. Extra aspect-ratio space uses a dimmed version of the current environment. No stretching or cropping of playable space.
 - HUD: full-width bottom anchor with a horizontally stretchable meter section; end ornaments, weapon and score retain uniform scale. Ornamental tips overlap the arena. Health/mana, weapon and score remain separate dynamic draws.
 - Pause/results and death wipe use screen space independently of the arena. Resize and fullscreen recalculate layout live.
 - Run native `-- --layout-test` for landscape, ultrawide and portrait rendered captures and assertions for menu bounds, uniform scaling and HUD bottom anchoring.
 
-The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 1.5 seconds it crossfades over 450 ms to the a white version of the same logo silhouette on black; loader remains bottom-right.
+The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 2 seconds it transitions over 1.2 seconds to the a white version of the same logo silhouette on black; loader remains bottom-right.
 
-The splash color transition preserves one texture, alpha silhouette, size and center. Native rendering mixes RGB to white; the browser overlays the identical image with a white filter. No differently cropped logo is swapped in.
+The splash color transition preserves one texture, alpha silhouette, size and center. Native rendering mixes RGB to white; the browser changes RGB using a single SVG color-transfer filter, preserving alpha instead of compositing a second copy. No differently cropped logo is swapped in.
