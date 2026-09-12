@@ -27,6 +27,20 @@ func _init():
 		assert(f.attack.ticks==(22 if weapon=="axe" else 14))
 		assert(f.attack.damage==(3 if weapon=="axe" else 2))
 	var enemy_ai=CairnEnemies.new(m,data.roster)
+	for v in ["swift","brute"]:
+		var found=false
+		for attempt in 100:
+			var actor=m.make(99,720,660,16,false)
+			actor.kind="legion"
+			actor.boss=false
+			enemy_ai.variant(actor,[v])
+			if actor.variant!=v:continue
+			found=true
+			assert(is_equal_approx(actor.size,.72 if v=="swift" else 1.18))
+			assert(is_equal_approx(actor.speedFactor,1.65 if v=="swift" else .68))
+			assert(is_equal_approx(enemy_ai.damage_scale(actor),.65 if v=="swift" else 1.35))
+		assert(found)
+	assert(enemy_ai.damage_scale({})==1.0)
 	for i in 100:
 		var plan=enemy_ai.plan()
 		assert(plan.size()==13 and plan[12]==["champion"])

@@ -7,3 +7,5 @@ Each area has three waves. The Keep has an additional boss encounter (wave 13). 
 Two or three enemies enter initially. Reinforcements enter at randomized 1.6–3.8 second intervals when living-enemy and specialist-pressure caps permit. Active count caps rise from three to five. Each arrival independently chooses side, offscreen distance, and lane position, then conforms to the walk polygon. Empty battlefields immediately admit the next reinforcement. Pending enemies prevent premature wave completion.
 
 Chicken opportunities occur in waves 2, 5, 8, and 11. This is a first-playthrough balance baseline; assess duration, pressure spikes, and recovery opportunities through play before increasing enemy health or counts.
+
+Variant tuning: swift enemies are 72% normal size, move at 165% speed, retain 85% health, and deal 65% damage. Brutes are 118% size, move at 68% speed, have 145% health, and deal 135% damage. Damage multipliers apply at hit resolution, leaving player and regular enemy damage unchanged.

@@ -49,10 +49,13 @@ func variant(e: Dictionary, allowed: Array=[]):
 		e.speedFactor=.75
 		return
 	e.variant=allowed.pick_random() if not allowed.is_empty() and randf()<.25 else "regular"
-	e.size=1.18 if e.variant=="brute" else (.9 if e.variant=="swift" else 1.0)
-	e.speedFactor=1.35 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
+	e.size=1.18 if e.variant=="brute" else (.72 if e.variant=="swift" else 1.0)
+	e.speedFactor=1.65 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))
 	e.max=e.hp
+
+static func damage_scale(e: Dictionary) -> float:
+	return .65 if e.get("variant", "regular")=="swift" else (1.35 if e.get("variant", "regular")=="brute" else 1.0)
 
 static func heavy(e: Dictionary) -> bool:
 	return e.boss or e.size>=1.15

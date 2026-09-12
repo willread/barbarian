@@ -483,7 +483,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		else:a.knock=false
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
 	var previous_hp=f.hp
-	f.hp=max(0,f.hp-a.damage*(100.0/48 if f.player else 1))
+	f.hp=max(0,f.hp-a.damage*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
