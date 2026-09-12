@@ -31,13 +31,13 @@ for(const target of targets){
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');
-  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><img class="metal-logo" src="maximum-force-logo.png" alt="Maximum Force" /><svg class="flat-logo" viewBox="960 210 750 420" aria-hidden="true"><image href="maximum-force-reference.png" width="1774" height="887" /></svg></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
+  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><img class="metal-logo" src="maximum-force-logo.png" alt="Maximum Force" /><img class="flat-logo" src="maximum-force-logo.png" alt="" aria-hidden="true" /></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
   html=html.replace('</head>',`<link rel="preload" as="image" href="maximum-force-logo.png"><style>
 html,body{background:#000!important}
 #cairn-loader{position:fixed;inset:0;display:grid;place-items:center;background:#000 url(studio-background.png) center/cover no-repeat;z-index:9999;pointer-events:auto}
 #cairn-loader .studio-art{position:relative;width:min(68vw,104vh);height:52vh;display:grid;place-items:center;z-index:1}
-#cairn-loader .studio-art img{width:100%;height:100%;object-fit:contain;animation:metal-out .45s ease-in-out 1.5s both}
-#cairn-loader .studio-art .flat-logo{position:absolute;inset:0;width:100%;height:100%;animation:flat-in .45s ease-in-out 1.5s both}
+#cairn-loader .studio-art img{width:100%;height:100%;object-fit:contain}
+#cairn-loader .studio-art .flat-logo{position:absolute;inset:0;width:100%;height:100%;filter:brightness(0) invert(1);animation:flat-in .45s ease-in-out 1.5s both}
 #cairn-loader::before{content:"";position:absolute;inset:0;background:#000;animation:flat-in .45s ease-in-out 1.5s both}
 @keyframes flat-in{from{opacity:0}to{opacity:1}}@keyframes metal-out{from{opacity:1}to{opacity:0}}
 #cairn-loader > svg{z-index:2;position:absolute;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));width:clamp(40px,7vmin,76px);height:clamp(40px,7vmin,76px);animation:spin 1.8s linear infinite}

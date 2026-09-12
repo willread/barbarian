@@ -71,4 +71,6 @@ Maximum Force artwork uses a proportional, contained crop of the supplied photor
 - Pause/results and death wipe use screen space independently of the arena. Resize and fullscreen recalculate layout live.
 - Run native `-- --layout-test` for landscape, ultrawide and portrait rendered captures and assertions for menu bounds, uniform scaling and HUD bottom anchoring.
 
-The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 1.5 seconds it crossfades over 450 ms to the supplied flat white logo on black; loader remains bottom-right.
+The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 1.5 seconds it crossfades over 450 ms to the a white version of the same logo silhouette on black; loader remains bottom-right.
+
+The splash color transition preserves one texture, alpha silhouette, size and center. Native rendering mixes RGB to white; the browser overlays the identical image with a white filter. No differently cropped logo is swapped in.
