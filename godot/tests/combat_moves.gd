@@ -60,5 +60,14 @@ func _init():
 	assert(runner.attack.is_empty() and runner.hurtTicks==24 and runner.hp==100)
 	for i in 5:m.reaction(runner)
 	assert(runner.x<700 and runner.hurtTicks>0,"Rebound moves backward while stunned")
+	var slow=m.make(20,800,660,100)
+	slow.size=1.18
+	slow.dir=1
+	var behind=m.make(21,700,660,100,true)
+	for i in 23:
+		ai.intent(slow,behind,true)
+		assert(slow.dir==1,"Heavy legion must not instantly face a flanking player")
+	ai.intent(slow,behind,true)
+	assert(slow.dir==-1 and slow.aiRest>=12)
 	print("CAIRN_MOVES_OK: shield opening, dive startup/momentum/recovery, weapon distinction, spin sides/once/lane")
 	quit()

@@ -61,7 +61,25 @@ func block(e: Dictionary, a: Dictionary, h: Dictionary) -> bool:
 	return true
 
 func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
-	if e.kind=="legion": return m.legion_intent(e,h,engaged)
+	# Heavy actors notice positional changes in slower beats; combat health/state stays current.
+	if heavy(e):
+		e["noticeTicks"]=max(0,e.get("noticeTicks",0)-1)
+		if e.noticeTicks==0 or not e.has("noticedPosition"):
+			e.noticedPosition=Vector2(h.x,h.y)
+			e.noticeTicks=12
+		h=h.duplicate()
+		h.x=e.noticedPosition.x
+		h.y=e.noticedPosition.y
+	if e.kind=="legion":
+		if heavy(e) and e.attack.is_empty() and not e.hurtTicks and e.down.is_empty():
+			var face=1 if h.x>=e.x else -1
+			if face!=e.dir:
+				e.turnTicks+=1
+				if e.turnTicks<24:return Vector2.ZERO
+				e.dir=face
+				e.aiRest=max(e.aiRest,12)
+			e.turnTicks=0
+		return m.legion_intent(e,h,engaged)
 	for key in ["brace","hopCooldown","rushCooldown"]: e[key]=max(0,e[key]-1)
 	if e.hopTicks and e.down.is_empty() and not e.hurtTicks:
 		e.hopTicks-=1
@@ -78,17 +96,17 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 	var y=(h.y-e.y)/m.SCALE
 	var face=-1 if x<0 else 1
 	if not e.attack.is_empty():
-		if e.kind=="marauder" and not e.attack.get("rush",false) and not e.rushCombo and e.attack.age<e.attack.from-6:
+		if e.kind=="marauder" and not heavy(e) and not e.attack.get("rush",false) and not e.rushCombo and e.attack.age<e.attack.from-6:
 			e.dir=face
 			e.attack.direction=face
 		return Vector2.ZERO
 	if e.aiRest and e.kind=="marauder": return Vector2.ZERO
 	if e.dir!=face:
 		e.turnTicks+=1
-		if e.turnTicks<(22 if e.kind=="shield" else 10): return Vector2.ZERO
+		if e.turnTicks<(22 if e.kind=="shield" else 10)+(14 if heavy(e) else 0): return Vector2.ZERO
 		e.dir=face
 		e.turnTicks=0
-		e.aiRest=max(e.aiRest,8)
+		e.aiRest=max(e.aiRest,16 if heavy(e) else 8)
 	else: e.turnTicks=0
 	if e.aiRest or h.hp<=0 or not h.down.is_empty(): return Vector2.ZERO
 	if not engaged: return Vector2(-face if abs(x)<75 else (face if abs(x)>95 else 0),(1 if e.id%2 else -1) if abs(y)<12 else (-sign(y) if abs(y)>24 else 0))
