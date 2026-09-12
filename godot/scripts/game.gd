@@ -373,7 +373,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		var recovery=f.kind=="champion" and not f.attack.is_empty() and f.attack.age>f.attack.to
 		var reaction=a.duplicate()
 		if boss_committed: reaction.knock=false
-		m.hurt(f,reaction)
+		if not a.get("no_stun",false) or f.hp<=0:m.hurt(f,reaction)
 		if f.hp>0 and (committed or boss_committed):
 			f.hurtTicks=0
 			f.recoil=0
@@ -1242,8 +1242,9 @@ func archer_test():
 		if arrow.attached:break
 	assert(arrow.attached and hero.hp<85,"Arrow must hit and embed with high damage")
 	assert(not blood.drops.is_empty(),"Arrow impact must emit blood")
-	arrow.advance(1.01)
-	assert(arrow.is_queued_for_deletion(),"Embedded arrow must expire in one second")
+	assert(hero.hurtTicks==0 and hero.recovering==0 and hero.recoil==0,"Arrow hits must not stun")
+	arrow.advance(.51)
+	assert(arrow.is_queued_for_deletion(),"Embedded arrow must expire in half a second")
 	var miss=load("res://scripts/arrow.gd").new()
 	arena_clip.add_child(miss)
 	miss.setup(self,archer)
@@ -1252,7 +1253,7 @@ func archer_test():
 		miss.advance(1.0/120)
 		if miss.stuck>=0:break
 	assert(miss.stuck>=0 and not miss.attached and miss.point.z==0,"Missed arrow must land under gravity")
-	miss.advance(1.01)
+	miss.advance(.51)
 	assert(miss.is_queued_for_deletion())
 	print("CAIRN_ARCHER_OK: retreat, draw, ballistic hit, blood, embedding and expiry")
 	get_tree().quit()
