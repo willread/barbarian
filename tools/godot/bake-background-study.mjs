@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {interiorWeights,sampleInterior} from './background-sampling.mjs';
 import path from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 const dir='studies/backgrounds/citadel-01-v5';
@@ -13,6 +14,7 @@ ctx.drawImage(await loadImage('studies/backgrounds/citadel-01-v3/base.png'),0,0,
 const pixels=ctx.getImageData(0,0,w,h).data;
 function mask(poly){const c=createCanvas(w,h),g=c.getContext('2d');g.fillStyle='white';g.beginPath();poly.forEach(([x,y],i)=>i?g.lineTo(x*w,y*h):g.moveTo(x*w,y*h));g.closePath();g.fill();return g.getImageData(0,0,w,h).data}
 const masks=m.regions.map(r=>mask(r.polygon)),flame=mask(m.regions[1].motion_polygon);
+const waterInterior=interiorWeights(masks[0],w,h);
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 const mix=(a,b,t)=>a+(b-a)*t;
 function sample(x,y,k){x=Math.max(0,Math.min(w-1,x));y=Math.max(0,Math.min(h-1,y));const ix=Math.floor(x),iy=Math.floor(y),jx=Math.min(w-1,ix+1),jy=Math.min(h-1,iy+1);return mix(mix(pixels[(iy*w+ix)*4+k],pixels[(iy*w+jx)*4+k],x-ix),mix(pixels[(jy*w+ix)*4+k],pixels[(jy*w+jx)*4+k],x-ix),y-iy)}
@@ -30,7 +32,12 @@ for(let r=0;r<m.regions.length;r++){
    else {dx=.002*Math.sin(yy/h*170+t*Math.PI*2)*w;dy=-.032*h;amount=coverage(flame,xx,yy)}
    const ax=xx-dx*(a-.5),ay=yy-dy*(a-.5),bx=xx-dx*(b-.5),by=yy-dy*(b-.5),ma=coverage(r===0?masks[0]:flame,ax,ay),mb=coverage(r===0?masks[0]:flame,bx,by);
    const warm=smooth(.035,.20,(sample(xx,yy,0)-sample(xx,yy,2))/255),pulse=r?1+warm*(.09*Math.sin(t*Math.PI*2)+.045*Math.sin(t*Math.PI*5+xx/w*9)):1;
-   for(let k=0;k<3;k++){const original=sample(xx,yy,k);out.data[idx+k]=mix(original,mix(original,sample(ax,ay,k),ma)*wa+mix(original,sample(bx,by,k),mb)*wb,amount)*pulse}out.data[idx+3]=Math.round(alpha*255);
+   for(let k=0;k<3;k++){const original=sample(xx,yy,k);if(r===0){
+    const sa=sampleInterior(pixels,waterInterior,w,h,ax,ay,k),sb=sampleInterior(pixels,waterInterior,w,h,bx,by,k);
+    const weightA=sa===null?0:wa,weightB=sb===null?0:wb,total=weightA+weightB;
+    const moving=total>1e-6?((sa??0)*weightA+(sb??0)*weightB)/total:original;
+    out.data[idx+k]=mix(original,moving,amount*waterInterior[yy*w+xx]);
+   }else out.data[idx+k]=mix(original,mix(original,sample(ax,ay,k),ma)*wa+mix(original,sample(bx,by,k),mb)*wb,amount)*pulse}out.data[idx+3]=Math.round(alpha*255);
   }
   fg.putImageData(out,0,0);ag.drawImage(frame,(f%8)*cw,Math.floor(f/8)*ch);
  }
