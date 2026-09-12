@@ -14,9 +14,9 @@ func _ready():
 	picture.region=Rect2(0,0,1774,887)
 	flat=load("res://art/maximum-force-white-v2.png")
 	white_layer=Node2D.new()
-	var additive=CanvasItemMaterial.new()
-	additive.blend_mode=CanvasItemMaterial.BLEND_MODE_ADD
-	white_layer.material=additive
+	var transparent_logo=ShaderMaterial.new()
+	transparent_logo.shader=preload("res://shaders/white_logo.gdshader")
+	white_layer.material=transparent_logo
 	white_layer.draw.connect(draw_white_logo)
 	add_child(white_layer)
 	ResourceLoader.load_threaded_request("res://main.tscn")
