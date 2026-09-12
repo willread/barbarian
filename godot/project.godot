@@ -2,6 +2,8 @@ config_version=5
 
 [application]
 config/name="Cairn"
+config/icon="res://art/branding/cairn-icon-256.png"
+config/windows_native_icon="res://art/branding/cairn.ico"
 run/main_scene="res://boot.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 

@@ -100,3 +100,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Enemy death flame flutter revision: four independently generated ElevenLabs effects, replacing crackling death-fire options. Exact prompts and unprocessed sources: `soundboard/death_fire/flutter-v2/`. Soft onset/fade, 2.4 kHz low-pass and -19 LUFS normalization; option 1 supplies the default. Generated with `tools/audio/death_fire.mjs`.
 
 - Four additional axe swing variants (axe-5 through axe-8), generated independently with ElevenLabs from prompts based on Heavy chop: tighter, darker, rougher and weightier. Original options and default preserved. Prompts and raw sources: `soundboard/axe-heavy-chop/`; generator: `tools/audio/axe-heavy-chop.mjs`. Same -18 LUFS preparation as the reference option.
+
+- Cairn stacked-stone app mark: built-in image generation from user-supplied Cairn A reference (2026-09-12). Master, PNG sizes, Windows ICO and prompt provenance in `godot/art/branding/`.

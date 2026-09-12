@@ -1,0 +1,4 @@
+# Cairn standalone mark
+Generated with the built-in image generation tool, 2026-09-12, using the stacked stones inside the supplied Cairn A as reference. Original generated alpha preserved. PNG and multi-resolution ICO variants resized with Pillow Lanczos.
+
+Prompt: Create a polished standalone game logo symbol and application icon for CAIRN, based on the three stacked stones inside the A in the reference. Exactly three irregular flattened stones: broad heavy base, medium middle, small capstone. Remove surrounding A. No lettering, border or ground plane. Weathered dark bronze-gold stone, realistic dimensional bevels, chipped rocky surfaces, restrained warm gold edge highlights and dark crevices. Dark fantasy aesthetic. Strong readable silhouette and separation at 32 pixels. Centered square with transparent margins; actual transparent background, no cast shadow outside the object. Production raster icon, not a mockup.

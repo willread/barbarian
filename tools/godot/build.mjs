@@ -45,7 +45,7 @@ for(const target of targets){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');
   const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><svg class="metal-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-label="Maximum Force"><image href="maximum-force-logo.png" width="1774" height="887" /></svg><svg class="flat-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-hidden="true"><defs><mask id="studio-white-shape" maskUnits="userSpaceOnUse" x="0" y="0" width="1774" height="887" style="mask-type:luminance"><image href="maximum-force-white-v2.png" width="1774" height="887" /></mask></defs><rect width="1774" height="887" fill="white" mask="url(#studio-white-shape)" /></svg></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
-  html=html.replace('</head>',`<link rel="preload" as="image" href="maximum-force-logo.png"><link rel="preload" as="image" href="maximum-force-white-v2.png"><link rel="preload" as="image" href="studio-background.png"><style>
+  html=html.replace('</head>',`<link rel="icon" type="image/png" sizes="32x32" href="cairn-icon-32.png"><link rel="icon" href="cairn.ico"><link rel="apple-touch-icon" href="cairn-icon-180.png"><link rel="preload" as="image" href="maximum-force-logo.png"><link rel="preload" as="image" href="maximum-force-white-v2.png"><link rel="preload" as="image" href="studio-background.png"><style>
 html,body{background:#000!important}
 #cairn-loader{position:fixed;inset:0;display:grid;place-items:center;background:#000 url(studio-background.png) center/cover no-repeat;z-index:9999;pointer-events:auto}
 #cairn-loader .studio-art{position:relative;width:min(68vw,101.7vh);aspect-ratio:2/1;z-index:1}
@@ -83,6 +83,7 @@ cairnCheck();
   fs.copyFileSync('godot/art/maximum-force-reference.png',path.join(path.dirname(file),'maximum-force-reference.png'));
   fs.copyFileSync('godot/art/studio-background.png',path.join(path.dirname(file),'studio-background.png'));
   fs.copyFileSync('godot/art/maximum-force-logo.png',path.join(path.dirname(file),'maximum-force-logo.png'));
+  for(const icon of ['cairn.ico','cairn-icon-32.png','cairn-icon-180.png'])fs.copyFileSync('godot/art/branding/'+icon,path.join(path.dirname(file),icon));
   fs.writeFileSync(file,html);
  }
  console.log(`${target}: ${file}`);
