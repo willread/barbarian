@@ -46,6 +46,7 @@ var displayed_health=100.0
 var displayed_mana=0.0
 var spell=-1
 var next_id=0
+var title_intro=0.0
 var clock=0.0
 var wave_time=0.0
 var accumulator=0.0
@@ -210,7 +211,9 @@ func change_phase(next: String):
 	if next=="paused":
 		options=false
 		settings_page=""
-	if next=="title": pause_cover=0.0
+	if next=="title":
+		pause_cover=0.0
+		title_intro=0.0
 	phase=next
 	overlay.z_index=2090 if next in ["lost","won","paused"] else 2000
 	keys.clear()
@@ -659,6 +662,7 @@ func _process(raw: float):
 	for child in get_children():
 		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
 	raw=min(raw,.25)
+	if phase=="title" and not loading_menu: title_intro=min(2.2,title_intro+raw)
 	if hit_stop>0 and phase=="playing":
 		hit_stop=max(0.,hit_stop-raw)
 		return
@@ -1074,7 +1078,16 @@ func draw_overlay():
 		var safe_width=2.*max(1.,min(center-gutter,open_right-center))
 		var width=min(safe_width,(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6)
 		var size=title_logo.get_size()*width/title_logo.get_width()
-		overlay.draw_texture_rect(title_logo,Rect2(Vector2(center-size.x*.5,screen_size.y*.1),size),false)
+		var t=clampf(title_intro/2.2,0.,1.)
+		# Integrated asymmetric velocity: accelerate briefly, then settle over a longer tail.
+		var travel=1.-pow(1.-t,5)*(1.+5.*t)
+		var zoom=lerpf(.24,1.,travel)
+		var unrest=sin(PI*t)*pow(1.-t,2)
+		var drift=Vector2(sin(t*37.)+sin(t*61.+.7)*.35,cos(t*43.)*.65)*unrest*15.
+		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+Vector2(0,26.*(1.-travel))+drift
+		overlay.draw_set_transform(pivot,sin(t*31.)*unrest*.025,Vector2.ONE*zoom)
+		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.55,t)))
+		overlay.draw_set_transform(Vector2.ZERO)
 	if phase=="won":
 		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
 		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))
