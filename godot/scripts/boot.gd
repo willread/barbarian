@@ -10,6 +10,8 @@ func _ready():
 	if OS.has_feature("web") or (not OS.get_cmdline_user_args().is_empty() and not "--splash-capture" in OS.get_cmdline_user_args()):
 		get_tree().change_scene_to_file.call_deferred("res://main.tscn")
 		return
+	get_window().size_changed.connect(fit_window)
+	fit_window()
 	picture=AtlasTexture.new()
 	picture.atlas=load("res://art/maximum-force-logo.png")
 	picture.region=Rect2(0,0,1774,887)
@@ -42,7 +44,7 @@ func _draw():
 	draw_texture_rect(backdrop,Rect2((screen-bg)*.5,bg),false)
 	var blend=smoothstep(3.0,4.2,elapsed)
 	draw_rect(Rect2(Vector2.ZERO,screen),Color(0,0,0,blend))
-	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
+	var ratio=min(screen.x*.476/picture.get_width(),screen.y*.364/picture.get_height())
 	var size=picture.get_size()*ratio
 	var bounds=Rect2((screen-size)*.5,size)
 	draw_texture_rect(picture,bounds,false,Color(1,1,1,1.-blend))
@@ -69,6 +71,13 @@ func _draw():
 
 func draw_white_logo():
 	var screen=get_viewport_rect().size
-	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
+	var ratio=min(screen.x*.476/picture.get_width(),screen.y*.364/picture.get_height())
 	var size=picture.get_size()*ratio
 	white_layer.draw_texture_rect(flat,Rect2((screen-size)*.5,size),false,Color(1,1,1,smoothstep(3.0,4.2,elapsed)))
+
+func fit_window():
+	var dimensions=get_window().size
+	var target=Vector2i(1440,roundi(1440.0*dimensions.y/maxi(1,dimensions.x)))
+	if get_window().content_scale_size!=target:get_window().content_scale_size=target
+	queue_redraw()
+	if is_instance_valid(white_layer):white_layer.queue_redraw()
