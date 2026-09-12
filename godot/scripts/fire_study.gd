@@ -24,6 +24,7 @@ func _ready():
 		face.position=Vector2(-meta.width*.5,0)
 		face.scale=Vector2(meta.width,meta.height)/face.texture.get_size()
 		group.add_child(face)
+		fire.heat_face(face,meta)
 		faces.append(face)
 	select(0)
 	if "--study-capture" in OS.get_cmdline_user_args(): capture.call_deferred()
@@ -31,7 +32,6 @@ func select(index: int):
 	selected=posmod(index,2)
 	for i in 2:
 		fires[i].emitting=i==selected
-		faces[i].modulate=Color(1.15,1.1,1.04) if i==selected else Color.WHITE
 func _input(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		if event.keycode in [KEY_UP,KEY_DOWN,KEY_TAB]:select(selected+1)
