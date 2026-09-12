@@ -29,7 +29,7 @@ func _init():
 	var enemy_ai=CairnEnemies.new(m,data.roster)
 	for i in 100:
 		var plan=enemy_ai.plan()
-		assert(plan.size()==8 and plan[7]==["champion"])
+		assert(plan.size()==9 and plan[8]==["champion"])
 		assert(plan[0][0]=="archer")
 		var types=[]
 		for wave in plan:
@@ -38,4 +38,5 @@ func _init():
 		assert(types.size()==6)
 	print("CAIRN_PARITY_OK: ",checked," frame snapshots, weapon timing and 100 encounter plans")
 	quit()
+
 

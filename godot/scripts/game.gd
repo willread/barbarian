@@ -367,7 +367,7 @@ func start_game():
 	swapped=true
 
 func screen_for_wave(number: int) -> int:
-	return 4 if number>=8 else 3 if number>=5 else 2 if number>=3 else 1
+	return clampi(1+int((number-1)/2),1,4)
 
 func spawn_wave():
 	for enemy in enemies:
@@ -1103,7 +1103,7 @@ func draw_hud():
 	hud.draw_set_transform(Vector2.ZERO)
 	center_text(hud,"SCORE",Vector2(1758*s+extra,810+83*252.0/380),22,Color("eedbb0"))
 	center_text(hud,"%06d"%score,Vector2(1758*s+extra,810+182*252.0/380),52,Color("eedbb0"))
-	center_text(hud,"FINAL DUEL" if wave==8 else "THE CITADEL",Vector2(1758*s+extra,810+281*252.0/380),22,Color("eedbb0"))
+	center_text(hud,"FINAL DUEL" if wave==encounters.size() else "THE CITADEL",Vector2(1758*s+extra,810+281*252.0/380),22,Color("eedbb0"))
 
 func draw_overlay():
 	if phase=="title":

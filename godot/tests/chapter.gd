@@ -18,7 +18,7 @@ func check():
 	game.menu_action("THE FALLEN CITADEL")
 	assert(game.phase=="playing" and game.background.key=="citadel-1")
 	game.set_process(false)
-	for pair in [[1,1],[2,1],[3,2],[4,2],[5,3],[7,3],[8,4]]:
+	for pair in [[1,1],[2,1],[3,2],[4,2],[5,3],[6,3],[7,4],[8,4],[9,4]]:
 		game.wave=pair[0]
 		game.spawn_wave()
 		assert(game.background.key=="citadel-%d"%pair[1])

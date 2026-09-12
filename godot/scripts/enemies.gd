@@ -8,7 +8,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster["archer"]={"hp":6,"speed":1.05}
 
 func plan() -> Array:
-	var themes=["legion","bone","shield","marauder","archer","shield","archer"]
+	var themes=["legion","bone","shield","marauder","archer","shield","archer","legion"]
 	themes.shuffle()
 	var result=[]
 	for i in themes.size():
