@@ -47,7 +47,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		if animate:
 			group.position.y=y-1224
 			var tween=create_tween()
-			tween.tween_interval((labels.size()-1-i)*.48)
+			tween.tween_interval((labels.size()-1-i)*.24)
 			tween.tween_property(group,"position:y",y,.3264).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 			tween.tween_property(group,"position:y",y+2.6,.024)
 			tween.tween_property(group,"position:y",y-4.9,.048).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
