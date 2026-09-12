@@ -120,3 +120,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Gulp: ElevenLabs text-to-sound v2, generated with `tools/audio/gulp.mjs`; prompt retained in `godot/audio/gulp-prompt.json`.
 
 - Weapon concept board: studies/weapons/armory-v1.png, built-in imagegen using the existing weapons-v8.png as reference. Design only; twelve rigid one-handed weapon concepts.
+
+- Selected armory sprites: imagegen recreation of approved concept board, `asset-sources/art/armory-selected-v1.png`; extraction and hand pivots in `tools/godot/bake-armory.mjs`. Four axe-behavior skins, no additional combat mechanics.

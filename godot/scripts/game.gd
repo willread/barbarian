@@ -42,6 +42,8 @@ var voice_enabled=true
 var master_volume=100
 var loading_menu=false
 var muted=false
+const WEAPON_CHOICES=["gravecleaver","blacktooth","barrow_star","gatebreaker"]
+var weapon_skin="gravecleaver"
 var weapon="axe"
 var chapter_select=false
 var wave=1
@@ -145,6 +147,9 @@ func _ready():
 		music_enabled=settings.get_value("audio","music",true)
 		voice_enabled=settings.get_value("audio","voice",true)
 		master_volume=clampi(settings.get_value("audio","volume",100),0,100)
+		weapon_skin=settings.get_value("game","weapon","gravecleaver")
+		if weapon_skin not in WEAPON_CHOICES:weapon_skin="gravecleaver"
+	weapon="sword" if weapon_skin=="sword" else "axe"
 	apply_settings(false)
 	var soundboard=preload("res://scripts/soundboard.gd").new()
 	soundboard.audio=audio
@@ -252,6 +257,10 @@ func change_phase(next: String):
 	responsive_layout()
 
 func menu_action(label: String):
+	if label.begins_with("WEAPON: "):
+		cycle_weapon(1)
+		refresh_settings(0)
+		return
 	match label:
 		"BEGIN":
 			chapter_select=true
@@ -265,7 +274,7 @@ func menu_action(label: String):
 			options=true
 			settings_page="root"
 			menu.switch_items(option_labels(),phase=="title")
-		"SOUND","DISPLAY":
+		"SOUND","DISPLAY","GAME":
 			settings_page=label.to_lower()
 			menu.switch_items(option_labels(),phase=="title")
 		"BACK":
@@ -273,7 +282,7 @@ func menu_action(label: String):
 				chapter_select=false
 				menu.switch_items(["BEGIN","OPTIONS","QUIT"],true)
 				return
-			if settings_page in ["sound","display"]:
+			if settings_page in ["sound","display","game"]:
 				settings_page="root"
 				menu.switch_items(option_labels(),phase=="title")
 			else:
@@ -312,7 +321,8 @@ func menu_action(label: String):
 func option_labels() -> Array:
 	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
-	return ["SOUND","DISPLAY","BACK"]
+	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"BACK"]
+	return ["GAME","SOUND","DISPLAY","BACK"]
 
 func refresh_settings(index: int):
 	menu.show_items(option_labels(),phase=="title",false)
@@ -323,6 +333,7 @@ func apply_settings(persist: bool=true):
 	AudioServer.set_bus_mute(0,master_volume==0)
 	if persist:
 		var config=ConfigFile.new()
+		config.set_value("game","weapon",weapon_skin)
 		config.set_value("audio","muted",muted)
 		config.set_value("audio","music",music_enabled)
 		config.set_value("audio","voice",voice_enabled)
@@ -357,6 +368,7 @@ func start_game():
 	wipe=null
 	hero=make_actor(-140,660,100,true)
 	hero.weapon=weapon
+	hero["weapon_skin"]=weapon_skin
 	wave=1
 	score=0
 	kills=0
@@ -847,6 +859,10 @@ func _input(event: InputEvent):
 			apply_settings()
 			refresh_settings(3)
 			return
+		if options and settings_page=="game" and menu.selected==0 and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
+			cycle_weapon(-1 if event.keycode==KEY_LEFT else 1)
+			refresh_settings(0)
+			return
 		menu.handle(event)
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
@@ -862,9 +878,15 @@ func _input(event: InputEvent):
 			if not keys.has(code): pressed[code]=true
 			keys[code]=true
 
-func toggle_weapon():
-	weapon="sword" if weapon=="axe" else "axe"
+func cycle_weapon(direction: int):
+	weapon_skin=WEAPON_CHOICES[posmod(WEAPON_CHOICES.find(weapon_skin)+direction,WEAPON_CHOICES.size())]
+	weapon="sword" if weapon_skin=="sword" else "axe"
 	hero.weapon=weapon
+	hero["weapon_skin"]=weapon_skin
+	apply_settings()
+
+func toggle_weapon():
+	cycle_weapon(1)
 
 func _notification(what: int):
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT and phase=="playing" and is_instance_valid(menu): change_phase("paused")
@@ -874,8 +896,8 @@ func drop_gear(f: Dictionary):
 	if not art.has_separate_weapon(f):return # Archer gear burns with the body; minotaurs fight bare-handed.
 	var pieces=[]
 	if f.player or f.kind=="champion":
-		var w=art.data.weapons[weapon if f.player else "axe"]
-		pieces.append([art.data.atlases["weapons-v8"].cels[int(w.frame)].file,w.length if f.player else 182])
+		var w=art.weapon_data(f) if f.player else art.data.weapons["axe"]
+		pieces.append([art.weapon_cel(w).file,w.length if f.player else 182])
 	else:
 		pieces.append([art.data.atlases["enemy-equipment-v1"].cels[0 if f.kind=="bone" else 1 if f.kind=="shield" else 2].file,108 if f.kind=="shield" else 140])
 		if f.kind=="shield": pieces.append([art.data.atlases["enemy-equipment-v1"].cels[3].file,158])

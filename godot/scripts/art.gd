@@ -2,10 +2,12 @@ class_name CairnArt
 extends RefCounted
 var data: Dictionary
 var textures: Dictionary={}
+var armory: Dictionary={}
 const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
+	armory=JSON.parse_string(FileAccess.get_file_as_string("res://art/armory.json"))
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
 	data.atlases["enemy-legion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/minotaur-atlas.json"))
@@ -77,15 +79,23 @@ func layout(p: Array) -> Dictionary:
 	var rig=cel.get("rig",{})
 	return {"atlas":atlas,"cel":cel,"rig":rig}
 
+func weapon_data(f: Dictionary) -> Dictionary:
+	var skin=f.get("weapon_skin","")
+	if f.weapon=="axe" and armory.has(skin):return armory[skin]
+	return data.weapons[f.weapon]
+
+func weapon_cel(w: Dictionary) -> Dictionary:
+	return w if w.has("file") else data.atlases["weapons-v8"].cels[int(w.frame)]
+
 func weapon_tip(f: Dictionary,p: Array) -> Vector2:
 	var l=layout(p)
 	var r=l.rig
-	var w=data.weapons[f.weapon]
+	var w=weapon_data(f)
 	return Vector2(f.x,f.y-f.height*4.5)+Vector2((r.grip[0]+sin(r.angle)*w.length*w.grip)*f.dir,r.grip[1]-cos(r.angle)*w.length*w.grip)
 
 func hit_box(f: Dictionary,p: Array) -> Array:
 	var r=layout(p).rig
-	var w=data.weapons[f.weapon]
+	var w=weapon_data(f)
 	var tip=Vector2(r.grip[0]+sin(r.angle)*w.length*w.grip,r.grip[1]-cos(r.angle)*w.length*w.grip)
 	var radius=17 if f.weapon=="axe" else 7
 	return [(min(r.grip[0],tip.x)-radius)/4.5,(abs(tip.x-r.grip[0])+radius*2)/4.5,(min(r.grip[1],tip.y)-radius)/4.5,(abs(tip.y-r.grip[1])+radius*2)/4.5]
@@ -113,11 +123,11 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 	var l=layout(p)
 	if f.player:
 		if l.rig.behind!=behind: return
-		var w=data.weapons[f.weapon]
-		var cel=data.atlases["weapons-v8"].cels[int(w.frame)]
-		var width=w.length*cel.width/cel.height*w.get("width",1)
+		var w=weapon_data(f)
+		var cel=weapon_cel(w)
+		var width=w.length*cel.width/cel.height*(1.0 if w.has("file") else w.get("width",1))
 		node.draw_set_transform(Vector2(l.rig.grip[0],l.rig.grip[1]),l.rig.angle)
-		node.draw_texture_rect(texture(cel.file),Rect2(-width*.5,-w.length*w.grip,width,w.length),false)
+		node.draw_texture_rect(texture(cel.file),Rect2(-width*w.get("pivot",.5),-w.length*w.grip,width,w.length),false)
 	elif f.kind!="legion":
 		var meta=data.enemyArt.bodySheets[NAMES[f.kind]]
 		var s=HEIGHTS[f.kind]/data.atlases[p[0]].cels[0].height

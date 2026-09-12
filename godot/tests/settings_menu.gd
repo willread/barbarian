@@ -7,7 +7,7 @@ func check():
 	var menu=load("res://scripts/menu.gd").new()
 	root.add_child(menu)
 	menu.setup(art)
-	for labels in [["SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOICE: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
+	for labels in [["GAME","SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOICE: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
 		menu.show_items(labels,true,false)
 		assert(menu.items.size()==labels.size())
 		for item in menu.items:assert(item.face.texture!=null)
@@ -15,7 +15,7 @@ func check():
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/settings-"+str(labels.size())+".png")
-	for labels in [["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],["SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOICE: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
+	for labels in [["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],["GAME","SOUND","DISPLAY","BACK"],["SOUND: ON","MUSIC: ON","VOICE: ON","VOLUME: 100","BACK"],["FULLSCREEN: OFF","BACK"]]:
 		menu.show_items(labels,false,false)
 		for viewport in [Vector2(1440,810),Vector2(810,1440),Vector2(1920,810)]:
 			menu.layout_screen(viewport,false)
@@ -26,6 +26,12 @@ func check():
 			assert(bounds.get_center().distance_to(viewport*.5)<.01)
 			assert(bounds.position.x>=0 and bounds.end.x<=viewport.x)
 			assert(bounds.position.y>=0 and bounds.end.y<=viewport.y)
+	for skin in ["gravecleaver","blacktooth","barrow_star","gatebreaker"]:
+		assert(art.data.menu.has("WEAPON: "+skin.replace("_"," ").to_upper()))
+		var f={"weapon":"axe","weapon_skin":skin}
+		var w=art.weapon_data(f)
+		assert(w.length>=150 and w.length<=180 and w.pivot>0 and w.pivot<1)
+		assert(art.texture(w.file)!=null)
 	assert(art.data.menu.has("QUIT"))
 	menu.free()
 	print("CAIRN_SETTINGS_OK: nested menus and 101 distinct stone volume labels")

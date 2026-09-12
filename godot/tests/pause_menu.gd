@@ -15,7 +15,7 @@ func check():
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/pause-menu.png")
 	game.menu_action("OPTIONS")
 	await create_timer(.6).timeout
-	assert(not game.menu.title_mode and game.menu.items[0].label=="SOUND")
+	assert(not game.menu.title_mode and game.menu.items[0].label=="GAME")
 	game.menu_action("SOUND")
 	await create_timer(.6).timeout
 	assert(not game.menu.title_mode and game.menu.items.size()==5)

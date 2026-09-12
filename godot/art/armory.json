@@ -1,0 +1,34 @@
+{
+  "gravecleaver": {
+    "file": "../art/weapon-gravecleaver.png",
+    "width": 387,
+    "height": 789,
+    "length": 160,
+    "grip": 0.8,
+    "pivot": 0.14987080103359174
+  },
+  "blacktooth": {
+    "file": "../art/weapon-blacktooth.png",
+    "width": 243,
+    "height": 837,
+    "length": 180,
+    "grip": 0.85,
+    "pivot": 0.49382716049382713
+  },
+  "barrow_star": {
+    "file": "../art/weapon-barrow_star.png",
+    "width": 326,
+    "height": 746,
+    "length": 150,
+    "grip": 0.81,
+    "pivot": 0.49693251533742333
+  },
+  "gatebreaker": {
+    "file": "../art/weapon-gatebreaker.png",
+    "width": 380,
+    "height": 647,
+    "length": 150,
+    "grip": 0.8,
+    "pivot": 0.44473684210526315
+  }
+}
