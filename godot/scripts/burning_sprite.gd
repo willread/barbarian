@@ -29,7 +29,7 @@ func setup(texture: Texture2D,rect: Rect2,flip: bool,seed_value: float):
 	body.texture=mask_view.get_texture()
 	body.position=rect.position
 	add_child(body)
-	anchor=Vector2(rect.get_center().x,rect.end.y)
+	anchor=rect.get_center()
 	fire=ContourFire.new()
 	fire.animation_speed=SPEED
 	add_child(fire)
@@ -42,6 +42,6 @@ func update_burn(age: float,engulf: float):
 	fire.strength=1.8*(1.-smoothstep(end-.6,end,age))
 	fire.interior=smoothstep(.08,.55,age)
 	var consumed=smoothstep(end-.65,end+.35,age)
-	fire.scale=Vector2(lerpf(1.,.4,consumed),lerpf(1.,.12,consumed))
+	fire.scale=Vector2(lerpf(1.,.4,consumed),lerpf(1.,.4,consumed))
 	fire.position=anchor*(Vector2.ONE-fire.scale)
 	fire.opacity=1.-smoothstep(end-.2,finished_at(engulf),age)
