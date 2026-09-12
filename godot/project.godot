@@ -7,6 +7,9 @@ config/windows_native_icon="res://art/branding/cairn.ico"
 run/main_scene="res://boot.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
+[autoload]
+WindowPreferences="*res://scripts/window_preferences.gd"
+
 [display]
 window/size/viewport_width=1440
 window/size/viewport_height=810

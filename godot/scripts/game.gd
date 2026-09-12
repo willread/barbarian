@@ -270,7 +270,9 @@ func menu_action(label: String):
 		"QUIT":
 			if OS.has_feature("web"):
 				JavaScriptBridge.eval("window.close(); setTimeout(() => alert('You can close this tab to quit Cairn.'), 100);")
-			else: get_tree().quit()
+			else:
+				WindowPreferences.save_window()
+				get_tree().quit()
 		"QUIT TO TITLE":
 			clear_world()
 			if is_instance_valid(wipe): wipe.queue_free()
