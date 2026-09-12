@@ -816,10 +816,16 @@ func draw_hud():
 		var top=70+i*140
 		var value=displayed_health if i==0 else displayed_mana
 		var colors=[Color("bf221e"),Color("710807")] if i==0 else [Color("269bff"),Color("074891")]
-		for row in 77:
-			var color=colors[0].lerp(colors[1],row/78.0)
-			var inset=max(0,7-min(row,76-row))
-			hud.draw_rect(Rect2(298+inset,top+17+row,max(0,min(901-inset,901*clamp(value/100,0,1))-inset),1),color)
+		# One solid polygon survives downscaling; one-pixel scanlines can vanish in WebGL.
+		var fill_width=901*clamp(value/100.,0.,1.)
+		if fill_width>0:
+			var left=298.0
+			var right=left+fill_width
+			var upper=top+17.0
+			var lower=upper+77.0
+			var bevel=min(7.,fill_width*.5)
+			var points=PackedVector2Array([Vector2(left+bevel,upper),Vector2(right-bevel,upper),Vector2(right,upper+bevel),Vector2(right,lower-bevel),Vector2(right-bevel,lower),Vector2(left+bevel,lower),Vector2(left,lower-bevel),Vector2(left,upper+bevel)])
+			hud.draw_polygon(points,PackedColorArray([colors[0],colors[0],colors[0],colors[1],colors[1],colors[1],colors[1],colors[0]]))
 		if i==1 and can_cast(): hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
 	var spec=art.data.weapons[weapon]
 	var cel=art.data.atlases["weapons-v8"].cels[int(spec.frame)]
@@ -1058,6 +1064,8 @@ func layout_test():
 			assert(point.y>=0 and point.y+item.height*menu.scale.y<=screen_size.y)
 		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/layout-title-%d.png"%dimensions.x)
 		start_game()
+		magic=60
+		displayed_mana=60
 		await get_tree().create_timer(.2).timeout
 		transition=-1
 		stage_walk=""
@@ -1069,5 +1077,12 @@ func layout_test():
 		assert(abs(hud.position.x)<.001)
 		assert(abs(hud.to_global(Vector2(screen_size.x/hud.scale.x,1062)).x-screen_size.x)<.001)
 		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/layout-game-%d.png"%dimensions.x)
+		var capture=get_viewport().get_texture().get_image()
+		var pixel_scale=Vector2(capture.get_size())/screen_size
+		var extra=screen_size.x/hud.scale.x-1440.
+		for meter in 2:
+			var point=hud.to_global(Vector2(298*1440./2172.+(901*1440./2172.+extra)*.25,810+(125+meter*140)*252./380.))*pixel_scale
+			var color=capture.get_pixel(int(point.x),int(point.y))
+			assert(color.r>color.g*1.4 if meter==0 else color.b>color.r*1.4,"HUD fill must survive responsive downscaling")
 	print("CAIRN_LAYOUT_OK: landscape, ultrawide, portrait; menu bounds and HUD anchor")
 	get_tree().quit()
