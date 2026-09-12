@@ -669,7 +669,7 @@ func _process(raw: float):
 	for child in get_children():
 		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
 	raw=min(raw,.25)
-	if phase=="title" and not loading_menu: title_intro=min(2.2,title_intro+raw)
+	if phase=="title" and not loading_menu: title_intro=min(1.1,title_intro+raw)
 	if hit_stop>0 and phase=="playing":
 		hit_stop=max(0.,hit_stop-raw)
 		return
@@ -1083,15 +1083,18 @@ func draw_overlay():
 		var safe_width=2.*max(1.,min(center-gutter,open_right-center))
 		var width=min(safe_width,(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6)
 		var size=title_logo.get_size()*width/title_logo.get_width()
-		var t=clampf(title_intro/2.2,0.,1.)
-		# Integrated asymmetric velocity: accelerate briefly, then settle over a longer tail.
-		var travel=1.-pow(1.-t,5)*(1.+5.*t)
-		var zoom=lerpf(.24,1.,travel)
-		var unrest=sin(PI*t)*pow(1.-t,2)
-		var drift=Vector2(sin(t*37.)+sin(t*61.+.7)*.35,cos(t*43.)*.65)*unrest*15.
-		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+Vector2(0,26.*(1.-travel))+drift
-		overlay.draw_set_transform(pivot,sin(t*31.)*unrest*.025,Vector2.ONE*zoom)
-		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.55,t)))
+		var t=clampf(title_intro/1.1,0.,1.)
+		# Hard arrival at 0.6 seconds, then two compact heavy rebounds.
+		var approach=clampf(t/.55,0.,1.)
+		var travel=1.-pow(1.-approach,3)*(1.+3.*approach)
+		var landing=clampf((t-.55)/.45,0.,1.)
+		var bounce=sin(landing*PI*3.)*pow(1.-landing,2)
+		var zoom=lerpf(.24,1.,travel)+bounce*.105
+		var unrest=sin(PI*approach)*.8+abs(bounce)*.65
+		var drift=Vector2(sin(t*101.)+sin(t*157.+.7)*.35,cos(t*127.)*.65)*unrest*17.
+		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+Vector2(0,26.*(1.-travel)+bounce*15.)+drift
+		overlay.draw_set_transform(pivot,sin(t*113.)*unrest*.035,Vector2.ONE*zoom)
+		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
 		overlay.draw_set_transform(Vector2.ZERO)
 	if phase=="won":
 		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
