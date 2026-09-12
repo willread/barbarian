@@ -6,6 +6,7 @@ var selected=0
 var clock=0.0
 var switching=false
 var title_mode=true
+var screen_size=Vector2(1440,810)
 
 func setup(source: CairnArt):
 	art=source
@@ -48,6 +49,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 			tween.tween_property(group,"position:y",y-4.9,.048).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 			tween.tween_property(group,"position:y",y,.0816).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	select(0,false)
+	layout_screen(screen_size,is_title)
 
 func switch_items(labels: Array,is_title: bool=true):
 	if switching: return
@@ -87,7 +89,7 @@ func handle(event: InputEvent):
 		if event.keycode in [KEY_UP,KEY_W]: select(selected-1)
 		if event.keycode in [KEY_ENTER,KEY_SPACE]: activate()
 	if event is InputEventMouseMotion or event is InputEventMouseButton:
-		var mouse=get_global_mouse_position()
+		var mouse=get_local_mouse_position()
 		for i in items.size():
 			var item=items[i]
 			if Rect2(item.node.position-Vector2(item.width*.5,0),Vector2(item.width,item.height)).has_point(mouse):
@@ -100,3 +102,11 @@ func _process(dt: float):
 	if not visible: return
 	for item in items: item.fire.set_process(visible)
 
+
+func layout_screen(size: Vector2,is_title: bool):
+	screen_size=size
+	var tall=size.y>1200
+	var factor=clamp(size.y/810.,.55,1.45) if is_title else clamp(size.y/1062.,.55,1.3)
+	scale=Vector2.ONE*factor
+	var anchor=Vector2(size.x*.5 if tall or not is_title else size.x*.32,size.y*.48 if is_title else size.y*.54)
+	position=anchor-Vector2(417.6 if is_title else 720.,380.7 if is_title else 430.)*factor

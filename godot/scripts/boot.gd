@@ -1,15 +1,13 @@
 extends Node2D
-var picture: AtlasTexture
+var picture: Texture2D
+var backdrop=preload("res://art/studio-background.png")
 var elapsed=0.0
 func _ready():
 	# Browser has an HTML splash while the engine itself downloads.
 	if OS.has_feature("web") or (not OS.get_cmdline_user_args().is_empty() and not "--splash-capture" in OS.get_cmdline_user_args()):
 		get_tree().change_scene_to_file.call_deferred("res://main.tscn")
 		return
-	picture=AtlasTexture.new()
-	picture.atlas=load("res://art/maximum-force-reference.png")
-	var source=picture.atlas.get_size()
-	picture.region=Rect2(0,source.y*.125,source.x*.5,source.y*.75)
+	picture=load("res://art/maximum-force-logo.png")
 	ResourceLoader.load_threaded_request("res://main.tscn")
 	if "--splash-capture" in OS.get_cmdline_user_args():capture.call_deferred()
 func capture():
@@ -26,8 +24,10 @@ func _process(dt: float):
 func _draw():
 	if not picture:return
 	var screen=get_viewport_rect().size
-	draw_rect(Rect2(Vector2.ZERO,screen),Color.BLACK)
-	var ratio=min(screen.x*.9/picture.get_width(),screen.y*.86/picture.get_height())
+	var cover=max(screen.x/backdrop.get_width(),screen.y/backdrop.get_height())
+	var bg=backdrop.get_size()*cover
+	draw_texture_rect(backdrop,Rect2((screen-bg)*.5,bg),false)
+	var ratio=min(screen.x*.78/picture.get_width(),screen.y*.62/picture.get_height())
 	var size=picture.get_size()*ratio
 	draw_texture_rect(picture,Rect2((screen-size)*.5,size),false)
 	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)

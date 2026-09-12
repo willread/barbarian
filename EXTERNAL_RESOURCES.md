@@ -53,3 +53,5 @@ Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Ru
 - User-supplied artwork: codex-clipboard-3e35ee56-7ca4-441c-b71a-40c6cb7e22e7.png, supplied in this task.
 - Stored unchanged at godot/art/maximum-force-reference.png. UI displays only the photorealistic panel; no third-party license inferred.
 
+## Responsive screen layers
+- `godot/art/title-background.png`, `cairn-logo.png`, `maximum-force-logo.png`, and `studio-background.png`: generated with OpenAI image generation from the existing Cairn artwork and user-supplied Maximum Force reference for this project. Backgrounds contain no lettering; logos have transparency. Original source art retained.

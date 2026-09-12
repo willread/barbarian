@@ -56,6 +56,12 @@ var skull_node: Sprite2D
 var heat_node: ColorRect
 var sound_player: AudioStreamPlayer
 var scenery_shade: Node2D
+var arena_clip: Control
+var screen_backdrop: Node2D
+var screen_size=Vector2(1440,810)
+var last_window_size=Vector2i.ZERO
+var title_background=preload("res://art/title-background.png")
+var title_logo=preload("res://art/cairn-logo.png")
 const CLOSE=.35/.49
 const OPEN=.45/.49
 const HOLD=.15
@@ -67,6 +73,16 @@ func _ready():
 	if "--fire-study" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('fire-study')")):
 		get_tree().change_scene_to_file.call_deferred("res://fire_study.tscn")
 		return
+	arena_clip=Control.new()
+	arena_clip.size=Vector2(1440,810)
+	arena_clip.clip_contents=true
+	arena_clip.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	add_child(arena_clip)
+	screen_backdrop=Node2D.new()
+	screen_backdrop.top_level=true
+	screen_backdrop.z_index=-200
+	screen_backdrop.draw.connect(draw_screen_backdrop)
+	add_child(screen_backdrop)
 	art=ArtScript.new()
 	# Finish loading battle cels before exposing the menu, avoiding first-hit stalls.
 	for atlas in art.data.atlases.values():
@@ -111,12 +127,15 @@ func _ready():
 	hud.z_index=1900
 	hud.draw.connect(draw_hud)
 	add_child(hud)
+	hud.top_level=true
 	overlay=Node2D.new()
 	overlay.z_index=2000
 	overlay.draw.connect(draw_overlay)
 	add_child(overlay)
+	overlay.top_level=true
 	menu=MenuScript.new()
 	add_child(menu)
+	menu.top_level=true
 	menu.setup(art)
 	menu.activated.connect(menu_action)
 	skull_node=Sprite2D.new()
@@ -134,6 +153,7 @@ func _ready():
 	if "--capture" in OS.get_cmdline_user_args(): capture_test.call_deferred()
 	if "--effects-test" in OS.get_cmdline_user_args(): effects_test.call_deferred()
 	if "--integration-test" in OS.get_cmdline_user_args(): integration_test.call_deferred()
+	if "--layout-test" in OS.get_cmdline_user_args(): layout_test.call_deferred()
 
 func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	var f=m.make(next_id,x,y,hp,player)
@@ -148,17 +168,19 @@ func change_phase(next: String):
 	accumulator=0
 	menu.visible=phase in ["title","paused","lost","won"]
 	if phase=="title":
-		get_window().content_scale_size=Vector2i(1440,810)
+
 		options=false
 		menu.show_items(["BEGIN","OPTIONS"])
 	else:
-		get_window().content_scale_size=Vector2i(1440,1062)
+
 		if phase=="paused": menu.show_items(["RESUME BATTLE","SOUND: OFF" if muted else "SOUND: ON","RETURN TO TITLE"],false)
 		if phase in ["lost","won"]: menu.show_items(["RISE AGAIN"],false)
 	for view in views.values(): view.visible=phase!="title"
 	hud.visible=phase!="title"
 	blood.visible=phase!="title"
 	background.visible=phase!="title"
+	last_window_size=Vector2i.ZERO
+	responsive_layout()
 
 func menu_action(label: String):
 	match label:
@@ -331,6 +353,8 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			change_phase("dying")
 			wipe=DeathWipe.new()
 			add_child(wipe)
+			last_window_size=Vector2i.ZERO
+			responsive_layout()
 		else:
 			kills+=1
 			score+=1500 if f.boss else 250
@@ -440,6 +464,9 @@ func tick(dt: float):
 
 func _process(raw: float):
 	if not art: return
+	responsive_layout()
+	for child in get_children():
+		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
 	raw=min(raw,.25)
 	if phase=="dying" and is_instance_valid(wipe):
 		wipe.advance(raw)
@@ -469,6 +496,7 @@ func _process(raw: float):
 	displayed_mana=lerpf(displayed_mana,magic,1-exp(-dt*12))
 	shake=max(0,shake-dt*35)
 	background.advance(clock)
+	screen_backdrop.queue_redraw()
 	heat_node.visible=background.key=="cinder" and phase!="title"
 	scenery_shade.visible=phase!="title"
 	heat_node.material.set_shader_parameter("clock",clock)
@@ -518,7 +546,7 @@ func _input(event: InputEvent):
 		menu.handle(event)
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
-		var point=get_global_mouse_position()
+		var point=hud.get_local_mouse_position()
 		if point.y>810 and point.x>820 and point.x<1030: toggle_weapon()
 	if event is InputEventKey:
 		var code=event.keycode
@@ -796,16 +824,25 @@ func draw_hud():
 	center_text(hud,"FINAL DUEL" if wave==8 else "THE VALLEY",Vector2(1758*s,810+281*252.0/380),22,Color("eedbb0"))
 
 func draw_overlay():
-	if phase=="title": overlay.draw_texture_rect(art.texture("cairn-title-v1.png"),Rect2(0,0,1440,810),false)
+	if phase=="title":
+		var tall=screen_size.y>1200
+		var width=min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66)
+		var size=title_logo.get_size()*width/title_logo.get_width()
+		var center=screen_size.x*.5 if tall else screen_size.x*.32
+		overlay.draw_texture_rect(title_logo,Rect2(Vector2(center-size.x*.5,screen_size.y*.1),size),false)
 	if phase=="paused":
-		overlay.draw_rect(Rect2(0,0,1440,1062),Color(.02,.025,.02,.85))
+		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.85))
+		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))
 		center_text(overlay,"CAIRN",Vector2(720,260),48,Color("bda06d"))
 		center_text(overlay,"The battle waits.",Vector2(720,330),40,Color("e7d5b0"))
 	if phase in ["lost","won"]:
-		if phase=="won": overlay.draw_rect(Rect2(0,0,1440,1062),Color(.02,.025,.02,.8))
+		if phase=="won": overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
+		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))
 		center_text(overlay,"THE LEGION ENDURES" if phase=="lost" else "THE VALLEY IS FREE",Vector2(720,250),24,Color("bda06d"))
 		center_text(overlay,"Even heroes fall." if phase=="lost" else "A legend rises.",Vector2(720,340),66,Color("e7d5b0"))
 		center_text(overlay,"%d enemies slain · %d points"%[kills,score],Vector2(720,385),24,Color("e7d5b0"))
+
+	overlay.draw_set_transform(Vector2.ZERO)
 
 func _draw():
 	pass
@@ -955,3 +992,54 @@ func integration_test():
 	get_tree().quit()
 
 
+
+func responsive_layout():
+	var window_size=get_window().size
+	if window_size==last_window_size:return
+	last_window_size=window_size
+	screen_size=Vector2(1440,1440.0*window_size.y/max(1,window_size.x))
+	get_window().content_scale_size=Vector2i(screen_size)
+	var hud_scale=clamp(screen_size.y*.23/252.,.4,1.)
+	var hud_height=252*hud_scale
+	var arena_scale=min(1.,max(.1,(screen_size.y-hud_height)/810.))
+	scale=Vector2.ONE*arena_scale
+	position=Vector2((1440-1440*arena_scale)*.5,(screen_size.y-hud_height-810*arena_scale)*.5)
+	hud.scale=Vector2.ONE*hud_scale
+	hud.position=Vector2((1440-1440*hud_scale)*.5,screen_size.y-1062*hud_scale)
+	overlay.position=Vector2.ZERO
+	overlay.scale=Vector2.ONE
+	menu.layout_screen(screen_size,phase=="title")
+	if is_instance_valid(wipe):
+		wipe.top_level=true
+		wipe.position=Vector2.ZERO
+		wipe.scale=screen_size/Vector2(1440,1062)
+	screen_backdrop.queue_redraw()
+	overlay.queue_redraw()
+func draw_screen_backdrop():
+	var painting=title_background if phase=="title" or not art else art.texture(background.key+"-base.png")
+	var factor=max(screen_size.x/painting.get_width(),screen_size.y/painting.get_height())
+	var size=painting.get_size()*factor
+	screen_backdrop.draw_texture_rect(painting,Rect2((screen_size-size)*.5,size),false,Color.WHITE if phase=="title" else Color(.25,.25,.25))
+func layout_test():
+	for dimensions in [Vector2i(1280,720),Vector2i(1600,700),Vector2i(640,960)]:
+		get_window().size=dimensions
+		change_phase("title")
+		await get_tree().create_timer(1.6).timeout
+		await RenderingServer.frame_post_draw
+		assert(abs(scale.x-scale.y)<.001)
+		for item in menu.items:
+			var point=menu.to_global(item.node.position)
+			assert(point.y>=0 and point.y+item.height*menu.scale.y<=screen_size.y)
+		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/layout-title-%d.png"%dimensions.x)
+		start_game()
+		await get_tree().create_timer(.2).timeout
+		transition=-1
+		stage_walk=""
+		hero.x=720
+		await get_tree().create_timer(.1).timeout
+		await RenderingServer.frame_post_draw
+		assert(abs(hud.to_global(Vector2(0,1062)).y-screen_size.y)<2)
+		assert(abs(hud.scale.x-hud.scale.y)<.001)
+		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/layout-game-%d.png"%dimensions.x)
+	print("CAIRN_LAYOUT_OK: landscape, ultrawide, portrait; menu bounds and HUD anchor")
+	get_tree().quit()
