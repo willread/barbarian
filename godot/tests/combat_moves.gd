@@ -8,7 +8,7 @@ func _init():
 	shield.kind="shield"
 	shield.dir=-1
 	assert(m.begin(shield,"shieldBash"))
-	shield.attack.age=shield.attack.from-7
+	shield.attack.age=shield.attack.from-13
 	assert(ai.guarding(shield))
 	shield.attack.age+=1
 	assert(not ai.guarding(shield) and ai.frame(shield)==5)

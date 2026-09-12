@@ -33,7 +33,7 @@ static func heavy(e: Dictionary) -> bool:
 	return e.boss or e.size>=1.15
 
 static func guard_open(e: Dictionary) -> bool:
-	return e.kind=="shield" and not e.attack.is_empty() and e.attack.age>=e.attack.from-6
+	return e.kind=="shield" and not e.attack.is_empty() and e.attack.age>=e.attack.from-12
 
 func frame(e: Dictionary) -> int:
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
