@@ -27,7 +27,7 @@ func setup(point: Vector2, heavy: bool):
 	for i in 72:
 		var front=i<44
 		var angle=TAU*(i+randf()*.8)/(44.0 if front else 28.0)
-		motes.append({"direction":Vector2(cos(angle),sin(angle)*.24),"reach":randf_range(275,335) if front else randf_range(55,205),"radius":randf_range(24,39) if front else randf_range(29,53),"lift":randf_range(4,15) if front else randf_range(30,65),"life":randf_range(.55,.85) if front else randf_range(.85,1.3),"front":front,"angle":randf_range(-.3,.3),"shade":randf_range(.8,1.12)})
+		motes.append({"direction":Vector2(cos(angle),sin(angle)*.32),"reach":randf_range(275,335) if front else randf_range(55,205),"radius":randf_range(24,39) if front else randf_range(29,53),"lift":randf_range(4,15) if front else randf_range(30,65),"life":randf_range(.55,.85) if front else randf_range(.85,1.3),"front":front,"angle":randf_range(-.3,.3),"shade":randf_range(.8,1.12)})
 	for i in 16:
 		var angle=randf()*TAU
 		grit.append({"velocity":Vector2(cos(angle)*randf_range(90,250),sin(angle)*35),"lift":randf_range(60,145),"r":randf_range(1.2,2.7)})
@@ -44,7 +44,7 @@ func _draw():
 	for mote in motes:
 		var t=clampf(age/mote.life,0,1)
 		var spread=1-exp(-age*(5.5 if mote.front else 2.5))
-		var p=mote.direction*mote.reach*spread*strength
+		var p=mote.direction*mote.reach*1.25*spread*strength
 		p.y-=mote.lift*(1-exp(-age*2))
 		var r=mote.radius*(.45+t*.95)*strength
 		var alpha=smoothstep(0,.035,age)*pow(1-t,1.2)*(.85 if mote.front else .68)
