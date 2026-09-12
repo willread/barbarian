@@ -32,6 +32,8 @@ const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--wi
 for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
  run(binary,['--headless','--path','godot','--export-release',target,file]);
+ // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
+ run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');

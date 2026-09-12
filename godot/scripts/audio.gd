@@ -1,4 +1,5 @@
 extends Node
+const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","foot_stone","foot_earth","landing","bow_draw","bow_release","arrow_hit","arrow_ground","hero_effort","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
 var voices: Array=[]
@@ -14,9 +15,9 @@ var watched: Dictionary={}
 func setup(source: Node2D):
 	game=source
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
-	for file in DirAccess.get_files_at("res://audio"):
-		var name=file.trim_suffix(".remap")
-		if name.ends_with(".ogg"):clips[name.trim_suffix(".ogg")]=load("res://audio/"+name)
+	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
+	for id in CLIP_IDS:
+		clips[id]=load("res://audio/"+id+".ogg")
 	for i in 16:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
