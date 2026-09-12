@@ -7,12 +7,15 @@ const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-ma
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
+	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 
 func texture(file: String) -> Texture2D:
 	if not textures.has(file): textures[file]=load("res://assets/"+file)
 	return textures[file]
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
+	if f.player and f.attack.get("spin",false):return ["hero-spin",min(7,int(max(0,f.attack.age-2)/3.0))]
+	if f.player and f.diveUsed and not f.air.is_empty():return ["hero-extra-unarmed-v8",8 if f.diveAge<2 else 9 if f.diveAge<4 else 10 if f.weapon=="axe" else 11]
 	if f.player and not f.pickup.is_empty() and f.down.is_empty() and not f.hurtTicks: return ["hero-pickup-unarmed-v1",min(7,int(f.pickup.age/.0725))]
 	if f.player and spell>=0 and f.down.is_empty() and not f.hurtTicks:
 		return ["hero-cast-unarmed-v1",0 if spell<5 else 1 if spell<9 else 2 if spell<13 else 3 if spell<17 else 4 if spell<45 else 5 if spell<77 else 6 if spell<84 else 7]
@@ -47,6 +50,7 @@ func enemy_frame(e: Dictionary) -> int:
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
 	if e.hp<=0: return 13
 	if e.hurtTicks or e.recovering: return 11
+	if CairnEnemies.guard_open(e) and e.attack.age<e.attack.from:return 5
 	if e.brace and (e.attack.is_empty() or e.attack.age<e.attack.from): return 15
 	if e.turnTicks: return 2
 	if not e.attack.is_empty():
@@ -125,7 +129,7 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 			node.draw_set_transform(point,1.2 if not f.down.is_empty() else -.23 if f.brace else -.3 if f.attack.get("bash",false) and p[1]==6 else 0.0)
 			draw_equipment(node,3,158)
 	node.draw_set_transform(Vector2.ZERO)
-	if f.player and not behind and not l.rig.behind:
+	if f.player and p[0]!="hero-spin" and not behind and not l.rig.behind:
 		node.draw_texture_rect(texture(l.cel.file.replace(".png","-hands.png")),body_rect(f,p),false)
 
 func draw_equipment(node: Node2D,index: int,height: float):

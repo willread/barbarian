@@ -74,3 +74,10 @@ Maximum Force artwork uses a proportional, contained crop of the supplied photor
 The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 2 seconds it transitions over 1.2 seconds to the a white version of the same logo silhouette on black; loader remains bottom-right.
 
 The splash crossfades to the original clean white artwork in maximum-force-reference.png. Both logo variants use tightly registered visible bounds and the same destination rectangle; four-second duration and 1.2-second midpoint fade remain.
+
+## Dive and crowd breaker controls
+- Press J: normal swing begins immediately. Hold J for 21 ticks (~350 ms): after the swing, one spin triggers. Release J to rearm. Spin hits each enemy once in a 27-unit ground-depth band, deals 1.2 damage with strong knockback, resists interruption through tick 26, and recovers until tick 40.
+- Space then J: commit to a descending attack. Running jumps retain horizontal momentum; standing jumps permit steering until the strike commits. Axe starts in 3 ticks, deals 4.5 damage; sword starts in 2 ticks, deals 3.2 with longer reach. The first unblocked target is knocked down, with a short hit-stop, blood burst and camera kick; nearby exposed enemies stagger.
+- Dive landing recovery: axe 8 ticks on hit / 24 on miss; sword 6 / 19, plus landing settle. Shield blocks do not earn hit recovery.
+- Shield revenants lower their shield in the final 6 windup ticks (~100 ms). AI blocking and the displayed lowered frame share that rule. Both charges and dives can punish the opening.
+- `tests/combat_moves.gd` covers move timing, momentum, recovery, shield window and spin hit uniqueness/depth. `--moves-test` covers actual press/hold/release, spin protection and shield dive outcomes. Existing ROM parity fixtures remain a baseline with extensions disabled; the shipped game enables the new move rules.

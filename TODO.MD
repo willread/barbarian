@@ -3,7 +3,6 @@
 - Spin attack to clear space
 - 3x levels with unique bosses
 - Per level tuning
-- Better health bar design
 - Analytics including in-depth play session data for tuning
 - Shareware model
 - Trailer

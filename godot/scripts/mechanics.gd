@@ -6,6 +6,7 @@ const HZ = 59.92274340431231
 const STEP = 1.0 / HZ
 const SCALE = 4.5
 const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":48}}
+var combat_extensions=false
 var attacks: Dictionary
 
 func _init(data: Dictionary = {}):
@@ -13,6 +14,7 @@ func _init(data: Dictionary = {}):
 
 func make(id: int, x: float, y: float, hp: float, player: bool = false) -> Dictionary:
 	return {"id":id,"x":x,"y":y,"hp":hp,"max":hp,"player":player,"dir":1,"weapon":"axe","kind":"legion","boss":false,"size":1.0,"speedFactor":1.0,"variant":"regular",
+	"holdTicks":0,"spinUsed":false,"diveUsed":false,"diveHit":false,"diveAge":0,
 	"velocityX":0.0,"velocityY":0.0,"running":false,"runDir":0,"tapDir":0,"tapTicks":-1,"air":{},"height":0.0,"jump":null,"jumpLaunch":5.5,"stagger":0,"hurtTicks":0,"hurtAge":0,"down":{},"recovering":0,"invTicks":0,"attack":{},"lastSlash":0,"aiClock":0,"aiRest":0,"aiChain":0,"aiChargeRest":0,"aiDx":0,"aiDy":0,"moving":false,"stride":0.0,"clock":randf()*4.8,"death":0.0,"recoil":0.0,"hitGlow":0.0,"electricTicks":0,"pickup":{},"gearDropped":false,"burnAge":0.0,"engulf":1.0,"burnSeed":randf()*100,"burnPoints":[],"scorched":false,"trail":0.0,"bootDistance":0.0,"bootCoat":0.0,"bootSide":1,"bootPos":Vector2(x,y),"turnTicks":0,"brace":0,"moveIndex":0,"phaseTwo":false,"hopCooldown":90+randf()*90,"hopTicks":0,"thinkTicks":0,"tactic":0.0,"rushCooldown":50,"rushCombo":false}
 
 func standing(f: Dictionary) -> bool:
@@ -22,9 +24,12 @@ func start_jump(f: Dictionary) -> bool:
 	if not f.air.is_empty() or not f.attack.is_empty() or f.hurtTicks or not f.down.is_empty() or f.recovering:
 		return false
 	f.jumpLaunch=5.5
-	f.air={"age":0,"launch":5.5,"vz":0.0,"land":0}
+	f.air={"age":0,"launch":5.5,"vz":0.0,"land":0,"carry":combat_extensions and f.running}
+	f.diveUsed=false
+	f.diveHit=false
+	f.diveAge=0
 	f.jump=0
-	f.velocityX=0.0
+	f.velocityX=f.dir*3.2 if f.air.carry else 0.0
 	f.velocityY=0.0
 	f.running=false
 	return true
@@ -40,12 +45,21 @@ func motion(f: Dictionary, dx: float, dy: float, edge: int = 0, bounded: bool = 
 		if a.age==3: a.vz=-a.launch
 		elif a.age>3 and f.height>0:
 			a.vz=min(8,a.vz+.25)
-			f.velocityX=move_toward(f.velocityX,dx*1.5,.0625) if dx else 0.0
+			if combat_extensions:
+				if not f.diveUsed:f.velocityX=move_toward(f.velocityX,dx*1.5,.08) if not a.carry else f.velocityX*.996
+			else:f.velocityX=move_toward(f.velocityX,dx*1.5,.0625) if dx else 0.0
+		if f.diveUsed:
+			f.diveAge+=1
+			if f.diveAge>=3:a.vz=max(a.vz,3.5 if f.weapon=="sword" else 5.0)
 		if a.age>=3 and not a.land:
 			f.height=max(0,f.height-a.vz)
 			f.x+=f.velocityX*SCALE
 		if a.age>=3 and f.height==0 and a.vz>=0:
-			if not a.land: a.land=3
+			if not a.land:
+				a.land=3
+				if f.diveUsed:
+					f.recovering=(8 if f.diveHit else 24) if f.weapon=="axe" else (6 if f.diveHit else 19)
+					f.attack={}
 			if a.land<3:
 				f.velocityX=0.0
 				a.vz=0.0
@@ -120,11 +134,11 @@ func select_strike(f: Dictionary, targets: Array) -> String:
 	return "slash"
 
 func begin(f: Dictionary, type: String) -> bool:
-	if not attacks.has(type) or not standing(f) or not f.attack.is_empty() or f.hurtTicks or (not f.air.is_empty() and type!="air"): return false
-	if type=="air" and (f.air.is_empty() or (f.air.vz>=0 and f.height<24)): return false
+	if (not attacks.has(type) and type!="spin") or not standing(f) or not f.attack.is_empty() or f.hurtTicks or (not f.air.is_empty() and type!="air"): return false
+	if type=="air" and (f.air.is_empty() or f.diveUsed or (f.air.land>0 if combat_extensions else (f.air.vz>=0 and f.height<24))): return false
 	var direction=-f.dir if type=="back" else f.dir
 	if type=="back": f.dir=direction
-	var a=attacks[type].duplicate(true)
+	var a=attacks[type].duplicate(true) if type!="spin" else {"ticks":40,"from":3,"to":26,"damage":1.2,"reach":48,"knock":true,"box":[-48,96,-47,47],"spin":true,"push":4.2}
 	a.merge({"type":type,"age":0,"elapsed":0.0,"direction":direction,"connected":false,"hits":[],"animationRate":1.0},true)
 	f.attack=a
 	if type=="slash":
@@ -140,6 +154,17 @@ func begin(f: Dictionary, type: String) -> bool:
 		a.damage*=w.damage
 		a.reach=w.reach
 		a.box=[0,w.reach,-64,64]
+	if combat_extensions and type=="air":
+		f.diveUsed=true
+		a.ticks=90
+		a.from=2 if f.weapon=="sword" else 3
+		a.to=89
+		a.damage=4.5 if f.weapon=="axe" else 3.2
+		a.knock=f.weapon=="axe"
+		a.dive=true
+		a.lane=30
+		a.box=[-6,42 if f.weapon=="axe" else 58,-36,90]
+	if type=="spin":a.lane=27
 	if type not in ["air","charge"]:
 		f.velocityX=0.0
 		f.velocityY=0.0
@@ -155,7 +180,7 @@ func rect(f: Dictionary, box: Array, direction: int) -> Rect2:
 	return Rect2(f.x/SCALE+(b[0] if direction>0 else -b[0]-b[1]),f.y/SCALE-f.height+b[2],b[1],b[3])
 
 func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
-	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=8*SCALE: return false
+	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=a.get("lane",8*SCALE): return false
 	var body=[-15,18,-47,47]
 	if e.player:
 		body=([-16,32,-56,56] if e.stagger==1 else [-8,24,-40,40]) if e.recovering or e.hurtTicks else [-16,28,-60,60]
@@ -175,7 +200,9 @@ func tick_attack(f: Dictionary, targets: Array, hit: Callable) -> Dictionary:
 			if not e.id in a.hits and can_hit(f,e,a):
 				a.hits.append(e.id)
 				a.connected=true
-				hit.call(e,a,f)
+				var strike=a.duplicate()
+				if a.get("spin",false):strike.direction=1 if e.x>=f.x else -1
+				hit.call(e,strike,f)
 	if a.age>=a.ticks:
 		f.attack={}
 		if f.air.is_empty(): f.height=0.0
@@ -195,7 +222,7 @@ func hurt(f: Dictionary, a: Dictionary):
 	f.aiChain=0
 	f.recovering=0
 	if a.get("knock",false) or f.hp<=0:
-		f.down={"age":0,"vz":-4.25 if f.player else -4.0,"vx":a.direction*(2 if f.player else 3.375),"ground":0}
+		f.down={"age":0,"vz":-4.25 if f.player else -4.0,"vx":a.direction*a.get("push",2 if f.player else 3.375),"ground":0}
 		f.hurtTicks=0
 		f.stagger=0
 		f.invTicks=0

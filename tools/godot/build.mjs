@@ -20,8 +20,10 @@ run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
  run(binary,['--headless','--path','godot','--script','tests/parity.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/combat_moves.gd']);
  run(binary,['--headless','--path','godot','--','--smoke-test']);
  run(binary,['--headless','--path','godot','--','--integration-test']);
+ run(binary,['--headless','--path','godot','--','--moves-test']);
  process.exit(0);
 }
 const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--windows')?['Windows']:['Web','Windows'];

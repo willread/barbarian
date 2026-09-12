@@ -50,6 +50,7 @@ var transition=-1.0
 var swapped=false
 var wipe: Node2D
 var shake=0.0
+var hit_stop=0.0
 var font: Font
 var serif: Font
 var skull_node: Sprite2D
@@ -89,6 +90,7 @@ func _ready():
 		for cel in atlas.cels: art.texture(cel.file)
 	for i in 48: art.texture("hero-idle-%d.png"%i)
 	m=MScript.new(art.data.attacks)
+	m.combat_extensions=true
 	e_ai=EScript.new(m,art.data.roster)
 	font=load("res://assets/anton.ttf")
 	serif=load("res://assets/cinzel.ttf")
@@ -154,6 +156,7 @@ func _ready():
 	if "--effects-test" in OS.get_cmdline_user_args(): effects_test.call_deferred()
 	if "--integration-test" in OS.get_cmdline_user_args(): integration_test.call_deferred()
 	if "--layout-test" in OS.get_cmdline_user_args(): layout_test.call_deferred()
+	if "--moves-test" in OS.get_cmdline_user_args(): moves_test.call_deferred()
 
 func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	var f=m.make(next_id,x,y,hp,player)
@@ -296,11 +299,23 @@ func can_cast() -> bool:
 
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
+	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=26:return
 	if not f.player and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
 		beep(380,.08)
 		return
+	if a.get("dive",false):
+		if not attacker.diveHit:
+			attacker.diveHit=true
+			hit_stop=.065 if attacker.weapon=="axe" else .045
+			for other in enemies:
+				if other.id!=f.id and other.hp>0 and other.down.is_empty() and abs(other.x-f.x)<120 and abs(other.y-f.y)<30 and not e_ai.guarding(other):
+					other.attack={}
+					other.hurtTicks=max(other.hurtTicks,16)
+					other.velocityX=0
+			a.knock=true
+		else:a.knock=false
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
 	f.hp=max(0,f.hp-a.damage*(100.0/48 if f.player else 1))
 	if a.get("magic",false) and f.hp>0:
@@ -337,10 +352,11 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		if f.hp<=0 and not f.player and not f.down.is_empty(): f.down.vx*=.48
 		impact.down=f.down
 		blood.hit(impact,a.direction,f.hp<=0)
+		if a.get("dive",false):blood.hit(impact,a.direction,true)
 		if f.hp<=0 and not f.player:
 			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
 		burst(f.x,f.y-105,12,Color("e97b4f") if f.player else Color("ffc473"))
-		shake=5 if a.get("knock",false) else 2
+		shake=7 if a.get("dive",false) else (5 if a.get("knock",false) else 2)
 		beep(60 if f.player else 100,.12)
 	if f.hp<=0:
 		f.death=0
@@ -425,9 +441,15 @@ func tick(dt: float):
 			if m.start_jump(hero): beep(160,.12)
 		elif pressed.has(KEY_J):
 			if m.begin(hero,m.select_strike(hero,enemies)): beep(230,.15)
+	if not keys.has(KEY_J):
+		hero.holdTicks=0
+		hero.spinUsed=false
+	else:hero.holdTicks+=1
+	if hero.holdTicks>=21 and not hero.spinUsed and hero.air.is_empty() and spell<0 and hero.pickup.is_empty():
+		if m.begin(hero,"spin"):hero.spinUsed=true
 	var busy=spell>=0 or not hero.pickup.is_empty()
 	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true)
-	if hero.attack.has("weapon"):
+	if hero.attack.has("weapon") and not hero.attack.get("dive",false):
 		var temp=hero.duplicate()
 		temp.attack=hero.attack.duplicate()
 		temp.attack.age+=1
@@ -468,6 +490,9 @@ func _process(raw: float):
 	for child in get_children():
 		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
 	raw=min(raw,.25)
+	if hit_stop>0 and phase=="playing":
+		hit_stop=max(0.,hit_stop-raw)
+		return
 	if phase=="dying" and is_instance_valid(wipe):
 		wipe.advance(raw)
 		if wipe.age>=3.8 and not hero.down.is_empty() and hero.down.ground: change_phase("lost")
@@ -1085,4 +1110,47 @@ func layout_test():
 			var color=capture.get_pixel(int(point.x),int(point.y))
 			assert(color.r>color.g*1.4 if meter==0 else color.b>color.r*1.4,"HUD fill must survive responsive downscaling")
 	print("CAIRN_LAYOUT_OK: landscape, ultrawide, portrait; menu bounds and HUD anchor")
+	get_tree().quit()
+
+func moves_test():
+	start_game()
+	transition=-1
+	stage_walk=""
+	for e in enemies:e.x=1500;e.aiRest=10000
+	hero.x=720
+	keys[KEY_J]=true
+	pressed[KEY_J]=true
+	tick(m.STEP)
+	assert(hero.attack.type=="slash" and hero.attack.age==1,"Press must attack immediately")
+	for i in 24:tick(m.STEP)
+	assert(hero.attack.get("spin",false) and hero.spinUsed)
+	var hp=hero.hp
+	damage(hero,{"damage":5,"direction":-1,"knock":true},enemies[0])
+	assert(hero.hp==hp and hero.attack.get("spin",false))
+	if DisplayServer.get_name()!="headless":
+		await get_tree().create_timer(.05).timeout
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/spin-action.png")
+	for i in 90:tick(m.STEP)
+	assert(hero.attack.is_empty() and hero.spinUsed,"Holding cannot repeat spin")
+	keys.erase(KEY_J)
+	tick(m.STEP)
+	assert(not hero.spinUsed)
+	keys[KEY_J]=true
+	pressed[KEY_J]=true
+	for i in 26:tick(m.STEP)
+	assert(hero.attack.get("spin",false))
+	var guard=make_actor(800,660,20,false)
+	guard.kind="shield"
+	guard.dir=-1
+	enemies.append(guard)
+	hero.diveHit=false
+	var dive={"damage":4.5,"dive":true,"direction":1,"knock":true}
+	damage(guard,dive.duplicate(),hero)
+	assert(guard.hp==20 and not hero.diveHit,"Visible guard must block aerial hits")
+	m.begin(guard,"shieldBash")
+	guard.attack.age=guard.attack.from-6
+	damage(guard,dive.duplicate(),hero)
+	assert(guard.hp<20 and not guard.down.is_empty() and hero.diveHit and hit_stop>0,"Exposed shield must be flattened")
+	print("CAIRN_HOLD_OK: instant slash, hold transition, interruption protection, release-to-rearm")
 	get_tree().quit()

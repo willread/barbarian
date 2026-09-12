@@ -27,10 +27,14 @@ func variant(e: Dictionary):
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))
 	e.max=e.hp
 
+static func guard_open(e: Dictionary) -> bool:
+	return e.kind=="shield" and not e.attack.is_empty() and e.attack.age>=e.attack.from-6
+
 func frame(e: Dictionary) -> int:
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
 	if e.hp<=0: return 13
 	if e.hurtTicks or e.recovering: return 11
+	if guard_open(e) and e.attack.age<e.attack.from:return 5
 	if e.brace and (e.attack.is_empty() or e.attack.age<e.attack.from): return 15
 	if e.turnTicks: return 2
 	if not e.attack.is_empty():
@@ -42,7 +46,7 @@ func frame(e: Dictionary) -> int:
 	return 1+int(e.stride*4)%4 if e.moving else 0
 
 func guarding(e: Dictionary) -> bool:
-	return e.kind=="shield" and e.hp>0 and not e.hurtTicks and e.down.is_empty() and not e.recovering and not e.turnTicks and frame(e) in [0,1,2,3,4,15] and (e.attack.is_empty() or e.attack.get("bash",false) and e.attack.age<e.attack.from)
+	return e.kind=="shield" and not guard_open(e) and e.hp>0 and not e.hurtTicks and e.down.is_empty() and not e.recovering and not e.turnTicks and frame(e) in [0,1,2,3,4,15] and (e.attack.is_empty() or e.attack.get("bash",false) and e.attack.age<e.attack.from)
 
 func block(e: Dictionary, a: Dictionary, h: Dictionary) -> bool:
 	if not guarding(e) or a.get("magic",false) or (h.x-e.x)*e.dir<=0: return false
