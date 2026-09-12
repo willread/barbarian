@@ -33,6 +33,7 @@ func setup(source: CairnArt,name: String):
 			mat.set_shader_parameter("travel",Vector2(l.dx/l.w,l.dy/l.h))
 			mat.set_shader_parameter("period",float(l.period))
 			mat.set_shader_parameter("smoke",l.smoke)
+			mat.set_shader_parameter("painting",sprite.texture)
 			sprite.material=mat
 			add_child(sprite)
 			layers.append(mat)
@@ -51,3 +52,4 @@ func _draw():
 			var radius=splash[2]*1440
 			var p=Vector2(splash[0]*1440+sin(i*21.73)*radius*a,splash[1]*810-radius*.8*a+radius*a*a)
 			draw_circle(p,.8,Color(.84,.88,.87,pow(sin(a*PI),2)*.45))
+

@@ -50,9 +50,13 @@ for(const [key,file,far]of [['valley','valley'],['swamp','swamp-concept-v4'],['c
 }
 for(const name of ['fluid-fire-v2-0','fluid-fire-v2-1','fluid-fire-v2-2','fluid-fire-v2-3','fluid-smoke-v1','cairn-title-v1','hud-bronze-v1','menu-stone-material-v1'])fs.copyFileSync(`public/art/${name}.png`,path.join(out,name+'.png'));
 fs.copyFileSync('public/fonts/anton.ttf',path.join(out,'anton.ttf'));
+fs.copyFileSync('public/fonts/cinzel.ttf',path.join(out,'cinzel.ttf'));
 // Bake the existing dynamic stone material for the finite menu vocabulary.
 GlobalFonts.registerFromPath('public/fonts/anton.ttf','Anton');
-const material=await loadImage('public/art/menu-stone-material-v1.png');
+const materialImage=await loadImage('public/art/menu-stone-material-v1.png');
+const material=createCanvas(materialImage.width,materialImage.height);material.getContext('2d').drawImage(materialImage,0,0);
+Object.defineProperty(material,'naturalWidth',{value:material.width});
+Object.defineProperty(material,'complete',{value:true});
 let stone=fs.readFileSync('public/stone-text.js','utf8');stone=stone.replace(' let frame=0;',' window.bakeStone=paint; return; let frame=0;');
 const fakeDoc={documentElement:{dataset:{}},createElement:()=>{const c=createCanvas(1,1);c.setAttribute=()=>{};return c;}};
 const sc={window:{},document:fakeDoc,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};vm.createContext(sc);vm.runInContext(stone,sc);
@@ -65,3 +69,4 @@ for(const label of ['BEGIN','OPTIONS','SOUND: ON','SOUND: OFF','FULLSCREEN: ON',
 }
 fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest));
 console.log('Asset conversion complete: '+out);
+

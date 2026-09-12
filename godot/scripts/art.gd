@@ -125,6 +125,8 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 			node.draw_set_transform(point,1.2 if not f.down.is_empty() else -.23 if f.brace else -.3 if f.attack.get("bash",false) and p[1]==6 else 0.0)
 			draw_equipment(node,3,158)
 	node.draw_set_transform(Vector2.ZERO)
+	if f.player and not behind and not l.rig.behind:
+		node.draw_texture_rect(texture(l.cel.file.replace(".png","-hands.png")),body_rect(f,p),false)
 
 func draw_equipment(node: Node2D,index: int,height: float):
 	var atlas=data.atlases["enemy-equipment-v1"]
