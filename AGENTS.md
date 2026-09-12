@@ -8,3 +8,5 @@
 
 - The native Godot project in godot/ is the current game implementation. Preserve public/ and app/ as the checkpoint reference while fidelity is reviewed. Use npm run godot:build and npm run godot:test for native work; the legacy npm build remains the web reference build.
 - On this machine, Godot tooling, imports and exports live on E:/Cairn-build-tools because C: had insufficient space. Do not delete unrelated files to make room.
+
+- Never commit `.env` files or credentials. Never print their values. Keep `core.hooksPath=.githooks` enabled; the pre-commit guard blocks environment files and locally configured secrets in staged content.
