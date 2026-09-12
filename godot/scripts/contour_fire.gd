@@ -6,6 +6,7 @@ var thermal_view: SubViewport
 var thermal: ShaderMaterial
 var emitting=true
 var strength=0.6
+var interior=0.0
 var source_origin=Vector2.ZERO
 const PADDING=32.0
 var clock=randf()*100
@@ -76,12 +77,14 @@ func restart():
 	emitting=true
 func _process(dt: float):
 	if not flow:return
+	if not is_visible_in_tree():return
 	clock+=dt
 	flow.set_shader_parameter("clock",clock)
 	flow.set_shader_parameter("delta",min(dt,.033333))
 	flow.set_shader_parameter("reset",not started)
 	flow.set_shader_parameter("emitting",emitting)
 	flow.set_shader_parameter("strength",strength)
+	flow.set_shader_parameter("interior",interior)
 	viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	if thermal:
 		thermal.set_shader_parameter("emitting",emitting)

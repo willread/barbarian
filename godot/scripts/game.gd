@@ -483,11 +483,6 @@ func _process(raw: float):
 			view.art=art
 			add_child(view)
 			views[f.id]=view
-			if not f.player:
-				var flames=Node2D.new()
-				flames.draw.connect(func():draw_flames(flames,f))
-				add_child(flames)
-				flame_views[f.id]=flames
 		views[f.id].visible=phase!="title"
 		views[f.id].update_view(spell if f.player else -1)
 		if flame_views.has(f.id):

@@ -53,6 +53,7 @@ func rebuild():
 	corpse.texture=mask_view.get_texture()
 	corpse.position=Vector2(-size.x*.5,-size.y)
 	assembly.add_child(corpse)
+	assembly.move_child(fire,-1)
 	queue_redraw()
 func _process(dt: float):
 	if not fire:return
@@ -62,6 +63,7 @@ func _process(dt: float):
 	burn.set_shader_parameter("burn_age",burning)
 	fire.emitting=burning>0 and burning<1.85
 	fire.strength=strength*(1.0-smoothstep(1.15,1.85,burning))
+	fire.interior=smoothstep(.08,.55,burning)
 	if age>4.5:rebuild()
 func _input(event: InputEvent):
 	if event is InputEventKey and event.pressed:

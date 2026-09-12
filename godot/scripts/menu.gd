@@ -27,22 +27,17 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		var y=top+i*(meta.height*size-(20.16 if not options else 15.84))
 		group.position=Vector2(center,y)
 		add_child(group)
-		var fire=Sprite2D.new()
-		fire.centered=false
-		fire.texture=art.texture("menu-"+meta.id+"-fuel.png")
-		fire.position=Vector2(-meta.fw*.5*size,-meta.pad*size)
-		fire.scale=Vector2(meta.fw,meta.fh)*size/fire.texture.get_size()
-		var mat=ShaderMaterial.new()
-		mat.shader=load("res://shaders/menu_fire.gdshader")
-		mat.set_shader_parameter("pixels",fire.texture.get_size())
-		fire.material=mat
+		var fire=ContourFire.new()
 		group.add_child(fire)
+		fire.setup(art.texture("menu-"+meta.id+"-fuel.png"),Vector2(meta.fw,meta.fh),Vector2(-meta.fw*.5,-meta.pad))
+		fire.scale=Vector2.ONE*size
 		var face=Sprite2D.new()
 		face.centered=false
 		face.texture=art.texture("menu-"+meta.id+".png")
 		face.position=Vector2(-meta.width*.5*size,0)
 		face.scale=Vector2(meta.width,meta.height)*size/face.texture.get_size()
 		group.add_child(face)
+		fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})
 		if animate:
 			group.position.y=y-1224
@@ -71,8 +66,7 @@ func select(index: int, shake: bool=true):
 	if items.is_empty(): return
 	selected=posmod(index,items.size())
 	for i in items.size():
-		items[i].fire.visible=i==selected
-		items[i].face.modulate=Color(1.25,1.25,1.25) if i==selected else Color.WHITE
+		items[i].fire.emitting=i==selected
 	if shake: quake()
 
 func quake():
@@ -104,5 +98,5 @@ func handle(event: InputEvent):
 func _process(dt: float):
 	clock+=dt
 	if not visible: return
-	for item in items: item.fire.material.set_shader_parameter("clock",clock)
+	for item in items: item.fire.set_process(visible)
 
