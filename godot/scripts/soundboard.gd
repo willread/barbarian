@@ -26,7 +26,7 @@ func _ready():
 	title.add_theme_font_size_override("font_size",28)
 	column.add_child(title)
 	var help=Label.new()
-	help.text="F8 / Escape: close · Choosing an option previews it and applies it to the game. Choices save automatically."
+	help.text="F8 / Escape: close · Choosing an option previews it and applies it to the game. Choices save automatically. Hover an option to inspect its generation prompt."
 	help.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(help)
 	var tools=HBoxContainer.new()
@@ -88,6 +88,7 @@ func _ready():
 			for job in groups[group]:
 				var button=Button.new()
 				button.text=str(buttons[id].size()-1)+" · "+job.name+" — "+job.description
+				button.tooltip_text=job.prompt
 				button.alignment=HORIZONTAL_ALIGNMENT_LEFT
 				button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 				button.toggle_mode=true
