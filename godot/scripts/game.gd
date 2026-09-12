@@ -500,7 +500,9 @@ func tick(dt: float):
 	if was_diving and not hero.air.is_empty() and hero.air.land>0:
 		var impact=preload("res://scripts/landing_impact.gd").new()
 		arena_clip.add_child(impact)
-		impact.setup(Vector2(hero.x,hero.y),hero.weapon=="axe")
+		var contact=art.weapon_tip(hero,art.pose(hero))
+		# Project the weapon tip onto the landing plane, preserving weapon reach and facing.
+		impact.setup(Vector2(contact.x,hero.y),hero.weapon=="axe")
 		landing_impacts.append(impact)
 	if hero.attack.has("weapon") and not hero.attack.get("dive",false):
 		var temp=hero.duplicate()
