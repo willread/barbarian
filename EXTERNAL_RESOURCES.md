@@ -113,3 +113,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - 2026-09-12: World 1 screen 2 background, `studies/backgrounds/citadel-02-v1/base.png`, generated using built-in OpenAI imagegen. Prompt and provenance in that folder's README.md. No stock download or third-party asset. Animation atlases are locally baked texture flow.
 
 - 2026-09-12: World 1 screens 3 and 4, `studies/backgrounds/citadel-03-v1/base.png` and `studies/backgrounds/citadel-04-v1/base.png`, generated using built-in OpenAI imagegen. Full prompts saved in each screen README.md. Local texture-flow fire atlases; no stock assets downloaded.
+
+- Register-to-unlock speech: user-provided Downloads clip `ElevenLabs_2026-09-12T20_53_27_Maverick - Commanding and Powerful_pvc_sp85_s50_sb80_se50_b_m2.mp3`, converted to `godot/voice/register-unlock.ogg` for locked-episode feedback.

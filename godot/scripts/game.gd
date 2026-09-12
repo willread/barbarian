@@ -172,7 +172,10 @@ func _ready():
 	menu.top_level=true
 	menu.setup(art)
 	menu.activated.connect(menu_action)
-	menu.sound_requested.connect(func(id):audio.play(id,-8))
+	menu.sound_requested.connect(func(id):
+		audio.play(id,-8)
+		if id=="resist":hero_voice.request_line("register_unlock",0.,2.)
+	)
 	skull_node=Sprite2D.new()
 	skull_node.texture=art.texture("skull-mask.png")
 	skull_node.centered=false

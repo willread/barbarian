@@ -18,6 +18,7 @@ func setup(source):
 	player=AudioStreamPlayer.new()
 	add_child(player)
 func request_line(id: String,delay: float=0.,expires: float=5.):
+	if game.muted or not game.voice_enabled:return
 	if not definitions.has(id) or id==active or cooldowns.get(id,0.)>time:return
 	for item in pending:
 		if item.id==id:return
@@ -42,7 +43,10 @@ func _process(dt):
 		pain=.45
 		if player.playing:player.stop();active="";gap=.75
 	previous_hp=game.hero.hp
-	if game.phase not in ["playing","dying"] or game.hero.hp<=0:
+	var menu_context=game.phase=="title"
+	pending=pending.filter(func(item):return definitions[item.id].get("menu",false)==menu_context)
+	if active!="" and definitions[active].get("menu",false)!=menu_context:player.stop();active=""
+	if game.phase not in ["playing","dying","title"] or (game.hero.hp<=0 and not menu_context):
 		player.stop();active="";pending.clear();return
 	if game.muted or not game.voice_enabled:player.stop();active="";pending.clear();return
 	glance_time-=dt

@@ -55,5 +55,15 @@
       0.0
     ],
     "fps": 30
+  },
+  "register_unlock": {
+    "file": "res://voice/register-unlock.ogg",
+    "priority": 2,
+    "cooldown": 4,
+    "envelope": [
+      0
+    ],
+    "fps": 20,
+    "menu": true
   }
 }
