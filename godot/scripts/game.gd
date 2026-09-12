@@ -59,6 +59,8 @@ var shake=0.0
 var hit_stop=0.0
 var font: Font
 var serif: Font
+var pause_cover=0.0
+var pause_skull: Sprite2D
 var skull_node: Sprite2D
 var heat_node: ColorRect
 var audio: Node
@@ -170,6 +172,11 @@ func _ready():
 	skull_node.material.shader=load("res://shaders/skull.gdshader")
 	skull_node.material.set_shader_parameter("skull",skull_node.texture)
 	add_child(skull_node)
+	pause_skull=skull_node.duplicate()
+	pause_skull.material=skull_node.material.duplicate()
+	pause_skull.top_level=true
+	pause_skull.z_index=2095
+	add_child(pause_skull)
 	hero=make_actor(720,660,100,true)
 	loading_menu=OS.has_feature("web")
 	change_phase("title")
@@ -200,6 +207,10 @@ func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	return f
 
 func change_phase(next: String):
+	if next=="paused":
+		options=false
+		settings_page=""
+	if next=="title": pause_cover=0.0
 	phase=next
 	overlay.z_index=2090 if next in ["lost","won","paused"] else 2000
 	keys.clear()
@@ -210,10 +221,10 @@ func change_phase(next: String):
 
 		options=false
 		settings_page=""
-		menu.show_items(["BEGIN","OPTIONS"])
+		menu.show_items(["BEGIN","OPTIONS","QUIT TO DESKTOP"])
 	else:
 
-		if phase=="paused": menu.show_items(["RESUME BATTLE","OPTIONS","RETURN TO TITLE"],false)
+		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],false)
 		if phase in ["lost","won"]: menu.show_items(["RISE AGAIN"],false)
 	for view in views.values(): view.visible=phase!="title"
 	hud.visible=phase!="title"
@@ -228,18 +239,18 @@ func menu_action(label: String):
 		"OPTIONS":
 			options=true
 			settings_page="root"
-			menu.switch_items(option_labels())
+			menu.switch_items(option_labels(),phase=="title")
 		"SOUND","DISPLAY":
 			settings_page=label.to_lower()
-			menu.switch_items(option_labels())
+			menu.switch_items(option_labels(),phase=="title")
 		"BACK":
 			if settings_page in ["sound","display"]:
 				settings_page="root"
-				menu.switch_items(option_labels())
+				menu.switch_items(option_labels(),phase=="title")
 			else:
 				options=false
 				settings_page=""
-				menu.switch_items(["BEGIN","OPTIONS"] if phase=="title" else ["RESUME BATTLE","OPTIONS","RETURN TO TITLE"])
+				menu.switch_items(["BEGIN","OPTIONS","QUIT TO DESKTOP"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],phase=="title")
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
 			apply_settings()
@@ -251,8 +262,12 @@ func menu_action(label: String):
 		"FULLSCREEN: ON","FULLSCREEN: OFF":
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
 			refresh_settings(0)
-		"RESUME BATTLE": change_phase("playing")
-		"RETURN TO TITLE":
+		"RETURN TO BATTLE": change_phase("playing")
+		"QUIT TO DESKTOP":
+			if OS.has_feature("web"):
+				JavaScriptBridge.eval("window.close(); setTimeout(() => alert('You can close this tab to quit Cairn.'), 100);")
+			else: get_tree().quit()
+		"QUIT TO TITLE":
 			clear_world()
 			if is_instance_valid(wipe): wipe.queue_free()
 			wipe=null
@@ -678,6 +693,13 @@ func _process(raw: float):
 	heat_node.visible=background.key=="cinder" and phase!="title"
 	scenery_shade.visible=phase!="title"
 	heat_node.material.set_shader_parameter("clock",clock)
+	pause_cover=move_toward(pause_cover,1.0 if phase=="paused" else 0.0,raw/.65)
+	pause_skull.visible=pause_cover>0
+	pause_skull.position=Vector2.ZERO
+	pause_skull.scale=screen_size/512.0
+	pause_skull.material.set_shader_parameter("progress",1.0-pause_cover)
+	if phase=="paused": menu.modulate.a=smoothstep(.8,1.0,pause_cover)
+	else: menu.modulate.a=1.0
 	skull_node.visible=transition>=0
 	if transition>=0:
 		var progress=1-transition/CLOSE if transition<CLOSE else 0.0 if transition<CLOSE+HOLD else (transition-CLOSE-HOLD)/OPEN
@@ -726,6 +748,7 @@ func _input(event: InputEvent):
 			elif phase=="title" and options: menu_action("BACK")
 			return
 	if phase in ["title","paused","lost","won"]:
+		if phase=="paused" and pause_cover<.8: return
 		if options and settings_page=="sound" and menu.selected==2 and not menu.switching and event is InputEventKey and event.pressed and event.keycode in [KEY_LEFT,KEY_RIGHT]:
 			master_volume=clampi(master_volume+(-1 if event.keycode==KEY_LEFT else 1),0,100)
 			apply_settings()
@@ -1046,11 +1069,6 @@ func draw_overlay():
 		var width=min(safe_width,(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6)
 		var size=title_logo.get_size()*width/title_logo.get_width()
 		overlay.draw_texture_rect(title_logo,Rect2(Vector2(center-size.x*.5,screen_size.y*.1),size),false)
-	if phase=="paused":
-		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.85))
-		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))
-		center_text(overlay,"CAIRN",Vector2(720,260),48,Color("bda06d"))
-		center_text(overlay,"The battle waits.",Vector2(720,330),40,Color("e7d5b0"))
 	if phase in ["lost","won"]:
 		if phase=="won": overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
 		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))

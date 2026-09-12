@@ -18,8 +18,8 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 	items.clear()
 	selected=0
 	title_mode=is_title
-	var options=labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
-	var size=1.0 if is_title and not options else .58 if is_title and labels.size()>3 else .71 if is_title else .55
+	var options=not labels.has("BEGIN") and labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
+	var size=1.0 if is_title and labels.has("BEGIN") else .58 if labels.size()>3 else .71
 	var center=417.6 if is_title else 720.0
 	var top=380.7 if is_title else 430.0
 	for i in labels.size():
@@ -111,7 +111,13 @@ func _process(dt: float):
 func layout_screen(size: Vector2,is_title: bool):
 	screen_size=size
 	var tall=size.y>1200
-	var factor=clamp(size.y/810.,.55,1.45) if is_title else clamp(size.y/1062.,.55,1.3)
+	var factor=clamp(size.y/810.,.55,1.45)
+	var bounds=Rect2()
+	for item in items:
+		var rect=Rect2(Vector2(item.x-item.width*.5,item.y),Vector2(item.width,item.height))
+		bounds=rect if bounds.size==Vector2.ZERO else bounds.merge(rect)
+	if not is_title: factor=min(factor,min(size.x*.86/max(1.,bounds.size.x),size.y*.8/max(1.,bounds.size.y)))
 	scale=Vector2.ONE*factor
 	var anchor=Vector2(size.x*.5 if tall or not is_title else size.x*.32,size.y*.48 if is_title else size.y*.54)
 	position=anchor-Vector2(417.6 if is_title else 720.,380.7 if is_title else 430.)*factor
+	if not is_title: position=size*.5-bounds.get_center()*factor
