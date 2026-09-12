@@ -834,9 +834,13 @@ func draw_hud():
 func draw_overlay():
 	if phase=="title":
 		var tall=screen_size.y>1200
-		var width=(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6
+		# Share the menu's actual anchor; keep generous gutters in the open art column.
+		var center=menu.to_global(Vector2(417.6,0)).x
+		var gutter=screen_size.x*.09
+		var open_right=screen_size.x-gutter if tall else screen_size.x*.64-gutter
+		var safe_width=2.*max(1.,min(center-gutter,open_right-center))
+		var width=min(safe_width,(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6)
 		var size=title_logo.get_size()*width/title_logo.get_width()
-		var center=screen_size.x*.5 if tall else screen_size.x*.32
 		overlay.draw_texture_rect(title_logo,Rect2(Vector2(center-size.x*.5,screen_size.y*.1),size),false)
 	if phase=="paused":
 		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.85))
