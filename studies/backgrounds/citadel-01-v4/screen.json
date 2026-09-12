@@ -1,0 +1,139 @@
+{
+  "id": "citadel-01-v4",
+  "title": "Aqueduct approach - waterfall and fire",
+  "status": "Masked flow study - awaiting review",
+  "size": [
+    1280,
+    720
+  ],
+  "frames": [
+    "../citadel-01-v3/base.png"
+  ],
+  "regions": [
+    {
+      "name": "Waterfall and impact water",
+      "fps": 30,
+      "polygon": [
+        [
+          0.102,
+          0.194
+        ],
+        [
+          0.14,
+          0.207
+        ],
+        [
+          0.158,
+          0.273
+        ],
+        [
+          0.174,
+          0.366
+        ],
+        [
+          0.19,
+          0.447
+        ],
+        [
+          0.199,
+          0.51
+        ],
+        [
+          0.225,
+          0.549
+        ],
+        [
+          0.275,
+          0.581
+        ],
+        [
+          0.3,
+          0.593
+        ],
+        [
+          0.281,
+          0.617
+        ],
+        [
+          0.212,
+          0.623
+        ],
+        [
+          0.155,
+          0.623
+        ],
+        [
+          0.119,
+          0.608
+        ],
+        [
+          0.095,
+          0.593
+        ],
+        [
+          0.075,
+          0.568
+        ],
+        [
+          0.08,
+          0.519
+        ],
+        [
+          0.108,
+          0.474
+        ],
+        [
+          0.105,
+          0.402
+        ],
+        [
+          0.097,
+          0.33
+        ],
+        [
+          0.09,
+          0.263
+        ]
+      ]
+    },
+    {
+      "name": "Brazier flame and reflected glow",
+      "fps": 30,
+      "polygon": [
+        [
+          0.881,
+          0.445
+        ],
+        [
+          0.916,
+          0.419
+        ],
+        [
+          0.963,
+          0.434
+        ],
+        [
+          0.986,
+          0.486
+        ],
+        [
+          0.982,
+          0.622
+        ],
+        [
+          0.95,
+          0.653
+        ],
+        [
+          0.892,
+          0.635
+        ],
+        [
+          0.872,
+          0.548
+        ]
+      ]
+    }
+  ],
+  "notes": "Expanded waterfall mask includes peripheral spray and impact ripples. Fire heat moves upward, while its broader reflected light pulses on stationary stone. Original painting remains fixed. Both effects repeat over 2 seconds; each region can be disabled independently."
+}
