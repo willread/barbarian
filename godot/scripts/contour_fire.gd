@@ -4,6 +4,7 @@ var viewport: SubViewport
 var flow: ShaderMaterial
 var thermal_view: SubViewport
 var thermal: ShaderMaterial
+var menu_palette=false
 var emitting=true
 var strength=0.6
 var interior=0.0
@@ -41,6 +42,7 @@ func setup(mask: Texture2D,source_size: Vector2,origin=Vector2.ZERO,with_heat=tr
 	surface.position=origin-Vector2.ONE*PADDING
 	surface.material=ShaderMaterial.new()
 	surface.material.shader=load("res://shaders/contour_fire_surface.gdshader")
+	surface.material.set_shader_parameter("menu_palette",menu_palette)
 	add_child(surface)
 	if not with_heat:return
 	# A separate persistent temperature field keeps hot stone cooling after flames move.
@@ -66,6 +68,7 @@ func heat_face(face: Sprite2D,rect: Rect2):
 	if not thermal_view:return
 	var material=ShaderMaterial.new()
 	material.shader=load("res://shaders/hot_stone.gdshader")
+	material.set_shader_parameter("menu_palette",menu_palette)
 	material.set_shader_parameter("temperature",thermal_view.get_texture())
 	material.set_shader_parameter("face_size",rect.size)
 	material.set_shader_parameter("domain",Vector2(viewport.size))

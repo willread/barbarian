@@ -1,8 +1,16 @@
 shader_type canvas_item;
+uniform bool menu_palette=false;
 void fragment(){
  float heat=texture(TEXTURE,UV).b;
  vec3 red=vec3(.6,.035,.004),orange=vec3(1.,.28,.012),ivory=vec3(1.,.92,.65);
  vec3 color=mix(red,orange,smoothstep(.08,.5,heat));
  color=mix(color,ivory,smoothstep(.6,1.,heat));
+ if(menu_palette){
+  vec3 shadow=vec3(.14,.025,.024);
+  vec3 body=vec3(.62,.15,.09);
+  vec3 core=vec3(.88,.77,.66);
+  color=mix(shadow,body,smoothstep(.12,.65,heat));
+  color=mix(color,core,smoothstep(.72,1.,heat));
+ }
  COLOR=vec4(color,smoothstep(.035,.3,heat)*.94);
 }

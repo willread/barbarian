@@ -30,6 +30,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		group.position=Vector2(center,y)
 		add_child(group)
 		var fire=ContourFire.new()
+		fire.menu_palette=true
 		group.add_child(fire)
 		fire.setup(art.texture("menu-"+meta.id+"-fuel.png"),Vector2(meta.fw,meta.fh),Vector2(-meta.fw*.5,-meta.pad))
 		fire.scale=Vector2.ONE*size
