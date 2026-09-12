@@ -11,8 +11,9 @@ func _ready():
 	material=burn_material
 func update_view(spell: int):
 	pose=art.pose(actor,spell)
-	position=Vector2(actor.x,actor.y-actor.height*4.5)
-	scale=Vector2(actor.dir*actor.size,actor.size)
+	# Set the basis directly: decomposing negative X scale during reparenting can
+	# leave a PI rotation behind, which a later scale assignment turns upside down.
+	transform=Transform2D(Vector2(actor.dir*actor.size,0),Vector2(0,actor.size),Vector2(actor.x,actor.y-actor.height*4.5))
 	z_index=int(actor.y)*2
 	burn_material.set_shader_parameter("burn_age",actor.burnAge if not actor.player else 0.0)
 	burn_material.set_shader_parameter("engulf",actor.engulf)

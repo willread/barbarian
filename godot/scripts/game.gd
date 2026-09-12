@@ -996,6 +996,20 @@ func integration_test():
 	change_phase("playing")
 	damage(hero,{"damage":100,"direction":-1,"knock":true},boss)
 	assert(phase=="dying" and wipe.age==-.5 and hero.gearDropped)
+	var facing_probe=FighterView.new()
+	facing_probe.art=art
+	facing_probe.actor=make_actor(720,660,100,true)
+	add_child(facing_probe)
+	facing_probe.actor.dir=-1
+	facing_probe.update_view(-1)
+	facing_probe.reparent(arena_clip)
+	for direction in [-1,1,-1,1]:
+		facing_probe.actor.dir=direction
+		facing_probe.update_view(-1)
+		assert(facing_probe.transform.x.is_equal_approx(Vector2(direction*facing_probe.actor.size,0)))
+		assert(facing_probe.transform.y.is_equal_approx(Vector2(0,facing_probe.actor.size)))
+	facing_probe.queue_free()
+	print("CAIRN_FACING_OK: mirrored fighter remains upright after arena reparent and repeated turns")
 	print("CAIRN_INTEGRATION_OK: shield windows, boss commitment, stun escape, magic duration, grounded burn, chicken pickup, stage entry, pause and death")
 	get_tree().quit()
 
