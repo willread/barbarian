@@ -225,7 +225,8 @@ func change_phase(next: String):
 	else:
 
 		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],false)
-		if phase in ["lost","won"]: menu.show_items(["RISE AGAIN"],false)
+		if phase=="lost": menu.show_items(["RISE AGAIN","QUIT TO TITLE"],false)
+		if phase=="won": menu.show_items(["RISE AGAIN"],false)
 	for view in views.values(): view.visible=phase!="title"
 	hud.visible=phase!="title"
 	blood.visible=phase!="title"
@@ -1074,8 +1075,8 @@ func draw_overlay():
 		var width=min(safe_width,(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6)
 		var size=title_logo.get_size()*width/title_logo.get_width()
 		overlay.draw_texture_rect(title_logo,Rect2(Vector2(center-size.x*.5,screen_size.y*.1),size),false)
-	if phase in ["lost","won"]:
-		if phase=="won": overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
+	if phase=="won":
+		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
 		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))
 		center_text(overlay,"THE LEGION ENDURES" if phase=="lost" else "THE VALLEY IS FREE",Vector2(720,250),24,Color("bda06d"))
 		center_text(overlay,"Even heroes fall." if phase=="lost" else "A legend rises.",Vector2(720,340),66,Color("e7d5b0"))
