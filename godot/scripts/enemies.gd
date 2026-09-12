@@ -30,7 +30,8 @@ func plan() -> Array:
 			var budget=6+screen*3+local_wave+randi_range(0,2)
 			var encounter: Array=[focus]
 			budget-=costs[focus]
-			while budget>0 and encounter.size()<9:
+			var population_cap=local_wave+2 if screen==0 else 9
+			while budget>0 and encounter.size()<population_cap:
 				var choices=pool.filter(func(kind):return costs[kind]<=budget and encounter.count(kind)<(3 if kind=="shield" else (2 if kind in ["archer","marauder"] else 4)))
 				if choices.is_empty():break
 				var kind=choices.pick_random()

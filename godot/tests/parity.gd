@@ -45,6 +45,7 @@ func _init():
 		var plan=enemy_ai.plan()
 		assert(plan.size()==13 and plan[12]==["champion"])
 		assert(enemy_ai.unlock_order.size()==3)
+		assert(plan[0].size()==2 and plan[1].size()<=3 and plan[2].size()<=4)
 		for w in 12:
 			var screen=int(w/3)
 			var allowed=["bone","legion"]+enemy_ai.unlock_order.slice(0,screen)
