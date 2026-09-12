@@ -16,8 +16,9 @@ if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepar
  run(process.execPath,['tools/godot/bake-assets.mjs']);
  run(process.execPath,['tools/godot/bake-extras.mjs']);
 }
+run(process.execPath,['tools/godot/bake-world.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
-if(!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
+if(!menuManifest.menu['THE FALLEN CITADEL']||!menuManifest.menu['THE SUNKEN WILDS']||!menuManifest.menu['THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
@@ -27,6 +28,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/creature_art.gd']);
  run(binary,['--headless','--path','godot','--script','tests/settings_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
  run(binary,['--headless','--path','godot','--script','tests/soundboard.gd']);
  run(binary,['--headless','--path','godot','--script','tests/hero_voice.gd']);
  run(binary,['--headless','--path','godot','--','--smoke-test']);

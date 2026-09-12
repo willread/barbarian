@@ -3,6 +3,7 @@ signal activated(label: String)
 signal sound_requested(id: String)
 var art: CairnArt
 var items: Array=[]
+const LOCKED=["THE SUNKEN WILDS","THE ASHEN DEPTHS"]
 var selected=0
 var clock=0.0
 var switching=false
@@ -20,6 +21,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 	title_mode=is_title
 	var options=not labels.has("BEGIN") and labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
 	var size=1.0 if is_title and labels.has("BEGIN") else .58 if labels.size()>3 else .71
+	if labels.has("THE FALLEN CITADEL"):size=.42
 	var center=417.6 if is_title else 720.0
 	var top=380.7 if is_title else 430.0
 	for i in labels.size():
@@ -40,6 +42,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		face.position=Vector2(-meta.width*.5*size,0)
 		face.scale=Vector2(meta.width,meta.height)*size/face.texture.get_size()
 		group.add_child(face)
+		if label in LOCKED:group.modulate=Color(.28,.28,.28,.65)
 		fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})
 		if animate:
@@ -71,7 +74,7 @@ func select(index: int, shake: bool=true):
 	if items.is_empty(): return
 	selected=posmod(index,items.size())
 	for i in items.size():
-		items[i].fire.emitting=i==selected
+		items[i].fire.emitting=i==selected and not items[i].label in LOCKED
 	if shake:
 		quake()
 		sound_requested.emit("menu_select")
@@ -83,7 +86,7 @@ func quake():
 	for x in [-2,2,-1.5,1,-.5,0]: tween.tween_property(item.node,"position:x",item.x+x,.035)
 
 func activate():
-	if switching or items.is_empty(): return
+	if switching or items.is_empty() or items[selected].label in LOCKED: return
 	quake()
 	sound_requested.emit("menu_activate")
 	activated.emit(items[selected].label)

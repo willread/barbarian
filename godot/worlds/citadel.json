@@ -1,0 +1,1043 @@
+[
+  {
+    "id": "citadel-01-v5",
+    "title": "Aqueduct approach - waterfall and fire",
+    "status": "Approved — World 1 / Screen 1",
+    "size": [
+      1280,
+      720
+    ],
+    "frames": [
+      "../citadel-01-v3/base.png"
+    ],
+    "regions": [
+      {
+        "name": "Waterfall and impact water",
+        "fps": 30,
+        "polygon": [
+          [
+            0.10543657331136738,
+            0.1991579718103606
+          ],
+          [
+            0.14332784184514002,
+            0.21526633717737506
+          ],
+          [
+            0.158,
+            0.273
+          ],
+          [
+            0.174,
+            0.366
+          ],
+          [
+            0.19,
+            0.447
+          ],
+          [
+            0.199,
+            0.51
+          ],
+          [
+            0.225,
+            0.549
+          ],
+          [
+            0.275,
+            0.581
+          ],
+          [
+            0.2652388797364086,
+            0.6106534870950028
+          ],
+          [
+            0.212,
+            0.623
+          ],
+          [
+            0.155,
+            0.623
+          ],
+          [
+            0.14662273476112025,
+            0.5828299469156142
+          ],
+          [
+            0.09308072487644152,
+            0.5755079626578803
+          ],
+          [
+            0.08649093904448106,
+            0.5535420098846787
+          ],
+          [
+            0.07990115321252059,
+            0.5286472634083836
+          ],
+          [
+            0.108,
+            0.474
+          ],
+          [
+            0.105,
+            0.402
+          ],
+          [
+            0.097,
+            0.33
+          ],
+          [
+            0.09,
+            0.263
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-1-loop-0.png",
+          "rect": [
+            100,
+            141,
+            254,
+            310
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      },
+      {
+        "name": "Brazier flame and reflected glow",
+        "fps": 30,
+        "polygon": [
+          [
+            0.881,
+            0.445
+          ],
+          [
+            0.916,
+            0.419
+          ],
+          [
+            0.963,
+            0.434
+          ],
+          [
+            0.986,
+            0.486
+          ],
+          [
+            0.982,
+            0.622
+          ],
+          [
+            0.95,
+            0.653
+          ],
+          [
+            0.892,
+            0.635
+          ],
+          [
+            0.872,
+            0.548
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.924,
+            0.484
+          ],
+          [
+            0.93,
+            0.482
+          ],
+          [
+            0.935,
+            0.498
+          ],
+          [
+            0.937,
+            0.519
+          ],
+          [
+            0.943,
+            0.536
+          ],
+          [
+            0.941,
+            0.555
+          ],
+          [
+            0.918,
+            0.555
+          ],
+          [
+            0.917,
+            0.539
+          ],
+          [
+            0.923,
+            0.52
+          ],
+          [
+            0.921,
+            0.505
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-1-loop-1.png",
+          "rect": [
+            1114,
+            299,
+            151,
+            174
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      }
+    ],
+    "notes": "60 baked frames over two seconds. Original painting stays fixed. Optional interpolation blends adjacent frames; the underlying motion is texture advection, not newly hand-drawn frames.",
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.6721581548599671
+        ],
+        [
+          1,
+          0.6765513454146074
+        ],
+        [
+          1,
+          0.8654585392641406
+        ],
+        [
+          0.1556836902800659,
+          0.8669229361156874
+        ],
+        [
+          0.15403801520149096,
+          0.8485838628574622
+        ],
+        [
+          0.05848434925864909,
+          0.8493501738971261
+        ],
+        [
+          0.047775947281713346,
+          0.8288486179754714
+        ],
+        [
+          0,
+          0.8288486179754714
+        ]
+      ],
+      "description": "Foot positions on the dry terrace, inside the rear rubble and front drop-off."
+    },
+    "approval": {
+      "state": "approved",
+      "date": "2026-09-12",
+      "world": 1,
+      "screen": 1,
+      "basis": "User approved protected-edge waterfall iteration 959a525"
+    },
+    "key": "citadel-1"
+  },
+  {
+    "id": "citadel-02-v1",
+    "title": "The breached gate â€” World 1 / Screen 2",
+    "status": "First pass â€” composition and masks for review",
+    "size": [
+      1280,
+      720
+    ],
+    "frames": [
+      "base.png"
+    ],
+    "notes": "Two localized brazier loops, 60 frames / two seconds. Flame motion is confined above the iron baskets; reflected light changes on fixed masonry. Background and banners remain static. Edit the glow/flame boundaries and the walkable foot area. This is a baked texture-flow first pass, not fluid simulation.",
+    "regions": [
+      {
+        "name": "Left brazier",
+        "fps": 30,
+        "polygon": [
+          [
+            0.192,
+            0.443
+          ],
+          [
+            0.214,
+            0.414
+          ],
+          [
+            0.251,
+            0.416
+          ],
+          [
+            0.276,
+            0.453
+          ],
+          [
+            0.28,
+            0.53
+          ],
+          [
+            0.259,
+            0.554
+          ],
+          [
+            0.211,
+            0.552
+          ],
+          [
+            0.19,
+            0.51
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.229,
+            0.475
+          ],
+          [
+            0.231,
+            0.46
+          ],
+          [
+            0.235,
+            0.455
+          ],
+          [
+            0.235,
+            0.446
+          ],
+          [
+            0.241,
+            0.46
+          ],
+          [
+            0.244,
+            0.447
+          ],
+          [
+            0.245,
+            0.467
+          ],
+          [
+            0.25,
+            0.473
+          ],
+          [
+            0.251,
+            0.479
+          ],
+          [
+            0.229,
+            0.479
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-2-loop-0.png",
+          "rect": [
+            243,
+            298,
+            117,
+            102
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      },
+      {
+        "name": "Right brazier",
+        "fps": 30,
+        "polygon": [
+          [
+            0.824,
+            0.435
+          ],
+          [
+            0.856,
+            0.41
+          ],
+          [
+            0.882,
+            0.42
+          ],
+          [
+            0.908,
+            0.458
+          ],
+          [
+            0.907,
+            0.526
+          ],
+          [
+            0.884,
+            0.551
+          ],
+          [
+            0.847,
+            0.55
+          ],
+          [
+            0.822,
+            0.515
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.858,
+            0.477
+          ],
+          [
+            0.858,
+            0.466
+          ],
+          [
+            0.862,
+            0.452
+          ],
+          [
+            0.866,
+            0.459
+          ],
+          [
+            0.866,
+            0.447
+          ],
+          [
+            0.87,
+            0.453
+          ],
+          [
+            0.873,
+            0.466
+          ],
+          [
+            0.875,
+            0.47
+          ],
+          [
+            0.877,
+            0.478
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-2-loop-1.png",
+          "rect": [
+            1052,
+            295,
+            112,
+            103
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.666
+        ],
+        [
+          1,
+          0.666
+        ],
+        [
+          1,
+          0.813
+        ],
+        [
+          1,
+          0.9533223503569467
+        ],
+        [
+          0.8986820428336079,
+          0.9547867472084935
+        ],
+        [
+          0.1886326194398682,
+          0.9621087314662273
+        ],
+        [
+          0.12026359143327842,
+          0.9635731283177741
+        ],
+        [
+          0,
+          0.9621087314662273
+        ],
+        [
+          0,
+          0.805
+        ]
+      ],
+      "description": "Foot positions on the flat courtyard; avoids foreground rubble."
+    },
+    "biome": "citadel",
+    "foreground": [
+      {
+        "name": "Foreground — lower left rubble",
+        "polygon": [
+          [
+            0,
+            0.811
+          ],
+          [
+            0.023,
+            0.811
+          ],
+          [
+            0.048599670510708404,
+            0.8273842211239246
+          ],
+          [
+            0.05683690280065898,
+            0.8654585392641406
+          ],
+          [
+            0.06013179571663921,
+            0.8786381109280615
+          ],
+          [
+            0.07907742998352553,
+            0.8757093172249679
+          ],
+          [
+            0.09060955518945635,
+            0.8903532857404357
+          ],
+          [
+            0.10214168039538715,
+            0.8991396668497162
+          ],
+          [
+            0.11037891268533773,
+            0.9093904448105437
+          ],
+          [
+            0.14662273476112025,
+            0.9108548416620904
+          ],
+          [
+            0.17215815485996705,
+            0.9943254622002563
+          ],
+          [
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "name": "Foreground — lower right rubble",
+        "polygon": [
+          [
+            0.7800658978583196,
+            1
+          ],
+          [
+            0.8014827018121911,
+            0.9225700164744646
+          ],
+          [
+            0.8105436573311368,
+            0.9123192385136372
+          ],
+          [
+            0.8405391889967945,
+            0.9003888433653406
+          ],
+          [
+            0.8690280065897859,
+            0.9035328574043566
+          ],
+          [
+            0.8731466227347611,
+            0.8757093172249679
+          ],
+          [
+            0.8813838550247117,
+            0.8405637927878455
+          ],
+          [
+            0.9093904448105437,
+            0.8332418085301116
+          ],
+          [
+            0.9472817133443163,
+            0.8303130148270181
+          ],
+          [
+            0.98,
+            0.831
+          ],
+          [
+            1,
+            0.844
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      }
+    ],
+    "composition_review": {
+      "status": "first-pass",
+      "actor_height_fraction": 0.22,
+      "notes": "Same cold grey masonry, iron, restrained amber practical light and mountain dusk as screen 1. Closer gate architecture and lower sky proportion are intentional. Foreground confined to low corners; inspect masks with actor preview. No floor reflection animation."
+    },
+    "key": "citadel-2"
+  },
+  {
+    "id": "citadel-03-v1",
+    "title": "The silent foundry — World 1 / Screen 3",
+    "status": "First pass — composition and masks for review",
+    "biome": "citadel",
+    "size": [
+      1280,
+      720
+    ],
+    "frames": [
+      "base.png"
+    ],
+    "regions": [
+      {
+        "name": "Foundry brazier",
+        "fps": 30,
+        "polygon": [
+          [
+            0.06,
+            0.392
+          ],
+          [
+            0.091,
+            0.356
+          ],
+          [
+            0.121,
+            0.373
+          ],
+          [
+            0.146,
+            0.419
+          ],
+          [
+            0.14,
+            0.493
+          ],
+          [
+            0.099,
+            0.52
+          ],
+          [
+            0.067,
+            0.49
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.089,
+            0.446
+          ],
+          [
+            0.093,
+            0.428
+          ],
+          [
+            0.098,
+            0.414
+          ],
+          [
+            0.102,
+            0.424
+          ],
+          [
+            0.103,
+            0.408
+          ],
+          [
+            0.108,
+            0.423
+          ],
+          [
+            0.112,
+            0.434
+          ],
+          [
+            0.116,
+            0.439
+          ],
+          [
+            0.115,
+            0.447
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-3-loop-0.png",
+          "rect": [
+            76,
+            256,
+            112,
+            120
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      },
+      {
+        "name": "Furnace",
+        "fps": 30,
+        "polygon": [
+          [
+            0.813,
+            0.38
+          ],
+          [
+            0.845,
+            0.36
+          ],
+          [
+            0.895,
+            0.363
+          ],
+          [
+            0.925,
+            0.404
+          ],
+          [
+            0.934,
+            0.482
+          ],
+          [
+            0.91,
+            0.542
+          ],
+          [
+            0.845,
+            0.539
+          ],
+          [
+            0.811,
+            0.491
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.85,
+            0.465
+          ],
+          [
+            0.855,
+            0.44
+          ],
+          [
+            0.864,
+            0.43
+          ],
+          [
+            0.875,
+            0.426
+          ],
+          [
+            0.881,
+            0.421
+          ],
+          [
+            0.885,
+            0.438
+          ],
+          [
+            0.894,
+            0.428
+          ],
+          [
+            0.901,
+            0.447
+          ],
+          [
+            0.899,
+            0.465
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-3-loop-1.png",
+          "rect": [
+            1038,
+            259,
+            159,
+            133
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.625
+        ],
+        [
+          1,
+          0.625
+        ],
+        [
+          1,
+          0.821
+        ],
+        [
+          0.938,
+          0.855
+        ],
+        [
+          0.904,
+          0.886
+        ],
+        [
+          0.22,
+          0.886
+        ],
+        [
+          0.133,
+          0.843
+        ],
+        [
+          0.061,
+          0.806
+        ],
+        [
+          0,
+          0.8
+        ]
+      ],
+      "description": "Continuous flat fighting floor; rear architecture and foreground rubble excluded."
+    },
+    "foreground": [],
+    "notes": "First-pass localized fire/glow loops, 60 frames / two seconds. Painting and banners stay fixed. Review composition, flame boundaries and walkable outline. Baked texture flow, not newly generated fluid frames. Foreground masks omitted: rubble is outside the walk area.",
+    "composition_review": {
+      "status": "first-pass",
+      "actor_height_fraction": 0.22,
+      "boss_arena": false
+    },
+    "key": "citadel-3"
+  },
+  {
+    "id": "citadel-04-v1",
+    "title": "The crownless keep — World 1 / Screen 4",
+    "status": "First pass — composition and masks for review",
+    "biome": "citadel",
+    "size": [
+      1280,
+      720
+    ],
+    "frames": [
+      "base.png"
+    ],
+    "regions": [
+      {
+        "name": "Left keep brazier",
+        "fps": 30,
+        "polygon": [
+          [
+            0.122,
+            0.456
+          ],
+          [
+            0.143,
+            0.433
+          ],
+          [
+            0.171,
+            0.438
+          ],
+          [
+            0.189,
+            0.469
+          ],
+          [
+            0.19,
+            0.52
+          ],
+          [
+            0.176,
+            0.545
+          ],
+          [
+            0.14,
+            0.541
+          ],
+          [
+            0.12,
+            0.507
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.154,
+            0.497
+          ],
+          [
+            0.155,
+            0.486
+          ],
+          [
+            0.158,
+            0.477
+          ],
+          [
+            0.16,
+            0.481
+          ],
+          [
+            0.163,
+            0.49
+          ],
+          [
+            0.165,
+            0.497
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-4-loop-0.png",
+          "rect": [
+            153,
+            311,
+            92,
+            83
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      },
+      {
+        "name": "Right keep brazier",
+        "fps": 30,
+        "polygon": [
+          [
+            0.814,
+            0.458
+          ],
+          [
+            0.832,
+            0.435
+          ],
+          [
+            0.853,
+            0.438
+          ],
+          [
+            0.876,
+            0.47
+          ],
+          [
+            0.878,
+            0.524
+          ],
+          [
+            0.856,
+            0.543
+          ],
+          [
+            0.822,
+            0.536
+          ],
+          [
+            0.806,
+            0.51
+          ]
+        ],
+        "motion_polygon": [
+          [
+            0.836,
+            0.497
+          ],
+          [
+            0.838,
+            0.486
+          ],
+          [
+            0.841,
+            0.477
+          ],
+          [
+            0.843,
+            0.485
+          ],
+          [
+            0.847,
+            0.492
+          ],
+          [
+            0.848,
+            0.498
+          ]
+        ],
+        "animation": {
+          "atlas": "citadel-4-loop-1.png",
+          "rect": [
+            1031,
+            313,
+            94,
+            79
+          ],
+          "columns": 8,
+          "count": 60,
+          "fps": 30
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.65
+        ],
+        [
+          1,
+          0.65
+        ],
+        [
+          1,
+          0.874
+        ],
+        [
+          0.913,
+          0.921
+        ],
+        [
+          0.199,
+          0.921
+        ],
+        [
+          0.105,
+          0.887
+        ],
+        [
+          0,
+          0.864
+        ]
+      ],
+      "description": "Continuous flat fighting floor; rear architecture and foreground rubble excluded."
+    },
+    "foreground": [],
+    "notes": "First-pass localized fire/glow loops, 60 frames / two seconds. Painting and banners stay fixed. Review composition, flame boundaries and walkable outline. Baked texture flow, not newly generated fluid frames. Foreground masks omitted: rubble is outside the walk area.",
+    "composition_review": {
+      "status": "first-pass",
+      "actor_height_fraction": 0.22,
+      "boss_arena": true
+    },
+    "key": "citadel-4"
+  }
+]

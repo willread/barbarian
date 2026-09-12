@@ -39,6 +39,7 @@ var master_volume=100
 var loading_menu=false
 var muted=false
 var weapon="axe"
+var chapter_select=false
 var wave=1
 var score=0
 var kills=0
@@ -245,7 +246,14 @@ func change_phase(next: String):
 
 func menu_action(label: String):
 	match label:
-		"BEGIN","RISE AGAIN": start_game()
+		"BEGIN":
+			chapter_select=true
+			menu.switch_items(["THE FALLEN CITADEL","THE SUNKEN WILDS","THE ASHEN DEPTHS","BACK"],true)
+		"THE FALLEN CITADEL":
+			chapter_select=false
+			start_game()
+		"THE SUNKEN WILDS","THE ASHEN DEPTHS":pass
+		"RISE AGAIN": start_game()
 		"OPTIONS":
 			options=true
 			settings_page="root"
@@ -254,6 +262,10 @@ func menu_action(label: String):
 			settings_page=label.to_lower()
 			menu.switch_items(option_labels(),phase=="title")
 		"BACK":
+			if chapter_select:
+				chapter_select=false
+				menu.switch_items(["BEGIN","OPTIONS","QUIT"],true)
+				return
 			if settings_page in ["sound","display"]:
 				settings_page="root"
 				menu.switch_items(option_labels(),phase=="title")
@@ -333,6 +345,7 @@ func clear_world():
 	blood.reset()
 
 func start_game():
+	chapter_select=false
 	clear_world()
 	if is_instance_valid(wipe): wipe.queue_free()
 	wipe=null
@@ -353,6 +366,9 @@ func start_game():
 	transition=CLOSE+HOLD
 	swapped=true
 
+func screen_for_wave(number: int) -> int:
+	return 4 if number>=8 else 3 if number>=5 else 2 if number>=3 else 1
+
 func spawn_wave():
 	for enemy in enemies:
 		if views.has(enemy.id): views[enemy.id].queue_free();views.erase(enemy.id)
@@ -363,7 +379,7 @@ func spawn_wave():
 		if is_instance_valid(arrow):arrow.queue_free()
 	arrows.clear()
 	enemies.clear()
-	var next=["valley","swamp","cinder"].pick_random()
+	var next="citadel-%d"%screen_for_wave(wave)
 	if next!=background.key:
 		blood.reset()
 		scorches.clear()
@@ -376,6 +392,7 @@ func spawn_wave():
 		f.boss=kind=="champion"
 		f.dir=1 if left else -1
 		e_ai.variant(f)
+		background.constrain(f)
 		enemies.append(f)
 	wave_time=0
 
@@ -666,7 +683,14 @@ func tick(dt: float):
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)
 		if phase!="playing": break
 	e_ai.separate(enemies)
+	background.constrain(hero)
+	if not chicken.is_empty():background.constrain(chicken)
+	for f in enemies: background.constrain(f)
 	if phase=="playing" and enemies.all(func(f):return f.hp<=0 and f.burnAge>3.4):
+		if wave<encounters.size() and screen_for_wave(wave+1)==screen_for_wave(wave):
+			wave+=1
+			spawn_wave()
+			return
 		begin_walk("exit")
 		transition=0
 		swapped=false
@@ -711,7 +735,7 @@ func _process(raw: float):
 	background.advance(clock)
 	screen_backdrop.queue_redraw()
 	heat_node.visible=background.key=="cinder" and phase!="title"
-	scenery_shade.visible=phase!="title"
+	scenery_shade.visible=phase!="title" and background.screen.is_empty()
 	heat_node.material.set_shader_parameter("clock",clock)
 	pause_cover=move_toward(pause_cover,1.0 if phase=="paused" else 0.0,raw/.65)
 	pause_skull.visible=pause_cover>0
@@ -762,7 +786,7 @@ func _input(event: InputEvent):
 	if event is InputEventKey:
 		var code=event.keycode
 		if event.pressed and not event.echo and code in [KEY_ESCAPE,KEY_P]:
-			if options:menu_action("BACK")
+			if options or chapter_select:menu_action("BACK")
 			elif phase=="playing": change_phase("paused")
 			elif phase=="paused": change_phase("playing")
 			elif phase=="title" and options: menu_action("BACK")
@@ -1079,7 +1103,7 @@ func draw_hud():
 	hud.draw_set_transform(Vector2.ZERO)
 	center_text(hud,"SCORE",Vector2(1758*s+extra,810+83*252.0/380),22,Color("eedbb0"))
 	center_text(hud,"%06d"%score,Vector2(1758*s+extra,810+182*252.0/380),52,Color("eedbb0"))
-	center_text(hud,"FINAL DUEL" if wave==8 else "THE VALLEY",Vector2(1758*s+extra,810+281*252.0/380),22,Color("eedbb0"))
+	center_text(hud,"FINAL DUEL" if wave==8 else "THE CITADEL",Vector2(1758*s+extra,810+281*252.0/380),22,Color("eedbb0"))
 
 func draw_overlay():
 	if phase=="title":

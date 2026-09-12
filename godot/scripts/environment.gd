@@ -3,11 +3,42 @@ var art: CairnArt
 var key="valley"
 var layers: Array=[]
 var clock=0.0
+var screen: Dictionary={}
+var chapter_screens=JSON.parse_string(FileAccess.get_file_as_string("res://worlds/citadel.json"))
 func setup(source: CairnArt,name: String):
 	art=source
 	key=name
 	for child in get_children(): child.queue_free()
 	layers.clear()
+	screen={}
+	if name.begins_with("citadel-"):
+		screen=chapter_screens[int(name.get_slice("-",1))-1]
+		var painting=Sprite2D.new()
+		painting.texture=art.texture(key+"-base.png")
+		painting.centered=false
+		painting.scale=Vector2(1440,810)/painting.texture.get_size()
+		add_child(painting)
+		for region in screen.regions:
+			var a=region.animation
+			var sprite=Sprite2D.new()
+			sprite.centered=false
+			sprite.texture=art.texture(a.atlas)
+			sprite.position=Vector2(a.rect[0],a.rect[1])*1.125
+			sprite.scale=Vector2(a.rect[2],a.rect[3])*1.125/sprite.texture.get_size()
+			var mat=ShaderMaterial.new()
+			mat.shader=preload("res://shaders/region_loop.gdshader")
+			sprite.material=mat
+			add_child(sprite)
+			layers.append(mat)
+		var foreground=Sprite2D.new()
+		foreground.centered=false
+		foreground.texture=art.texture(key+"-foreground.png")
+		foreground.scale=Vector2(1.125,1.125)
+		foreground.z_as_relative=false
+		foreground.z_index=1805
+		add_child(foreground)
+		z_index=-100
+		return
 	var base=Sprite2D.new()
 	base.texture=art.texture(key+"-base.png")
 	base.centered=false
@@ -45,7 +76,7 @@ func advance(t: float):
 	queue_redraw()
 
 func _draw():
-	if not art: return
+	if not art or not screen.is_empty(): return
 	for splash in art.data.environments[key].splashes:
 		for i in 44:
 			var a=fmod(clock/.75+i/44.0,1)
@@ -53,3 +84,18 @@ func _draw():
 			var p=Vector2(splash[0]*1440+sin(i*21.73)*radius*a,splash[1]*810-radius*.8*a+radius*a*a)
 			draw_circle(p,.8,Color(.84,.88,.87,pow(sin(a*PI),2)*.45))
 
+
+func constrain(f: Dictionary):
+	if screen.is_empty():return
+	var x=clampf(f.x,0,1440)/1440.0
+	var poly=screen.walkable.polygon
+	var ys: Array=[]
+	for i in poly.size():
+		var a=poly[i]
+		var b=poly[(i+1)%poly.size()]
+		if absf(a[0]-b[0])<0.000001:continue
+		if x>=minf(a[0],b[0]) and x<=maxf(a[0],b[0]):
+			ys.append(lerpf(a[1],b[1],(x-a[0])/(b[0]-a[0]))*810)
+	if ys.size()>=2:
+		ys.sort()
+		f.y=clampf(f.y,ys[0]+2,ys[-1]-2)

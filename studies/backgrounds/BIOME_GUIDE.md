@@ -15,7 +15,7 @@ Optional `foreground: [{name, polygon}]` uses normalized coordinates in the same
 
 Use very sparingly: low corner rubble or an occasional edge prop, no full-width front wall, no central obstruction and no large areas hiding combat. Design the walkable region separately so actors do not enter solid props. Foreground masks do not make a solid object traversable. Keep the actor's head, torso and weapon readable. Tight outlines prevent patches of the floor being redrawn over feet.
 
-The workshop implements this compositing with scale silhouettes and editable polygons. Native gameplay adoption is pending the new-world integration; the old environments are not changed by this preview tool.
+The workshop implements this compositing with scale silhouettes and editable polygons. Native gameplay now consumes these masks through the chapter asset bake. Foreground renders after actors and effects, before HUD and transition UI.
 
 ## Review each screen
 
