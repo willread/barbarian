@@ -29,7 +29,7 @@ func update_view(spell: int):
 			add_child(burning)
 			burning.setup(art.texture(layout.cel.file),rect,layout.atlas.facing<0,actor.burnSeed)
 		burning.update_burn(actor.burnAge,actor.engulf)
-		if actor.burnAge>3.3:
+		if actor.burnAge>=BurningSprite.finished_at(actor.engulf):
 			burning.queue_free()
 			burning=null
 			burn_finished=true

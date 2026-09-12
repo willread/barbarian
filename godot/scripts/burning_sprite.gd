@@ -3,6 +3,10 @@ extends Node2D
 var mask_view: SubViewport
 var burn: ShaderMaterial
 var fire: ContourFire
+var anchor=Vector2.ZERO
+const SPEED=1.3
+static func finished_at(engulf: float) -> float:
+	return .15+engulf+.6+.45
 func setup(texture: Texture2D,rect: Rect2,flip: bool,seed_value: float):
 	mask_view=SubViewport.new()
 	mask_view.size=Vector2i(rect.size.ceil())
@@ -25,7 +29,9 @@ func setup(texture: Texture2D,rect: Rect2,flip: bool,seed_value: float):
 	body.texture=mask_view.get_texture()
 	body.position=rect.position
 	add_child(body)
+	anchor=Vector2(rect.get_center().x,rect.end.y)
 	fire=ContourFire.new()
+	fire.animation_speed=SPEED
 	add_child(fire)
 	fire.setup(mask_view.get_texture(),Vector2(mask_view.size),rect.position,false)
 func update_burn(age: float,engulf: float):
@@ -35,3 +41,7 @@ func update_burn(age: float,engulf: float):
 	fire.emitting=age>0 and age<end
 	fire.strength=1.8*(1.-smoothstep(end-.6,end,age))
 	fire.interior=smoothstep(.08,.55,age)
+	var consumed=smoothstep(end-.65,end+.35,age)
+	fire.scale=Vector2(lerpf(1.,.4,consumed),lerpf(1.,.12,consumed))
+	fire.position=anchor*(Vector2.ONE-fire.scale)
+	fire.opacity=1.-smoothstep(end-.2,finished_at(engulf),age)

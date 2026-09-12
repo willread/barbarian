@@ -604,7 +604,7 @@ func tick_actor(f: Dictionary,dt: float):
 		f.death+=dt
 		f.moving=false
 		if not f.player and not f.down.is_empty() and f.down.ground:
-			f.burnAge+=dt
+			f.burnAge+=dt*BurningSprite.SPEED
 			if not f.scorched:
 				f.scorched=true
 				scorches.append({"x":f.x,"y":f.y,"r":(85 if f.boss else 45)*f.size})
@@ -721,7 +721,7 @@ func tick(dt: float):
 	background.constrain(hero)
 	if not chicken.is_empty():background.constrain(chicken)
 	for f in enemies: background.constrain(f)
-	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0 and f.burnAge>1.7):
+	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0 and f.burnAge>=BurningSprite.finished_at(f.engulf)):
 		if wave<encounters.size() and screen_for_wave(wave+1)==screen_for_wave(wave):
 			wave+=1
 			spawn_wave()

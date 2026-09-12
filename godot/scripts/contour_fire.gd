@@ -7,6 +7,9 @@ var thermal: ShaderMaterial
 var menu_palette=false
 var emitting=true
 var strength=0.6
+var animation_speed=1.0
+var opacity=1.0
+var surface: Sprite2D
 var interior=0.0
 var source_origin=Vector2.ZERO
 const PADDING=32.0
@@ -36,7 +39,7 @@ func setup(mask: Texture2D,source_size: Vector2,origin=Vector2.ZERO,with_heat=tr
 	flow.set_shader_parameter("fuel_mask",mask)
 	rect.material=flow
 	viewport.add_child(rect)
-	var surface=Sprite2D.new()
+	surface=Sprite2D.new()
 	surface.centered=false
 	surface.texture=viewport.get_texture()
 	surface.position=origin-Vector2.ONE*PADDING
@@ -81,6 +84,8 @@ func restart():
 func _process(dt: float):
 	if not flow:return
 	if not is_visible_in_tree():return
+	dt*=animation_speed
+	surface.material.set_shader_parameter("opacity",opacity)
 	clock+=dt
 	flow.set_shader_parameter("clock",clock)
 	flow.set_shader_parameter("delta",min(dt,.033333))
