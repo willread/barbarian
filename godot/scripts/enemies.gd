@@ -58,7 +58,7 @@ func guarding(e: Dictionary) -> bool:
 	return e.kind=="shield" and not guard_open(e) and e.hp>0 and not e.hurtTicks and e.down.is_empty() and not e.recovering and not e.turnTicks and frame(e) in [0,1,2,3,4,15] and (e.attack.is_empty() or e.attack.get("bash",false) and e.attack.age<e.attack.from)
 
 func block(e: Dictionary, a: Dictionary, h: Dictionary) -> bool:
-	if not guarding(e) or a.get("magic",false) or (h.x-e.x)*e.dir<=0: return false
+	if not guarding(e) or a.get("magic",false) or (a.get("origin_x",h.x)-e.x)*e.dir<=0: return false
 	e.x-=e.dir*(35 if a.get("knock",false) else 10)
 	e.brace=14
 	e.aiRest=max(e.aiRest,12)

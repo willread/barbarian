@@ -13,6 +13,14 @@ func _init():
 	shield.attack.age+=1
 	assert(not ai.guarding(shield) and ai.frame(shield)==5)
 	var hero=m.make(1,720,660,100,true)
+	var blast_guard=m.make(90,800,660,20)
+	blast_guard.kind="shield"
+	blast_guard.dir=1
+	hero.x=900
+	assert(not ai.block(blast_guard,{"origin_x":700,"knock":false},hero),"Rear blast bypasses guard even with player in front")
+	hero.x=700
+	assert(ai.block(blast_guard,{"origin_x":900,"knock":false},hero),"Front blast respects guard even with player behind")
+	hero.x=720
 	hero.running=true
 	assert(m.start_jump(hero) and hero.velocityX==3.2)
 	assert(m.begin(hero,"air") and hero.attack.from==3)

@@ -1,5 +1,5 @@
 extends Node
-const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
+const CLIP_IDS=["sword","axe","flesh","heavy_hit","charge_hit","death_fire","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}
@@ -42,7 +42,8 @@ func setup(source: Node2D):
 
 func set_variant(id: String,variant: String,persist: bool=true):
 	if not originals.has(id):return
-	var path="res://audio_options/"+variant+".mp3"
+	var path="res://audio_options/"+variant+".ogg"
+	if not ResourceLoader.exists(path):path="res://audio_options/"+variant+".mp3"
 	if variant not in ["original","none"] and not ResourceLoader.exists(path):return
 	clips[id]=null if variant=="none" else originals[id] if variant=="original" else load(path)
 	choices[id]=variant
@@ -105,7 +106,7 @@ func _process(dt: float):
 		var burning=actor.burnAge>0
 		var ground=not actor.down.is_empty() and actor.down.ground>0
 		var attack=actor.attack.get("type","")
-		if burning and not state.burn:play("fire",-15)
+		if burning and not state.burn:play("death_fire",-10)
 		if ground and not state.ground:play("body_fall",-8)
 		if attack!=state.attack:
 			if attack=="marauderRush":play("roar",-8)

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 const context={window:{},Math,Set};vm.createContext(context);
-vm.runInContext(fs.readFileSync('public/mechanics.js','utf8'),context);
+vm.runInContext(fs.readFileSync('tools/asset-bake-source/mechanics.js','utf8'),context);
 const M=context.window.AshenMechanics;
 const make=()=>M.init({id:1,x:720,y:660,hp:100,player:true,dir:1,stride:0,weapon:'axe'});
 const pick=f=>Object.fromEntries(['x','y','height','velocityX','velocityY','running','stride','hurtTicks','stagger','recovering','invTicks'].map(k=>[k,f[k]]));

@@ -6,19 +6,16 @@ const require=createRequire(import.meta.url);
 let lib;try{lib=require('@napi-rs/canvas')}catch{lib=require('C:/Users/will/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@napi-rs/canvas')}
 const{createCanvas,loadImage,Path2D}=lib;
 const out=path.resolve(process.argv[2]||'godot/assets');
-const source=fs.readFileSync('public/game.js','utf8').replace(/\r/g,'');
-// Preserve the exact Bezier skull iris, including its eye and nose cutouts.
-const shape=source.slice(source.indexOf('    const skull=new Path2D();'),source.indexOf('    // Centre the skull bounds'));
-const eyes=source.slice(source.indexOf('    ctx.beginPath();ctx.moveTo(-89,-44)'),source.indexOf('\n  }\n\nfunction drawBloodSplatter'));
+const {skull:shape,eyes,hud:code}=JSON.parse(fs.readFileSync('tools/asset-bake-source/drawing.json','utf8'));
 const c=createCanvas(512,512),ctx=c.getContext('2d');ctx.translate(256,281);ctx.fillStyle='#fff';
 vm.runInNewContext(shape+'ctx.fill(skull);ctx.fillStyle="#000";'+eyes,{ctx,Path2D});
 fs.writeFileSync(path.join(out,'skull-mask.png'),c.toBuffer('image/png'));
 // Use the existing bronze renderer so all frame crops and protruding details match.
-const hudTexture=await loadImage('public/art/hud-bronze-v1.png'),crestImage=await loadImage('public/art/hud-bronze-top-extended-v2.png');
+const hudTexture=await loadImage('asset-sources/art/hud-bronze-v1.png'),crestImage=await loadImage('asset-sources/art/hud-bronze-top-extended-v2.png');
 const hudCrests=createCanvas(2172,66),cg=hudCrests.getContext('2d');cg.drawImage(crestImage,0,0,2172,66,0,0,2172,66);
 const p=cg.getImageData(0,0,2172,66);for(let i=0;i<p.data.length;i+=4){const x=i/4%2172,d=p.data;d[i+3]=x>110&&x<2062?0:255*Math.max(0,Math.min(1,(d[i]-Math.max(d[i+1],d[i+2])*1.12-6)/18));}cg.putImageData(p,0,0);
 const hud=createCanvas(1440,296),h=hud.getContext('2d');h.fillText=()=>{};
-const code=source.slice(source.indexOf('  function drawHUD()'),source.indexOf('  function drawFighter'));
+
 vm.runInNewContext(code+'drawHUD();',{hudTexture,hudCrests,$:()=>hud,displayedHealth:0,displayedMana:0,canCast:()=>false,clamp:v=>Math.max(0,Math.min(1,v)),weapons:{axe:{}},weaponId:'axe',weaponAtlas:null,score:0,wave:1,encounters:Array(8)});
 fs.writeFileSync(path.join(out,'hud-native-frame.png'),hud.toBuffer('image/png'));
 console.log('Exact skull and HUD artwork prepared');

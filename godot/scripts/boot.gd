@@ -3,6 +3,7 @@ var picture: AtlasTexture
 var flat: Texture2D
 var backdrop=preload("res://art/studio-background.png")
 var elapsed=0.0
+var white_layer: Node2D
 func _ready():
 	# Browser has an HTML splash while the engine itself downloads.
 	if OS.has_feature("web") or (not OS.get_cmdline_user_args().is_empty() and not "--splash-capture" in OS.get_cmdline_user_args()):
@@ -12,16 +13,23 @@ func _ready():
 	picture.atlas=load("res://art/maximum-force-logo.png")
 	picture.region=Rect2(0,0,1774,887)
 	flat=load("res://art/maximum-force-white-v2.png")
+	white_layer=Node2D.new()
+	var additive=CanvasItemMaterial.new()
+	additive.blend_mode=CanvasItemMaterial.BLEND_MODE_ADD
+	white_layer.material=additive
+	white_layer.draw.connect(draw_white_logo)
+	add_child(white_layer)
 	ResourceLoader.load_threaded_request("res://main.tscn")
 	if "--splash-capture" in OS.get_cmdline_user_args():capture.call_deferred()
 func capture():
-	await get_tree().create_timer(.8).timeout
+	await get_tree().create_timer(3.6).timeout
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/studio-splash.png")
 	get_tree().quit()
 func _process(dt: float):
 	if not picture:return
 	elapsed+=dt
+	white_layer.queue_redraw()
 	queue_redraw()
 	if elapsed>=6.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
 		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get("res://main.tscn"))
@@ -37,7 +45,7 @@ func _draw():
 	var size=picture.get_size()*ratio
 	var bounds=Rect2((screen-size)*.5,size)
 	draw_texture_rect(picture,bounds,false,Color(1,1,1,1.-blend))
-	draw_texture_rect(flat,bounds,false,Color(1,1,1,blend))
+
 	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)
 	var center=screen-Vector2.ONE*(radius+32.)
 	draw_arc(center,radius*.75,0,TAU,64,Color("777671"),radius*.23,true)
@@ -47,3 +55,9 @@ func _draw():
 		var a=center+Vector2.from_angle(angle-.13)*radius*.85
 		var b=center+Vector2.from_angle(angle+.13)*radius*.85
 		draw_colored_polygon(PackedVector2Array([a,tip,b]),Color("b2afa6"))
+
+func draw_white_logo():
+	var screen=get_viewport_rect().size
+	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
+	var size=picture.get_size()*ratio
+	white_layer.draw_texture_rect(flat,Rect2((screen-size)*.5,size),false,Color(1,1,1,smoothstep(3.0,4.2,elapsed)))

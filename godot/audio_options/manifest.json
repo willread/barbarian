@@ -1221,6 +1221,78 @@
       "description": "One strong human HAH with a quick echo.",
       "prompt": "One strong short HAH, performed by a real adult male actor. Single syllable and stable open vowel, around 450 milliseconds, forceful chest voice and clean ending. Brief quiet room echo only after the voice. No repeated shout, extra syllable, growling, pitch processing, dialogue or music.",
       "duration": 1.3
+    },
+    {
+      "id": "charge_hit-1",
+      "group": "charge_hit",
+      "label": "Blocked / charge_hited attack",
+      "name": "Body check",
+      "description": "A massive shoulder impact with armor crunch.",
+      "prompt": "One charging armored warrior slams bodily into an enemy. Immediate deep fleshy THUD with compressed leather and dull armor clacks, tiny gritty settling tail. Heavy contact only, no running footsteps, swing, whoosh, voice or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "charge_hit-2",
+      "group": "charge_hit",
+      "label": "Blocked / charge_hited attack",
+      "name": "Crushing tackle",
+      "description": "A hard body blow with a short bone crack.",
+      "prompt": "One violent shoulder tackle connects. Compact chesty WHUMP layered with one dry rib crack and short leather creak. Dense physical collision, no airy swipe, slash, running steps, scream or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "charge_hit-3",
+      "group": "charge_hit",
+      "label": "Blocked / charge_hited attack",
+      "name": "Iron collision",
+      "description": "A low armored collision and dull rattle.",
+      "prompt": "Two heavy armored bodies collide once. Low blunt KLANG-THUD, padded body mass and two small dull metal rattles. Short hard contact, no whoosh, blade noise, bell ringing or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "charge_hit-4",
+      "group": "charge_hit",
+      "label": "Blocked / charge_hited attack",
+      "name": "Brutal ram",
+      "description": "A bassy organic impact with gritty crunch.",
+      "prompt": "One powerful body ram hits a dense opponent. Deep low DUK with a compressed organic crunch and tiny cloth rustle. Short and brutal, no explosion, swinging air, words or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "death_fire-1",
+      "group": "death_fire",
+      "label": "Blocked / death_fireed attack",
+      "name": "Ember flash",
+      "description": "A brief low crackle with a hot pop.",
+      "prompt": "An enemy corpse ignites and burns briefly. One small dry ignition pop followed by rough low fire crackling for half a second, then quiet embers. No airy ignition whoosh, scream, wind, music or explosion.",
+      "duration": 0.65
+    },
+    {
+      "id": "death_fire-2",
+      "group": "death_fire",
+      "label": "Blocked / death_fireed attack",
+      "name": "Dry combustion",
+      "description": "A compact gritty burst of burning.",
+      "prompt": "A short close burst of fire consuming dry cloth. Tight coarse crackles with a low soft combustion body, quickly fading to two ember ticks. No sweeping whoosh, wind, vocalization or music.",
+      "duration": 0.65
+    },
+    {
+      "id": "death_fire-3",
+      "group": "death_fire",
+      "label": "Blocked / death_fireed attack",
+      "name": "Hot cinders",
+      "description": "Several irregular hot snaps over low fire.",
+      "prompt": "A small intense flame burns for less than a second. Three irregular sharp ember snaps above a low subdued combustion rumble, abrupt natural decay. No rising whoosh, explosion, voice or long ambience.",
+      "duration": 0.65
+    },
+    {
+      "id": "death_fire-4",
+      "group": "death_fire",
+      "label": "Blocked / death_fireed attack",
+      "name": "Smoldering end",
+      "description": "A short soft fire flutter and cooling crackle.",
+      "prompt": "Brief corpse-burning fire: low rough flame flutter, small uneven sizzling crackles and a final ember pop. Under one second, dark and close. No airy swish, large roar, human sounds or music.",
+      "duration": 0.65
     }
   ]
 }

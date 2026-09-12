@@ -50,7 +50,7 @@ html,body{background:#000!important}
 #cairn-loader .studio-art{position:relative;width:min(68vw,101.7vh);aspect-ratio:2/1;z-index:1}
 #cairn-loader .studio-art > svg{position:absolute;inset:0;width:100%;height:100%}
 #cairn-loader .metal-logo{animation:metal-out 1.2s ease-in-out 3s both}
-#cairn-loader .flat-logo{animation:flat-in 1.2s ease-in-out 3s both}
+#cairn-loader .flat-logo{mix-blend-mode:screen;animation:flat-in 1.2s ease-in-out 3s both}
 #cairn-loader::before{content:"";position:absolute;inset:0;background:#000;animation:flat-in 1.2s ease-in-out 3s both}
 @keyframes flat-in{from{opacity:0}to{opacity:1}}@keyframes metal-out{from{opacity:1}to{opacity:0}}
 #cairn-loader > svg[viewBox]{z-index:2;position:absolute;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));width:clamp(40px,7vmin,76px);height:clamp(40px,7vmin,76px);animation:spin 1.8s linear infinite}

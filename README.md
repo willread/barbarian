@@ -1,9 +1,14 @@
-# Cairn — Godot
+# Cairn
 
-The game has a native Godot implementation for Windows and browser play in [godot/](godot/README.md). Open godot/project.godot or use the godot:build, godot:serve and godot:test npm scripts.
+Godot dark-fantasy brawler. Browser and Windows builds.
 
-The pre-port web checkpoint is tagged checkpoint/pre-godot-port. The app/ and public/ implementations below are retained as the fidelity reference; current game development targets godot/.
+- `npm run godot:test` runs gameplay and asset regression checks.
+- `npm run godot:build` exports Web and Windows.
+- `npm run dev` serves the local web build at http://localhost:3001/.
+- F8 opens the live sound lab.
 
----
+Godot tooling and generated assets on this machine live in `E:/Cairn-build-tools`. See `godot/README.md` for setup.
 
-# barbarian
+The retired web game is preserved in Git history (`checkpoint/pre-godot-port`). `asset-sources/` retains useful source artwork/fonts, and `tools/asset-bake-source/` contains only helpers required by asset preparation and mechanics parity tests. The old React web app and browser runtime have been removed.
+
+Audio source recordings and prompts are retained under `soundboard/`; external resources are recorded in `EXTERNAL_RESOURCES.md`. Credentials must remain in ignored local environment files.

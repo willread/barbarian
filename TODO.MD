@@ -1,8 +1,13 @@
-- Some thinner blood drips on death screen, better variety of widths in general
-- Better general blood splatters (more realistic, more vertical coverage, more random drop sizes including bigger)
-- Archers dont fall when they die
+- Better pause screen: use skull zoom to black, hori/vert centered menus, same size as submenu font on main menu, include full options menu but in new orientation, top level: Return to Battle, Options, Quit to Title.
+- Add a quit to desktop button to main menu
 
-- 3x levels with unique bosses
+- Tutorial system
+- Better use of multi weapon system?
+- Better axe seems flimsy
+
+- 3x biomes with unique bosses
+- More backgrounds
+- Better background animations
 - Per level tuning
 - Analytics including in-depth play session data for tuning
 - Shareware model
@@ -12,5 +17,6 @@
 - Promo art
 - Widescreen support
 - Menu screen
-  - Select weapon
+  - Select chapter
+  - Select weapon?
   - Difficulty

@@ -2,7 +2,7 @@
 
 Open `project.godot` in **Godot 4.7.2 Standard** (GDScript). This is a native Godot 2D game; it does not embed a browser, run the old game JavaScript, or depend on React at runtime. Both Windows and single-threaded WebGL 2 browser exports use Compatibility rendering.
 
-The original implementation remains under `public/` and `app/` as the migration reference. Git tag `checkpoint/pre-godot-port` identifies the untouched playable web checkpoint.
+The original implementation is retained in Git history. Source art lives in `asset-sources/` and necessary conversion/parity helpers in `tools/asset-bake-source/`. Git tag `checkpoint/pre-godot-port` identifies the untouched playable web checkpoint.
 
 ## Build and play
 

@@ -17,12 +17,12 @@ fs.mkdirSync(out,{recursive:true});
 const write=(name,c)=>fs.writeFileSync(path.join(out,name+'.png'),c.toBuffer('image/png'));
 const manifest=JSON.parse(fs.readFileSync(path.join(out,"manifest.json"),"utf8"));
 // Bake the existing dynamic stone material for the finite menu vocabulary.
-GlobalFonts.registerFromPath('public/fonts/anton.ttf','Anton');
-const materialImage=await loadImage('public/art/menu-stone-material-v1.png');
+GlobalFonts.registerFromPath('asset-sources/fonts/anton.ttf','Anton');
+const materialImage=await loadImage('asset-sources/art/menu-stone-material-v1.png');
 const material=createCanvas(materialImage.width,materialImage.height);material.getContext('2d').drawImage(materialImage,0,0);
 Object.defineProperty(material,'naturalWidth',{value:material.width});
 Object.defineProperty(material,'complete',{value:true});
-let stone=fs.readFileSync('public/stone-text.js','utf8');stone=stone.replace(' let frame=0;',' window.bakeStone=(el)=>{cache.clear();paint(el)}; return; let frame=0;');
+let stone=fs.readFileSync('tools/asset-bake-source/stone-text.js','utf8');stone=stone.replace(' let frame=0;',' window.bakeStone=(el)=>{cache.clear();paint(el)}; return; let frame=0;');
 const fakeDoc={documentElement:{dataset:{}},createElement:()=>{const c=createCanvas(1,1);c.setAttribute=()=>{};return c;}};
 const sc={window:{},document:fakeDoc,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};vm.createContext(sc);vm.runInContext(stone,sc);
 manifest.menu=manifest.menu||{};

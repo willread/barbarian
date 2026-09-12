@@ -1,0 +1,92 @@
+[
+  {
+    "file": "godot\\audio\\music_menu.ogg",
+    "estimated_bpm": 80.0,
+    "start": 0.03,
+    "end": 57.03,
+    "length": 57.0,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.1029072105884552
+  },
+  {
+    "file": "godot\\audio\\music_game.ogg",
+    "estimated_bpm": 120.0,
+    "start": 0.02,
+    "end": 58.03,
+    "length": 58.01,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.03242570161819458
+  },
+  {
+    "file": "godot\\audio_options\\music_game-1.ogg",
+    "estimated_bpm": 120.0,
+    "start": 1.87,
+    "end": 57.92,
+    "length": 56.05,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.01529308408498764
+  },
+  {
+    "file": "godot\\audio_options\\music_game-2.ogg",
+    "estimated_bpm": 120.0,
+    "start": 0.39,
+    "end": 58.46,
+    "length": 58.07,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.003023862838745117
+  },
+  {
+    "file": "godot\\audio_options\\music_game-3.ogg",
+    "estimated_bpm": 120.0,
+    "start": 0.03,
+    "end": 58.06,
+    "length": 58.03,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.015369027853012085
+  },
+  {
+    "file": "godot\\audio_options\\music_game-4.ogg",
+    "estimated_bpm": 120.0,
+    "start": 1.6400000000000001,
+    "end": 59.59,
+    "length": 57.95,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.021893948316574097
+  },
+  {
+    "file": "godot\\audio_options\\music_menu-1.ogg",
+    "estimated_bpm": 78.94736842105263,
+    "start": 1.83,
+    "end": 59.54,
+    "length": 57.71,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.036123692989349365
+  },
+  {
+    "file": "godot\\audio_options\\music_menu-2.ogg",
+    "estimated_bpm": 80.0,
+    "start": 0.38,
+    "end": 57.44,
+    "length": 57.06,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.01777505874633789
+  },
+  {
+    "file": "godot\\audio_options\\music_menu-3.ogg",
+    "estimated_bpm": 84.50704225352113,
+    "start": 1.7,
+    "end": 58.47,
+    "length": 56.77,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.004950568079948425
+  },
+  {
+    "file": "godot\\audio_options\\music_menu-4.ogg",
+    "estimated_bpm": 80.0,
+    "start": 1.85,
+    "end": 58.81,
+    "length": 56.96,
+    "blend_seconds": 0.04,
+    "seam_peak_difference": 0.03246234729886055
+  }
+]

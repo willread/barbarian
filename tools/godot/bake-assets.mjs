@@ -13,7 +13,7 @@ const write=(name,c)=>fs.writeFileSync(path.join(out,name+'.png'),c.toBuffer('im
 const document={createElement:()=>createCanvas(1,1)};
 const sandbox={window:{},document,console,Math,Float32Array,Int32Array,Uint8ClampedArray,Set,Map};
 vm.createContext(sandbox);
-for(const file of ['animation','mechanics','hero-rig','enemy-art','enemy-rig','enemies','environments'])vm.runInContext(fs.readFileSync(`public/${file}.js`,'utf8'),sandbox);
+for(const file of ['animation','mechanics','hero-rig','enemy-art','enemy-rig','enemies','environments'])vm.runInContext(fs.readFileSync(`tools/asset-bake-source/${file}.js`,'utf8'),sandbox);
 const A=sandbox.window.AshenAnimation,R=sandbox.window.AshenHeroRig;
 const configs={
  'hero-pickup-unarmed-v1':{columns:4,rows:2,frames:8},'hero-cast-unarmed-v1':{columns:4,rows:2,frames:8},
@@ -25,7 +25,7 @@ const configs={
 };
 const atlases={},manifest={atlases:{},weapons:R.weapons,enemyArt:sandbox.window.AshenEnemyArt,attacks:sandbox.window.AshenMechanics.attacks,roster:sandbox.window.AshenEnemies.roster,environments:{}};
 for(const [name,config]of Object.entries(configs)){
- const decoded=A.decodeChroma(await loadImage(`public/art/${name}.png`));
+ const decoded=A.decodeChroma(await loadImage(`asset-sources/art/${name}.png`));
  if(name==='chicken-v1'){const g=decoded.getContext('2d'),p=g.getImageData(0,0,decoded.width,decoded.height);for(let i=0;i<p.data.length;i+=4)p.data[i+3]*=A.clamp((p.data[i]-Math.min(p.data[i+1],p.data[i+2])-7)/18);g.putImageData(p,0,0)}
  atlases[name]=new A.Atlas(decoded,config);
 }
@@ -44,21 +44,21 @@ for(const [name,atlas] of Object.entries(atlases)){
 }
 for(let i=0;i<48;i++)write(`hero-idle-${i}`,atlases['hero-actions-unarmed-v8'].breathingCel(atlases['hero-actions-unarmed-v8'].cels[0],i*.1+.00001));
 for(const [key,file,far]of [['valley','valley'],['swamp','swamp-concept-v4'],['cinder','cinder-concept-v6','cinder-concept-v5']]){
- const env=new sandbox.window.AshenEnvironments.Environment(await loadImage(`public/art/${file}.png`),key,1440,810,null,null,far?await loadImage(`public/art/${far}.png`):null);
+ const env=new sandbox.window.AshenEnvironments.Environment(await loadImage(`asset-sources/art/${file}.png`),key,1440,810,null,null,far?await loadImage(`asset-sources/art/${far}.png`):null);
  write(`${key}-base`,env.base);if(env.near)write(`${key}-near`,env.near);
  manifest.environments[key]={near:!!env.near,splashes:env.splashes,layers:env.layers.map((l,i)=>{write(`${key}-layer-${i}`,l.texture);write(`${key}-mask-${i}`,l.mask);return {x:l.x,y:l.y,w:l.w,h:l.h,dx:l.dx,dy:l.dy,period:l.period,smoke:!!l.smoke,near:!!l.near};})};
 }
-for(const name of ['fluid-fire-v2-0','fluid-fire-v2-1','fluid-fire-v2-2','fluid-fire-v2-3','fluid-smoke-v1','cairn-title-v1','hud-bronze-v1','menu-stone-material-v1'])fs.copyFileSync(`public/art/${name}.png`,path.join(out,name+'.png'));
-fs.copyFileSync('public/fonts/anton.ttf',path.join(out,'anton.ttf'));
-fs.copyFileSync('public/fonts/cinzel.ttf',path.join(out,'cinzel.ttf'));
-for(const font of ['anton','cinzel'])fs.copyFileSync(`public/fonts/${font}-OFL.txt`,path.join(out,`${font}-OFL.txt`));
+for(const name of ['fluid-fire-v2-0','fluid-fire-v2-1','fluid-fire-v2-2','fluid-fire-v2-3','fluid-smoke-v1','cairn-title-v1','hud-bronze-v1','menu-stone-material-v1'])fs.copyFileSync(`asset-sources/art/${name}.png`,path.join(out,name+'.png'));
+fs.copyFileSync('asset-sources/fonts/anton.ttf',path.join(out,'anton.ttf'));
+fs.copyFileSync('asset-sources/fonts/cinzel.ttf',path.join(out,'cinzel.ttf'));
+for(const font of ['anton','cinzel'])fs.copyFileSync(`asset-sources/fonts/${font}-OFL.txt`,path.join(out,`${font}-OFL.txt`));
 // Bake the existing dynamic stone material for the finite menu vocabulary.
-GlobalFonts.registerFromPath('public/fonts/anton.ttf','Anton');
-const materialImage=await loadImage('public/art/menu-stone-material-v1.png');
+GlobalFonts.registerFromPath('asset-sources/fonts/anton.ttf','Anton');
+const materialImage=await loadImage('asset-sources/art/menu-stone-material-v1.png');
 const material=createCanvas(materialImage.width,materialImage.height);material.getContext('2d').drawImage(materialImage,0,0);
 Object.defineProperty(material,'naturalWidth',{value:material.width});
 Object.defineProperty(material,'complete',{value:true});
-let stone=fs.readFileSync('public/stone-text.js','utf8');stone=stone.replace(' let frame=0;',' window.bakeStone=(el)=>{cache.clear();paint(el)}; return; let frame=0;');
+let stone=fs.readFileSync('tools/asset-bake-source/stone-text.js','utf8');stone=stone.replace(' let frame=0;',' window.bakeStone=(el)=>{cache.clear();paint(el)}; return; let frame=0;');
 const fakeDoc={documentElement:{dataset:{}},createElement:()=>{const c=createCanvas(1,1);c.setAttribute=()=>{};return c;}};
 const sc={window:{},document:fakeDoc,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};vm.createContext(sc);vm.runInContext(stone,sc);
 manifest.menu={};

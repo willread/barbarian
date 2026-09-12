@@ -450,7 +450,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
 		burst(f.x,f.y-105,12,Color("e97b4f") if f.player else Color("ffc473"))
 		shake=7 if a.get("dive",false) else (5 if a.get("knock",false) else 2)
-		audio.play("arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "bone" if f.kind in ["bone","archer"] else "heavy_hit" if a.get("knock",false) else "flesh")
+		audio.play("charge_hit" if a.get("type","")=="charge" else "arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "bone" if f.kind in ["bone","archer"] else "heavy_hit" if a.get("knock",false) else "flesh")
 		if f.player and not a.get("no_stun",false):audio.play("hero_pain",-6)
 	if f.hp<=0:
 		f.death=0
@@ -481,9 +481,10 @@ func resolve_slam(origin: Vector2,strike: Dictionary):
 		if enemy.hp<=0:continue
 		var delta=Vector2(enemy.x,enemy.y)-origin
 		var previous_hp=enemy.hp
-		if abs(delta.x)<(150 if hero.weapon=="axe" else 187.5) and abs(delta.y)<57.0 and enemy.down.is_empty() and not enemy.invTicks:
+		if Vector2(delta.x/(150.0 if hero.weapon=="axe" else 187.5),delta.y/110.0).length_squared()<1.0 and enemy.down.is_empty() and not enemy.invTicks:
 			var blow=strike.duplicate()
 			blow.direction=1 if delta.x>=0 else -1
+			blow.origin_x=origin.x
 			damage(enemy,blow,hero)
 		# The pressure wave moves nearby bodies without requiring damage or stagger.
 		var distance=Vector2(delta.x,delta.y*1.8).length()
@@ -1337,7 +1338,7 @@ func moves_test():
 	assert(not distant.has("slamPush"))
 	assert(above.slamPush.y<0 and below.slamPush.y>0)
 	assert(small.slamPush.length()>above.slamPush.length() and large.slamPush.length()<above.slamPush.length())
-	assert(is_equal_approx(above.slamPush.length(),pow(1.0-126.0/375.0,1.2)*750.0))
+	assert(is_equal_approx(above.slamPush.length(),pow(1.0-126.0/375.0,1.2)*500.0))
 	assert(abs(above.slamPush.x)<.01 and abs(below.slamPush.x)<.01)
 	assert(expanded.slamPush.x>0,"Expanded radius must reach enemies 340 units from impact")
 	var old_x=fringe.x
