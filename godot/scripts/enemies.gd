@@ -7,27 +7,48 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster=data.duplicate(true)
 	roster["archer"]={"hp":6,"speed":1.05}
 
+var unlock_order: Array=[]
+var variant_order: Array=[]
+var wave_variants: Array=[]
+
 func plan() -> Array:
-	var themes=["legion","bone","shield","marauder","archer","shield","archer","legion"]
-	themes.shuffle()
-	var result=[]
-	for i in themes.size():
-		var wave=[themes[i],themes[i]]
-		for j in 1+int(i/2): wave.append(["legion","bone","shield","marauder","archer"].pick_random())
-		wave.shuffle()
-		result.append(wave)
-	# Guarantee a ranged enemy immediately without increasing first-wave population.
-	result[0][0]="archer"
+	unlock_order=["shield","archer","marauder"]
+	unlock_order.shuffle()
+	variant_order=["brute","swift"]
+	variant_order.shuffle()
+	wave_variants.clear()
+	var result: Array=[]
+	var pool=["bone","legion"]
+	var previous=""
+	var costs={"bone":1,"legion":2,"shield":3,"archer":3,"marauder":3}
+	for screen in 4:
+		if screen>0:pool.append(unlock_order[screen-1])
+		for local_wave in 3:
+			var focus=pool.pick_random()
+			if focus==previous:focus=pool[(pool.find(focus)+1+randi()%(pool.size()-1))%pool.size()]
+			previous=focus
+			var budget=6+screen*3+local_wave+randi_range(0,2)
+			var encounter: Array=[focus]
+			budget-=costs[focus]
+			while budget>0 and encounter.size()<9:
+				var choices=pool.filter(func(kind):return costs[kind]<=budget and encounter.count(kind)<(2 if kind in ["shield","archer","marauder"] else 4))
+				if choices.is_empty():break
+				var kind=choices.pick_random()
+				encounter.append(kind)
+				budget-=costs[kind]
+			encounter.shuffle()
+			result.append(encounter)
+			wave_variants.append([] if screen<2 else ([variant_order[0]] if screen==2 else variant_order.duplicate()))
 	result.append(["champion"])
+	wave_variants.append([])
 	return result
 
-func variant(e: Dictionary):
+func variant(e: Dictionary, allowed: Array=[]):
 	if e.kind=="archer":return
 	if e.boss:
 		e.speedFactor=.75
 		return
-	var roll=randf()
-	e.variant="brute" if roll<.18 else ("swift" if roll<.4 else "regular")
+	e.variant=allowed.pick_random() if not allowed.is_empty() and randf()<.25 else "regular"
 	e.size=1.18 if e.variant=="brute" else (.9 if e.variant=="swift" else 1.0)
 	e.speedFactor=1.35 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))

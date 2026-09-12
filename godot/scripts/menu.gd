@@ -3,7 +3,7 @@ signal activated(label: String)
 signal sound_requested(id: String)
 var art: CairnArt
 var items: Array=[]
-const LOCKED=["THE SUNKEN WILDS","THE ASHEN DEPTHS"]
+const LOCKED=["EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS"]
 var selected=0
 var clock=0.0
 var switching=false
@@ -42,7 +42,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		face.position=Vector2(-meta.width*.5*size,0)
 		face.scale=Vector2(meta.width,meta.height)*size/face.texture.get_size()
 		group.add_child(face)
-		if label in LOCKED:group.modulate=Color(.28,.28,.28,.65)
+		if label in LOCKED:group.modulate=Color(1,1,1,.35)
 		fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})
 		if animate:

@@ -29,13 +29,19 @@ func _init():
 	var enemy_ai=CairnEnemies.new(m,data.roster)
 	for i in 100:
 		var plan=enemy_ai.plan()
-		assert(plan.size()==9 and plan[8]==["champion"])
-		assert(plan[0][0]=="archer")
+		assert(plan.size()==13 and plan[12]==["champion"])
+		assert(enemy_ai.unlock_order.size()==3)
+		for w in 12:
+			var screen=int(w/3)
+			var allowed=["bone","legion"]+enemy_ai.unlock_order.slice(0,screen)
+			for kind in plan[w]:assert(kind in allowed)
+			assert(plan[w].size()<=9)
+			assert(enemy_ai.wave_variants[w].size()==(0 if screen<2 else screen-1))
 		var types=[]
 		for wave in plan:
 			for kind in wave:
 				if not kind in types: types.append(kind)
-		assert(types.size()==6)
+		assert("bone" in types and "legion" in types and "champion" in types)
 	print("CAIRN_PARITY_OK: ",checked," frame snapshots, weapon timing and 100 encounter plans")
 	quit()
 
