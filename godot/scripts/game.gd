@@ -30,6 +30,7 @@ var chicken_node: Node2D
 var used_chickens: Array=[]
 var phase="title"
 var options=false
+var loading_menu=false
 var muted=true
 var weapon="axe"
 var wave=1
@@ -85,7 +86,11 @@ func _ready():
 	screen_backdrop.draw.connect(draw_screen_backdrop)
 	add_child(screen_backdrop)
 	art=ArtScript.new()
-	# Finish loading battle cels before exposing the menu, avoiding first-hit stalls.
+	# Load every packaged image, including menu fuel masks, HUD and all levels.
+	for entry in DirAccess.get_files_at("res://assets"):
+		var file=entry.trim_suffix(".remap")
+		if file.ends_with(".png"): art.texture(file)
+	# Also retain atlas resources stored outside the asset directory.
 	for atlas in art.data.atlases.values():
 		for cel in atlas.cels: art.texture(cel.file)
 	for i in 48: art.texture("hero-idle-%d.png"%i)
@@ -150,13 +155,27 @@ func _ready():
 	skull_node.material.set_shader_parameter("skull",skull_node.texture)
 	add_child(skull_node)
 	hero=make_actor(720,660,100,true)
+	loading_menu=OS.has_feature("web")
 	change_phase("title")
+	if loading_menu: reveal_browser_menu.call_deferred()
 	if "--smoke-test" in OS.get_cmdline_user_args(): smoke_test.call_deferred()
 	if "--capture" in OS.get_cmdline_user_args(): capture_test.call_deferred()
 	if "--effects-test" in OS.get_cmdline_user_args(): effects_test.call_deferred()
 	if "--integration-test" in OS.get_cmdline_user_args(): integration_test.call_deferred()
 	if "--layout-test" in OS.get_cmdline_user_args(): layout_test.call_deferred()
 	if "--moves-test" in OS.get_cmdline_user_args(): moves_test.call_deferred()
+
+func reveal_browser_menu():
+	# Submit the first fully textured frame before releasing the HTML loading cover.
+	menu.process_mode=Node.PROCESS_MODE_DISABLED
+	await RenderingServer.frame_post_draw
+	JavaScriptBridge.eval("window.cairnMenuReady=true; window.dispatchEvent(new Event('cairn-menu-ready'));")
+	while JavaScriptBridge.eval("!!document.getElementById('cairn-loader')"):
+		await get_tree().process_frame
+	menu.process_mode=Node.PROCESS_MODE_INHERIT
+	menu.clock=0.0
+	loading_menu=false
+
 
 func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	var f=m.make(next_id,x,y,hp,player)
@@ -560,6 +579,7 @@ func _process(raw: float):
 	queue_redraw()
 
 func _input(event: InputEvent):
+	if loading_menu:return
 	if event is InputEventKey:
 		var code=event.keycode
 		if event.pressed and not event.echo and code in [KEY_ESCAPE,KEY_P]:

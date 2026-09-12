@@ -23,7 +23,7 @@ func _process(dt: float):
 	if not picture:return
 	elapsed+=dt
 	queue_redraw()
-	if elapsed>=4.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
+	if elapsed>=6.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
 		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get("res://main.tscn"))
 func _draw():
 	if not picture:return
@@ -31,7 +31,7 @@ func _draw():
 	var cover=max(screen.x/backdrop.get_width(),screen.y/backdrop.get_height())
 	var bg=backdrop.get_size()*cover
 	draw_texture_rect(backdrop,Rect2((screen-bg)*.5,bg),false)
-	var blend=smoothstep(2.0,3.2,elapsed)
+	var blend=smoothstep(3.0,4.2,elapsed)
 	draw_rect(Rect2(Vector2.ZERO,screen),Color(0,0,0,blend))
 	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
 	var size=picture.get_size()*ratio

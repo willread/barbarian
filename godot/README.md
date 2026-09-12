@@ -61,19 +61,19 @@ The menu study defaults to intensity 0.6; the enemy study defaults to 1.8 (three
 For optional warm/cooling edges, enable `with_heat` and call `heat_face(sprite, local_rect)`. This assigns the heat material, so callers with an existing body material should compose their own response or disable this pass. Enemy study disables the extra thermal viewport and uses the existing burn-away material on a live mask instead. Free the component with its owner after residual fire has cooled; cost scales with mask area and number of simultaneous effects.
 
 ## Opening studio splash
-Maximum Force artwork uses a proportional, contained crop of the supplied photorealistic panel. Browser shell displays it during engine loading for at least four seconds, with a bottom-right padded metal ring. Windows uses boot.tscn with the same minimum and aspect-aware layout. The original Cairn menu follows the splash. Export post-processing copies the artwork next to the web shell.
+Maximum Force artwork uses a proportional, contained crop of the supplied photorealistic panel. Browser shell displays it during engine loading for at least six seconds, with a bottom-right padded metal ring. Windows uses boot.tscn with the same minimum and aspect-aware layout. The original Cairn menu follows the splash. Export post-processing copies the artwork next to the web shell.
 
 ## Responsive presentation
-- Studio splash: independent cover background, contained transparent logo, viewport-anchored spinner; four-second minimum remains.
+- Studio splash: independent cover background, contained transparent logo, viewport-anchored spinner; six-second minimum remains.
 - Cairn title: cover background and transparent logo; menu anchors shift to center in portrait. Mouse coordinates are converted to menu-local space after layout transforms.
 - Combat: original 1440x810 arena is uniformly fitted and clipped, preserving all ROM movement/hit distances. Extra aspect-ratio space uses a dimmed version of the current environment. No stretching or cropping of playable space.
 - HUD: full-width bottom anchor with a horizontally stretchable meter section; end ornaments, weapon and score retain uniform scale. Ornamental tips overlap the arena. Health/mana, weapon and score remain separate dynamic draws.
 - Pause/results and death wipe use screen space independently of the arena. Resize and fullscreen recalculate layout live.
 - Run native `-- --layout-test` for landscape, ultrawide and portrait rendered captures and assertions for menu bounds, uniform scaling and HUD bottom anchoring.
 
-The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 2 seconds it transitions over 1.2 seconds to the a white version of the same logo silhouette on black; loader remains bottom-right.
+The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 3 seconds it transitions over 1.2 seconds to the a white version of the same logo silhouette on black; loader remains bottom-right.
 
-The splash crossfades to the original clean white artwork in maximum-force-reference.png. Both logo variants use tightly registered visible bounds and the same destination rectangle; four-second duration and 1.2-second midpoint fade remain.
+The splash crossfades to the original clean white artwork in maximum-force-reference.png. Both logo variants use tightly registered visible bounds and the same destination rectangle; six-second duration and 1.2-second midpoint fade remain.
 
 ## Dive and crowd breaker controls
 - Press J: normal swing begins immediately. Hold J for 21 ticks (~350 ms): after the swing, one spin triggers. Release J to rearm. Spin hits each enemy once in a 27-unit ground-depth band, deals 1.2 damage with strong knockback, resists interruption through tick 26, and recovers until tick 40.
@@ -81,3 +81,5 @@ The splash crossfades to the original clean white artwork in maximum-force-refer
 - Dive landing recovery: axe 8 ticks on hit / 24 on miss; sword 6 / 19, plus landing settle. Shield blocks do not earn hit recovery.
 - Shield revenants lower their shield in the final 6 windup ticks (~100 ms). AI blocking and the displayed lowered frame share that rule. Both charges and dives can punish the opening.
 - `tests/combat_moves.gd` covers move timing, momentum, recovery, shield window and spin hit uniqueness/depth. `--moves-test` covers actual press/hold/release, spin protection and shield dive outcomes. Existing ROM parity fixtures remain a baseline with extensions disabled; the shipped game enables the new move rules.
+
+Menu reveal waits for all packaged PNG assets to be cached, a submitted Godot frame, and decoded browser splash images. The six-second splash is a minimum; slow loading extends it. Menu drop animations wait behind the loading cover.
