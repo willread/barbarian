@@ -407,6 +407,7 @@ func screen_for_wave(number: int) -> int:
 	return clampi(1+int((number-1)/3),1,4)
 
 func spawn_wave():
+	combo.suspend()
 	for enemy in enemies:
 		if views.has(enemy.id): views[enemy.id].queue_free();views.erase(enemy.id)
 		if flame_views.has(enemy.id): flame_views[enemy.id].queue_free();flame_views.erase(enemy.id)
@@ -462,6 +463,7 @@ func step_reinforcements(dt: float):
 		reinforcement_wait=randf_range(1.6,3.8)
 
 func begin_walk(kind: String):
+	combo.suspend()
 	stage_walk=kind
 	if audio:audio.play("transition",-14)
 	keys.clear()
@@ -649,6 +651,17 @@ func tick_actor(f: Dictionary,dt: float):
 				f.scorched=true
 				scorches.append({"x":f.x,"y":f.y,"r":(85 if f.boss else 45)*f.size})
 
+# Waiting is latched between encounters, not whenever the player backs away.
+func step_combo(dt: float):
+	var living=enemies.filter(func(enemy):return enemy.hp>0)
+	if living.is_empty():combo.suspend()
+	if combo.waiting_for_combat:
+		var ready=living.any(func(enemy):return enemy.x>=0 and enemy.x<=1440 and absf(enemy.x-hero.x)<=(650. if enemy.kind=="archer" else 260.) and absf(enemy.y-hero.y)<=90.)
+		if not ready:return
+		combo.resume()
+		return # Keep the full grace period on the first combat frame.
+	hero.hp=minf(hero.max,hero.hp+combo.advance(dt))
+
 func tick(dt: float):
 	if stage_walk:
 		hero.x+=322*dt
@@ -668,7 +681,7 @@ func tick(dt: float):
 	arrows=arrows.filter(func(arrow):return is_instance_valid(arrow))
 	for arrow in arrows:arrow.advance(dt)
 	if phase=="playing":
-		hero.hp=minf(hero.max,hero.hp+combo.advance(dt))
+		step_combo(dt)
 		step_chicken(dt)
 		step_reinforcements(dt)
 	if pressed.has(KEY_K) and can_cast():
