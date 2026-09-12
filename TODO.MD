@@ -1,5 +1,5 @@
-- Thinner blood drips on death screen
-- Better general blood splatters (more realistic, more vertical)
+- Some thinner blood drips on death screen, better variety of widths in general
+- Better general blood splatters (more realistic, more vertical coverage, more random drop sizes including bigger)
 - Archers dont fall when they die
 
 - 3x levels with unique bosses
