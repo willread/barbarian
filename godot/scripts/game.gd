@@ -387,6 +387,9 @@ func spawn_wave():
 	enemies.clear()
 	var next="citadel-%d"%screen_for_wave(wave)
 	if next!=background.key:
+		hero.bootCoat=0.0
+		hero.bootDistance=0.0
+		hero.bootPos=Vector2(hero.x,hero.y)
 		blood.reset()
 		scorches.clear()
 	background.setup(art,next)
