@@ -104,8 +104,11 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	node.draw_texture_rect(texture(file),rect,false)
 	node.draw_set_transform(Vector2.ZERO)
 
+func has_separate_weapon(f: Dictionary) -> bool:
+	return f.player or f.kind not in ["archer","legion"]
+
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
-	if f.gearDropped or f.kind in ["archer","legion"]: return
+	if f.gearDropped or not has_separate_weapon(f): return
 	var l=layout(p)
 	if f.player:
 		if l.rig.behind!=behind: return

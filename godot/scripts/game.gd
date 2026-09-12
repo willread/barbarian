@@ -670,7 +670,7 @@ func _notification(what: int):
 
 func drop_gear(f: Dictionary):
 	f.gearDropped=true
-	if f.kind in ["archer","legion"]:return # Archer gear burns with the body; minotaurs fight bare-handed.
+	if not art.has_separate_weapon(f):return # Archer gear burns with the body; minotaurs fight bare-handed.
 	var pieces=[]
 	if f.player or f.kind=="champion":
 		var w=art.data.weapons[weapon if f.player else "axe"]

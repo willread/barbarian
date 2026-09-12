@@ -1,6 +1,11 @@
 extends SceneTree
 func _init():
 	var art=load("res://scripts/art.gd").new()
+	var mechanics=load("res://scripts/mechanics.gd").new()
+	var hero=mechanics.make(1,720,650,100,true)
+	assert(art.has_separate_weapon(hero),"Player must retain weapon despite legacy legion kind")
+	hero.player=false
+	assert(not art.has_separate_weapon(hero),"Minotaurs remain unarmed")
 	var archer={"kind":"archer","hp":0,"down":{"ground":0,"vz":-2}}
 	assert(art.enemy_frame(archer)==10)
 	archer.down.vz=2
