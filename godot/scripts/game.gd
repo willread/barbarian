@@ -1091,7 +1091,7 @@ func draw_overlay():
 		var recoil=sin(landing*PI)*pow(1.-landing,1.2)
 		var zoom=lerpf(.24,1.,travel)-recoil*.065
 		var unrest=sin(PI*approach)*.8+sin(PI*landing)*pow(1.-landing,2)*.15
-		var drift=Vector2(sin(title_intro*57.)+sin(title_intro*83.)*.25,cos(title_intro*67.)*.8)*unrest*12.
+		var drift=Vector2(sin(title_intro*18.)+sin(title_intro*26.)*.25,cos(title_intro*21.)*.8)*unrest*12.
 		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+drift
 		overlay.draw_set_transform(pivot,0.,Vector2.ONE*zoom)
 		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
