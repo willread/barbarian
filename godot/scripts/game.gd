@@ -712,7 +712,7 @@ func tick(dt: float):
 	background.constrain(hero)
 	if not chicken.is_empty():background.constrain(chicken)
 	for f in enemies: background.constrain(f)
-	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0 and f.burnAge>3.4):
+	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0 and f.burnAge>1.7):
 		if wave<encounters.size() and screen_for_wave(wave+1)==screen_for_wave(wave):
 			wave+=1
 			spawn_wave()
