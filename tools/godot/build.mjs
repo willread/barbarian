@@ -31,11 +31,11 @@ for(const target of targets){
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');
-  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><svg class="metal-logo" viewBox="78 41 1621 829" preserveAspectRatio="none" aria-label="Maximum Force"><image href="maximum-force-logo.png" width="1774" height="887" /></svg><svg class="flat-logo" viewBox="0 0 1621 829" preserveAspectRatio="none" aria-hidden="true"><svg x="228" y="0" width="1358" height="687" viewBox="1041 216 627 326" preserveAspectRatio="none"><image href="maximum-force-reference.png" width="1774" height="887" /></svg><svg x="0" y="701" width="1621" height="128" viewBox="973 569 721 52" preserveAspectRatio="none"><image href="maximum-force-reference.png" width="1774" height="887" /></svg></svg></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
+  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><svg class="metal-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-label="Maximum Force"><image href="maximum-force-logo.png" width="1774" height="887" /></svg><svg class="flat-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-hidden="true"><image href="maximum-force-white-v2.png" width="1774" height="887" /></svg></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
   html=html.replace('</head>',`<link rel="preload" as="image" href="maximum-force-logo.png"><link rel="preload" as="image" href="maximum-force-reference.png"><style>
 html,body{background:#000!important}
 #cairn-loader{position:fixed;inset:0;display:grid;place-items:center;background:#000 url(studio-background.png) center/cover no-repeat;z-index:9999;pointer-events:auto}
-#cairn-loader .studio-art{position:relative;width:min(68vw,101.7vh);aspect-ratio:1621/829;z-index:1}
+#cairn-loader .studio-art{position:relative;width:min(68vw,101.7vh);aspect-ratio:2/1;z-index:1}
 #cairn-loader .studio-art > svg{position:absolute;inset:0;width:100%;height:100%}
 #cairn-loader .metal-logo{animation:metal-out 1.2s ease-in-out 2s both}
 #cairn-loader .flat-logo{animation:flat-in 1.2s ease-in-out 2s both}
@@ -61,6 +61,7 @@ const cairnWatch=new MutationObserver(cairnCheck);
 cairnWatch.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
 cairnCheck();
 </script></body>`);
+  fs.copyFileSync('godot/art/maximum-force-white-v2.png',path.join(path.dirname(file),'maximum-force-white-v2.png'));
   fs.copyFileSync('godot/art/maximum-force-reference.png',path.join(path.dirname(file),'maximum-force-reference.png'));
   fs.copyFileSync('godot/art/studio-background.png',path.join(path.dirname(file),'studio-background.png'));
   fs.copyFileSync('godot/art/maximum-force-logo.png',path.join(path.dirname(file),'maximum-force-logo.png'));

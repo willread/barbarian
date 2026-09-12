@@ -1,7 +1,6 @@
 extends Node2D
 var picture: AtlasTexture
-var flat_mark: AtlasTexture
-var flat_text: AtlasTexture
+var flat: Texture2D
 var backdrop=preload("res://art/studio-background.png")
 var elapsed=0.0
 func _ready():
@@ -11,13 +10,8 @@ func _ready():
 		return
 	picture=AtlasTexture.new()
 	picture.atlas=load("res://art/maximum-force-logo.png")
-	picture.region=Rect2(78,41,1621,829)
-	flat_mark=AtlasTexture.new()
-	flat_mark.atlas=load("res://art/maximum-force-reference.png")
-	flat_mark.region=Rect2(1041,216,627,326)
-	flat_text=AtlasTexture.new()
-	flat_text.atlas=flat_mark.atlas
-	flat_text.region=Rect2(973,569,721,52)
+	picture.region=Rect2(0,0,1774,887)
+	flat=load("res://art/maximum-force-white-v2.png")
 	ResourceLoader.load_threaded_request("res://main.tscn")
 	if "--splash-capture" in OS.get_cmdline_user_args():capture.call_deferred()
 func capture():
@@ -43,9 +37,7 @@ func _draw():
 	var size=picture.get_size()*ratio
 	var bounds=Rect2((screen-size)*.5,size)
 	draw_texture_rect(picture,bounds,false,Color(1,1,1,1.-blend))
-	# Register the monogram and wordmark independently to the metallic artwork.
-	draw_texture_rect(flat_mark,Rect2(bounds.position+Vector2(228,0)*ratio,Vector2(1358,687)*ratio),false,Color(1,1,1,blend))
-	draw_texture_rect(flat_text,Rect2(bounds.position+Vector2(0,701)*ratio,Vector2(1621,128)*ratio),false,Color(1,1,1,blend))
+	draw_texture_rect(flat,bounds,false,Color(1,1,1,blend))
 	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)
 	var center=screen-Vector2.ONE*(radius+32.)
 	draw_arc(center,radius*.75,0,TAU,64,Color("777671"),radius*.23,true)
