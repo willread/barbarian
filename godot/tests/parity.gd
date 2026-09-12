@@ -27,6 +27,15 @@ func _init():
 		assert(f.attack.ticks==(22 if weapon=="axe" else 14))
 		assert(f.attack.damage==(3 if weapon=="axe" else 2))
 	var enemy_ai=CairnEnemies.new(m,data.roster)
+	var entrant={"x":-500.0,"size":1.18}
+	enemy_ai.keep_in_arena(entrant)
+	assert(entrant.x==-500.0)
+	entrant.x=720.0
+	enemy_ai.keep_in_arena(entrant)
+	for edge in [-500.0,1900.0]:
+		entrant.x=edge
+		enemy_ai.keep_in_arena(entrant)
+		assert(entrant.x>=140*1.18 and entrant.x<=1440-140*1.18)
 	for v in ["swift","brute"]:
 		var found=false
 		for attempt in 100:

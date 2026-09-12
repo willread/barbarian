@@ -44,6 +44,14 @@ func plan() -> Array:
 	wave_variants.append([])
 	return result
 
+static func arena_margin(e: Dictionary) -> float:
+	return 140.0*e.size
+
+static func keep_in_arena(e: Dictionary):
+	var margin=arena_margin(e)
+	if e.x>=margin and e.x<=1440.-margin:e["entered_arena"]=true
+	if e.get("entered_arena",false):e.x=clampf(e.x,margin,1440.-margin)
+
 static func shield_limit(area: int) -> int:
 	return clampi(area-1,0,3)
 
@@ -214,7 +222,8 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	e.dir=1 if dx>=0 else -1
 	if h.hp<=0:return Vector2.ZERO
 	if abs(dx)<310:
-		if (e.dir==1 and e.x> -120) or (e.dir==-1 and e.x<1560):return Vector2(-e.dir,sign(dy)*.3)
+		var margin=arena_margin(e) if e.get("entered_arena",false) else -120.0
+		if (e.dir==1 and e.x>margin+2) or (e.dir==-1 and e.x<1440.-margin-2):return Vector2(-e.dir,sign(dy)*.3)
 	if abs(dx)>650:return Vector2(e.dir,sign(dy)*.5)
 	if abs(dy)>28:return Vector2(0,sign(dy))
 	if not e.aiRest:

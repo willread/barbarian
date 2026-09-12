@@ -723,7 +723,9 @@ func tick(dt: float):
 	e_ai.separate(enemies)
 	background.constrain(hero)
 	if not chicken.is_empty():background.constrain(chicken)
-	for f in enemies: background.constrain(f)
+	for f in enemies:
+		e_ai.keep_in_arena(f)
+		background.constrain(f)
 	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0 and f.burnAge>=BurningSprite.finished_at(f.engulf)):
 		if wave<encounters.size() and screen_for_wave(wave+1)==screen_for_wave(wave):
 			wave+=1
