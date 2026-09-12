@@ -4,7 +4,7 @@ func _init():
 	var audio=load("res://scripts/audio.gd").new()
 	source.add_child(audio)
 	audio.setup(source)
-	assert(audio.clips.size()==28,"Expected 26 SFX and two music tracks")
+	assert(audio.clips.size()==29,"Expected 26 SFX and two music tracks")
 	for id in audio.clips:
 		var stream=audio.clips[id]
 		assert(stream is AudioStreamOggVorbis and stream.get_length()>.08,"Invalid audio: "+id)

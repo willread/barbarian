@@ -73,3 +73,6 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 
 ### Creature and blood revision (2026-09-11)
 - Built-in OpenAI ImageGen: `godot/art/minotaur-source.png` (16 minotaur poses), `archer-death-source.png` (reference-guided archer fall poses), and revised `hero-spin-neutral-source.png` (neutral olive/tan color correction). Derived runtime cels baked with `godot/scripts/bake_creature_update.gd` and `bake_spin.gd`. No external stock imagery. Legacy `legion` roster identifier now renders an unarmed minotaur.
+
+### Menu soundboard (2026-09-12)
+- 116 ElevenLabs generated alternatives: four each for 27 effects and two music tracks, including highlight, activation and landing. Prompts and descriptions: `soundboard/manifest.json`; generation: `tools/audio/menu-soundboard.mjs` and `tools/audio/full-soundboard.mjs`. Runtime copies in `godot/audio_options/`. Source MP3s retained, listening copies trimmed and normalized to -18 LUFS / -2 dBTP using FFmpeg. Credentials read only from ignored `.env.local`. F8 opens the hidden in-game soundboard, pauses play, and applies selected variants immediately; local selections persist in user://soundboard.cfg. Music uses a two-second wrap crossfade and -19 LUFS normalization.

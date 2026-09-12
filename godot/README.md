@@ -89,3 +89,6 @@ Skeleton archers appear in pre-boss encounter plans: 6 HP, retreat inside 310px,
 ## Generated audio
 26 dry ElevenLabs effects and two instrumental deep-guitar music tracks are in `audio/`. Runtime uses normalized Ogg files; original MP3s are excluded from exports. Menu/game tracks crossfade when phases change and have baked loop joins. Music ducks while paused or after death. SOUND controls all audio. Browsers unlock playback after the first key or click; native builds start automatically.
 `tools/audio/generate.mjs` reads the gitignored root `.env.local` locally and skips already-generated clips; `tools/audio/prepare.py` trims leading silence, normalizes and prepares Ogg loops. Prompts are recorded in `godot/audio/generation-manifest.json`. No API requests or keys are present in the shipped game.
+
+### Sound lab
+Press F8 to open the hidden soundboard. The game pauses; click any option to audition and apply it to later sound events. Escape/F8 closes it, preserving the previous pause state. All 27 effects and both music tracks have four alternatives plus the original. Choices persist locally in `user://soundboard.cfg`; preview volume does not change the gameplay mix.

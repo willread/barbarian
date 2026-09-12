@@ -2,6 +2,8 @@ extends Node
 const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","foot_stone","foot_earth","landing","bow_draw","bow_release","arrow_hit","arrow_ground","hero_effort","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
+var originals: Dictionary={}
+var choices: Dictionary={}
 var voices: Array=[]
 var tracks: Array=[]
 var gates: Dictionary={}
@@ -18,6 +20,12 @@ func setup(source: Node2D):
 	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
 	for id in CLIP_IDS:
 		clips[id]=load("res://audio/"+id+".ogg")
+	clips["menu_activate"]=clips["menu_land"]
+	originals=clips.duplicate()
+	var saved=ConfigFile.new()
+	if saved.load("user://soundboard.cfg")==OK:
+		for id in saved.get_section_keys("choices"):
+			set_variant(id,saved.get_value("choices",id),false)
 	for i in 16:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
@@ -30,6 +38,22 @@ func setup(source: Node2D):
 			player.stream.loop=true
 		player.volume_db=-60
 		tracks.append(player)
+
+func set_variant(id: String,variant: String,persist: bool=true):
+	if not originals.has(id):return
+	var path="res://audio_options/"+variant+".mp3"
+	if variant!="original" and not ResourceLoader.exists(path):return
+	clips[id]=originals[id] if variant=="original" else load(path)
+	choices[id]=variant
+	if id in ["music_menu","music_game"] and not tracks.is_empty():
+		var track=tracks[0 if id=="music_menu" else 1]
+		track.stop()
+		track.stream=clips[id]
+		track.stream.loop=true
+	if persist:
+		var saved=ConfigFile.new()
+		for key in choices:saved.set_value("choices",key,choices[key])
+		saved.save("user://soundboard.cfg")
 
 func play(id: String,db: float=-4,pitch: float=1.0):
 	if not unlocked or game.muted or not clips.has(id):return

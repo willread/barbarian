@@ -123,6 +123,9 @@ func _ready():
 	audio=preload("res://scripts/audio.gd").new()
 	add_child(audio)
 	audio.setup(self)
+	var soundboard=preload("res://scripts/soundboard.gd").new()
+	soundboard.audio=audio
+	add_child(soundboard)
 	blood=BloodScript.new()
 	add_child(blood)
 	ground_fx=Node2D.new()

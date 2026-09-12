@@ -1,0 +1,1058 @@
+{
+  "provider": "ElevenLabs",
+  "date": "2026-09-12T11:22:48.920Z",
+  "jobs": [
+    {
+      "id": "selection-1",
+      "group": "selection",
+      "label": "Selection / highlight",
+      "name": "Stone detent",
+      "description": "A compact stone knock with a gritty edge.",
+      "duration": 0.6,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One short dense stone detent locking into a notch. Dry granite knock, low chesty thock and very brief grit."
+    },
+    {
+      "id": "selection-2",
+      "group": "selection",
+      "label": "Selection / highlight",
+      "name": "Iron catch",
+      "description": "A blunt iron clunk with a short bass tail.",
+      "duration": 0.6,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One thick iron catch engaging, dull heavy low clunk with restrained metallic rattle. Tight and tactile."
+    },
+    {
+      "id": "selection-3",
+      "group": "selection",
+      "label": "Selection / highlight",
+      "name": "Crypt latch",
+      "description": "A hollow, wooden-and-stone tomb latch.",
+      "duration": 0.7,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One ancient oak and stone crypt latch shifting and seating, hollow dark low knock and brief dusty scrape."
+    },
+    {
+      "id": "selection-4",
+      "group": "selection",
+      "label": "Selection / highlight",
+      "name": "Basalt nudge",
+      "description": "A muted rock movement ending in a low bump.",
+      "duration": 0.65,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One very short rough basalt block nudge ending in a deep rounded bump, dense compressed stone body, little treble."
+    },
+    {
+      "id": "activation-1",
+      "group": "activation",
+      "label": "Click / activate",
+      "name": "Seal breaker",
+      "description": "A hard stone crack over a deep impact.",
+      "duration": 1,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One thick stone seal punched inward, sharp compact rocky crack atop a heavy bass thud, small debris tail."
+    },
+    {
+      "id": "activation-2",
+      "group": "activation",
+      "label": "Click / activate",
+      "name": "Iron verdict",
+      "description": "A decisive hammer blow to thick iron.",
+      "duration": 0.9,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One heavy hammer strikes a massive dull iron plate, deep low metallic THUNK, no ringing high ping, short resonant decay."
+    },
+    {
+      "id": "activation-3",
+      "group": "activation",
+      "label": "Click / activate",
+      "name": "Tomb lock",
+      "description": "A massive locking bolt slams home.",
+      "duration": 1,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One huge ancient iron tomb bolt slams home against stone. Layered mechanical clack and thick low end impact, brief chain settle."
+    },
+    {
+      "id": "activation-4",
+      "group": "activation",
+      "label": "Click / activate",
+      "name": "Obsidian crush",
+      "description": "A dense crushing crunch with a bass pulse.",
+      "duration": 0.9,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One dense obsidian stone crushed under a heavy press, visceral low crunchy impact with a short deep pressure thump, no explosion."
+    },
+    {
+      "id": "drop-1",
+      "group": "drop",
+      "label": "Menu item landing",
+      "name": "Monolith",
+      "description": "A giant stone slab hits bedrock.",
+      "duration": 1.5,
+      "prompt": "Dark fantasy menu Foley. Heavy stone and aged iron, deep bass and dense low mids. One isolated impact, immediate onset, short decay. No music, voices, bleeps or risers. One massive carved granite monolith drops onto bedrock. Huge heavy initial THUD, deep sub bass weight, gritty stone fracture and brief settling chips. No preceding whoosh."
+    },
+    {
+      "id": "drop-2",
+      "group": "drop",
+      "label": "Menu item landing",
+      "name": "Iron altar",
+      "description": "A heavy iron block lands on stone.",
+      "duration": 1.5,
+      "prompt": "Dark fantasy menu Foley. Heavy stone and aged iron, deep bass and dense low mids. One isolated impact, immediate onset, short decay. No music, voices, bleeps or risers. One enormous iron altar lands on stone floor, crushing low metallic KLANG THUNK, deep dark resonant body with grit and compact settling rattle. No bright ringing."
+    },
+    {
+      "id": "drop-3",
+      "group": "drop",
+      "label": "Menu item landing",
+      "name": "Buried titan",
+      "description": "A subterranean thump with dusty rubble.",
+      "duration": 1.6,
+      "prompt": "Premium dark fantasy game menu sound design. Dark, heavy, bassy physical stone and aged iron. Close forceful transient with dense low mid body and controlled deep bass, audible on normal speakers. No music, voices, bright digital bleeps or long cinematic risers. One isolated event, immediate onset. One colossal stone foot slams packed earth over bedrock, thunderously heavy muffled bass thump, rough midrange impact, dusty rubble cascading briefly."
+    },
+    {
+      "id": "drop-4",
+      "group": "drop",
+      "label": "Menu item landing",
+      "name": "Sarcophagus",
+      "description": "A tomb lid slams shut with a second settling knock.",
+      "duration": 1.6,
+      "prompt": "Dark fantasy menu Foley. Heavy stone and aged iron, deep bass and dense low mids. One isolated impact, immediate onset, short decay. No music, voices, bleeps or risers. One massive stone sarcophagus lid drops shut. Crushing low stone-on-stone thunk then one much quieter settling knock, brief grit, cavernous but controlled low resonance."
+    },
+    {
+      "id": "sword-1",
+      "group": "sword",
+      "label": "Sword",
+      "name": "Raw weight",
+      "description": "One fast steel sword swing through air, narrow sharp whoosh. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One fast steel sword swing through air, narrow sharp whoosh. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "sword-2",
+      "group": "sword",
+      "label": "Sword",
+      "name": "Deep impact",
+      "description": "One fast steel sword swing through air, narrow sharp whoosh. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One fast steel sword swing through air, narrow sharp whoosh. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "sword-3",
+      "group": "sword",
+      "label": "Sword",
+      "name": "Rough texture",
+      "description": "One fast steel sword swing through air, narrow sharp whoosh. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One fast steel sword swing through air, narrow sharp whoosh. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "sword-4",
+      "group": "sword",
+      "label": "Sword",
+      "name": "Dark resonance",
+      "description": "One fast steel sword swing through air, narrow sharp whoosh. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One fast steel sword swing through air, narrow sharp whoosh. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "axe-1",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Raw weight",
+      "description": "One forceful heavy axe swing through air, broad low whoosh. close, dry and physical.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One forceful heavy axe swing through air, broad low whoosh. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "axe-2",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Deep impact",
+      "description": "One forceful heavy axe swing through air, broad low whoosh. deeper, heavier and more forceful.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One forceful heavy axe swing through air, broad low whoosh. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "axe-3",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Rough texture",
+      "description": "One forceful heavy axe swing through air, broad low whoosh. more grit, strain and material detail.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One forceful heavy axe swing through air, broad low whoosh. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "axe-4",
+      "group": "axe",
+      "label": "Axe",
+      "name": "Dark resonance",
+      "description": "One forceful heavy axe swing through air, broad low whoosh. a fuller body and short, ominous tail.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One forceful heavy axe swing through air, broad low whoosh. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "flesh-1",
+      "group": "flesh",
+      "label": "Flesh",
+      "name": "Raw weight",
+      "description": "One sword striking flesh: solid short thud with wet cutting detail. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One sword striking flesh: solid short thud with wet cutting detail. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "flesh-2",
+      "group": "flesh",
+      "label": "Flesh",
+      "name": "Deep impact",
+      "description": "One sword striking flesh: solid short thud with wet cutting detail. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One sword striking flesh: solid short thud with wet cutting detail. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "flesh-3",
+      "group": "flesh",
+      "label": "Flesh",
+      "name": "Rough texture",
+      "description": "One sword striking flesh: solid short thud with wet cutting detail. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One sword striking flesh: solid short thud with wet cutting detail. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "flesh-4",
+      "group": "flesh",
+      "label": "Flesh",
+      "name": "Dark resonance",
+      "description": "One sword striking flesh: solid short thud with wet cutting detail. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One sword striking flesh: solid short thud with wet cutting detail. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "heavy_hit-1",
+      "group": "heavy_hit",
+      "label": "Heavy hit",
+      "name": "Raw weight",
+      "description": "One heavy axe chop into flesh, dense low impact with brief wet tearing. close, dry and physical.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy axe chop into flesh, dense low impact with brief wet tearing. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "heavy_hit-2",
+      "group": "heavy_hit",
+      "label": "Heavy hit",
+      "name": "Deep impact",
+      "description": "One heavy axe chop into flesh, dense low impact with brief wet tearing. deeper, heavier and more forceful.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy axe chop into flesh, dense low impact with brief wet tearing. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "heavy_hit-3",
+      "group": "heavy_hit",
+      "label": "Heavy hit",
+      "name": "Rough texture",
+      "description": "One heavy axe chop into flesh, dense low impact with brief wet tearing. more grit, strain and material detail.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy axe chop into flesh, dense low impact with brief wet tearing. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "heavy_hit-4",
+      "group": "heavy_hit",
+      "label": "Heavy hit",
+      "name": "Dark resonance",
+      "description": "One heavy axe chop into flesh, dense low impact with brief wet tearing. a fuller body and short, ominous tail.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy axe chop into flesh, dense low impact with brief wet tearing. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "bone-1",
+      "group": "bone",
+      "label": "Bone",
+      "name": "Raw weight",
+      "description": "One hard strike breaking dry bone, brittle crack with fragments. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One hard strike breaking dry bone, brittle crack with fragments. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "bone-2",
+      "group": "bone",
+      "label": "Bone",
+      "name": "Deep impact",
+      "description": "One hard strike breaking dry bone, brittle crack with fragments. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One hard strike breaking dry bone, brittle crack with fragments. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "bone-3",
+      "group": "bone",
+      "label": "Bone",
+      "name": "Rough texture",
+      "description": "One hard strike breaking dry bone, brittle crack with fragments. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One hard strike breaking dry bone, brittle crack with fragments. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "bone-4",
+      "group": "bone",
+      "label": "Bone",
+      "name": "Dark resonance",
+      "description": "One hard strike breaking dry bone, brittle crack with fragments. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One hard strike breaking dry bone, brittle crack with fragments. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "shield-1",
+      "group": "shield",
+      "label": "Shield",
+      "name": "Raw weight",
+      "description": "One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. close, dry and physical.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "shield-2",
+      "group": "shield",
+      "label": "Shield",
+      "name": "Deep impact",
+      "description": "One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. deeper, heavier and more forceful.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "shield-3",
+      "group": "shield",
+      "label": "Shield",
+      "name": "Rough texture",
+      "description": "One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. more grit, strain and material detail.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "shield-4",
+      "group": "shield",
+      "label": "Shield",
+      "name": "Dark resonance",
+      "description": "One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. a fuller body and short, ominous tail.",
+      "duration": 0.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy sword blocked by an old iron shield, dull clang, straps creak, short metallic tail. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "body_fall-1",
+      "group": "body_fall",
+      "label": "Body fall",
+      "name": "Raw weight",
+      "description": "Heavy human body falls onto stone, solid thump and leather equipment settling. close, dry and physical.",
+      "duration": 1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Heavy human body falls onto stone, solid thump and leather equipment settling. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "body_fall-2",
+      "group": "body_fall",
+      "label": "Body fall",
+      "name": "Deep impact",
+      "description": "Heavy human body falls onto stone, solid thump and leather equipment settling. deeper, heavier and more forceful.",
+      "duration": 1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Heavy human body falls onto stone, solid thump and leather equipment settling. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "body_fall-3",
+      "group": "body_fall",
+      "label": "Body fall",
+      "name": "Rough texture",
+      "description": "Heavy human body falls onto stone, solid thump and leather equipment settling. more grit, strain and material detail.",
+      "duration": 1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Heavy human body falls onto stone, solid thump and leather equipment settling. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "body_fall-4",
+      "group": "body_fall",
+      "label": "Body fall",
+      "name": "Dark resonance",
+      "description": "Heavy human body falls onto stone, solid thump and leather equipment settling. a fuller body and short, ominous tail.",
+      "duration": 1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Heavy human body falls onto stone, solid thump and leather equipment settling. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "foot_stone-1",
+      "group": "foot_stone",
+      "label": "Foot stone",
+      "name": "Raw weight",
+      "description": "One heavy leather boot footstep on gritty stone. close, dry and physical.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on gritty stone. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "foot_stone-2",
+      "group": "foot_stone",
+      "label": "Foot stone",
+      "name": "Deep impact",
+      "description": "One heavy leather boot footstep on gritty stone. deeper, heavier and more forceful.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on gritty stone. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "foot_stone-3",
+      "group": "foot_stone",
+      "label": "Foot stone",
+      "name": "Rough texture",
+      "description": "One heavy leather boot footstep on gritty stone. more grit, strain and material detail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on gritty stone. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "foot_stone-4",
+      "group": "foot_stone",
+      "label": "Foot stone",
+      "name": "Dark resonance",
+      "description": "One heavy leather boot footstep on gritty stone. a fuller body and short, ominous tail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on gritty stone. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "foot_earth-1",
+      "group": "foot_earth",
+      "label": "Foot earth",
+      "name": "Raw weight",
+      "description": "One heavy leather boot footstep on dry packed earth. close, dry and physical.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on dry packed earth. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "foot_earth-2",
+      "group": "foot_earth",
+      "label": "Foot earth",
+      "name": "Deep impact",
+      "description": "One heavy leather boot footstep on dry packed earth. deeper, heavier and more forceful.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on dry packed earth. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "foot_earth-3",
+      "group": "foot_earth",
+      "label": "Foot earth",
+      "name": "Rough texture",
+      "description": "One heavy leather boot footstep on dry packed earth. more grit, strain and material detail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on dry packed earth. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "foot_earth-4",
+      "group": "foot_earth",
+      "label": "Foot earth",
+      "name": "Dark resonance",
+      "description": "One heavy leather boot footstep on dry packed earth. a fuller body and short, ominous tail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One heavy leather boot footstep on dry packed earth. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "landing-1",
+      "group": "landing",
+      "label": "Landing",
+      "name": "Raw weight",
+      "description": "Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. close, dry and physical.",
+      "duration": 1.1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "landing-2",
+      "group": "landing",
+      "label": "Landing",
+      "name": "Deep impact",
+      "description": "Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. deeper, heavier and more forceful.",
+      "duration": 1.1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "landing-3",
+      "group": "landing",
+      "label": "Landing",
+      "name": "Rough texture",
+      "description": "Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. more grit, strain and material detail.",
+      "duration": 1.1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "landing-4",
+      "group": "landing",
+      "label": "Landing",
+      "name": "Dark resonance",
+      "description": "Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. a fuller body and short, ominous tail.",
+      "duration": 1.1,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Powerful weapon slam into stone ground, heavy impact then loose grit and dust scattering. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "bow_draw-1",
+      "group": "bow_draw",
+      "label": "Bow draw",
+      "name": "Raw weight",
+      "description": "Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "bow_draw-2",
+      "group": "bow_draw",
+      "label": "Bow draw",
+      "name": "Deep impact",
+      "description": "Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "bow_draw-3",
+      "group": "bow_draw",
+      "label": "Bow draw",
+      "name": "Rough texture",
+      "description": "Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "bow_draw-4",
+      "group": "bow_draw",
+      "label": "Bow draw",
+      "name": "Dark resonance",
+      "description": "Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow pulled from leather quiver, feather rustle then wooden bow flex under string tension. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "bow_release-1",
+      "group": "bow_release",
+      "label": "Bow release",
+      "name": "Raw weight",
+      "description": "Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. close, dry and physical.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "bow_release-2",
+      "group": "bow_release",
+      "label": "Bow release",
+      "name": "Deep impact",
+      "description": "Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. deeper, heavier and more forceful.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "bow_release-3",
+      "group": "bow_release",
+      "label": "Bow release",
+      "name": "Rough texture",
+      "description": "Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. more grit, strain and material detail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "bow_release-4",
+      "group": "bow_release",
+      "label": "Bow release",
+      "name": "Dark resonance",
+      "description": "Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. a fuller body and short, ominous tail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Wooden longbow string snaps forward releasing arrow, taut dry twang, short swift hiss. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "arrow_hit-1",
+      "group": "arrow_hit",
+      "label": "Arrow hit",
+      "name": "Raw weight",
+      "description": "Arrow punctures flesh, tight dry puncture and tiny wet thud. close, dry and physical.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow punctures flesh, tight dry puncture and tiny wet thud. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "arrow_hit-2",
+      "group": "arrow_hit",
+      "label": "Arrow hit",
+      "name": "Deep impact",
+      "description": "Arrow punctures flesh, tight dry puncture and tiny wet thud. deeper, heavier and more forceful.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow punctures flesh, tight dry puncture and tiny wet thud. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "arrow_hit-3",
+      "group": "arrow_hit",
+      "label": "Arrow hit",
+      "name": "Rough texture",
+      "description": "Arrow punctures flesh, tight dry puncture and tiny wet thud. more grit, strain and material detail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow punctures flesh, tight dry puncture and tiny wet thud. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "arrow_hit-4",
+      "group": "arrow_hit",
+      "label": "Arrow hit",
+      "name": "Dark resonance",
+      "description": "Arrow punctures flesh, tight dry puncture and tiny wet thud. a fuller body and short, ominous tail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Arrow punctures flesh, tight dry puncture and tiny wet thud. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "arrow_ground-1",
+      "group": "arrow_ground",
+      "label": "Arrow ground",
+      "name": "Raw weight",
+      "description": "Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. close, dry and physical.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "arrow_ground-2",
+      "group": "arrow_ground",
+      "label": "Arrow ground",
+      "name": "Deep impact",
+      "description": "Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. deeper, heavier and more forceful.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "arrow_ground-3",
+      "group": "arrow_ground",
+      "label": "Arrow ground",
+      "name": "Rough texture",
+      "description": "Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. more grit, strain and material detail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "arrow_ground-4",
+      "group": "arrow_ground",
+      "label": "Arrow ground",
+      "name": "Dark resonance",
+      "description": "Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. a fuller body and short, ominous tail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Iron arrowhead hits gritty stone and wooden shaft vibrates briefly. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "hero_effort-1",
+      "group": "hero_effort",
+      "label": "Hero effort",
+      "name": "Raw weight",
+      "description": "One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. close, dry and physical.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. Close dry chest voice."
+    },
+    {
+      "id": "hero_effort-2",
+      "group": "hero_effort",
+      "label": "Hero effort",
+      "name": "Deep impact",
+      "description": "One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. deeper, heavier and more forceful.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. Lower powerful chest resonance, natural human or creature voice."
+    },
+    {
+      "id": "hero_effort-3",
+      "group": "hero_effort",
+      "label": "Hero effort",
+      "name": "Rough texture",
+      "description": "One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. more grit, strain and material detail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. Rougher strained breath and gravelly texture."
+    },
+    {
+      "id": "hero_effort-4",
+      "group": "hero_effort",
+      "label": "Hero effort",
+      "name": "Dark resonance",
+      "description": "One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. a fuller body and short, ominous tail.",
+      "duration": 0.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior effort grunt, nonverbal, forceful breath, no words. Deep resonant chest tone and short crypt room decay."
+    },
+    {
+      "id": "hero_pain-1",
+      "group": "hero_pain",
+      "label": "Hero pain",
+      "name": "Raw weight",
+      "description": "One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. Close dry chest voice."
+    },
+    {
+      "id": "hero_pain-2",
+      "group": "hero_pain",
+      "label": "Hero pain",
+      "name": "Deep impact",
+      "description": "One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. Lower powerful chest resonance, natural human or creature voice."
+    },
+    {
+      "id": "hero_pain-3",
+      "group": "hero_pain",
+      "label": "Hero pain",
+      "name": "Rough texture",
+      "description": "One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. Rougher strained breath and gravelly texture."
+    },
+    {
+      "id": "hero_pain-4",
+      "group": "hero_pain",
+      "label": "Hero pain",
+      "name": "Dark resonance",
+      "description": "One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep adult male warrior short hurt grunt, nonverbal, restrained and realistic. Deep resonant chest tone and short crypt room decay."
+    },
+    {
+      "id": "roar-1",
+      "group": "roar",
+      "label": "Roar",
+      "name": "Raw weight",
+      "description": "One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. close, dry and physical.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. Close dry chest voice."
+    },
+    {
+      "id": "roar-2",
+      "group": "roar",
+      "label": "Roar",
+      "name": "Deep impact",
+      "description": "One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. deeper, heavier and more forceful.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. Lower powerful chest resonance, natural human or creature voice."
+    },
+    {
+      "id": "roar-3",
+      "group": "roar",
+      "label": "Roar",
+      "name": "Rough texture",
+      "description": "One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. more grit, strain and material detail.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. Rougher strained breath and gravelly texture."
+    },
+    {
+      "id": "roar-4",
+      "group": "roar",
+      "label": "Roar",
+      "name": "Dark resonance",
+      "description": "One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. a fuller body and short, ominous tail.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One menacing heavy armored undead warrior coarse battle roar, nonverbal, no words. Deep resonant chest tone and short crypt room decay."
+    },
+    {
+      "id": "death-1",
+      "group": "death",
+      "label": "Death",
+      "name": "Raw weight",
+      "description": "One deep male warrior final strained death cry and expelled breath, no words. close, dry and physical.",
+      "duration": 1.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep male warrior final strained death cry and expelled breath, no words. Close dry chest voice."
+    },
+    {
+      "id": "death-2",
+      "group": "death",
+      "label": "Death",
+      "name": "Deep impact",
+      "description": "One deep male warrior final strained death cry and expelled breath, no words. deeper, heavier and more forceful.",
+      "duration": 1.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep male warrior final strained death cry and expelled breath, no words. Lower powerful chest resonance, natural human or creature voice."
+    },
+    {
+      "id": "death-3",
+      "group": "death",
+      "label": "Death",
+      "name": "Rough texture",
+      "description": "One deep male warrior final strained death cry and expelled breath, no words. more grit, strain and material detail.",
+      "duration": 1.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep male warrior final strained death cry and expelled breath, no words. Rougher strained breath and gravelly texture."
+    },
+    {
+      "id": "death-4",
+      "group": "death",
+      "label": "Death",
+      "name": "Dark resonance",
+      "description": "One deep male warrior final strained death cry and expelled breath, no words. a fuller body and short, ominous tail.",
+      "duration": 1.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. One deep male warrior final strained death cry and expelled breath, no words. Deep resonant chest tone and short crypt room decay."
+    },
+    {
+      "id": "lightning-1",
+      "group": "lightning",
+      "label": "Lightning",
+      "name": "Raw weight",
+      "description": "Violent natural lightning crack, branching electrical snaps and short deep thunder body. close, dry and physical.",
+      "duration": 1.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Violent natural lightning crack, branching electrical snaps and short deep thunder body. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "lightning-2",
+      "group": "lightning",
+      "label": "Lightning",
+      "name": "Deep impact",
+      "description": "Violent natural lightning crack, branching electrical snaps and short deep thunder body. deeper, heavier and more forceful.",
+      "duration": 1.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Violent natural lightning crack, branching electrical snaps and short deep thunder body. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "lightning-3",
+      "group": "lightning",
+      "label": "Lightning",
+      "name": "Rough texture",
+      "description": "Violent natural lightning crack, branching electrical snaps and short deep thunder body. more grit, strain and material detail.",
+      "duration": 1.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Violent natural lightning crack, branching electrical snaps and short deep thunder body. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "lightning-4",
+      "group": "lightning",
+      "label": "Lightning",
+      "name": "Dark resonance",
+      "description": "Violent natural lightning crack, branching electrical snaps and short deep thunder body. a fuller body and short, ominous tail.",
+      "duration": 1.8,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Violent natural lightning crack, branching electrical snaps and short deep thunder body. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "fire-1",
+      "group": "fire",
+      "label": "Fire",
+      "name": "Raw weight",
+      "description": "Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. close, dry and physical.",
+      "duration": 2.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "fire-2",
+      "group": "fire",
+      "label": "Fire",
+      "name": "Deep impact",
+      "description": "Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. deeper, heavier and more forceful.",
+      "duration": 2.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "fire-3",
+      "group": "fire",
+      "label": "Fire",
+      "name": "Rough texture",
+      "description": "Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. more grit, strain and material detail.",
+      "duration": 2.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "fire-4",
+      "group": "fire",
+      "label": "Fire",
+      "name": "Dark resonance",
+      "description": "Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. a fuller body and short, ominous tail.",
+      "duration": 2.5,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Body ignites in a short turbulent burst of realistic fire, irregular crackles fading to embers. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "chicken-1",
+      "group": "chicken",
+      "label": "Chicken",
+      "name": "Raw weight",
+      "description": "A real chicken making two brief natural clucks, close isolated farm animal recording, no background. close, dry and physical.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real chicken making two brief natural clucks, close isolated farm animal recording, no background. Natural close recording."
+    },
+    {
+      "id": "chicken-2",
+      "group": "chicken",
+      "label": "Chicken",
+      "name": "Deep impact",
+      "description": "A real chicken making two brief natural clucks, close isolated farm animal recording, no background. deeper, heavier and more forceful.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real chicken making two brief natural clucks, close isolated farm animal recording, no background. Lower fuller natural bird timbre, NOT a monster."
+    },
+    {
+      "id": "chicken-3",
+      "group": "chicken",
+      "label": "Chicken",
+      "name": "Rough texture",
+      "description": "A real chicken making two brief natural clucks, close isolated farm animal recording, no background. more grit, strain and material detail.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real chicken making two brief natural clucks, close isolated farm animal recording, no background. Rougher feather and breath detail, clearly a real chicken."
+    },
+    {
+      "id": "chicken-4",
+      "group": "chicken",
+      "label": "Chicken",
+      "name": "Dark resonance",
+      "description": "A real chicken making two brief natural clucks, close isolated farm animal recording, no background. a fuller body and short, ominous tail.",
+      "duration": 0.9,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real chicken making two brief natural clucks, close isolated farm animal recording, no background. Slightly hollow natural chest resonance, realistic bird."
+    },
+    {
+      "id": "chicken_hit-1",
+      "group": "chicken_hit",
+      "label": "Chicken hit",
+      "name": "Raw weight",
+      "description": "A real startled chicken gives one short squawk with a wing flutter, no background. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real startled chicken gives one short squawk with a wing flutter, no background. Natural close recording."
+    },
+    {
+      "id": "chicken_hit-2",
+      "group": "chicken_hit",
+      "label": "Chicken hit",
+      "name": "Deep impact",
+      "description": "A real startled chicken gives one short squawk with a wing flutter, no background. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real startled chicken gives one short squawk with a wing flutter, no background. Lower fuller natural bird timbre, NOT a monster."
+    },
+    {
+      "id": "chicken_hit-3",
+      "group": "chicken_hit",
+      "label": "Chicken hit",
+      "name": "Rough texture",
+      "description": "A real startled chicken gives one short squawk with a wing flutter, no background. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real startled chicken gives one short squawk with a wing flutter, no background. Rougher feather and breath detail, clearly a real chicken."
+    },
+    {
+      "id": "chicken_hit-4",
+      "group": "chicken_hit",
+      "label": "Chicken hit",
+      "name": "Dark resonance",
+      "description": "A real startled chicken gives one short squawk with a wing flutter, no background. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. A real startled chicken gives one short squawk with a wing flutter, no background. Slightly hollow natural chest resonance, realistic bird."
+    },
+    {
+      "id": "pickup-1",
+      "group": "pickup",
+      "label": "Pickup",
+      "name": "Raw weight",
+      "description": "Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. close, dry and physical.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "pickup-2",
+      "group": "pickup",
+      "label": "Pickup",
+      "name": "Deep impact",
+      "description": "Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. deeper, heavier and more forceful.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "pickup-3",
+      "group": "pickup",
+      "label": "Pickup",
+      "name": "Rough texture",
+      "description": "Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. more grit, strain and material detail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "pickup-4",
+      "group": "pickup",
+      "label": "Pickup",
+      "name": "Dark resonance",
+      "description": "Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. a fuller body and short, ominous tail.",
+      "duration": 0.7,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Brief leather rustle and satisfying small organic pickup sound, subtle warm low resonance. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "transition-1",
+      "group": "transition",
+      "label": "Transition",
+      "name": "Raw weight",
+      "description": "Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. close, dry and physical.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. Close dry realistic recording, dense low-mid body, restrained room tail."
+    },
+    {
+      "id": "transition-2",
+      "group": "transition",
+      "label": "Transition",
+      "name": "Deep impact",
+      "description": "Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. deeper, heavier and more forceful.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. Emphasize deep weight and dark low frequencies with a stronger transient, natural and tactile."
+    },
+    {
+      "id": "transition-3",
+      "group": "transition",
+      "label": "Transition",
+      "name": "Rough texture",
+      "description": "Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. more grit, strain and material detail.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. More organic rough texture, layered material detail, forceful and gritty, no bright synthetic sheen."
+    },
+    {
+      "id": "transition-4",
+      "group": "transition",
+      "label": "Transition",
+      "name": "Dark resonance",
+      "description": "Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. a fuller body and short, ominous tail.",
+      "duration": 1.2,
+      "prompt": "Dark sword-and-sorcery game SFX. No music, words or unrelated background. One event, immediate onset. Ominous low rush of air through an ancient crypt, compact dark whoosh, no voices. Dark full resonant body with a short natural stone chamber tail, controlled bass, intimate not distant."
+    },
+    {
+      "id": "music_menu-1",
+      "group": "music_menu",
+      "label": "Menu music",
+      "name": "Slow doom",
+      "description": "Slow thick sustained chords and a crushing half-time riff. Brooding 80 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Brooding doom metal at 80 BPM. Slow thick sustained chords and a crushing half-time riff. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_menu-2",
+      "group": "music_menu",
+      "label": "Menu music",
+      "name": "Iron procession",
+      "description": "Syncopated palm-muted low chugs with a memorable dark motif. Brooding 80 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Brooding doom metal at 80 BPM. Syncopated palm-muted low chugs with a memorable dark motif. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_menu-3",
+      "group": "music_menu",
+      "label": "Menu music",
+      "name": "Subterranean dread",
+      "description": "Sparse ominous bass-heavy guitar drones alternating with massive riffs. Brooding 80 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Brooding doom metal at 80 BPM. Sparse ominous bass-heavy guitar drones alternating with massive riffs. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_menu-4",
+      "group": "music_menu",
+      "label": "Menu music",
+      "name": "War altar",
+      "description": "Dense rolling low-register riffs and thunderous tom-driven drums. Brooding 80 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Brooding doom metal at 80 BPM. Dense rolling low-register riffs and thunderous tom-driven drums. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_game-1",
+      "group": "music_game",
+      "label": "Gameplay music",
+      "name": "Crushing groove",
+      "description": "Slow thick sustained chords and a crushing half-time riff. Driving 120 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Driving combat groove metal at 120 BPM. Slow thick sustained chords and a crushing half-time riff. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_game-2",
+      "group": "music_game",
+      "label": "Gameplay music",
+      "name": "Low-end assault",
+      "description": "Syncopated palm-muted low chugs with a memorable dark motif. Driving 120 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Driving combat groove metal at 120 BPM. Syncopated palm-muted low chugs with a memorable dark motif. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_game-3",
+      "group": "music_game",
+      "label": "Gameplay music",
+      "name": "War march",
+      "description": "Sparse ominous bass-heavy guitar drones alternating with massive riffs. Driving 120 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Driving combat groove metal at 120 BPM. Sparse ominous bass-heavy guitar drones alternating with massive riffs. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "music_game-4",
+      "group": "music_game",
+      "label": "Gameplay music",
+      "name": "Relentless siege",
+      "description": "Dense rolling low-register riffs and thunderous tom-driven drums. Driving 120 BPM.",
+      "duration": 60000,
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Driving combat groove metal at 120 BPM. Dense rolling low-register riffs and thunderous tom-driven drums. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    }
+  ]
+}

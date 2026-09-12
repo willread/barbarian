@@ -23,6 +23,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/combat_moves.gd']);
  run(binary,['--headless','--path','godot','--script','tests/audio_assets.gd']);
  run(binary,['--headless','--path','godot','--script','tests/creature_art.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/soundboard.gd']);
  run(binary,['--headless','--path','godot','--','--smoke-test']);
  run(binary,['--headless','--path','godot','--','--integration-test']);
  run(binary,['--headless','--path','godot','--','--moves-test']);
@@ -33,6 +34,7 @@ const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--wi
 for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
  run(binary,['--headless','--path','godot','--export-release',target,file]);
+ run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
  // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);
  if(target==='Web'){

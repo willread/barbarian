@@ -84,7 +84,7 @@ func quake():
 func activate():
 	if switching or items.is_empty(): return
 	quake()
-	sound_requested.emit("menu_land")
+	sound_requested.emit("menu_activate")
 	activated.emit(items[selected].label)
 
 func handle(event: InputEvent):

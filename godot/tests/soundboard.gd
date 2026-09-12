@@ -1,0 +1,41 @@
+extends SceneTree
+func _init():call_deferred("check")
+func check():
+	var source=Node2D.new()
+	root.add_child(source)
+	var audio=load("res://scripts/audio.gd").new()
+	source.add_child(audio)
+	audio.setup(source)
+	audio.set_process(false)
+	var board=load("res://scripts/soundboard.gd").new()
+	board.audio=audio
+	source.add_child(board)
+	assert(board.buttons.size()==29)
+	var data=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/manifest.json"))
+	assert(data.jobs.size()==116)
+	for job in data.jobs:
+		var clip=load("res://audio_options/"+job.id+".mp3")
+		assert(clip is AudioStreamMP3 and clip.get_length()>.1)
+		if job.get("music",false):assert(clip.get_length()>50)
+	board.toggle()
+	assert(paused and board.opened)
+	audio.set_variant("sword","sword-3",false)
+	assert(audio.clips.sword.resource_path.ends_with("sword-3.mp3"))
+	audio.set_variant("music_game","music_game-2",false)
+	assert(audio.tracks[1].stream==audio.clips.music_game and audio.tracks[1].stream.loop)
+	board.toggle()
+	assert(not paused and not board.opened)
+	paused=true
+	board.toggle()
+	board.toggle()
+	assert(paused,"Closing lab preserves preexisting pause")
+	paused=false
+	if "--capture" in OS.get_cmdline_user_args():
+		board.toggle()
+		await process_frame
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("E:/Cairn-build-tools/soundboard-check.png")
+		board.toggle()
+	source.free()
+	print("CAIRN_SOUNDBOARD_OK: 116 decodable options, 29 groups, live effect/music replacement and pause restoration")
+	quit()
