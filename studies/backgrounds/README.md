@@ -17,3 +17,6 @@ The shader is in waterfall.js. Loop duration 2 seconds. The browser runs a real 
 
 ## V4 waterfall coverage and brazier
 Expanded waterfall perimeter and eased the brightness cutoff to include dim spray and water. Added separate fire coverage mask: bright warm flame texture travels upward, while the broader warm stone region receives only periodic lighting modulation. No masonry displacement in the fire region. Both use the two-second loop and independent region toggles. V3 retained for comparison.
+
+### Mask refinement
+Water uses explicit stone exclusion polygons, applied after edge softening, and identical source/destination water coverage. Fire motion uses a separate narrow flame mask; the broad glow mask only modulates light. Debug: green is moving water, bright yellow is moving flame, dim orange is lighting-only coverage. Source sampling cannot use the broad glow region.
