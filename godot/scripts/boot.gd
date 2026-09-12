@@ -2,12 +2,16 @@ extends Node2D
 var picture: Texture2D
 var backdrop=preload("res://art/studio-background.png")
 var elapsed=0.0
+var flat: AtlasTexture
 func _ready():
 	# Browser has an HTML splash while the engine itself downloads.
 	if OS.has_feature("web") or (not OS.get_cmdline_user_args().is_empty() and not "--splash-capture" in OS.get_cmdline_user_args()):
 		get_tree().change_scene_to_file.call_deferred("res://main.tscn")
 		return
 	picture=load("res://art/maximum-force-logo.png")
+	flat=AtlasTexture.new()
+	flat.atlas=load("res://art/maximum-force-reference.png")
+	flat.region=Rect2(960,210,750,420)
 	ResourceLoader.load_threaded_request("res://main.tscn")
 	if "--splash-capture" in OS.get_cmdline_user_args():capture.call_deferred()
 func capture():
@@ -19,7 +23,7 @@ func _process(dt: float):
 	if not picture:return
 	elapsed+=dt
 	queue_redraw()
-	if elapsed>=2.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
+	if elapsed>=3.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
 		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get("res://main.tscn"))
 func _draw():
 	if not picture:return
@@ -27,9 +31,14 @@ func _draw():
 	var cover=max(screen.x/backdrop.get_width(),screen.y/backdrop.get_height())
 	var bg=backdrop.get_size()*cover
 	draw_texture_rect(backdrop,Rect2((screen-bg)*.5,bg),false)
-	var ratio=min(screen.x*.78/picture.get_width(),screen.y*.62/picture.get_height())
+	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
 	var size=picture.get_size()*ratio
-	draw_texture_rect(picture,Rect2((screen-size)*.5,size),false)
+	var blend=smoothstep(1.5,1.95,elapsed)
+	draw_rect(Rect2(Vector2.ZERO,screen),Color(0,0,0,blend))
+	draw_texture_rect(picture,Rect2((screen-size)*.5,size),false,Color(1,1,1,1.-blend))
+	var flat_ratio=min(screen.x*.68/flat.get_width(),screen.y*.52/flat.get_height())
+	var flat_size=flat.get_size()*flat_ratio
+	draw_texture_rect(flat,Rect2((screen-flat_size)*.5,flat_size),false,Color(1,1,1,blend))
 	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)
 	var center=screen-Vector2.ONE*(radius+32.)
 	draw_arc(center,radius*.75,0,TAU,64,Color("777671"),radius*.23,true)
