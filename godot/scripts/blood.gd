@@ -1,0 +1,89 @@
+class_name CairnBlood
+extends Node2D
+var drops: Array=[]
+var marks: Array=[]
+var wet: Dictionary={}
+var air_view: Node2D
+func _ready():
+	z_index=-10
+	air_view=Node2D.new()
+	air_view.z_index=1800
+	air_view.draw.connect(draw_air)
+	add_child(air_view)
+func reset():
+	drops.clear()
+	marks.clear()
+	wet.clear()
+	queue_redraw()
+func cell(x: float,y: float) -> Vector2i: return Vector2i(floor(x/16),floor(y/16))
+func stain(x: float,y: float,r: float,amount: float=1,track: bool=false,angle: float=0):
+	if x<0 or x>=1440 or y<535 or y>=810: return
+	var points=PackedVector2Array()
+	for i in 14:
+		var a=i/14.0*TAU
+		var rr=r*(.72+randf()*.4)
+		points.append(Vector2(cos(a)*rr,sin(a)*rr*(.65 if track else .34)).rotated(angle)+Vector2(x,y))
+	marks.append({"points":points,"x":x,"y":y,"r":r,"alpha":min(.86,amount*.8)})
+	if not track:
+		for yy in range(int((y-r*.34)/16),int((y+r*.34)/16)+1):
+			for xx in range(int((x-r)/16),int((x+r)/16)+1): wet[Vector2i(xx,yy)]=65.0
+	queue_redraw()
+func hit(f: Dictionary,direction: int,fatal: bool):
+	var count=(36+randi()%17) if fatal else (18+randi()%11)
+	var units=4.5/CairnMechanics.STEP
+	var launched=not f.down.is_empty() and not f.down.ground
+	var horizontal=f.down.vx if launched else f.velocityX
+	var vertical=f.down.vz if launched else f.air.get("vz",f.attack.get("vz",0))
+	var force=(25 if launched else 80)+randf()*(65 if launched else 120)
+	var fan=.45+randf()*.55
+	var lift=(10 if launched else 35)+randf()*(35 if launched else 90)
+	var height=85+randf()*50+f.height*4.5
+	stain(f.x,f.y,7 if launched else 42 if fatal else 19)
+	for i in count:
+		var angle=(randf()-.5)*fan
+		var speed=force*(.5+randf()*.8)
+		drops.append({"x":f.x+(randf()-.5)*18,"y":f.y+(randf()-.5)*12,"z":height+(randf()-.5)*24,"vx":horizontal*units*(1 if launched else .6)+direction*cos(angle)*speed,"vy":f.velocityY*units*.6+sin(angle)*speed*.6,"vz":-vertical*units*(1 if launched else .45)+lift+(randf()-.5)*280,"gravity":.25*units/CairnMechanics.STEP if launched else 850.0,"drag":0.0 if launched else .8,"r":(5 if fatal else 3.5)+randf()*(5 if fatal else 4)})
+	while drops.size()>700: drops.pop_front()
+func step(dt: float,fighters: Array):
+	for d in drops:
+		d.x+=d.vx*dt
+		d.y+=d.vy*dt
+		d.z+=d.vz*dt
+		d.vz-=d.gravity*dt
+		d.vx*=exp(-dt*d.drag)
+		if d.z<=0: stain(d.x,clamp(d.y,540,790),d.r*2.3)
+	drops=drops.filter(func(d):return d.z>0)
+	for key in wet.keys():
+		wet[key]-=dt
+		if wet[key]<=0: wet.erase(key)
+	for f in fighters:
+		if not f.down.is_empty() and not f.down.ground:
+			f.trail-=dt
+			if f.trail<=0:
+				f.trail=.02+randf()*.025
+				for i in 2: drops.append({"x":f.x+(randf()-.5)*18,"y":f.y+(randf()-.5)*10,"z":60+f.height*4.5+randf()*25,"vx":f.down.vx*4.5/CairnMechanics.STEP*(.12+randf()*.18),"vy":(randf()-.5)*35,"vz":-f.down.vz*4.5/CairnMechanics.STEP*.12+(randf()-.5)*60,"gravity":850.0,"drag":1.6,"r":3+randf()*4})
+		var now=Vector2(f.x,f.y)
+		var delta=now-f.bootPos
+		f.bootPos=now
+		if not f.air.is_empty() or f.height>3:
+			f.bootDistance=0
+			continue
+		f.bootCoat=max(f.bootCoat,wet.get(cell(f.x,f.y),0)/65.0)
+		f.bootDistance+=min(delta.length(),40)
+		if f.bootDistance>=20 and f.bootCoat>.05:
+			f.bootDistance=0
+			f.bootSide*=-1
+			var angle=delta.angle()
+			var point=now+Vector2(-sin(angle)*f.bootSide*9,cos(angle)*f.bootSide*5)
+			stain(point.x,point.y,15 if not f.down.is_empty() else 7,f.bootCoat,true,angle)
+			f.bootCoat*=.82
+	while drops.size()>700: drops.pop_front()
+	if air_view: air_view.queue_redraw()
+func _draw():
+	for mark in marks:
+		draw_colored_polygon(mark.points,Color(.282,.027,.043,mark.alpha))
+		draw_set_transform(Vector2(mark.x,mark.y),0,Vector2(1,.34))
+		draw_circle(Vector2(-mark.r*.08,-mark.r*.04),mark.r*.56,Color(.45,.047,.07,mark.alpha*.65))
+		draw_set_transform(Vector2.ZERO)
+func draw_air():
+	for d in drops: air_view.draw_line(Vector2(d.x,d.y-d.z),Vector2(d.x-d.vx*.014,d.y-d.z+d.vz*.014),Color("43060a"),d.r,true)

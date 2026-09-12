@@ -36,3 +36,9 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Godot generated imports, converted assets and local tool downloads
+/godot/.godot/
+/godot/assets/
+/.tools/
+/godot/build/
