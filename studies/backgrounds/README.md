@@ -1,0 +1,8 @@
+# Background approval workshop
+Open /background-study/index.html in the local preview. The study is intentionally independent of the Godot game: no combat loop or export is needed for artwork iterations. Copy studies/backgrounds into the preview's background-study directory after changes; the normal build also copies it.
+
+Each immutable version folder contains screen.json, original concept, frame source and four registered frame images. Regions use normalized polygons, individually selectable and independently timed. Playback uses opaque frame replacement, never UV warping or frame crossfading. Current first draft: two regions, waterfall/splash and brazier. Mist remains static. Generated frame registration is imperfect and requires review; do not describe it as approved or final manual animation. Preview images are 1280x720; final high-resolution production art is pending approval.
+
+Review composition and animation separately, record notes and export JSON. Local browser decisions are not automatically committed or deployed. After user approval, preserve the reviewed version and integrate its region/frame metadata with the native environment renderer. New iterations get sibling version folders.
+
+Built-in image generation: concept prompt requested a 16:9 ruined aqueduct approach, matte fighting terrace, no statues/characters/UI, waterfall left and brazier right, muted blue-grey ruins and sunset. Frame prompt requested a 2x2 sheet of four identical-camera copies changing only descending waterfall/spray, ripples, flames and mist. Frames were generated, then split/resized for review with Pillow. No displacement shader or procedural particle overlay is used.

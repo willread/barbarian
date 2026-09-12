@@ -105,3 +105,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 
 - HUD portrait atlas `godot/art/hero-portrait-v1.png`: built-in image generation, using the existing hero title artwork as identity reference. Prompt: 6 columns (neutral, left, right, pain, small speaking mouth, wide speaking mouth) by 4 rows (healthy, scratched, bruised/bloody, severely battered), consistent head scale and photorealistic dark fantasy lighting.
 - Dinner voice line supplied by user: ElevenLabs Maverick, 2026-09-12T15_27_24. Converted to Ogg at -18 LUFS; volume envelope sampled at 30 Hz for mouth animation. Runtime clip and extendable line definitions: `godot/voice/`.
+
+- Citadel background workshop v1: built-in image-generated concept and four-frame animation draft. Sources, workflow and prompts documented in `studies/backgrounds/README.md`. Not approved or integrated into gameplay.

@@ -86,6 +86,7 @@ cairnCheck();
   fs.copyFileSync('godot/art/studio-background.png',path.join(path.dirname(file),'studio-background.png'));
   fs.copyFileSync('godot/art/maximum-force-logo.png',path.join(path.dirname(file),'maximum-force-logo.png'));
   for(const icon of ['cairn.ico','cairn-icon-32.png','cairn-icon-180.png','cairn-icon-256.png'])fs.copyFileSync('godot/art/branding/'+icon,path.join(path.dirname(file),icon));
+  fs.cpSync('studies/backgrounds',path.join(path.dirname(file),'background-study'),{recursive:true});
   fs.writeFileSync(file,html);
  }
  console.log(`${target}: ${file}`);
