@@ -135,5 +135,26 @@
       ]
     }
   ],
-  "notes": "Expanded waterfall mask includes peripheral spray and impact ripples. Fire heat moves upward, while its broader reflected light pulses on stationary stone. Original painting remains fixed. Both effects repeat over 2 seconds; each region can be disabled independently."
+  "notes": "Expanded waterfall mask includes peripheral spray and impact ripples. Fire heat moves upward, while its broader reflected light pulses on stationary stone. Original painting remains fixed. Both effects repeat over 2 seconds; each region can be disabled independently.",
+  "walkable": {
+    "polygon": [
+      [
+        0.025,
+        0.699
+      ],
+      [
+        0.975,
+        0.699
+      ],
+      [
+        0.975,
+        0.842
+      ],
+      [
+        0.025,
+        0.842
+      ]
+    ],
+    "description": "Foot positions on the dry terrace, inside the rear rubble and front drop-off."
+  }
 }
