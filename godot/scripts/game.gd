@@ -61,6 +61,9 @@ const OPEN=.45/.49
 const HOLD=.15
 
 func _ready():
+	if "--fire-study" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('fire-study')")):
+		get_tree().change_scene_to_file.call_deferred("res://fire_study.tscn")
+		return
 	art=ArtScript.new()
 	# Finish loading battle cels before exposing the menu, avoiding first-hit stalls.
 	for atlas in art.data.atlases.values():
