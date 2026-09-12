@@ -21,6 +21,9 @@ func setup(source: Node2D):
 		clips[id]=load("res://audio/"+("slam_boom" if id=="landing" else id)+".ogg")
 	clips["menu_activate"]=clips["menu_land"]
 	originals=clips.duplicate()
+	var defaults=JSON.parse_string(FileAccess.get_file_as_string("res://audio_defaults.json"))
+	for id in defaults.get("choices",{}): set_variant(id,defaults.choices[id],false)
+	for id in defaults.get("volumes",{}): set_volume(id,float(defaults.volumes[id]),false)
 	var saved=ConfigFile.new()
 	if saved.load("user://soundboard.cfg")==OK:
 		for id in saved.get_section_keys("choices"):
@@ -122,3 +125,10 @@ func _exit_tree():
 		player.stop()
 		player.stream=null
 	clips.clear()
+
+func export_choices() -> String:
+	var preset={"version":1,"choices":{},"volumes":{}}
+	for id in originals:
+		preset.choices[id]=choices.get(id,"original")
+		preset.volumes[id]=volumes.get(id,0.0)
+	return JSON.stringify(preset,"\t",true)

@@ -37,6 +37,9 @@ func check():
 	assert(audio.tracks[1].stream==null)
 	audio.set_variant("music_game","original",false)
 	assert(audio.tracks[1].stream!=null)
+	var exported=JSON.parse_string(audio.export_choices())
+	assert(exported.choices.sword=="none" and exported.volumes.resist==6)
+	assert(exported.choices.size()==audio.originals.size())
 	board.toggle()
 	assert(not paused and not board.opened)
 	paused=true

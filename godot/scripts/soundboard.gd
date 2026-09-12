@@ -41,6 +41,10 @@ func _ready():
 	stop.text="Stop preview"
 	stop.pressed.connect(func():preview.stop())
 	tools.add_child(stop)
+	var export_button=Button.new()
+	export_button.text="Export sound choices"
+	export_button.pressed.connect(export_choices)
+	tools.add_child(export_button)
 	var volume=HSlider.new()
 	volume.custom_minimum_size.x=180
 	volume.min_value=-30
@@ -153,3 +157,12 @@ func _input(event):
 func _exit_tree():
 	preview.stop()
 	preview.stream=null
+
+func export_choices():
+	var text=audio.export_choices()
+	if OS.has_feature("web"):
+		JavaScriptBridge.download_buffer(text.to_utf8_buffer(),"cairn-sound-choices.json","application/json")
+	else:
+		var path=OS.get_system_dir(OS.SYSTEM_DIR_DOWNLOADS).path_join("cairn-sound-choices.json")
+		var file=FileAccess.open(path,FileAccess.WRITE)
+		if file: file.store_string(text)
