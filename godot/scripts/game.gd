@@ -638,6 +638,9 @@ func tick(dt: float):
 	if spell>=0:
 		spell+=1
 		if spell>=20 and spell<77:
+			if not chicken.is_empty() and not chicken.roast and chicken.x>=0 and chicken.x<=1440:
+				chicken.lightning_until=clock+.22
+				roast_chicken(1 if chicken.x>=hero.x else -1)
 			for f in enemies:
 				if f.hp>0 and f.x>=0 and f.x<=1440: damage(f,{"damage":.12,"knock":false,"magic":true,"continuous":true,"direction":1 if f.x>hero.x else -1},hero)
 		if spell>=90: spell=-1
@@ -1016,17 +1019,21 @@ func step_chicken(dt: float):
 		if not a.is_empty() and a.age>=a.from and a.age<=a.to and abs(c.y-hero.y)<32:
 			var reach=(a.box[0]+a.box[1] if a.has("box") else a.reach)*4.5
 			if (c.x-hero.x)*a.direction> -15 and (c.x-hero.x)*a.direction<reach+26:
-				audio.play("chicken_hit",-5)
-				c.roast=true
-				c.age=0
-				c.height=10
-				c.flight=true
-				c.vx=a.direction*(180+randf()*90)
-				c.vz=250+randf()*70
-				c.trail=0
+				roast_chicken(a.direction)
 	if is_instance_valid(chicken_node):
 		chicken_node.z_index=int(c.y)*2
 		chicken_node.queue_redraw()
+
+func roast_chicken(direction: float):
+	if chicken.is_empty() or chicken.roast:return
+	audio.play("chicken_hit",-5)
+	chicken.roast=true
+	chicken.age=0
+	chicken.height=10
+	chicken.flight=true
+	chicken.vx=direction*(180+randf()*90)
+	chicken.vz=250+randf()*70
+	chicken.trail=0
 
 func remove_chicken():
 	chicken={}
@@ -1092,6 +1099,8 @@ func draw_air():
 		if spell>=20:
 			for f in enemies:
 				if f.hp>0 and f.x>=0 and f.x<=1440: lightning(air_fx,Vector2(f.x,-55),Vector2(f.x,f.y-100),f.id*7919+cycle*104729,fmod(elapsed,.16)/.04)
+	if not chicken.is_empty() and clock<chicken.get("lightning_until",-1.0):
+		lightning(air_fx,Vector2(chicken.x,-55),Vector2(chicken.x,chicken.y-chicken.height*4.5-25),7193+int(clock/.04)*7919,1.0)
 	for f in enemies:
 		if f.boss and f.hp>0 and clock<f.get("healthBarUntil",-1.0):
 			center_text(air_fx,"Cairn Champion · Unbound" if f.phaseTwo else "Cairn Champion",Vector2(720,43),20,Color("e6d2aa"))
