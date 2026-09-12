@@ -12,4 +12,4 @@ Variant tuning: swift enemies are 72% normal size, move at 165% speed, retain 85
 
 Opening aqueduct population limits count the entire wave, including reinforcements: exactly two enemies in wave 1, at most three in wave 2, and at most four in wave 3. Later areas retain their existing budgets and active caps.
 
-Global damage tuning: `game.gd` exposes `damage_multiplier` in the Godot Inspector, default 0.75 (25% less damage). This applies at the shared damage handler to player and enemy attacks, arrows, charge, slam, and lightning, after retaining weapon and variant differences. Healing is unchanged.
+Global damage tuning: `game.gd` exposes `damage_multiplier` in the Godot Inspector, default 0.5 (50% less damage). This applies at the shared damage handler to player and enemy attacks, arrows, charge, slam, and lightning, after retaining weapon and variant differences. Healing is unchanged.
