@@ -480,7 +480,8 @@ func resolve_slam(origin: Vector2,strike: Dictionary):
 	for enemy in ordered:
 		if enemy.hp<=0:continue
 		var delta=Vector2(enemy.x,enemy.y)-origin
-		if abs(delta.x)<(125 if hero.weapon=="axe" else 156.25) and abs(delta.y)<47.5 and enemy.down.is_empty() and not enemy.invTicks:
+		var previous_hp=enemy.hp
+		if abs(delta.x)<(150 if hero.weapon=="axe" else 187.5) and abs(delta.y)<57.0 and enemy.down.is_empty() and not enemy.invTicks:
 			var blow=strike.duplicate()
 			blow.direction=1 if delta.x>=0 else -1
 			damage(enemy,blow,hero)
@@ -488,7 +489,9 @@ func resolve_slam(origin: Vector2,strike: Dictionary):
 		var distance=Vector2(delta.x,delta.y*1.8).length()
 		if distance<375:
 			var outward=delta.normalized() if delta.length()>1 else Vector2(hero.dir,0)
-			enemy.slamPush=outward*pow(1.0-distance/375.0,1.2)*500.0
+			var mass_resistance=clampf(1.0/pow(enemy.size,2),.4,1.6)
+			var force=750.0 if enemy.hp==previous_hp else 500.0
+			enemy.slamPush=outward*pow(1.0-distance/375.0,1.2)*force*mass_resistance
 	hero.recovering=(8 if hero.diveHit else 24) if hero.weapon=="axe" else (6 if hero.diveHit else 19)
 
 
@@ -1317,7 +1320,11 @@ func moves_test():
 	var above=m.make(903,760,580,30)
 	var below=m.make(904,760,720,30)
 	var expanded=m.make(905,1100,650,30)
-	enemies=[near,fringe,distant,above,below,expanded]
+	var large=m.make(906,760,580,30)
+	large.size=1.4
+	var small=m.make(907,760,580,30)
+	small.size=.8
+	enemies=[near,fringe,distant,above,below,expanded,large,small]
 	hero.diveHit=false
 	hero.x=720
 	hero.y=650
@@ -1329,6 +1336,8 @@ func moves_test():
 	assert(near.slamPush.length()>fringe.slamPush.length() and fringe.slamPush.length()>0)
 	assert(not distant.has("slamPush"))
 	assert(above.slamPush.y<0 and below.slamPush.y>0)
+	assert(small.slamPush.length()>above.slamPush.length() and large.slamPush.length()<above.slamPush.length())
+	assert(is_equal_approx(above.slamPush.length(),pow(1.0-126.0/375.0,1.2)*750.0))
 	assert(abs(above.slamPush.x)<.01 and abs(below.slamPush.x)<.01)
 	assert(expanded.slamPush.x>0,"Expanded radius must reach enemies 340 units from impact")
 	var old_x=fringe.x
