@@ -227,6 +227,9 @@ func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	return f
 
 func change_phase(next: String):
+	if next=="dying":
+		audio.stop_gameplay()
+		hero_voice.reset()
 	if next=="paused":
 		options=false
 		settings_page=""

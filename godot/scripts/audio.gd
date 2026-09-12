@@ -70,7 +70,13 @@ func save_choices():
 	saved.set_value("settings","quiet_foley",true)
 	saved.save("user://soundboard.cfg")
 
+func stop_gameplay():
+	for voice in voices+tracks:voice.stop()
+	last_spell=-1
+	chicken_clock=0.0
+
 func play(id: String,db: float=-4,pitch: float=1.0):
+	if game.get("phase") in ["dying","lost"] and id not in ["menu_select","menu_activate","menu_land","resist"]:return
 	if game.get("voice_enabled")==false and id in ["hero_effort","hero_pain","magic_shout","roar","death"]:return
 	if not unlocked or game.muted or clips.get(id)==null:return
 	if game.get("hero_voice") and game.hero_voice.player.playing:
@@ -94,7 +100,7 @@ func _process(dt: float):
 	var audible=unlocked and not game.muted and not game.loading_menu
 	for i in tracks.size():
 		var track=tracks[i]
-		var selected=game.music_enabled and ((game.phase=="title")== (i==0))
+		var selected=game.phase not in ["dying","lost"] and game.music_enabled and ((game.phase=="title")== (i==0))
 		var target=-10.0+volumes.get("music_menu" if i==0 else "music_game",0.0) if audible and selected else -60.0
 		if game.phase in ["paused","dying","lost","won"]:target-=8
 		track.volume_db=move_toward(track.volume_db,target,dt*35)
@@ -105,7 +111,7 @@ func _process(dt: float):
 			if voice.get_meta("sound_id","") in ["hero_effort","hero_pain","magic_shout","roar","death"]:voice.stop()
 	if game.muted:
 		for voice in voices:voice.stop()
-	if game.phase=="paused":return
+	if game.phase in ["paused","dying","lost"]:return
 	var h=game.hero
 	if game.spell>=13 and last_spell<13:play("magic_shout",-3,1.0)
 	if game.spell>=20 and last_spell<20:play("lightning",-5)
