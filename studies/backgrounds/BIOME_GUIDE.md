@@ -24,3 +24,6 @@ Compare against the approved reference using the editor's reference toggle. Turn
 ## Current screen 2 review
 
 Breached Gate matches the stone/iron/dusk palette and uses the same broad paving scale. Its close gatehouse intentionally replaces the aqueduct's open vista. Its two low corner rubble masks are optional, unapproved draft boundaries. The apparent warm sheen on several paving stones should remain under review against the matte-ground guideline. Banners remain static in this first pass.
+
+## HUD framing and upper crop allowance
+The native arena fills the window width at uniform scale and anchors its bottom above the independently sized HUD. At 16:9 the upper approximately 23% of the 16:9 painting is cropped. Upper sky, roofs and arch crowns are expendable; put essential landmarks and combat cues below that band. Keep the fighting floor and actor silhouettes in the lower area. Wider windows crop more from the top; tall windows reveal more vertical space. Never shrink the whole arena merely to preserve upper scenery.

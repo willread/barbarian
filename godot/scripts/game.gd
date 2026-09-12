@@ -1310,9 +1310,10 @@ func responsive_layout():
 	get_window().content_scale_size=Vector2i(screen_size)
 	var hud_scale=clamp(screen_size.y*.23/252.,.4,1.)
 	var hud_height=252*hud_scale
-	var arena_scale=min(1.,max(.1,(screen_size.y-hud_height)/810.))
-	scale=Vector2.ONE*arena_scale
-	position=Vector2((1440-1440*arena_scale)*.5,(screen_size.y-hud_height-810*arena_scale)*.5)
+	# Fit the arena width, reserving the upper painting as vertical crop space.
+	# Bottom alignment preserves the fighting floor immediately above the HUD.
+	scale=Vector2.ONE
+	position=Vector2(0,screen_size.y-hud_height-810.)
 	hud.scale=Vector2.ONE*hud_scale
 	hud.position=Vector2(0,screen_size.y-1062*hud_scale)
 	overlay.position=Vector2.ZERO
