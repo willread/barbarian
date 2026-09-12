@@ -395,6 +395,8 @@ func spawn_wave():
 	wave_time=0
 
 func spawn_encounter_enemy():
+	if pending_enemies.is_empty():return
+	if pending_enemies[0]=="shield" and enemies.filter(func(enemy):return enemy.hp>0 and enemy.kind=="shield").size()>=e_ai.shield_limit(screen_for_wave(wave)):return
 	var kind=pending_enemies.pop_front()
 	var left=randf()<.5
 	var f=make_actor(randf_range(-650,-420) if left else randf_range(1860,2090),randf_range(570,730),e_ai.roster[kind].hp)

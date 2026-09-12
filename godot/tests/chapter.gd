@@ -45,5 +45,17 @@ func check():
 			if game.pending_enemies.is_empty():break
 		assert(game.pending_enemies.is_empty() and spawned==expected)
 	assert(game.enemies.size()==1 and game.enemies[0].boss)
+	for area in [2,3,4]:
+		game.wave=(area-1)*3+1
+		game.enemies.clear()
+		game.pending_enemies=["shield","shield","shield","shield"]
+		for attempt in 4:game.spawn_encounter_enemy()
+		assert(game.enemies.size()==area-1)
+		game.reinforcement_wait=0
+		game.step_reinforcements(5.0)
+		assert(game.enemies.size()==area-1)
+		game.enemies[0].hp=0
+		game.step_reinforcements(5.0)
+		assert(game.enemies.filter(func(enemy):return enemy.hp>0).size()==area-1)
 	print("CAIRN_CHAPTER_OK: selection, locked chapters, ordered screens, walk limits and final boss")
 	quit()

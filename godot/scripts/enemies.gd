@@ -31,7 +31,7 @@ func plan() -> Array:
 			var encounter: Array=[focus]
 			budget-=costs[focus]
 			while budget>0 and encounter.size()<9:
-				var choices=pool.filter(func(kind):return costs[kind]<=budget and encounter.count(kind)<(2 if kind in ["shield","archer","marauder"] else 4))
+				var choices=pool.filter(func(kind):return costs[kind]<=budget and encounter.count(kind)<(3 if kind=="shield" else (2 if kind in ["archer","marauder"] else 4)))
 				if choices.is_empty():break
 				var kind=choices.pick_random()
 				encounter.append(kind)
@@ -42,6 +42,9 @@ func plan() -> Array:
 	result.append(["champion"])
 	wave_variants.append([])
 	return result
+
+static func shield_limit(area: int) -> int:
+	return clampi(area-1,0,3)
 
 func variant(e: Dictionary, allowed: Array=[]):
 	if e.kind=="archer":return
