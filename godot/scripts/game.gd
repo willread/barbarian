@@ -46,6 +46,7 @@ var displayed_health=100.0
 var displayed_mana=0.0
 var spell=-1
 var next_id=0
+var hero_voice: Node
 var title_intro=0.0
 var clock=0.0
 var wave_time=0.0
@@ -129,6 +130,9 @@ func _ready():
 	audio=preload("res://scripts/audio.gd").new()
 	add_child(audio)
 	audio.setup(self)
+	hero_voice=preload("res://scripts/hero_voice.gd").new()
+	add_child(hero_voice)
+	hero_voice.setup(self)
 	var settings=ConfigFile.new()
 	if settings.load("user://settings.cfg")==OK:
 		muted=settings.get_value("audio","muted",false)
@@ -300,6 +304,7 @@ func apply_settings(persist: bool=true):
 		config.save("user://settings.cfg")
 
 func clear_world():
+	if hero_voice:hero_voice.reset()
 	for view in views.values(): view.queue_free()
 	for view in flame_views.values(): view.queue_free()
 	views.clear()
@@ -871,6 +876,7 @@ func step_chicken(dt: float):
 	var schedule={2:5,4:7,6:6,8:9}
 	if schedule.has(wave) and wave_time>=schedule[wave] and not wave in used_chickens and chicken.is_empty():
 		used_chickens.append(wave)
+		hero_voice.request_line("dinner",.9,4.)
 		chicken={"x":90.0,"y":610.0,"dir":1,"age":0.0,"roast":false,"turn":0.0,"hop":0.0,"height":0.0,"flight":false,"picked":false}
 		chicken_node=Node2D.new()
 		chicken_node.draw.connect(draw_chicken)
@@ -1060,11 +1066,8 @@ func draw_hud():
 			var points=PackedVector2Array([Vector2(left+bevel,upper),Vector2(right-bevel,upper),Vector2(right,upper+bevel),Vector2(right,lower-bevel),Vector2(right-bevel,lower),Vector2(left+bevel,lower),Vector2(left,lower-bevel),Vector2(left,upper+bevel)])
 			hud.draw_polygon(points,PackedColorArray([colors[0],colors[0],colors[0],colors[1],colors[1],colors[1],colors[1],colors[0]]))
 		if i==1 and magic>=100: hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
-	var spec=art.data.weapons[weapon]
-	var cel=art.data.atlases["weapons-v8"].cels[int(spec.frame)]
-	hud.draw_set_transform(Vector2(1400*s+extra,810+193*252.0/380),.5,Vector2(s,252.0/380))
-	var width=245*cel.width/cel.height
-	hud.draw_texture_rect(art.texture(cel.file),Rect2(-width/2,-122.5,width,245),false)
+	hud.draw_set_transform(Vector2.ZERO)
+	hero_voice.draw_portrait(hud,Rect2(1400*s+extra-80,810+46,160,160))
 	hud.draw_set_transform(Vector2.ZERO)
 	center_text(hud,"SCORE",Vector2(1758*s+extra,810+83*252.0/380),22,Color("eedbb0"))
 	center_text(hud,"%06d"%score,Vector2(1758*s+extra,810+182*252.0/380),52,Color("eedbb0"))

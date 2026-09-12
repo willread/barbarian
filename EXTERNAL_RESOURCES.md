@@ -102,3 +102,6 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Four additional axe swing variants (axe-5 through axe-8), generated independently with ElevenLabs from prompts based on Heavy chop: tighter, darker, rougher and weightier. Original options and default preserved. Prompts and raw sources: `soundboard/axe-heavy-chop/`; generator: `tools/audio/axe-heavy-chop.mjs`. Same -18 LUFS preparation as the reference option.
 
 - Cairn stacked-stone app mark: built-in image generation from user-supplied Cairn A reference (2026-09-12). Master, PNG sizes, Windows ICO and prompt provenance in `godot/art/branding/`.
+
+- HUD portrait atlas `godot/art/hero-portrait-v1.png`: built-in image generation, using the existing hero title artwork as identity reference. Prompt: 6 columns (neutral, left, right, pain, small speaking mouth, wide speaking mouth) by 4 rows (healthy, scratched, bruised/bloody, severely battered), consistent head scale and photorealistic dark fantasy lighting.
+- Dinner voice line supplied by user: ElevenLabs Maverick, 2026-09-12T15_27_24. Converted to Ogg at -18 LUFS; volume envelope sampled at 30 Hz for mouth animation. Runtime clip and extendable line definitions: `godot/voice/`.

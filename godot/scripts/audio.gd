@@ -72,6 +72,9 @@ func save_choices():
 
 func play(id: String,db: float=-4,pitch: float=1.0):
 	if not unlocked or game.muted or clips.get(id)==null:return
+	if game.get("hero_voice") and game.hero_voice.player.playing:
+		if id=="hero_effort":return
+		if id in ["hero_pain","magic_shout"]:game.hero_voice.interrupt()
 	var now=Time.get_ticks_msec()
 	if now-gates.get(id,-1000)<65:return
 	gates[id]=now

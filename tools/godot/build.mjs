@@ -28,6 +28,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/settings_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/soundboard.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/hero_voice.gd']);
  run(binary,['--headless','--path','godot','--','--smoke-test']);
  run(binary,['--headless','--path','godot','--','--integration-test']);
  run(binary,['--headless','--path','godot','--','--moves-test']);
