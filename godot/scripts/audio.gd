@@ -1,5 +1,5 @@
 extends Node
-const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","landing","bow_release","arrow_hit","hero_effort","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
+const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}
@@ -84,7 +84,7 @@ func _process(dt: float):
 		for voice in voices:voice.stop()
 	if game.phase=="paused":return
 	var h=game.hero
-	if game.spell>=0 and last_spell<0:play("hero_effort",-6,.85)
+	if game.spell>=13 and last_spell<13:play("magic_shout",-3,1.0)
 	if game.spell>=20 and last_spell<20:play("lightning",-5)
 	last_spell=game.spell
 	for actor in [h]+game.enemies:

@@ -10,12 +10,12 @@ func check():
 	var board=load("res://scripts/soundboard.gd").new()
 	board.audio=audio
 	source.add_child(board)
-	assert(board.buttons.size()==25)
+	assert(board.buttons.size()==26)
 	for id in ["foot_stone","foot_earth","bow_draw","arrow_ground"]:
 		assert(not audio.clips.has(id) and not board.buttons.has(id))
 	assert(audio.originals.landing.resource_path.ends_with("slam_boom.ogg"))
 	var data=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/manifest.json"))
-	assert(data.jobs.size()==116)
+	assert(data.jobs.size()==120)
 	for job in data.jobs:
 		if job.group in ["foot_stone","foot_earth","bow_draw","arrow_ground"]:continue
 		var clip=load("res://audio_options/"+job.id+".mp3")
@@ -47,5 +47,5 @@ func check():
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/soundboard-check.png")
 		board.toggle()
 	source.free()
-	print("CAIRN_SOUNDBOARD_OK: 116 retained options, 25 active groups, live effect/music replacement and pause restoration")
+	print("CAIRN_SOUNDBOARD_OK: 120 retained options, 26 active groups, live effect/music replacement and pause restoration")
 	quit()

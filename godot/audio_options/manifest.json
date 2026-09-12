@@ -1149,6 +1149,42 @@
       "duration": 60000,
       "music": true,
       "prompt": "Instrumental dark sword-and-sorcery game metal. DEEP BASSY downtuned baritone guitars dominate, thick low distorted riffs, bass guitar doubling the roots, powerful natural drums. No vocals, choir, bright solos or synth leads. Driving combat groove metal at 120 BPM. Dense rolling low-register riffs and thunderous tom-driven drums. D minor, ancient battlefield atmosphere. Seamless repeating loop structure, no intro or ending, compatible downbeats at beginning and end. Leave space for game sound effects."
+    },
+    {
+      "id": "magic_shout-1",
+      "group": "magic_shout",
+      "label": "Magic invocation shout",
+      "name": "Thunderous invocation",
+      "description": "A deep, mighty RAAH with fading mountain echoes.",
+      "prompt": "One mighty adult male barbarian battle shout: a deep chest-driven RAAAH, explosive voiced onset and powerful sustained throat for 700 milliseconds. Huge natural mountain echoes repeat and fade behind him. Human heroic voice, not a monster. No words, music, thunder, weapons or airy whoosh.",
+      "duration": 2.6
+    },
+    {
+      "id": "magic_shout-2",
+      "group": "magic_shout",
+      "label": "Magic invocation shout",
+      "name": "Gravel oath",
+      "description": "A coarse, commanding shout with a cavern tail.",
+      "prompt": "One enormous adult male warrior gives a forceful low HAAAH while raising his weapon. Gravelly chest voice, open-throated power, short sustained cry. Two spacious natural stone-cavern echoes decay afterward. No words, monsters, wind, music or effects.",
+      "duration": 2.6
+    },
+    {
+      "id": "magic_shout-3",
+      "group": "magic_shout",
+      "label": "Magic invocation shout",
+      "name": "Sky challenge",
+      "description": "A ringing heroic roar with distant echoes.",
+      "prompt": "A powerful adult male barbarian shouts one heroic RAAAH to the sky. Strong low chest body and gritty upper vocal edge, natural human performance. Mountain echoes follow the dry close shout and fade. No dialogue, music, whoosh or thunder.",
+      "duration": 2.6
+    },
+    {
+      "id": "magic_shout-4",
+      "group": "magic_shout",
+      "label": "Magic invocation shout",
+      "name": "Ancient call",
+      "description": "A bassy, commanding cry with a long stone echo.",
+      "prompt": "One deep adult male warrior releases a mighty OAAAH invocation. Loud resonant chest voice, rough natural throat, decisive voiced ending. A spacious ancient stone hall echoes the cry into silence. No words, growling creature, musical tones or weapons.",
+      "duration": 2.6
     }
   ]
 }
