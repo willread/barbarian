@@ -1084,15 +1084,16 @@ func draw_overlay():
 		var width=min(safe_width,(min(1200.0,screen_size.x*.86) if tall else min(900.0,screen_size.x*.66))*.6)
 		var size=title_logo.get_size()*width/title_logo.get_width()
 		var t=clampf(title_intro/1.25,0.,1.)
-		# Smooth forward approach; impact is followed by one small recoil in depth.
+		# Perspective depth accelerates into the foreground instead of easing before contact.
 		var approach=clampf(title_intro/.8,0.,1.)
-		var travel=smoothstep(0.,1.,approach)
+		var travel=pow(approach,1.6)
 		var landing=clampf((title_intro-.8)/.45,0.,1.)
-		var recoil=sin(landing*PI)*pow(1.-landing,1.2)
-		var zoom=lerpf(.24,1.,travel)-recoil*.065
-		var unrest=sin(PI*approach)*.8+sin(PI*landing)*pow(1.-landing,2)*.15
-		var drift=Vector2(sin(title_intro*18.)+sin(title_intro*26.)*.25,cos(title_intro*21.)*.8)*unrest*12.
-		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+drift
+		var recoil=sin(landing*TAU*1.2)*exp(-landing*6.)*(1.-landing)
+		var zoom=1./(1.+3.2*(1.-travel))+recoil*.10
+		var unrest=sin(PI*approach)*.8+abs(recoil)*.12
+		var drift=Vector2(sin(title_intro*18.)+sin(title_intro*26.)*.25,cos(title_intro*21.)*.8)*unrest*4.
+		var arc=Vector2(-22.*(1.-travel),-48.*sin(approach*PI))*zoom
+		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+arc+drift
 		overlay.draw_set_transform(pivot,0.,Vector2.ONE*zoom)
 		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
 		overlay.draw_set_transform(Vector2.ZERO)
