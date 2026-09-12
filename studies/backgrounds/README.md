@@ -19,12 +19,12 @@ The shader is in waterfall.js. Loop duration 2 seconds. The browser runs a real 
 Expanded waterfall perimeter and eased the brightness cutoff to include dim spray and water. Added separate fire coverage mask: bright warm flame texture travels upward, while the broader warm stone region receives only periodic lighting modulation. No masonry displacement in the fire region. Both use the two-second loop and independent region toggles. V3 retained for comparison.
 
 ### Mask refinement
-Water uses explicit stone exclusion polygons, applied after edge softening, and identical source/destination water coverage. Fire motion uses a separate narrow flame mask; the broad glow mask only modulates light. Debug: green is moving water, bright yellow is moving flame, dim orange is lighting-only coverage. Source sampling cannot use the broad glow region.
+Water uses a single editable polygon with identical source/destination water coverage. Fire motion uses a separate narrow flame mask; the broad glow mask only modulates light. Debug: green is moving water, bright yellow is moving flame, dim orange is lighting-only coverage. Source sampling cannot use the broad glow region.
 
 ## Standalone geometry editor
 Run `npm run level:editor` and open http://localhost:3002/ . This serves the source workshop directly, without building or starting Godot. The game preview also retains its workshop link.
 
-Enable **Edit geometry**, choose a shape, and drag its handles. Double-click an edge to insert a vertex; select a handle and press Delete/Backspace to remove it (minimum three). Shift-drag translates the selected polygon. Undo/Redo and Ctrl+Z/Ctrl+Y are supported. Water exclusions, flame motion, glow coverage and the walkable polygon are separate editable shapes; Add stone exclusion creates another hole to refine.
+Enable **Edit geometry**, choose a shape, and drag its handles. Double-click an edge to insert a vertex; select a handle and press Delete/Backspace to remove it (minimum three). Shift-drag translates the selected polygon. Undo/Redo and Ctrl+Z/Ctrl+Y are supported. Water, flame motion, glow coverage and the walkable polygon are separate editable shapes. Refine their outlines directly; no per-image rock exclusions are used.
 
 Geometry autosaves in this browser per screen. Export level JSON to preserve a portable copy and give it to the agent for incorporation in the source manifest. Import JSON restores that geometry. Browser saves do not modify repository files. Reset to source is undoable.
 
