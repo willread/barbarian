@@ -1,7 +1,7 @@
 {
   "id": "citadel-02-v1",
-  "title": "The breached gate — World 1 / Screen 2",
-  "status": "First pass — composition and masks for review",
+  "title": "The breached gate \u00e2\u20ac\u201d World 1 / Screen 2",
+  "status": "First pass \u00e2\u20ac\u201d composition and masks for review",
   "size": [
     1280,
     720
@@ -232,5 +232,87 @@
       ]
     ],
     "description": "Foot positions on the flat courtyard; avoids foreground rubble."
+  },
+  "biome": "citadel",
+  "foreground": [
+    {
+      "name": "Foreground \u2014 lower left rubble",
+      "polygon": [
+        [
+          0,
+          0.811
+        ],
+        [
+          0.023,
+          0.811
+        ],
+        [
+          0.045,
+          0.832
+        ],
+        [
+          0.054,
+          0.885
+        ],
+        [
+          0.09,
+          0.898
+        ],
+        [
+          0.119,
+          0.958
+        ],
+        [
+          0.139,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "name": "Foreground \u2014 lower right rubble",
+      "polygon": [
+        [
+          0.869,
+          1
+        ],
+        [
+          0.885,
+          0.937
+        ],
+        [
+          0.916,
+          0.921
+        ],
+        [
+          0.927,
+          0.866
+        ],
+        [
+          0.948,
+          0.835
+        ],
+        [
+          0.98,
+          0.831
+        ],
+        [
+          1,
+          0.844
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "composition_review": {
+    "status": "first-pass",
+    "actor_height_fraction": 0.22,
+    "notes": "Same cold grey masonry, iron, restrained amber practical light and mountain dusk as screen 1. Closer gate architecture and lower sky proportion are intentional. Foreground confined to low corners; inspect masks with actor preview. No floor reflection animation."
   }
 }

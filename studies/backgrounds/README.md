@@ -40,3 +40,6 @@ Water sampling refinement: a generic 3px inset plus 7px feather keeps border tex
 
 ## World screen order
 worlds.json records the approved World 1 screen 1 (citadel-01-v5) and draft screen 2 (citadel-02-v1). The selector defaults to screen 2 for review; the approved aqueduct remains selectable. Approval here locks the reviewed study assets and sequence designation; game progression integration is a separate step once the world screens are ready.
+
+## Composition and foreground review
+See BIOME_GUIDE.md for the shared visual and walkability contract. Actor scale / occlusion preview adds three simple human-sized silhouettes; click to place the gold figure when geometry editing is off. A green/red foot ring checks its foot point against the walk polygon. Foreground compositing redraws masked original painting pixels after these figures. Toggle it to inspect occlusion. Add/remove foreground masks in the geometry editor; they support the same vertex controls, undo, local saves and JSON exports. The reference toggle shows the approved aqueduct for palette/material comparison. These are preview tools, not native gameplay collision integration.
