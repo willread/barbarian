@@ -384,6 +384,8 @@ func spawn_wave():
 		blood.reset()
 		scorches.clear()
 	background.setup(art,next)
+	last_window_size=Vector2i.ZERO
+	responsive_layout()
 	for kind in encounters[wave-1]:
 		var i=enemies.size()
 		var left=wave!=encounters.size() and randf()<.5
@@ -1313,7 +1315,8 @@ func responsive_layout():
 	# Fit the arena width, reserving the upper painting as vertical crop space.
 	# Bottom alignment preserves the fighting floor immediately above the HUD.
 	scale=Vector2.ONE
-	position=Vector2(0,screen_size.y-hud_height-810.)
+	var bottom_crop=float(background.screen.get("framing",{}).get("bottom_crop",0.0)) if background else 0.0
+	position=Vector2(0,screen_size.y-hud_height-810.+810.*bottom_crop)
 	hud.scale=Vector2.ONE*hud_scale
 	hud.position=Vector2(0,screen_size.y-1062*hud_scale)
 	overlay.position=Vector2.ZERO

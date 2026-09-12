@@ -27,3 +27,5 @@ Breached Gate matches the stone/iron/dusk palette and uses the same broad paving
 
 ## HUD framing and upper crop allowance
 The native arena fills the window width at uniform scale and anchors its bottom above the independently sized HUD. At 16:9 the upper approximately 23% of the 16:9 painting is cropped. Upper sky, roofs and arch crowns are expendable; put essential landmarks and combat cues below that band. Keep the fighting floor and actor silhouettes in the lower area. Wider windows crop more from the top; tall windows reveal more vertical space. Never shrink the whole arena merely to preserve upper scenery.
+
+Per-screen framing: `framing.bottom_crop` is the normalized bottom slice hidden behind the HUD. The aqueduct uses 0.08; other screens default to zero. The entire world moves together, keeping actors, animated regions and foreground registered. Layout refreshes on screen changes. The editor exposes Bottom crop % with a three-percent margin beneath the walkable polygon, and shows both cropped bands in the 16:9 guide. Export edited JSON to apply framing changes to the game.

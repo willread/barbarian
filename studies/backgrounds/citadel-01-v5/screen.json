@@ -241,5 +241,8 @@
     "world": 1,
     "screen": 1,
     "basis": "User approved protected-edge waterfall iteration 959a525"
+  },
+  "framing": {
+    "bottom_crop": 0.08
   }
 }

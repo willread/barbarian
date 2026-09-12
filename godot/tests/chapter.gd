@@ -19,7 +19,7 @@ func check():
 	assert(game.phase=="playing" and game.background.key=="citadel-1")
 	game.set_process(false)
 	assert(game.scale==Vector2.ONE and game.position.x==0)
-	assert(absf(game.position.y+810-(game.screen_size.y-252*game.hud.scale.y))<1)
+	assert(absf(game.position.y+810*(1.0-float(game.background.screen.get("framing",{}).get("bottom_crop",0.0)))-(game.screen_size.y-252*game.hud.scale.y))<1)
 	for pair in [[1,1],[2,1],[3,2],[4,2],[5,3],[6,3],[7,4],[8,4],[9,4]]:
 		game.wave=pair[0]
 		game.spawn_wave()
