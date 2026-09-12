@@ -59,3 +59,7 @@ The menu study defaults to intensity 0.6; the enemy study defaults to 1.8 (three
 `ContourFire.setup(mask, source_size, origin, with_heat)` accepts any static Texture2D or live ViewportTexture. Size and origin describe the mask in local pixels, independent of menu metadata. Parent the effect with the object to inherit its position, scale and depth. A 32-pixel simulation margin surrounds the source. Set `strength` and `emitting` to control fuel; stopping emission allows existing flames to dissipate. `restart()` clears simulation history and randomizes its noise phase.
 
 For optional warm/cooling edges, enable `with_heat` and call `heat_face(sprite, local_rect)`. This assigns the heat material, so callers with an existing body material should compose their own response or disable this pass. Enemy study disables the extra thermal viewport and uses the existing burn-away material on a live mask instead. Free the component with its owner after residual fire has cooled; cost scales with mask area and number of simultaneous effects.
+
+## Opening studio splash
+Maximum Force artwork uses a proportional, contained crop of the supplied photorealistic panel. Browser shell displays it during engine loading for at least two seconds, with a bottom-right padded metal ring. Windows uses boot.tscn with the same minimum and aspect-aware layout. The original Cairn menu follows the splash. Export post-processing copies the artwork next to the web shell.
+

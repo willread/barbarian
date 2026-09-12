@@ -48,3 +48,8 @@ Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Ru
 - **@napi-rs/canvas**: existing bundled runtime used by tools/godot asset-conversion scripts; upstream https://github.com/Brooooooklyn/canvas, MIT. Used only during asset preparation, not shipped as a game runtime.
 - **Anton and Cinzel**: existing unmodified SIL OFL fonts reused in Godot; notices copied into generated assets and included in exports. Cinzel replaces the old browser/system Georgia references for portable HUD and results text.
 - **Existing game artwork**: converted locally from public/art using the existing project's extraction and colour correction; no new stock art, ROM sprites, or reference video copied into the port. The scope limitations above still apply.
+
+## Maximum Force opening splash
+- User-supplied artwork: codex-clipboard-3e35ee56-7ca4-441c-b71a-40c6cb7e22e7.png, supplied in this task.
+- Stored unchanged at godot/art/maximum-force-reference.png. UI displays only the photorealistic panel; no third-party license inferred.
+

@@ -31,9 +31,33 @@ for(const target of targets){
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');
-  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
-  html=html.replace('</head>',`<style>html,body{background:#000!important}#cairn-loader{position:fixed;inset:0;display:grid;place-items:center;background:#000;z-index:9999;pointer-events:none}#cairn-loader svg{width:100px;height:100px;animation:spin 1.8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}#status-progress,#status-splash{visibility:hidden}</style></head>`).replace('<body>',`<body>${ring}`);
-  html=html.replace('</body>',`<script>const cairnWatch=new MutationObserver(()=>{const s=document.getElementById('status');if(!s||getComputedStyle(s).display==='none'||document.getElementById('status-notice')?.style.display==='block'){document.getElementById('cairn-loader')?.remove();cairnWatch.disconnect();}});cairnWatch.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});</script></body>`);
+  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><img src="maximum-force-reference.png" alt="Maximum Force" /></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
+  html=html.replace('</head>',`<link rel="preload" as="image" href="maximum-force-reference.png"><style>
+html,body{background:#000!important}
+#cairn-loader{position:fixed;inset:0;display:grid;place-items:center;background:#000;z-index:9999;pointer-events:auto}
+#cairn-loader .studio-art{position:relative;width:min(90vw,114.66vh);aspect-ratio:4/3;overflow:hidden}
+#cairn-loader .studio-art img{position:absolute;width:200%;height:133.333%;max-width:none;left:0;top:-16.666%}
+#cairn-loader svg{position:absolute;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));width:clamp(40px,7vmin,76px);height:clamp(40px,7vmin,76px);animation:spin 1.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}#status-progress,#status-splash{visibility:hidden}
+</style></head>`).replace('<body>',`<body>${ring}<script>window.cairnSplashStart=performance.now();</script>`);
+  html=html.replace('</body>',`<script>
+let cairnDone=false;
+const cairnCheck=()=>{
+ const status=document.getElementById('status');
+ const failed=document.getElementById('status-notice')?.style.display==='block';
+ if(failed){document.getElementById('cairn-loader')?.remove();cairnWatch.disconnect();return;}
+ if(cairnDone||status&&getComputedStyle(status).display!=='none')return;
+ cairnDone=true;
+ const image=document.querySelector('.studio-art img');
+ Promise.resolve(image?.decode()).catch(()=>{}).then(()=>{
+  setTimeout(()=>{document.getElementById('cairn-loader')?.remove();cairnWatch.disconnect();},Math.max(0,2000-(performance.now()-window.cairnSplashStart)));
+ });
+};
+const cairnWatch=new MutationObserver(cairnCheck);
+cairnWatch.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+cairnCheck();
+</script></body>`);
+  fs.copyFileSync('godot/art/maximum-force-reference.png',path.join(path.dirname(file),'maximum-force-reference.png'));
   fs.writeFileSync(file,html);
  }
  console.log(`${target}: ${file}`);
