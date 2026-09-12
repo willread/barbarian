@@ -1,0 +1,114 @@
+{
+  "id": "citadel-01-v2",
+  "title": "Aqueduct approach",
+  "status": "Draft - animation continuity review",
+  "size": [
+    1280,
+    720
+  ],
+  "frames": [
+    "frame-0.png",
+    "frame-1.png",
+    "frame-2.png",
+    "frame-3.png",
+    "frame-4.png",
+    "frame-5.png",
+    "frame-6.png",
+    "frame-7.png"
+  ],
+  "regions": [
+    {
+      "name": "Waterfall and splash",
+      "fps": 12,
+      "polygon": [
+        [
+          0.128,
+          0.2
+        ],
+        [
+          0.175,
+          0.21
+        ],
+        [
+          0.213,
+          0.49
+        ],
+        [
+          0.285,
+          0.57
+        ],
+        [
+          0.29,
+          0.67
+        ],
+        [
+          0.115,
+          0.68
+        ],
+        [
+          0.097,
+          0.59
+        ],
+        [
+          0.146,
+          0.55
+        ],
+        [
+          0.14,
+          0.35
+        ]
+      ]
+    },
+    {
+      "name": "Brazier flame",
+      "fps": 14,
+      "polygon": [
+        [
+          0.916,
+          0.515
+        ],
+        [
+          0.95,
+          0.515
+        ],
+        [
+          0.954,
+          0.638
+        ],
+        [
+          0.918,
+          0.638
+        ]
+      ]
+    }
+  ],
+  "notes": "Eight-frame motion draft. No frame blending or warping. Use Seam check to inspect 7, 8, 1, 2 continuously. Generation still has registration differences; approval remains pending. Mist stays static.",
+  "loop_metrics": {
+    "Waterfall and splash": {
+      "adjacent_mean_absolute_pixel_change": [
+        41.676,
+        41.588,
+        43.033,
+        43.036,
+        40.248,
+        41.018,
+        41.004,
+        41.129
+      ],
+      "seam_to_other_steps_ratio": 0.99
+    },
+    "Brazier flame": {
+      "adjacent_mean_absolute_pixel_change": [
+        12.38,
+        13.743,
+        17.996,
+        18.389,
+        14.474,
+        13.505,
+        12.473,
+        13.497
+      ],
+      "seam_to_other_steps_ratio": 0.92
+    }
+  }
+}

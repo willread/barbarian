@@ -107,3 +107,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Dinner voice line supplied by user: ElevenLabs Maverick, 2026-09-12T15_27_24. Converted to Ogg at -18 LUFS; volume envelope sampled at 30 Hz for mouth animation. Runtime clip and extendable line definitions: `godot/voice/`.
 
 - Citadel background workshop v1: built-in image-generated concept and four-frame animation draft. Sources, workflow and prompts documented in `studies/backgrounds/README.md`. Not approved or integrated into gameplay.
+
+- Citadel study V2: eight-frame sheet generated with the built-in image tool from V1 frame 0, requesting cyclic downward water and upward flame motion with fixed scenery. Source retained in `studies/backgrounds/citadel-01-v2/`; review caveats in the workshop README.
