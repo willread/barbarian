@@ -287,7 +287,7 @@ func spawn_wave():
 	for kind in encounters[wave-1]:
 		var i=enemies.size()
 		var left=wave!=encounters.size() and randf()<.5
-		var f=make_actor(-80-i*90 if left else 1520+i*90,660 if wave==encounters.size() else 570+randf()*150,e_ai.roster[kind].hp)
+		var f=make_actor(-420-i*130 if left else 1860+i*130,660 if wave==encounters.size() else 570+randf()*150,e_ai.roster[kind].hp)
 		f.kind=kind
 		f.boss=kind=="champion"
 		f.dir=1 if left else -1
@@ -510,7 +510,7 @@ func tick(dt: float):
 			f.y=clamp(f.y+f.velocityY*m.SCALE,560,755)
 			f.moving=intent!=Vector2.ZERO
 			if f.moving: f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
-		f.x=clamp(f.x,-180,1620)
+		f.x=clamp(f.x,-2400,3840)
 		var finished=m.tick_attack(f,[hero],damage)
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)
 		if phase!="playing": break
@@ -768,9 +768,16 @@ func step_chicken(dt: float):
 				c.dir=(1 if c.x>hero.x else -1) if abs(c.x-hero.x)<180 else (-c.dir if randf()<.2 else c.dir)
 				c.targetY=575+randf()*150
 				if randf()<.28: c.hop=.3
-			if c.x<90: c.dir=1
-			if c.x>1350: c.dir=-1
 			c.x+=c.dir*235*dt
+			# Reflect overshoot after movement; keep the whole sprite inside the arena.
+			if c.x<70:
+				c.x=140-c.x
+				c.dir=1
+				c.turn=max(c.turn,.35)
+			elif c.x>1370:
+				c.x=2740-c.x
+				c.dir=-1
+				c.turn=max(c.turn,.35)
 			c.y+=clamp(c.get("targetY",630)-c.y,-60,60)*dt
 			c.hop=max(0,c.hop-dt)
 			c.height=sin(c.hop/.3*PI)*5

@@ -57,3 +57,6 @@ Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Ru
 - `godot/art/title-background.png`, `cairn-logo.png`, `maximum-force-logo.png`, and `studio-background.png`: generated with OpenAI image generation from the existing Cairn artwork and user-supplied Maximum Force reference for this project. Backgrounds contain no lettering; logos have transparency. Original source art retained.
 - `godot/art/maximum-force-white-v2.png`: imagegen-created clean white variant from the metallic logo, followed by an imagegen black-background correction. No deterministic source-mask conversion.
 - `godot/art/hero-spin-source.png`: imagegen-generated eight-cell unarmed hero spin study using the existing hero-actions-unarmed-v8 character reference. `spin-*.png` and `spin-atlas.json` are game-ready keyed/normalized cels and authored weapon sockets produced by `scripts/bake_spin.gd`.
+
+### Ground-impact reference (implementation guidance only)
+- Kate Kruse, Ground Impact VFX: https://frontfangs.artstation.com/projects/QrnV5Z — layered shockwave/dust/debris reference. No downloaded artwork or third-party code used; the dust shader and particles are project code.
