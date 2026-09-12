@@ -185,11 +185,8 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	var dy=h.y-e.y
 	e.dir=1 if dx>=0 else -1
 	if h.hp<=0:return Vector2.ZERO
-	# Enter the arena before retreating; no firing from outside the visible playfield.
-	if e.x<95:return Vector2(1,sign(dy)*.4)
-	if e.x>1345:return Vector2(-1,sign(dy)*.4)
 	if abs(dx)<310:
-		if (e.dir==1 and e.x>110) or (e.dir==-1 and e.x<1330):return Vector2(-e.dir,sign(dy)*.3)
+		if (e.dir==1 and e.x> -120) or (e.dir==-1 and e.x<1560):return Vector2(-e.dir,sign(dy)*.3)
 	if abs(dx)>650:return Vector2(e.dir,sign(dy)*.5)
 	if abs(dy)>28:return Vector2(0,sign(dy))
 	if not e.aiRest:

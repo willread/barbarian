@@ -13,6 +13,7 @@ var facing=1
 var angle=0.0
 
 func setup(source: Node2D,archer: Dictionary):
+	modulate=Color(.82,.82,.82,1)
 	game=source
 	owner_actor=archer
 	# Registered to the release cel's bow/arrow junction in source-pixel space.
@@ -69,7 +70,9 @@ func update_position():
 func _draw():
 	# Consistent material palette: dark ash shaft, forged iron, muted goose feathers.
 	# Embedded arrows terminate at the surface: the point and socket are buried.
-	var end=0.0 if stuck>=0 else -12.0
+	var buried=26.0 if stuck>=0 else 0.0
+	draw_set_transform(Vector2(buried,0))
+	var end=-buried if stuck>=0 else -12.0
 	draw_line(Vector2(-87,1),Vector2(end,1),Color("281d16"),3.2,true)
 	draw_line(Vector2(-87,0),Vector2(end,0),Color("5c432b"),2.4,true)
 	draw_line(Vector2(-86,-.65),Vector2(end,-.65),Color("8c6c44"),.65,true)

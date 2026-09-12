@@ -1233,6 +1233,11 @@ func archer_test():
 	archer.attack={}
 	archer.x=550
 	assert(e_ai.archer_intent(archer,hero).x<0,"Archer must retreat when crowded")
+	archer.x=-100
+	hero.x=400
+	assert(e_ai.archer_intent(archer,hero).is_zero_approx() and archer.attack.type=="archerShot","Archers can fire from offscreen")
+	archer.attack={}
+	hero.x=720
 	archer.x=350
 	var arrow=load("res://scripts/arrow.gd").new()
 	arena_clip.add_child(arrow)
