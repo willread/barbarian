@@ -2,7 +2,7 @@ export async function createWaterfall(image,regions,width,height){
  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
  const gl=canvas.getContext('webgl',{alpha:false,antialias:false,preserveDrawingBuffer:true});if(!gl)throw Error('WebGL required for the waterfall study');
  const vertex=`attribute vec2 p;varying vec2 uv;void main(){uv=(p+1.)*.5;gl_Position=vec4(p.x,-p.y,0.,1.);}`;
- const fragment=`precision highp float;varying vec2 uv;uniform sampler2D base,mask,fireMask;uniform float time,enabled,fireEnabled,showMask;
+ const fragment=`precision highp float;varying vec2 uv;uniform sampler2D base,mask,fireMask;uniform float time,enabled,fireEnabled,showMask,blendEnabled;
  float coverage(vec2 p){return texture2D(mask,p).r;}
  void main(){
  vec3 original=texture2D(base,uv).rgb;
@@ -13,6 +13,7 @@ export async function createWaterfall(image,regions,width,height){
  float phase=fract(time/2.);
  float a=phase,b=fract(phase+.5);
  float wa=1.-abs(a*2.-1.),wb=1.-abs(b*2.-1.);
+ if(blendEnabled<.5){wa=1.;wb=0.;}
  float splash=smoothstep(.52,.58,uv.y);
  vec2 direction=mix(vec2(.003,.06),vec2((uv.x-.16)*.7,.008),splash);
  vec2 pa=uv-direction*(a-.5),pb=uv-direction*(b-.5);
@@ -44,5 +45,5 @@ export async function createWaterfall(image,regions,width,height){
  function regionMask(polygon,blur){const mask=document.createElement('canvas');mask.width=width;mask.height=height;const ctx=mask.getContext('2d');ctx.fillStyle='black';ctx.fillRect(0,0,width,height);ctx.filter=`blur(${blur}px)`;ctx.fillStyle='white';ctx.beginPath();polygon.forEach(([x,y],i)=>i?ctx.lineTo(x*width,y*height):ctx.moveTo(x*width,y*height));ctx.closePath();ctx.fill();return mask}
  const mask=regionMask(regions[0].polygon,5),fire=regionMask(regions[1]?.polygon||[],10);
  function texture(source,unit,name){gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,gl.createTexture());gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,source);gl.uniform1i(gl.getUniformLocation(program,name),unit)}texture(image,0,'base');texture(mask,1,'mask');texture(fire,2,'fireMask');
- return {canvas,render(time,enabled=true,showMask=false,fireEnabled=true){gl.uniform1f(gl.getUniformLocation(program,'time'),time);gl.uniform1f(gl.getUniformLocation(program,'enabled'),+enabled);gl.uniform1f(gl.getUniformLocation(program,'fireEnabled'),+fireEnabled);gl.uniform1f(gl.getUniformLocation(program,'showMask'),+showMask);gl.drawArrays(gl.TRIANGLES,0,6);return canvas},checkLoop(){this.render(0);let a=new Uint8Array(width*height*4);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,a);this.render(2);let b=new Uint8Array(a.length);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,b);let max=0;for(let i=0;i<a.length;i++)max=Math.max(max,Math.abs(a[i]-b[i]));return max;}};
+ return {canvas,render(time,enabled=true,showMask=false,fireEnabled=true,blendEnabled=true){gl.uniform1f(gl.getUniformLocation(program,'blendEnabled'),+blendEnabled);gl.uniform1f(gl.getUniformLocation(program,'time'),time);gl.uniform1f(gl.getUniformLocation(program,'enabled'),+enabled);gl.uniform1f(gl.getUniformLocation(program,'fireEnabled'),+fireEnabled);gl.uniform1f(gl.getUniformLocation(program,'showMask'),+showMask);gl.drawArrays(gl.TRIANGLES,0,6);return canvas},checkLoop(){this.render(0);let a=new Uint8Array(width*height*4);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,a);this.render(2);let b=new Uint8Array(a.length);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,b);let max=0;for(let i=0;i<a.length;i++)max=Math.max(max,Math.abs(a[i]-b[i]));return max;}};
 }
