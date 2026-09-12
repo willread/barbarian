@@ -96,3 +96,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - ElevenLabs generated four charge_hit and four death_fire variants. Exact prompts and sources are in `soundboard/charge_hit/` and `soundboard/death_fire/`. Default Ogg streams generated from option 1.
 - `tools/audio/clean-music-loops.py` creates beat-aligned, 40ms seam-blended Ogg loops from retained music sources. Measurements in `soundboard/music-loop-report.json`.
 - Legacy public artwork/fonts relocated to `asset-sources/`; required conversion/parity helpers relocated to `tools/asset-bake-source/`. Historical paths above describe original provenance.
+
+- Enemy death flame flutter revision: four independently generated ElevenLabs effects, replacing crackling death-fire options. Exact prompts and unprocessed sources: `soundboard/death_fire/flutter-v2/`. Soft onset/fade, 2.4 kHz low-pass and -19 LUFS normalization; option 1 supplies the default. Generated with `tools/audio/death_fire.mjs`.

@@ -1225,7 +1225,7 @@
     {
       "id": "charge_hit-1",
       "group": "charge_hit",
-      "label": "Blocked / charge_hited attack",
+      "label": "Charge impact",
       "name": "Body check",
       "description": "A massive shoulder impact with armor crunch.",
       "prompt": "One charging armored warrior slams bodily into an enemy. Immediate deep fleshy THUD with compressed leather and dull armor clacks, tiny gritty settling tail. Heavy contact only, no running footsteps, swing, whoosh, voice or music.",
@@ -1234,7 +1234,7 @@
     {
       "id": "charge_hit-2",
       "group": "charge_hit",
-      "label": "Blocked / charge_hited attack",
+      "label": "Charge impact",
       "name": "Crushing tackle",
       "description": "A hard body blow with a short bone crack.",
       "prompt": "One violent shoulder tackle connects. Compact chesty WHUMP layered with one dry rib crack and short leather creak. Dense physical collision, no airy swipe, slash, running steps, scream or music.",
@@ -1243,7 +1243,7 @@
     {
       "id": "charge_hit-3",
       "group": "charge_hit",
-      "label": "Blocked / charge_hited attack",
+      "label": "Charge impact",
       "name": "Iron collision",
       "description": "A low armored collision and dull rattle.",
       "prompt": "Two heavy armored bodies collide once. Low blunt KLANG-THUD, padded body mass and two small dull metal rattles. Short hard contact, no whoosh, blade noise, bell ringing or music.",
@@ -1252,7 +1252,7 @@
     {
       "id": "charge_hit-4",
       "group": "charge_hit",
-      "label": "Blocked / charge_hited attack",
+      "label": "Charge impact",
       "name": "Brutal ram",
       "description": "A bassy organic impact with gritty crunch.",
       "prompt": "One powerful body ram hits a dense opponent. Deep low DUK with a compressed organic crunch and tiny cloth rustle. Short and brutal, no explosion, swinging air, words or music.",
@@ -1261,37 +1261,37 @@
     {
       "id": "death_fire-1",
       "group": "death_fire",
-      "label": "Blocked / death_fireed attack",
-      "name": "Ember flash",
-      "description": "A brief low crackle with a hot pop.",
-      "prompt": "An enemy corpse ignites and burns briefly. One small dry ignition pop followed by rough low fire crackling for half a second, then quiet embers. No airy ignition whoosh, scream, wind, music or explosion.",
+      "label": "Enemy death flame flutter",
+      "name": "Soft flame flutter",
+      "description": "Soft, close flame flutter with a rounded fade.",
+      "prompt": "A brief close recording of a small flame softly fluttering as it dies down. Smooth low breathy combustion, gentle irregular flapping pulses, warm muffled body and rounded fade. Only soft flutter: no crackles, clicks, sparks, pops, snaps, sizzling, ignition transient, impact, voice or music.",
       "duration": 0.65
     },
     {
       "id": "death_fire-2",
       "group": "death_fire",
-      "label": "Blocked / death_fireed attack",
-      "name": "Dry combustion",
-      "description": "A compact gritty burst of burning.",
-      "prompt": "A short close burst of fire consuming dry cloth. Tight coarse crackles with a low soft combustion body, quickly fading to two ember ticks. No sweeping whoosh, wind, vocalization or music.",
+      "label": "Enemy death flame flutter",
+      "name": "Low rolling flame",
+      "description": "Low, warm rolling flame with slow soft pulses.",
+      "prompt": "One short low flame flutter. Warm hollow air gently rolls in uneven soft pulses, like a tiny flame wavering in still air. Restrained bass body, rounded soft onset and decay. No sharp crackling, wood burning, snapping, popping, sizzling, explosive ignition, wind gust, vocal or music.",
       "duration": 0.65
     },
     {
       "id": "death_fire-3",
       "group": "death_fire",
-      "label": "Blocked / death_fireed attack",
-      "name": "Hot cinders",
-      "description": "Several irregular hot snaps over low fire.",
-      "prompt": "A small intense flame burns for less than a second. Three irregular sharp ember snaps above a low subdued combustion rumble, abrupt natural decay. No rising whoosh, explosion, voice or long ambience.",
+      "label": "Enemy death flame flutter",
+      "name": "Fading fire breath",
+      "description": "A quiet breath of flame that flutters away.",
+      "prompt": "Close soft fire breathing for less than a second. Fine smooth airy flutter with subtle low rumble, two or three gentle irregular swells dissolving into silence. Muted and intimate, no sharp attack. No crackle, clicks, pops, sparks, hiss, impacts, dramatic whoosh, voices or music.",
       "duration": 0.65
     },
     {
       "id": "death_fire-4",
       "group": "death_fire",
-      "label": "Blocked / death_fireed attack",
-      "name": "Smoldering end",
-      "description": "A short soft fire flutter and cooling crackle.",
-      "prompt": "Brief corpse-burning fire: low rough flame flutter, small uneven sizzling crackles and a final ember pop. Under one second, dark and close. No airy swish, large roar, human sounds or music.",
+      "label": "Enemy death flame flutter",
+      "name": "Smoldering flutter",
+      "description": "The smoldering texture alone, without ember crackle.",
+      "prompt": "A small dying flame gently flutters, dark and close. Soft low fluttering air ripples with a delicate warm combustion texture and a quick smooth fade. Only the soft smoldering flutter, no wood crackle, ember pops, sharp snaps, sizzling, percussion, ignition burst, speech or music.",
       "duration": 0.65
     }
   ]
