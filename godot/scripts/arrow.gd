@@ -62,9 +62,25 @@ func update_position():
 	queue_redraw()
 
 func _draw():
-	# Arrow tip is the contact point; shaft trails behind it.
-	draw_line(Vector2(-49,0),Vector2(-5,0),Color("896648"),2.2,true)
-	draw_line(Vector2(-48,-.5),Vector2(-6,-.5),Color("c5a274"),.7,true)
-	draw_colored_polygon(PackedVector2Array([Vector2(0,0),Vector2(-9,-3),Vector2(-7,0),Vector2(-9,3)]),Color("a6aba9"))
+	# Consistent material palette: dark ash shaft, forged iron, muted goose feathers.
+	# Embedded arrows terminate at the surface: the point and socket are buried.
+	var end=0.0 if stuck>=0 else -12.0
+	draw_line(Vector2(-87,1),Vector2(end,1),Color("281d16"),3.2,true)
+	draw_line(Vector2(-87,0),Vector2(end,0),Color("745535"),2.4,true)
+	draw_line(Vector2(-86,-.65),Vector2(end,-.65),Color("aa8554"),.65,true)
+	# Narrow nock and tightly bound feather roots.
+	draw_line(Vector2(-92,0),Vector2(-86,0),Color("51432d"),2.0,true)
+	for x in [-84,-82,-64,-62]:
+		draw_line(Vector2(x,-1.3),Vector2(x,1.3),Color("c1af82"),.65,true)
 	for side in [-1,1]:
-		draw_colored_polygon(PackedVector2Array([Vector2(-48,0),Vector2(-50,side*4),Vector2(-39,side*3),Vector2(-36,0)]),Color("9b9a81"))
+		var edge=PackedVector2Array([Vector2(-86,side*.8),Vector2(-87,side*5),Vector2(-80,side*6),Vector2(-66,side*3.4),Vector2(-62,side*.7)])
+		draw_colored_polygon(edge,Color("8a8166") if side<0 else Color("514c3c"))
+		for i in 8:
+			var x=-84+i*2.4
+			var width=5.2-float(i)*.4
+			draw_line(Vector2(x,side*.9),Vector2(x-2.4,side*width),Color("b2a383") if side<0 else Color("756b53"),.55,true)
+	if stuck<0:
+		# Three shaded facets keep the broadhead metallic without a bright white triangle.
+		draw_colored_polygon(PackedVector2Array([Vector2(0,0),Vector2(-15,-4),Vector2(-12,0)]),Color("92938a"))
+		draw_colored_polygon(PackedVector2Array([Vector2(0,0),Vector2(-12,0),Vector2(-15,4)]),Color("414541"))
+		draw_line(Vector2(-16,0),Vector2(-11,0),Color("64675e"),2.5,true)
