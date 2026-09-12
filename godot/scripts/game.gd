@@ -877,7 +877,7 @@ func draw_chicken():
 	var cel=atlas.cels[10 if c.roast else 9 if c.hop else int(c.age*16)%8]
 	var s=132/atlas.cellWidth
 	chicken_node.draw_set_transform(Vector2(c.x,c.y-c.height*4.5),0,Vector2(c.dir,1))
-	chicken_node.draw_texture_rect(art.texture(cel.file),Rect2((cel.left-atlas.cellWidth*.5)*s,-cel.height*s,cel.width*s,cel.height*s),false,Color.WHITE if c.roast else Color(0.68,0.65,0.61,1.0))
+	chicken_node.draw_texture_rect(art.texture(cel.file),Rect2((cel.left-atlas.cellWidth*.5)*s,-cel.height*s,cel.width*s,cel.height*s),false,Color(0.76,0.73,0.69,1.0))
 	chicken_node.draw_set_transform(Vector2.ZERO)
 
 func draw_ground():
