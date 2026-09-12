@@ -7,10 +7,8 @@ var viewport: SubViewport
 var fluid: ShaderMaterial
 var surface: Sprite2D
 var started=false
-var fine_drips: Array=[]
 func _ready():
 	z_index=2050
-	for i in 12:fine_drips.append({"x":randf_range(30,1410),"y":randf_range(30,550),"length":randf_range(100,370),"width":randf_range(.8,1.7),"delay":randf_range(.08,.5)})
 	var bursts=[]
 	for i in 5: bursts.append({"at":.06+randf()*.5,"width":.012+randf()*.07})
 	for n in 280:
@@ -79,11 +77,3 @@ func _draw():
 	if age<0: return
 	var fade=clamp((age-.25)/1.3,0,1)
 	draw_rect(Rect2(0,0,1440,1062),Color(.439,.035,.063,fade*fade*(3-2*fade)))
-
-
-	for drip in fine_drips:
-		var t=clampf((age-drip.delay)/2.8,0,1)
-		if t<=0:continue
-		var end=Vector2(drip.x,drip.y+drip.length*(1-pow(1-t,3)))
-		draw_line(Vector2(drip.x,drip.y),end,Color("570a10"),drip.width,true)
-		draw_circle(end,drip.width*.8,Color("690c14"))
