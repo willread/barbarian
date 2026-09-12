@@ -4,7 +4,7 @@ const KINDS=["legion","bone","shield","marauder","champion"]
 var art: CairnArt
 var kind=0
 var age=0.0
-var strength=0.6
+var strength=1.8
 var fire: ContourFire
 var corpse: Sprite2D
 var mask_view: SubViewport
@@ -70,7 +70,7 @@ func _input(event: InputEvent):
 			kind=posmod(kind+(1 if event.keycode==KEY_DOWN else -1),KINDS.size())
 			rebuild()
 		if event.keycode in [KEY_LEFT,KEY_RIGHT]:
-			strength=clamp(strength+(.1 if event.keycode==KEY_RIGHT else -.1),.1,1.4)
+			strength=clamp(strength+(.1 if event.keycode==KEY_RIGHT else -.1),.1,3.0)
 			queue_redraw()
 func _draw():
 	draw_rect(Rect2(0,0,1440,810),Color("151519"))

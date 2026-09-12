@@ -52,7 +52,7 @@ Open http://localhost:3001/?fire-study to review the isolated BEGIN / OPTIONS ef
 
 The prototype stores velocity and temperature in a small persistent SubViewport. Letter-edge emission feeds a buoyant, curl-driven advection field; a separate shader maps temperature to dark red, orange and small ivory cores. Selection stops emission and lets residual heat dissipate. It uses Compatibility rendering and no compute shaders.
 
-Both studies default to intensity 0.6. Open http://localhost:3001/?enemy-fire-study for a looping grounded-corpse burn. Up/down cycles all five enemy types, Space restarts, and left/right adjusts intensity. This is an isolated replacement candidate; production enemy deaths retain their existing effect. The corpse's live dissolving alpha drives emission, so flames follow its remaining edges. Ignition starts after the grounded pose, and emission tapers before the body disappears.
+The menu study defaults to intensity 0.6; the enemy study defaults to 1.8 (three times the fuel input). Open http://localhost:3001/?enemy-fire-study for a looping grounded-corpse burn. Up/down cycles all five enemy types, Space restarts, and left/right adjusts intensity. This is an isolated replacement candidate; production enemy deaths retain their existing effect. The corpse's live dissolving alpha drives emission, so flames follow its remaining edges. Ignition starts after the grounded pose, and emission tapers before the body disappears.
 
 ### Reusing contour fire
 
