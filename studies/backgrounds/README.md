@@ -9,3 +9,8 @@ Built-in image generation: concept prompt requested a 16:9 ruined aqueduct appro
 
 ## V2 eight-frame loop review
 Eight newly generated phases, 12 fps waterfall and 14 fps brazier. Version selector retains V1. Seam check repeats the last two and first two frames without interpolating or reversing flow. The source prompt specifies eight consecutive cyclic phases with pinned architecture, downward waterfall motion and upward curling flame; image generation still introduces registration differences. Per-region pixel-change measurements are recorded in screen.json: a similar seam delta only rules out an unusually large seam cut, not jitter across every frame. This is still unapproved draft artwork.
+
+## V3 locked waterfall
+V2 removed from active version selector; archived files retained. Uses the ORIGINAL concept painting as the immutable base. Hand-defined normalized waterfall/spray polygon, 3px soft edge, brightness-based water coverage to retain darker rock details. Only source water detail is advected downward; spray-area detail moves radially outward. Two phases offset by half a cycle blend with triangular weights; the zero-weight phase resets invisibly. No camera movement, generated scenery substitutions, or full-scene displacement.
+
+The shader is in waterfall.js. Loop duration 2 seconds. The browser runs a real framebuffer comparison at t=0 and t=2 and displays the maximum channel difference. This verifies identical endpoints, not the artistic quality of motion. Seam review plays a short interval across the boundary. Frame step samples at 30Hz. This is a deterministic masked-flow prototype, not a hand-drawn frame atlas; it can be baked after motion approval. It deliberately leaves the other regions static. Native integration awaits user review.
