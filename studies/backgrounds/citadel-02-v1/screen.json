@@ -1,0 +1,236 @@
+{
+  "id": "citadel-02-v1",
+  "title": "The breached gate — World 1 / Screen 2",
+  "status": "First pass — composition and masks for review",
+  "size": [
+    1280,
+    720
+  ],
+  "frames": [
+    "base.png"
+  ],
+  "notes": "Two localized brazier loops, 60 frames / two seconds. Flame motion is confined above the iron baskets; reflected light changes on fixed masonry. Background and banners remain static. Edit the glow/flame boundaries and the walkable foot area. This is a baked texture-flow first pass, not fluid simulation.",
+  "regions": [
+    {
+      "name": "Left brazier",
+      "fps": 30,
+      "polygon": [
+        [
+          0.192,
+          0.443
+        ],
+        [
+          0.214,
+          0.414
+        ],
+        [
+          0.251,
+          0.416
+        ],
+        [
+          0.276,
+          0.453
+        ],
+        [
+          0.28,
+          0.53
+        ],
+        [
+          0.259,
+          0.554
+        ],
+        [
+          0.211,
+          0.552
+        ],
+        [
+          0.19,
+          0.51
+        ]
+      ],
+      "motion_polygon": [
+        [
+          0.229,
+          0.475
+        ],
+        [
+          0.231,
+          0.46
+        ],
+        [
+          0.235,
+          0.455
+        ],
+        [
+          0.235,
+          0.446
+        ],
+        [
+          0.241,
+          0.46
+        ],
+        [
+          0.244,
+          0.447
+        ],
+        [
+          0.245,
+          0.467
+        ],
+        [
+          0.25,
+          0.473
+        ],
+        [
+          0.251,
+          0.479
+        ],
+        [
+          0.229,
+          0.479
+        ]
+      ],
+      "animation": {
+        "atlas": "brazier-1.png",
+        "rect": [
+          243,
+          298,
+          117,
+          102
+        ],
+        "columns": 8,
+        "count": 60,
+        "fps": 30
+      }
+    },
+    {
+      "name": "Right brazier",
+      "fps": 30,
+      "polygon": [
+        [
+          0.824,
+          0.435
+        ],
+        [
+          0.856,
+          0.41
+        ],
+        [
+          0.882,
+          0.42
+        ],
+        [
+          0.908,
+          0.458
+        ],
+        [
+          0.907,
+          0.526
+        ],
+        [
+          0.884,
+          0.551
+        ],
+        [
+          0.847,
+          0.55
+        ],
+        [
+          0.822,
+          0.515
+        ]
+      ],
+      "motion_polygon": [
+        [
+          0.858,
+          0.477
+        ],
+        [
+          0.858,
+          0.466
+        ],
+        [
+          0.862,
+          0.452
+        ],
+        [
+          0.866,
+          0.459
+        ],
+        [
+          0.866,
+          0.447
+        ],
+        [
+          0.87,
+          0.453
+        ],
+        [
+          0.873,
+          0.466
+        ],
+        [
+          0.875,
+          0.47
+        ],
+        [
+          0.877,
+          0.478
+        ]
+      ],
+      "animation": {
+        "atlas": "brazier-2.png",
+        "rect": [
+          1052,
+          295,
+          112,
+          103
+        ],
+        "columns": 8,
+        "count": 60,
+        "fps": 30
+      }
+    }
+  ],
+  "walkable": {
+    "polygon": [
+      [
+        0,
+        0.666
+      ],
+      [
+        1,
+        0.666
+      ],
+      [
+        1,
+        0.813
+      ],
+      [
+        0.913,
+        0.842
+      ],
+      [
+        0.886,
+        0.899
+      ],
+      [
+        0.166,
+        0.922
+      ],
+      [
+        0.119,
+        0.878
+      ],
+      [
+        0.065,
+        0.846
+      ],
+      [
+        0,
+        0.805
+      ]
+    ],
+    "description": "Foot positions on the flat courtyard; avoids foreground rubble."
+  }
+}

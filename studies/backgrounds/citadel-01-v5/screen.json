@@ -1,7 +1,7 @@
 {
   "id": "citadel-01-v5",
   "title": "Aqueduct approach - waterfall and fire",
-  "status": "Approved masks / baked flow loops awaiting animation review",
+  "status": "Approved \u2014 World 1 / Screen 1",
   "size": [
     1280,
     720
@@ -234,5 +234,12 @@
       ]
     ],
     "description": "Foot positions on the dry terrace, inside the rear rubble and front drop-off."
+  },
+  "approval": {
+    "state": "approved",
+    "date": "2026-09-12",
+    "world": 1,
+    "screen": 1,
+    "basis": "User approved protected-edge waterfall iteration 959a525"
   }
 }

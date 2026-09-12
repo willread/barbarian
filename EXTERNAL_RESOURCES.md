@@ -109,3 +109,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Citadel background workshop v1: built-in image-generated concept and four-frame animation draft. Sources, workflow and prompts documented in `studies/backgrounds/README.md`. Not approved or integrated into gameplay.
 
 - Citadel study V2: eight-frame sheet generated with the built-in image tool from V1 frame 0, requesting cyclic downward water and upward flame motion with fixed scenery. Source retained in `studies/backgrounds/citadel-01-v2/`; review caveats in the workshop README.
+
+- 2026-09-12: World 1 screen 2 background, `studies/backgrounds/citadel-02-v1/base.png`, generated using built-in OpenAI imagegen. Prompt and provenance in that folder's README.md. No stock download or third-party asset. Animation atlases are locally baked texture flow.

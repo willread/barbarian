@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {createCanvas,loadImage,Image} from '@napi-rs/canvas';
+import {createBakedLoops} from '../../studies/backgrounds/baked-loops.js';
+globalThis.document={createElement:()=>createCanvas(1280,720)};globalThis.Image=Image;
+const dir='studies/backgrounds/citadel-02-v1/',m=JSON.parse(fs.readFileSync(dir+'screen.json'));
+const flow=await createBakedLoops(await loadImage(dir+'base.png'),m.regions,1280,720,dir);
+assert.equal(flow.checkLoop(),0);
+const first=flow.render(0).getContext('2d').getImageData(0,0,1280,720).data;
+const next=flow.render(.3).getContext('2d').getImageData(0,0,1280,720).data;
+let count=0;for(let i=0;i<first.length;i++)if(first[i]!==next[i])count++;
+assert(count>100);console.log('Gate loops: matching endpoints and animated pixel variation verified');

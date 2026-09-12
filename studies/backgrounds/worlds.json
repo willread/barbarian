@@ -1,0 +1,22 @@
+{
+  "worlds": [
+    {
+      "id": "citadel",
+      "name": "The Fallen Citadel",
+      "screens": [
+        {
+          "order": 1,
+          "id": "citadel-01-v5",
+          "name": "Aqueduct approach",
+          "status": "approved"
+        },
+        {
+          "order": 2,
+          "id": "citadel-02-v1",
+          "name": "The breached gate",
+          "status": "first-pass"
+        }
+      ]
+    }
+  ]
+}
