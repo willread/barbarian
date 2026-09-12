@@ -65,6 +65,7 @@ func _ready():
 			groups[job.group].append(job)
 		for group in groups:
 			var id={"selection":"menu_select","activation":"menu_activate","drop":"menu_land"}.get(group,group)
+			if not audio.originals.has(id):continue
 			var box=VBoxContainer.new()
 			box.set_meta("search",(groups[group][0].label+" "+group).to_lower())
 			content.add_child(box)

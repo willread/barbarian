@@ -1,5 +1,5 @@
 extends Node
-const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","foot_stone","foot_earth","landing","bow_draw","bow_release","arrow_hit","arrow_ground","hero_effort","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
+const CLIP_IDS=["sword","axe","flesh","heavy_hit","bone","shield","body_fall","landing","bow_release","arrow_hit","hero_effort","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}
@@ -8,8 +8,6 @@ var voices: Array=[]
 var tracks: Array=[]
 var gates: Dictionary={}
 var unlocked=false
-var step_distance=0.0
-var last_position=Vector2.ZERO
 var last_spell=-1
 var chicken_clock=0.0
 var watched: Dictionary={}
@@ -19,17 +17,13 @@ func setup(source: Node2D):
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
 	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
 	for id in CLIP_IDS:
-		clips[id]=load("res://audio/"+id+".ogg")
+		clips[id]=load("res://audio/"+("slam_boom" if id=="landing" else id)+".ogg")
 	clips["menu_activate"]=clips["menu_land"]
 	originals=clips.duplicate()
 	var saved=ConfigFile.new()
 	if saved.load("user://soundboard.cfg")==OK:
 		for id in saved.get_section_keys("choices"):
 			set_variant(id,saved.get_value("choices",id),false)
-	# One-time migration also silences these events for existing sound-lab profiles.
-	if not saved.get_value("settings","quiet_foley",false):
-		for id in ["foot_stone","foot_earth","bow_draw"]:set_variant(id,"none",false)
-		if DisplayServer.get_name()!="headless":save_choices()
 	for i in 16:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
@@ -90,14 +84,6 @@ func _process(dt: float):
 		for voice in voices:voice.stop()
 	if game.phase=="paused":return
 	var h=game.hero
-	var point=Vector2(h.x,h.y)
-	var distance=point.distance_to(last_position)
-	last_position=point
-	if h.moving and h.height<=0 and distance<30:
-		step_distance+=distance
-		if step_distance>55:
-			step_distance=0
-			play("foot_earth" if game.background.key=="swamp" else "foot_stone",-15)
 	if game.spell>=0 and last_spell<0:play("hero_effort",-6,.85)
 	if game.spell>=20 and last_spell<20:play("lightning",-5)
 	last_spell=game.spell
@@ -110,7 +96,6 @@ func _process(dt: float):
 		if burning and not state.burn:play("fire",-15)
 		if ground and not state.ground:play("body_fall",-8)
 		if attack!=state.attack:
-			if attack=="archerShot":play("bow_draw",-13)
 			if attack=="marauderRush":play("roar",-8)
 			if attack=="spin":play("axe" if h.weapon=="axe" else "sword",-6,.85)
 		watched[key]={"burn":burning,"ground":ground,"attack":attack}

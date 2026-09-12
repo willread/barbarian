@@ -94,3 +94,5 @@ Skeleton archers appear in pre-boss encounter plans: 6 HP, retreat inside 310px,
 Press F8 to open the hidden soundboard. The game pauses; click any option to audition and apply it to later sound events. Escape/F8 closes it, preserving the previous pause state. All 27 effects and both music tracks have four alternatives plus the original. Choices persist locally in `user://soundboard.cfg`; preview volume does not change the gameplay mix.
 
 Every sound-lab group also offers **No sound**, saved like other choices. Footsteps (both surfaces) and bow draws start disabled; existing profiles receive this default once, after which explicit sound-lab choices are respected.
+
+Footsteps and bow draws have now been removed from runtime playback and the sound lab (assets retained). Ground and character arrow contacts share Arrow hit. Jump slam landing uses a thunderous boom with four new choices.

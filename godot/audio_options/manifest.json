@@ -477,42 +477,42 @@
     {
       "id": "landing-1",
       "group": "landing",
-      "label": "Landing",
-      "name": "Bedrock strike",
-      "description": "A huge ground impact with a mineral crack.",
-      "duration": 1.1,
-      "prompt": "A heavy axe head strikes bedrock. Instant hard stone KRAK over a powerful bass THUD, followed by scattering gravel. Ground contact only, no approach or sword-like sweep. Isolated dark fantasy game sound, close dry recording.",
-      "revision": 2
+      "label": "Jump slam boom",
+      "name": "Thundercrack",
+      "description": "A violent ground crack over a huge low boom.",
+      "duration": 1.8,
+      "prompt": "A gigantic weapon hits bedrock: instant stone CRACK and enormous deep thunder BOOM together. Dense chest-shaking low rumble decays for one second, small rubble afterward. Contact starts immediately, no whoosh, rising wind, voices or music.",
+      "revision": 3
     },
     {
       "id": "landing-2",
       "group": "landing",
-      "label": "Landing",
-      "name": "Earth crater",
-      "description": "A bassy thump with dense soil crunch.",
-      "duration": 1.1,
-      "prompt": "An enormous weapon slams packed earth. Deep WHUD, compressed gritty crunch, small clods patter outward. Physical close impact, no wind burst, explosion or metallic whistle. Isolated dark fantasy game sound, close dry recording.",
-      "revision": 2
+      "label": "Jump slam boom",
+      "name": "Seismic boom",
+      "description": "A deep earth-shaking concussion with rubble.",
+      "duration": 1.8,
+      "prompt": "One colossal ground slam. Immediate bass-heavy BOOOM with a hard gritty thud at its front, deep seismic rumble and scattered rock chips fading. Physical and thunderous, no swing, airy sweep, voice or music.",
+      "revision": 3
     },
     {
       "id": "landing-3",
       "group": "landing",
-      "label": "Landing",
-      "name": "Iron on flagstone",
-      "description": "A blunt clang layered with breaking stone.",
-      "duration": 1.1,
-      "prompt": "A broad iron blade slams a flagstone. Dark low KLANG and sharp stone fracture at exactly the same instant, short rubble tail. No swing sound or high ringing. Isolated dark fantasy game sound, close dry recording.",
-      "revision": 2
+      "label": "Jump slam boom",
+      "name": "Storm hammer",
+      "description": "A sharp thunderous impact with a rolling tail.",
+      "duration": 1.8,
+      "prompt": "A massive hammer strikes a stone floor with the force of thunder. Sudden explosive low KRA-BOOM, rolling dark thunder tail and short dry stone debris. No approach sound, windy swoosh or music.",
+      "revision": 3
     },
     {
       "id": "landing-4",
       "group": "landing",
-      "label": "Landing",
-      "name": "Cracked slab",
-      "description": "A sharp stone break and subterranean rumble.",
-      "duration": 1.1,
-      "prompt": "A stone floor slab breaks under one huge hammer strike. Dry explosive KRAK on a low DUM, short uneven rubble clicks and a low 300 millisecond rumble. No whoosh or musical bass note. Isolated dark fantasy game sound, close dry recording.",
-      "revision": 2
+      "label": "Jump slam boom",
+      "name": "Cavern shock",
+      "description": "A dense low blast and short cavern echo.",
+      "duration": 1.8,
+      "prompt": "One monumental weapon-ground impact. Dense low DROOM with a crushed stone attack, powerful sub-bass body and short cavernous rumbling decay. No whoosh, metal ringing, voices or music.",
+      "revision": 3
     },
     {
       "id": "bow_draw-1",

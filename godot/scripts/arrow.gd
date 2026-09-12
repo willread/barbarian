@@ -56,7 +56,7 @@ func advance(dt: float):
 				facing=h.dir
 				attachment=Vector2((point.x-h.x)*h.dir,point.z-h.height*4.5)
 		if point.z<=0:
-			game.audio.play("arrow_ground",-13)
+			game.audio.play("arrow_hit")
 			point.z=0
 			stuck=0.0
 		if age>3.0:queue_free()
