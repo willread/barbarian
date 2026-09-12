@@ -20,3 +20,12 @@ Expanded waterfall perimeter and eased the brightness cutoff to include dim spra
 
 ### Mask refinement
 Water uses explicit stone exclusion polygons, applied after edge softening, and identical source/destination water coverage. Fire motion uses a separate narrow flame mask; the broad glow mask only modulates light. Debug: green is moving water, bright yellow is moving flame, dim orange is lighting-only coverage. Source sampling cannot use the broad glow region.
+
+## Standalone geometry editor
+Run `npm run level:editor` and open http://localhost:3002/ . This serves the source workshop directly, without building or starting Godot. The game preview also retains its workshop link.
+
+Enable **Edit geometry**, choose a shape, and drag its handles. Double-click an edge to insert a vertex; select a handle and press Delete/Backspace to remove it (minimum three). Shift-drag translates the selected polygon. Undo/Redo and Ctrl+Z/Ctrl+Y are supported. Water exclusions, flame motion, glow coverage and the walkable polygon are separate editable shapes; Add stone exclusion creates another hole to refine.
+
+Geometry autosaves in this browser per screen. Export level JSON to preserve a portable copy and give it to the agent for incorporation in the source manifest. Import JSON restores that geometry. Browser saves do not modify repository files. Reset to source is undoable.
+
+For targeted regeneration, select the region, enter instructions, and Export region request. The JSON contains the complete edited level, selected polygon and a black/white PNG mask. Give that file to the agent; generation is intentionally not automatic. Preview edits affect existing motion masks immediately and do not regenerate artwork. Historical V1/V2 frame-loop descriptions above refer to archived approaches; current V4 uses masked texture flow.

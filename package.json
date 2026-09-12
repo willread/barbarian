@@ -13,7 +13,8 @@
     "test": "node tools/godot/build.mjs --test",
     "godot:build": "node tools/godot/build.mjs",
     "godot:serve": "node tools/godot/serve.mjs",
-    "godot:test": "node tools/godot/build.mjs --test"
+    "godot:test": "node tools/godot/build.mjs --test",
+    "level:editor": "node tools/godot/level-editor.mjs"
   },
   "dependencies": {
     "@napi-rs/canvas": "0.1.100"
