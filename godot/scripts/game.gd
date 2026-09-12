@@ -529,6 +529,7 @@ func tick(dt: float):
 			arrows.append(arrow)
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)
 		if phase!="playing": break
+	e_ai.separate(enemies)
 	if phase=="playing" and enemies.all(func(f):return f.hp<=0 and f.burnAge>3.4):
 		begin_walk("exit")
 		transition=0

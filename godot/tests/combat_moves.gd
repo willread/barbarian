@@ -69,5 +69,10 @@ func _init():
 		assert(slow.dir==1,"Heavy legion must not instantly face a flanking player")
 	ai.intent(slow,behind,true)
 	assert(slow.dir==-1 and slow.aiRest>=12)
+	var crowd=[m.make(31,720,660,10),m.make(32,720,660,10),m.make(33,720,660,10)]
+	for i in 8:ai.separate(crowd)
+	for i in crowd.size():
+		for j in range(i+1,crowd.size()):
+			assert(abs(crowd[i].x-crowd[j].x)>=121.9,"Stacked enemies must separate")
 	print("CAIRN_MOVES_OK: shield opening, dive startup/momentum/recovery, weapon distinction, spin sides/once/lane")
 	quit()

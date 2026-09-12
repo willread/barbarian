@@ -193,3 +193,29 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if not e.aiRest:
 		e.attack={"type":"archerShot","age":0,"elapsed":0.0,"ticks":54,"from":30,"to":-1,"direction":e.dir,"hits":[],"connected":false,"damage":0,"reach":0}
 	return Vector2.ZERO
+
+func separate(actors: Array):
+	# Elliptical footprints respect the shallow walkable lane and sprite width.
+	# Grounded living enemies separate; airborne reactions and corpses remain free.
+	var standing=actors.filter(func(e):return e.hp>0 and e.down.is_empty() and e.height<=0)
+	for iteration in 4:
+		for i in standing.size():
+			for j in range(i+1,standing.size()):
+				var a=standing[i]
+				var b=standing[j]
+				var size=(a.size+b.size)*.5
+				var radius=Vector2(122,62)*size
+				var delta=Vector2(b.x-a.x,b.y-a.y)/radius
+				var distance=delta.length()
+				if distance>=1:continue
+				var direction=delta/distance if distance>.001 else Vector2(1 if a.id<b.id else -1,0)
+				var correction=direction*(1-distance)*radius
+				# Attacking/heavier actors yield less, preventing attacks being dragged sideways.
+				var wa=(1.0 if a.attack.is_empty() else .2)/a.size
+				var wb=(1.0 if b.attack.is_empty() else .2)/b.size
+				if a.attack.get("rush",false) or b.attack.get("rush",false):
+					correction=Vector2((1 if b.x>=a.x else -1)*(radius.x-abs(b.x-a.x)),0)
+				a.x-=correction.x*wa/(wa+wb)
+				b.x+=correction.x*wb/(wa+wb)
+				a.y=clampf(a.y-correction.y*wa/(wa+wb),560,755)
+				b.y=clampf(b.y+correction.y*wb/(wa+wb),560,755)
