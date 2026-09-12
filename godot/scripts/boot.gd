@@ -2,6 +2,7 @@ extends Node2D
 var picture: AtlasTexture
 var flat: Texture2D
 var backdrop=preload("res://art/studio-background.png")
+var stones=preload("res://art/branding/cairn-icon-256.png")
 var elapsed=0.0
 var white_layer: Node2D
 func _ready():
@@ -46,15 +47,25 @@ func _draw():
 	var bounds=Rect2((screen-size)*.5,size)
 	draw_texture_rect(picture,bounds,false,Color(1,1,1,1.-blend))
 
-	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)
-	var center=screen-Vector2.ONE*(radius+32.)
-	draw_arc(center,radius*.75,0,TAU,64,Color("777671"),radius*.23,true)
-	for i in 12:
-		var angle=elapsed*TAU/1.8+i*TAU/12.
-		var tip=center+Vector2.from_angle(angle)*radius*1.25
-		var a=center+Vector2.from_angle(angle-.13)*radius*.85
-		var b=center+Vector2.from_angle(angle+.13)*radius*.85
-		draw_colored_polygon(PackedVector2Array([a,tip,b]),Color("b2afa6"))
+	var edge=clampf(min(screen.x,screen.y)*.09,60.,96.)
+	var origin=screen-Vector2.ONE*(edge+24.)
+	var cycle=fmod(elapsed,2.8)/2.8
+	var regions=[Rect2(0,142,256,114),Rect2(0,88,256,54),Rect2(0,0,256,88)]
+	for i in 3:
+		var t=cycle-i*.16
+		if t<0 or cycle>.99:continue
+		var drop=0.0
+		if t<.12:drop=-256.*(1.-pow(t/.12,2.5))
+		elif t<.17:drop=-7.*sin((t-.12)/.05*PI)
+		elif t<.21:drop=-1.5*sin((t-.17)/.04*PI)
+		if cycle>.82:drop=270.*pow((cycle-.82)/.17,2.)
+		var region=regions[i]
+		var target=Rect2(origin+(region.position+Vector2(0,drop))*edge/256.,region.size*edge/256.)
+		# Clip motion to the loader square, just like the browser SVG viewport.
+		var clipped=target.intersection(Rect2(origin,Vector2.ONE*edge))
+		if clipped.has_area():
+			var source=Rect2(region.position+(clipped.position-target.position)*256./edge,clipped.size*256./edge)
+			draw_texture_rect_region(stones,clipped,source)
 
 func draw_white_logo():
 	var screen=get_viewport_rect().size

@@ -44,7 +44,7 @@ for(const target of targets){
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');
-  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><svg class="metal-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-label="Maximum Force"><image href="maximum-force-logo.png" width="1774" height="887" /></svg><svg class="flat-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-hidden="true"><defs><mask id="studio-white-shape" maskUnits="userSpaceOnUse" x="0" y="0" width="1774" height="887" style="mask-type:luminance"><image href="maximum-force-white-v2.png" width="1774" height="887" /></mask></defs><rect width="1774" height="887" fill="white" mask="url(#studio-white-shape)" /></svg></div><svg viewBox="0 0 120 120"><defs><linearGradient id="metal"><stop stop-color="#d7d1c4"/><stop offset=".45" stop-color="#615f5b"/><stop offset=".7" stop-color="#242522"/><stop offset="1" stop-color="#aaa494"/></linearGradient></defs><g fill="url(#metal)" stroke="#161713">${Array.from({length:12},(_,i)=>`<path d="M55 19 L60 3 L68 24 L63 32 L54 30Z" transform="rotate(${i*30} 60 60)"/>`).join('')}<path fill-rule="evenodd" d="M60 20a40 40 0 1 1 0 80a40 40 0 1 1 0-80 M60 31a29 29 0 1 0 0 58a29 29 0 1 0 0-58"/></g></svg></div>`;
+  const ring=`<div id="cairn-loader" aria-label="Loading Cairn"><div class="studio-art"><svg class="metal-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-label="Maximum Force"><image href="maximum-force-logo.png" width="1774" height="887" /></svg><svg class="flat-logo" viewBox="0 0 1774 887" preserveAspectRatio="none" aria-hidden="true"><defs><mask id="studio-white-shape" maskUnits="userSpaceOnUse" x="0" y="0" width="1774" height="887" style="mask-type:luminance"><image href="maximum-force-white-v2.png" width="1774" height="887" /></mask></defs><rect width="1774" height="887" fill="white" mask="url(#studio-white-shape)" /></svg></div><svg class="cairn-stack" viewBox="0 0 256 256" aria-label="Loading"><defs>${[[0,142,256,114],[0,88,256,54],[0,0,256,88]].map((r,i)=>`<clipPath id="stone-${i}"><rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/></clipPath>`).join('')}</defs>${[0,1,2].map(i=>`<g class="stone stone-${i}"><image href="cairn-icon-256.png" width="256" height="256" clip-path="url(#stone-${i})"/></g>`).join('')}</svg></div>`;
   html=html.replace('</head>',`<link rel="icon" type="image/png" sizes="32x32" href="cairn-icon-32.png"><link rel="icon" href="cairn.ico"><link rel="apple-touch-icon" href="cairn-icon-180.png"><link rel="preload" as="image" href="maximum-force-logo.png"><link rel="preload" as="image" href="maximum-force-white-v2.png"><link rel="preload" as="image" href="studio-background.png"><style>
 html,body{background:#000!important}
 #cairn-loader{position:fixed;inset:0;display:grid;place-items:center;background:#000 url(studio-background.png) center/cover no-repeat;z-index:9999;pointer-events:auto}
@@ -54,8 +54,9 @@ html,body{background:#000!important}
 #cairn-loader .flat-logo{animation:flat-in 1.2s ease-in-out 3s both}
 #cairn-loader::before{content:"";position:absolute;inset:0;background:#000;animation:flat-in 1.2s ease-in-out 3s both}
 @keyframes flat-in{from{opacity:0}to{opacity:1}}@keyframes metal-out{from{opacity:1}to{opacity:0}}
-#cairn-loader > svg[viewBox]{z-index:2;position:absolute;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));width:clamp(40px,7vmin,76px);height:clamp(40px,7vmin,76px);animation:spin 1.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}#status-progress,#status-splash{visibility:hidden}
+#cairn-loader > .cairn-stack{z-index:2;position:absolute;right:max(24px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));width:clamp(60px,9vmin,96px);height:clamp(60px,9vmin,96px);overflow:hidden}
+${[0,1,2].map(i=>{const t=i*16;return `.stone-${i}{animation:stone-${i} 2.8s linear infinite}@keyframes stone-${i}{0%,${t}%{transform:translateY(-256px);opacity:0;animation-timing-function:cubic-bezier(.55,0,1,.45)}${t+1}%{opacity:1}${t+12}%{transform:translateY(0);opacity:1;animation-timing-function:ease-out}${t+14}%{transform:translateY(-7px);animation-timing-function:ease-in}${t+17}%{transform:translateY(0)}${t+19}%{transform:translateY(-1.5px)}${t+21}%,82%{transform:translateY(0);opacity:1;animation-timing-function:ease-in}99%,100%{transform:translateY(270px);opacity:0}}`}).join('')}
+#status-progress,#status-splash{visibility:hidden}
 </style></head>`).replace('<body>',`<body>${ring}<script>window.cairnSplashStart=performance.now();</script>`);
   html=html.replace('</body>',`<script>
 let cairnDone=false, cairnImagesReady=false;
@@ -83,7 +84,7 @@ cairnCheck();
   fs.copyFileSync('godot/art/maximum-force-reference.png',path.join(path.dirname(file),'maximum-force-reference.png'));
   fs.copyFileSync('godot/art/studio-background.png',path.join(path.dirname(file),'studio-background.png'));
   fs.copyFileSync('godot/art/maximum-force-logo.png',path.join(path.dirname(file),'maximum-force-logo.png'));
-  for(const icon of ['cairn.ico','cairn-icon-32.png','cairn-icon-180.png'])fs.copyFileSync('godot/art/branding/'+icon,path.join(path.dirname(file),icon));
+  for(const icon of ['cairn.ico','cairn-icon-32.png','cairn-icon-180.png','cairn-icon-256.png'])fs.copyFileSync('godot/art/branding/'+icon,path.join(path.dirname(file),icon));
   fs.writeFileSync(file,html);
  }
  console.log(`${target}: ${file}`);
