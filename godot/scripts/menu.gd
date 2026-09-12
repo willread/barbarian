@@ -18,8 +18,8 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 	items.clear()
 	selected=0
 	title_mode=is_title
-	var options=labels.size()==3 and str(labels[0]).begins_with("SOUND:")
-	var size=1.0 if is_title and not options else .71 if is_title else .55
+	var options=labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
+	var size=1.0 if is_title and not options else .58 if is_title and labels.size()>3 else .71 if is_title else .55
 	var center=417.6 if is_title else 720.0
 	var top=380.7 if is_title else 430.0
 	for i in labels.size():

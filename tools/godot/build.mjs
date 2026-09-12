@@ -16,6 +16,8 @@ if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepar
  run(process.execPath,['tools/godot/bake-assets.mjs']);
  run(process.execPath,['tools/godot/bake-extras.mjs']);
 }
+const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
+if(!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
@@ -23,6 +25,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/combat_moves.gd']);
  run(binary,['--headless','--path','godot','--script','tests/audio_assets.gd']);
  run(binary,['--headless','--path','godot','--script','tests/creature_art.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/settings_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/soundboard.gd']);
  run(binary,['--headless','--path','godot','--','--smoke-test']);
  run(binary,['--headless','--path','godot','--','--integration-test']);
