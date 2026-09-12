@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 const dir='studies/backgrounds/citadel-01-v5';
-const m=JSON.parse(fs.readFileSync(process.argv[2]||'studies/backgrounds/citadel-01-v5/approved-masks.json','utf8'));
+let m=JSON.parse(fs.readFileSync(process.argv[2]||'studies/backgrounds/citadel-01-v5/approved-masks.json','utf8'));
+const waterfallOnly=process.argv.includes('--waterfall');
+if(waterfallOnly){const current=JSON.parse(fs.readFileSync(path.join(dir,'screen.json'),'utf8'));current.regions[0].polygon=m.regions[0].polygon;m=current;}
 m.id='citadel-01-v5';m.status='Approved masks / baked flow loops awaiting animation review';
 m.notes='60 baked frames over two seconds. Original painting stays fixed. Optional interpolation blends adjacent frames; the underlying motion is texture advection, not newly hand-drawn frames.';
 m.frames=['../citadel-01-v3/base.png'];
@@ -16,6 +18,7 @@ const mix=(a,b,t)=>a+(b-a)*t;
 function sample(x,y,k){x=Math.max(0,Math.min(w-1,x));y=Math.max(0,Math.min(h-1,y));const ix=Math.floor(x),iy=Math.floor(y),jx=Math.min(w-1,ix+1),jy=Math.min(h-1,iy+1);return mix(mix(pixels[(iy*w+ix)*4+k],pixels[(iy*w+jx)*4+k],x-ix),mix(pixels[(jy*w+ix)*4+k],pixels[(jy*w+jx)*4+k],x-ix),y-iy)}
 function coverage(data,x,y){if(x<0||x>=w||y<0||y>=h)return 0;return data[(Math.floor(y)*w+Math.floor(x))*4+3]/255}
 for(let r=0;r<m.regions.length;r++){
+ if(waterfallOnly&&r!==0)continue;
  const poly=m.regions[r].polygon,x=Math.floor(Math.min(...poly.map(p=>p[0]))*w)-2,y=Math.floor(Math.min(...poly.map(p=>p[1]))*h)-2,cw=Math.ceil(Math.max(...poly.map(p=>p[0]))*w)-x+2,ch=Math.ceil(Math.max(...poly.map(p=>p[1]))*h)-y+2;
  const atlas=createCanvas(cw*8,ch*8),ag=atlas.getContext('2d'),frame=createCanvas(cw,ch),fg=frame.getContext('2d');
  for(let f=0;f<60;f++){
@@ -34,4 +37,4 @@ for(let r=0;r<m.regions.length;r++){
  const filename=r?'fire.png':'waterfall.png';fs.writeFileSync(path.join(dir,filename),atlas.toBuffer('image/png'));m.regions[r].animation={atlas:filename,rect:[x,y,cw,ch],columns:8,count:60,fps:30};
 }
 fs.writeFileSync(path.join(dir,'screen.json'),JSON.stringify(m,null,2)+'\n');
-console.log('Baked waterfall and fire: 60 frames each, 2 second loops');
+console.log(waterfallOnly?'Baked waterfall only: 60 frames, 2 second loop':'Baked waterfall and fire: 60 frames each, 2 second loops');
