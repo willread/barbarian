@@ -67,7 +67,7 @@ Maximum Force artwork uses a proportional, contained crop of the supplied photor
 - Studio splash: independent cover background, contained transparent logo, viewport-anchored spinner; three-second minimum remains.
 - Cairn title: cover background and transparent logo; menu anchors shift to center in portrait. Mouse coordinates are converted to menu-local space after layout transforms.
 - Combat: original 1440x810 arena is uniformly fitted and clipped, preserving all ROM movement/hit distances. Extra aspect-ratio space uses a dimmed version of the current environment. No stretching or cropping of playable space.
-- HUD: independent uniform scale and bottom anchor; ornamental tips overlap the arena. Health/mana, weapon and score remain separate dynamic draws.
+- HUD: full-width bottom anchor with a horizontally stretchable meter section; end ornaments, weapon and score retain uniform scale. Ornamental tips overlap the arena. Health/mana, weapon and score remain separate dynamic draws.
 - Pause/results and death wipe use screen space independently of the arena. Resize and fullscreen recalculate layout live.
 - Run native `-- --layout-test` for landscape, ultrawide and portrait rendered captures and assertions for menu bounds, uniform scaling and HUD bottom anchoring.
 

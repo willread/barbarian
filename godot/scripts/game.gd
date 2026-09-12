@@ -547,6 +547,7 @@ func _input(event: InputEvent):
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
 		var point=hud.get_local_mouse_position()
+		point.x-=screen_size.x/hud.scale.x-1440.
 		if point.y>810 and point.x>820 and point.x<1030: toggle_weapon()
 	if event is InputEventKey:
 		var code=event.keycode
@@ -800,10 +801,17 @@ func center_text(node: Node2D,text: String,p: Vector2,size: int,color: Color):
 
 func draw_hud():
 	if phase=="title": return
-	var tex=art.texture("hud-bronze-v1.png")
 	var s=1440.0/2172
-	hud.draw_texture_rect(art.texture("hud-native-frame.png"),Rect2(0,766,1440,296),false)
-	hud.draw_set_transform(Vector2(0,810),0,Vector2(s,252.0/380))
+	var extra=screen_size.x/hud.scale.x-1440.
+	var stretch=1.+extra/(901*s)
+	hud.draw_set_transform(Vector2.ZERO)
+	var frame=art.texture("hud-native-frame.png")
+	var uv_scale=frame.get_size()/Vector2(1440,296)
+	for section in [Vector3(0,220,220),Vector3(220,550,550+extra),Vector3(770,670,670)]:
+		var x=section.x+(extra if section.x>=770 else 0.)
+		hud.draw_texture_rect_region(frame,Rect2(x,766,section.z,296),Rect2(Vector2(section.x,0)*uv_scale,Vector2(section.y,296)*uv_scale))
+	# Stretch only the meter span; end ornaments and equipment panels retain their shape.
+	hud.draw_set_transform(Vector2(298*s*(1.-stretch),810),0,Vector2(s*stretch,252.0/380))
 	for i in 2:
 		var top=70+i*140
 		var value=displayed_health if i==0 else displayed_mana
@@ -815,13 +823,13 @@ func draw_hud():
 		if i==1 and can_cast(): hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
 	var spec=art.data.weapons[weapon]
 	var cel=art.data.atlases["weapons-v8"].cels[int(spec.frame)]
-	hud.draw_set_transform(Vector2(1400*s,810+193*252.0/380),.5,Vector2(s,252.0/380))
+	hud.draw_set_transform(Vector2(1400*s+extra,810+193*252.0/380),.5,Vector2(s,252.0/380))
 	var width=245*cel.width/cel.height
 	hud.draw_texture_rect(art.texture(cel.file),Rect2(-width/2,-122.5,width,245),false)
 	hud.draw_set_transform(Vector2.ZERO)
-	center_text(hud,"SCORE",Vector2(1758*s,810+83*252.0/380),22,Color("eedbb0"))
-	center_text(hud,"%06d"%score,Vector2(1758*s,810+182*252.0/380),52,Color("eedbb0"))
-	center_text(hud,"FINAL DUEL" if wave==8 else "THE VALLEY",Vector2(1758*s,810+281*252.0/380),22,Color("eedbb0"))
+	center_text(hud,"SCORE",Vector2(1758*s+extra,810+83*252.0/380),22,Color("eedbb0"))
+	center_text(hud,"%06d"%score,Vector2(1758*s+extra,810+182*252.0/380),52,Color("eedbb0"))
+	center_text(hud,"FINAL DUEL" if wave==8 else "THE VALLEY",Vector2(1758*s+extra,810+281*252.0/380),22,Color("eedbb0"))
 
 func draw_overlay():
 	if phase=="title":
@@ -1005,7 +1013,7 @@ func responsive_layout():
 	scale=Vector2.ONE*arena_scale
 	position=Vector2((1440-1440*arena_scale)*.5,(screen_size.y-hud_height-810*arena_scale)*.5)
 	hud.scale=Vector2.ONE*hud_scale
-	hud.position=Vector2((1440-1440*hud_scale)*.5,screen_size.y-1062*hud_scale)
+	hud.position=Vector2(0,screen_size.y-1062*hud_scale)
 	overlay.position=Vector2.ZERO
 	overlay.scale=Vector2.ONE
 	menu.layout_screen(screen_size,phase=="title")
@@ -1040,6 +1048,8 @@ func layout_test():
 		await RenderingServer.frame_post_draw
 		assert(abs(hud.to_global(Vector2(0,1062)).y-screen_size.y)<2)
 		assert(abs(hud.scale.x-hud.scale.y)<.001)
+		assert(abs(hud.position.x)<.001)
+		assert(abs(hud.to_global(Vector2(screen_size.x/hud.scale.x,1062)).x-screen_size.x)<.001)
 		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/layout-game-%d.png"%dimensions.x)
 	print("CAIRN_LAYOUT_OK: landscape, ultrawide, portrait; menu bounds and HUD anchor")
 	get_tree().quit()
