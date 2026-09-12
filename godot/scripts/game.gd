@@ -1,4 +1,6 @@
 extends Node2D
+# Global combat tuning: scales all incoming damage, for player and enemies.
+@export_range(0.0, 3.0, 0.05) var damage_multiplier: float = 0.75
 const MScript=preload("res://scripts/mechanics.gd")
 const EScript=preload("res://scripts/enemies.gd")
 const ArtScript=preload("res://scripts/art.gd")
@@ -487,7 +489,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		else:a.knock=false
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
 	var previous_hp=f.hp
-	f.hp=max(0,f.hp-a.damage*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
+	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
@@ -1540,7 +1542,7 @@ func archer_test():
 	for i in 90:
 		arrow.advance(1.0/120)
 		if arrow.attached:break
-	assert(arrow.attached and hero.hp<85,"Arrow must hit and embed with high damage")
+	assert(arrow.attached and is_equal_approx(hero.hp,100.-8.5*(100./48.)*damage_multiplier),"Arrow damage must respect global tuning and embed")
 	assert(not blood.drops.is_empty(),"Arrow impact must emit blood")
 	assert(hero.hurtTicks==0 and hero.recovering==0 and hero.recoil==0,"Arrow hits must not stun")
 	arrow.advance(.51)

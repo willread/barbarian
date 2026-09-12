@@ -11,3 +11,5 @@ Chicken opportunities occur in waves 2, 5, 8, and 11. This is a first-playthroug
 Variant tuning: swift enemies are 72% normal size, move at 165% speed, retain 85% health, and deal 65% damage. Brutes are 118% size, move at 68% speed, have 145% health, and deal 135% damage. Damage multipliers apply at hit resolution, leaving player and regular enemy damage unchanged.
 
 Opening aqueduct population limits count the entire wave, including reinforcements: exactly two enemies in wave 1, at most three in wave 2, and at most four in wave 3. Later areas retain their existing budgets and active caps.
+
+Global damage tuning: `game.gd` exposes `damage_multiplier` in the Godot Inspector, default 0.75 (25% less damage). This applies at the shared damage handler to player and enemy attacks, arrows, charge, slam, and lightning, after retaining weapon and variant differences. Healing is unchanged.
