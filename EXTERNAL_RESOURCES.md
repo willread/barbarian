@@ -59,7 +59,7 @@ Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Ru
 - `godot/art/hero-spin-source.png`: imagegen-generated eight-cell unarmed hero spin study using the existing hero-actions-unarmed-v8 character reference. `spin-*.png` and `spin-atlas.json` are game-ready keyed/normalized cels and authored weapon sockets produced by `scripts/bake_spin.gd`.
 
 ### Ground-impact reference (implementation guidance only)
-- Kate Kruse, Ground Impact VFX: https://frontfangs.artstation.com/projects/QrnV5Z — layered shockwave/dust/debris reference. No downloaded artwork or third-party code used; the dust shader and particles are project code.
+- Kate Kruse, Ground Impact VFX: https://frontfangs.artstation.com/projects/QrnV5Z ï¿½ layered shockwave/dust/debris reference. No downloaded artwork or third-party code used; the dust shader and particles are project code.
 
 ### Skeleton archer (2026-09-11)
 Built-in ImageGen created `godot/art/archer-source.png` and the chroma-key edit `archer-keyed.png`; runtime cels and metadata are baked with `godot/scripts/bake_archer.gd`. No downloaded art. Prompt: 4x2 whole-body sprite sheet, realistic dark-fantasy thin skeleton, green tattered frock, quiver and wooden bow, consistent right-facing idle/retreat/draw/release/hurt poses. Follow-up: preserve sprites and replace background with flat #FF00FF.
@@ -90,7 +90,7 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Four ElevenLabs deep dull impact options; exact prompts and sources in `soundboard/resist-thud/`, generator `tools/audio/resist-thud.mjs`. Default `godot/audio/resist.ogg`. Used for shield blocks, heavy-enemy charge resistance, and committed enemy reactions.
 
 ### Short human magic shouts (2026-09-12)
-- Regenerated all four invocation shouts with ElevenLabs at 1.3 seconds, requesting one 400–500ms human syllable and a brief diffuse echo. Exact prompts and original generations: `soundboard/magic-shout-short/`; generator: `tools/audio/magic-shout-short.mjs`. Replaces existing magic_shout option IDs and default Ogg, preserving sound-lab volume/selection settings.
+- Regenerated all four invocation shouts with ElevenLabs at 1.3 seconds, requesting one 400ï¿½500ms human syllable and a brief diffuse echo. Exact prompts and original generations: `soundboard/magic-shout-short/`; generator: `tools/audio/magic-shout-short.mjs`. Replaces existing magic_shout option IDs and default Ogg, preserving sound-lab volume/selection settings.
 
 ### Impact/burn audio and loops (2026-09-12)
 - ElevenLabs generated four charge_hit and four death_fire variants. Exact prompts and sources are in `soundboard/charge_hit/` and `soundboard/death_fire/`. Default Ogg streams generated from option 1.
@@ -124,3 +124,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 - Selected armory sprites: imagegen recreation of approved concept board, `asset-sources/art/armory-selected-v1.png`; extraction and hand pivots in `tools/godot/bake-armory.mjs`. Four axe-behavior skins, no additional combat mechanics.
 
 - Holiday accessories: built-in imagegen, `asset-sources/art/holiday-v1.png`, Santa hat, pumpkin head and candy cane. Alpha-preserving sprite extraction and pose attachment metadata: `tools/godot/bake-holiday.mjs`.
+
+Score HUD mockups (2026-09-12): studies/score-hud/directions-v1.png generated using OpenAI imagegen with current game reference. Suggested fonts Cinzel, Oswald and Rajdhani are SIL OFL 1.1; licenses: https://github.com/google/fonts/blob/main/ofl/cinzel/OFL.txt , https://github.com/google/fonts/blob/main/ofl/oswald/OFL.txt , https://github.com/google/fonts/blob/main/ofl/rajdhani/OFL.txt . Concept lettering is illustrative; no runtime font changes.
