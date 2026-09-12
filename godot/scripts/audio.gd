@@ -26,6 +26,10 @@ func setup(source: Node2D):
 	if saved.load("user://soundboard.cfg")==OK:
 		for id in saved.get_section_keys("choices"):
 			set_variant(id,saved.get_value("choices",id),false)
+	# One-time migration also silences these events for existing sound-lab profiles.
+	if not saved.get_value("settings","quiet_foley",false):
+		for id in ["foot_stone","foot_earth","bow_draw"]:set_variant(id,"none",false)
+		if DisplayServer.get_name()!="headless":save_choices()
 	for i in 16:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
@@ -33,7 +37,7 @@ func setup(source: Node2D):
 	for id in ["music_menu","music_game"]:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
-		if clips.has(id):
+		if clips.get(id)!=null:
 			player.stream=clips[id]
 			player.stream.loop=true
 		player.volume_db=-60
@@ -42,21 +46,24 @@ func setup(source: Node2D):
 func set_variant(id: String,variant: String,persist: bool=true):
 	if not originals.has(id):return
 	var path="res://audio_options/"+variant+".mp3"
-	if variant!="original" and not ResourceLoader.exists(path):return
-	clips[id]=originals[id] if variant=="original" else load(path)
+	if variant not in ["original","none"] and not ResourceLoader.exists(path):return
+	clips[id]=null if variant=="none" else originals[id] if variant=="original" else load(path)
 	choices[id]=variant
 	if id in ["music_menu","music_game"] and not tracks.is_empty():
 		var track=tracks[0 if id=="music_menu" else 1]
 		track.stop()
 		track.stream=clips[id]
-		track.stream.loop=true
-	if persist:
-		var saved=ConfigFile.new()
-		for key in choices:saved.set_value("choices",key,choices[key])
-		saved.save("user://soundboard.cfg")
+		if track.stream:track.stream.loop=true
+	if persist:save_choices()
+
+func save_choices():
+	var saved=ConfigFile.new()
+	for key in choices:saved.set_value("choices",key,choices[key])
+	saved.set_value("settings","quiet_foley",true)
+	saved.save("user://soundboard.cfg")
 
 func play(id: String,db: float=-4,pitch: float=1.0):
-	if not unlocked or game.muted or not clips.has(id):return
+	if not unlocked or game.muted or clips.get(id)==null:return
 	var now=Time.get_ticks_msec()
 	if now-gates.get(id,-1000)<65:return
 	gates[id]=now

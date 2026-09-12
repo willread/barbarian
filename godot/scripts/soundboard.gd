@@ -79,9 +79,15 @@ func _ready():
 			original.pressed.connect(func():choose(id,"original"))
 			box.add_child(original)
 			buttons[id].append([original,"original"])
+			var silent=Button.new()
+			silent.text="No sound"
+			silent.toggle_mode=true
+			silent.pressed.connect(func():choose(id,"none"))
+			box.add_child(silent)
+			buttons[id].append([silent,"none"])
 			for job in groups[group]:
 				var button=Button.new()
-				button.text=str(buttons[id].size())+" · "+job.name+" — "+job.description
+				button.text=str(buttons[id].size()-1)+" · "+job.name+" — "+job.description
 				button.alignment=HORIZONTAL_ALIGNMENT_LEFT
 				button.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 				button.toggle_mode=true
@@ -100,7 +106,7 @@ func choose(id: String,variant: String):
 	refresh()
 	preview.stop()
 	preview.stream=audio.clips[id]
-	preview.play()
+	if preview.stream:preview.play()
 func toggle():
 	opened=not opened
 	panel.visible=opened

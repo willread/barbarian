@@ -23,6 +23,12 @@ func check():
 	assert(audio.clips.sword.resource_path.ends_with("sword-3.mp3"))
 	audio.set_variant("music_game","music_game-2",false)
 	assert(audio.tracks[1].stream==audio.clips.music_game and audio.tracks[1].stream.loop)
+	audio.set_variant("sword","none",false)
+	assert(audio.clips.sword==null and audio.choices.sword=="none")
+	audio.set_variant("music_game","none",false)
+	assert(audio.tracks[1].stream==null)
+	audio.set_variant("music_game","original",false)
+	assert(audio.tracks[1].stream!=null)
 	board.toggle()
 	assert(not paused and not board.opened)
 	paused=true
