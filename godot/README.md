@@ -73,4 +73,4 @@ Maximum Force artwork uses a proportional, contained crop of the supplied photor
 
 The studio splash defaults to a 16:9 window with a centered logo bounded to 68% of width / 52% of height. At 2 seconds it transitions over 1.2 seconds to the a white version of the same logo silhouette on black; loader remains bottom-right.
 
-The splash color transition preserves one texture, alpha silhouette, size and center. Native rendering mixes RGB to white; the browser changes RGB using a single SVG color-transfer filter, preserving alpha instead of compositing a second copy. No differently cropped logo is swapped in.
+The splash crossfades to the original clean white artwork in maximum-force-reference.png. Both logo variants use tightly registered visible bounds and the same destination rectangle; four-second duration and 1.2-second midpoint fade remain.

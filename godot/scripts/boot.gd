@@ -1,21 +1,19 @@
 extends Node2D
-var picture: Texture2D
+var picture: AtlasTexture
+var flat: AtlasTexture
 var backdrop=preload("res://art/studio-background.png")
 var elapsed=0.0
-var logo: Sprite2D
-var logo_material: ShaderMaterial
 func _ready():
 	# Browser has an HTML splash while the engine itself downloads.
 	if OS.has_feature("web") or (not OS.get_cmdline_user_args().is_empty() and not "--splash-capture" in OS.get_cmdline_user_args()):
 		get_tree().change_scene_to_file.call_deferred("res://main.tscn")
 		return
-	picture=load("res://art/maximum-force-logo.png")
-	logo=Sprite2D.new()
-	logo.texture=picture
-	logo_material=ShaderMaterial.new()
-	logo_material.shader=load("res://shaders/logo_monochrome.gdshader")
-	logo.material=logo_material
-	add_child(logo)
+	picture=AtlasTexture.new()
+	picture.atlas=load("res://art/maximum-force-logo.png")
+	picture.region=Rect2(78,41,1621,829)
+	flat=AtlasTexture.new()
+	flat.atlas=load("res://art/maximum-force-reference.png")
+	flat.region=Rect2(973,216,721,405)
 	ResourceLoader.load_threaded_request("res://main.tscn")
 	if "--splash-capture" in OS.get_cmdline_user_args():capture.call_deferred()
 func capture():
@@ -26,11 +24,6 @@ func capture():
 func _process(dt: float):
 	if not picture:return
 	elapsed+=dt
-	var screen=get_viewport_rect().size
-	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
-	logo.position=screen*.5
-	logo.scale=Vector2.ONE*ratio
-	logo_material.set_shader_parameter("blend",smoothstep(2.0,3.2,elapsed))
 	queue_redraw()
 	if elapsed>=4.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
 		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get("res://main.tscn"))
@@ -42,6 +35,11 @@ func _draw():
 	draw_texture_rect(backdrop,Rect2((screen-bg)*.5,bg),false)
 	var blend=smoothstep(2.0,3.2,elapsed)
 	draw_rect(Rect2(Vector2.ZERO,screen),Color(0,0,0,blend))
+	var ratio=min(screen.x*.68/picture.get_width(),screen.y*.52/picture.get_height())
+	var size=picture.get_size()*ratio
+	var bounds=Rect2((screen-size)*.5,size)
+	draw_texture_rect(picture,bounds,false,Color(1,1,1,1.-blend))
+	draw_texture_rect(flat,bounds,false,Color(1,1,1,blend))
 	var radius=clamp(min(screen.x,screen.y)*.035,18.,35.)
 	var center=screen-Vector2.ONE*(radius+32.)
 	draw_arc(center,radius*.75,0,TAU,64,Color("777671"),radius*.23,true)
