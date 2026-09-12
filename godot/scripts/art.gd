@@ -97,8 +97,7 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	if f.player and p==["hero-actions-unarmed-v8",0] and f.attack.is_empty() and not f.moving: file="hero-idle-%d.png"%int(fmod(f.clock,4.8)/4.8*48)
 	var facing=l.atlas.facing
 	node.draw_set_transform(Vector2.ZERO,0,Vector2(facing,1))
-	# The generated spin cels are warmer than the core body atlas.
-	node.draw_texture_rect(texture(file),rect,false,Color(.84,.96,1.0) if p[0]=="hero-spin" else Color.WHITE)
+	node.draw_texture_rect(texture(file),rect,false)
 	node.draw_set_transform(Vector2.ZERO)
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):

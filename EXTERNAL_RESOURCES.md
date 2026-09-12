@@ -65,3 +65,5 @@ Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Ru
 Built-in ImageGen created `godot/art/archer-source.png` and the chroma-key edit `archer-keyed.png`; runtime cels and metadata are baked with `godot/scripts/bake_archer.gd`. No downloaded art. Prompt: 4x2 whole-body sprite sheet, realistic dark-fantasy thin skeleton, green tattered frock, quiver and wooden bow, consistent right-facing idle/retreat/draw/release/hurt poses. Follow-up: preserve sprites and replace background with flat #FF00FF.
 
 Archer quiver-reach pose: built-in ImageGen, `godot/art/archer-quiver-source.png`, baked as `archer-8.png`. Prompt: same green-frock skeleton, right-facing, bow lowered, right hand reaching behind shoulder to grasp an arrow in quiver; flat magenta key background.
+
+Spin color correction: built-in ImageGen edit saved as `godot/art/hero-spin-neutral-source.png`, referenced the normal hero atlas. Prompt: preserve exact sheet layout, poses and wrist/foot registration; replace red/orange skin with neutral tan, cream highlights, umber leather and muted bronze matching the normal hero; keep green key background. Re-baked into existing spin cels.

@@ -30,6 +30,7 @@ func _init():
 	for i in 100:
 		var plan=enemy_ai.plan()
 		assert(plan.size()==8 and plan[7]==["champion"])
+		assert(plan[0][0]=="archer")
 		var types=[]
 		for wave in plan:
 			for kind in wave:

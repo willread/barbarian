@@ -16,6 +16,8 @@ func plan() -> Array:
 		for j in 1+int(i/2): wave.append(["legion","bone","shield","marauder","archer"].pick_random())
 		wave.shuffle()
 		result.append(wave)
+	# Guarantee a ranged enemy immediately without increasing first-wave population.
+	result[0][0]="archer"
 	result.append(["champion"])
 	return result
 

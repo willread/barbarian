@@ -1,6 +1,6 @@
 extends SceneTree
 func _init():
-	var sheet=Image.load_from_file("res://art/hero-spin-source.png")
+	var sheet=Image.load_from_file("res://art/hero-spin-neutral-source.png")
 	var cels=[]
 	var grips=[Vector2(327,192),Vector2(325,192),Vector2(335,192),Vector2(59,192),Vector2(49,166),Vector2(45,166),Vector2(51,166),Vector2(339,166)]
 	for i in 8:
