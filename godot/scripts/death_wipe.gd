@@ -15,6 +15,9 @@ func _ready():
 		var burst=bursts.pick_random()
 		var arrival=.03+randf()*.62 if randf()<.24 else clamp(burst.at+(randf()+randf()-1)*burst.width,.03,.65)
 		deposits.append({"x":randf()*W,"y":randf()*H,"rx":9+randf()*19 if n<72 else 1+randf()*6,"ry":6+randf()*12 if n<72 else 1+randf()*4,"angle":randf()*PI,"phase":randf()*TAU,"lobes":2+randi()%4,"roughness":pow(randf(),1.7),"amount":1.7+randf()*2 if n<72 else .3+randf()*1.1,"at":arrival})
+	# Narrow high-volume deposits form fine rivulets among the broader splashes.
+	for n in 65:
+		deposits.append({"x":randf()*W,"y":randf()*H,"rx":.65+pow(randf(),1.6)*4.2,"ry":1.5+randf()*5,"angle":randf()*.35,"phase":randf()*TAU,"lobes":2,"roughness":randf()*.35,"amount":1.8+randf()*2.4,"at":.04+randf()*.61})
 	deposits.sort_custom(func(a,b):return a.at<b.at)
 	viewport=SubViewport.new()
 	viewport.size=Vector2i(W,H)

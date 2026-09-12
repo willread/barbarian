@@ -667,7 +667,7 @@ func _notification(what: int):
 
 func drop_gear(f: Dictionary):
 	f.gearDropped=true
-	if f.kind=="archer":return # Bow and quiver remain in the burning body silhouette.
+	if f.kind in ["archer","legion"]:return # Archer gear burns with the body; minotaurs fight bare-handed.
 	var pieces=[]
 	if f.player or f.kind=="champion":
 		var w=art.data.weapons[weapon if f.player else "axe"]

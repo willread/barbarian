@@ -70,3 +70,6 @@ Spin color correction: built-in ImageGen edit saved as `godot/art/hero-spin-neut
 
 ### ElevenLabs audio (2026-09-11)
 Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_sound_v2`) and two instrumental music compositions (default Music API model). Source MP3s, playback Oggs, and complete prompts/settings are under `godot/audio/`. User direction: deep bassy distorted guitars, dark sword-and-sorcery; menu doom groove, faster combat groove. Audio is subject to the account's applicable ElevenLabs terms. Processing uses FFmpeg loudness normalization and loop crossfades. Credentials remain in ignored `.env.local` and are never included in assets or exports.
+
+### Creature and blood revision (2026-09-11)
+- Built-in OpenAI ImageGen: `godot/art/minotaur-source.png` (16 minotaur poses), `archer-death-source.png` (reference-guided archer fall poses), and revised `hero-spin-neutral-source.png` (neutral olive/tan color correction). Derived runtime cels baked with `godot/scripts/bake_creature_update.gd` and `bake_spin.gd`. No external stock imagery. Legacy `legion` roster identifier now renders an unarmed minotaur.

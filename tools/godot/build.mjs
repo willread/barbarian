@@ -22,6 +22,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/parity.gd']);
  run(binary,['--headless','--path','godot','--script','tests/combat_moves.gd']);
  run(binary,['--headless','--path','godot','--script','tests/audio_assets.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/creature_art.gd']);
  run(binary,['--headless','--path','godot','--','--smoke-test']);
  run(binary,['--headless','--path','godot','--','--integration-test']);
  run(binary,['--headless','--path','godot','--','--moves-test']);

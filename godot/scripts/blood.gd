@@ -58,14 +58,14 @@ func hit(f: Dictionary,direction: int,fatal: bool):
 	var horizontal=f.down.vx if launched else f.velocityX
 	var vertical=f.down.vz if launched else f.air.get("vz",f.attack.get("vz",0))
 	var force=(25 if launched else 80)+randf()*(65 if launched else 120)
-	var fan=.45+randf()*.55
-	var lift=(10 if launched else 35)+randf()*(35 if launched else 90)
+	var fan=.65+randf()*1.1
+	var lift=(10 if launched else 75)+randf()*(85 if launched else 160)
 	var height=85+randf()*50+f.height*4.5
 	stain(f.x,f.y,7 if launched else 42 if fatal else 19)
 	for i in count:
 		var angle=(randf()-.5)*fan
 		var speed=force*(.5+randf()*.8)
-		drops.append({"x":f.x+(randf()-.5)*18,"y":f.y+(randf()-.5)*12,"z":height+(randf()-.5)*24,"vx":horizontal*units*(1 if launched else .6)+direction*cos(angle)*speed,"vy":f.velocityY*units*.6+sin(angle)*speed*.6,"vz":-vertical*units*(1 if launched else .45)+lift+(randf()-.5)*280,"gravity":.25*units/CairnMechanics.STEP if launched else 850.0,"drag":0.0 if launched else .8,"r":(5 if fatal else 3.5)+randf()*(5 if fatal else 4)})
+		drops.append({"x":f.x+(randf()-.5)*18,"y":f.y+(randf()-.5)*12,"z":height+(randf()-.5)*65,"vx":horizontal*units*(1 if launched else .6)+direction*cos(angle)*speed,"vy":f.velocityY*units*.6+sin(angle)*speed*.9,"vz":-vertical*units*(1 if launched else .45)+lift+(randf()-.5)*530,"gravity":.25*units/CairnMechanics.STEP if launched else 850.0,"drag":0.0 if launched else .8,"r":1.5+pow(randf(),2.1)*(16 if fatal else 11)})
 	while drops.size()>700: drops.pop_front()
 func step(dt: float,fighters: Array):
 	for d in drops:
@@ -115,4 +115,10 @@ func finish_ink():
 		pending.clear()
 		ink.queue_redraw()
 func draw_air():
-	for d in drops: air_view.draw_line(Vector2(d.x,d.y-d.z),Vector2(d.x-d.vx*.014,d.y-d.z+d.vz*.014),Color("43060a"),d.r,true)
+	for d in drops:
+		var point=Vector2(d.x,d.y-d.z)
+		var velocity=Vector2(d.vx,d.vy-d.vz)
+		var tail=velocity.normalized()*min(d.r*2.4,velocity.length()*.009)
+		air_view.draw_line(point-tail,point,Color("43060a"),max(1,d.r*.7),true)
+		air_view.draw_circle(point,d.r*.5,Color("51090e"))
+		if d.r>5:air_view.draw_circle(point+Vector2(-.12,-.16)*d.r,d.r*.13,Color(.38,.08,.09,.65))

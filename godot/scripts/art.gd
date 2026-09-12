@@ -2,12 +2,13 @@ class_name CairnArt
 extends RefCounted
 var data: Dictionary
 var textures: Dictionary={}
-const HEIGHTS={"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310}
+const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
+	data.atlases["enemy-legion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/minotaur-atlas.json"))
 	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 
 func texture(file: String) -> Texture2D:
@@ -20,7 +21,7 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 	if f.player and not f.pickup.is_empty() and f.down.is_empty() and not f.hurtTicks: return ["hero-pickup-unarmed-v1",min(7,int(f.pickup.age/.0725))]
 	if f.player and spell>=0 and f.down.is_empty() and not f.hurtTicks:
 		return ["hero-cast-unarmed-v1",0 if spell<5 else 1 if spell<9 else 2 if spell<13 else 3 if spell<17 else 4 if spell<45 else 5 if spell<77 else 6 if spell<84 else 7]
-	if not f.player and f.kind!="legion": return ["enemy-"+f.kind+"-v1",enemy_frame(f)]
+	if not f.player: return ["enemy-"+f.kind+"-v1",enemy_frame(f)]
 	var reaction="hero-reactions-unarmed-v8" if f.player else "enemy-combat-v3"
 	var offset=8 if f.player else 0
 	if not f.down.is_empty():
@@ -49,13 +50,16 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 
 func enemy_frame(e: Dictionary) -> int:
 	if e.kind=="archer":
-		if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering:return 7
+		if not e.down.is_empty():return 12 if e.down.ground else 10 if e.down.vz<0 else 11
+		if e.hp<=0:return 12
+		if e.hurtTicks or e.recovering:return 7
 		if not e.attack.is_empty():return 8 if e.attack.age<12 else 4 if e.attack.age<22 else 5 if e.attack.age<40 else 6
 		return 1+int(e.stride*4)%3 if e.moving else 0
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
 	if e.hp<=0: return 13
 	if e.hurtTicks or e.recovering: return 11
 	if CairnEnemies.guard_open(e) and e.attack.age<e.attack.from:return 5
+	if e.kind=="legion" and e.attack.get("type","")=="enemyCharge":return 15
 	if e.brace and (e.attack.is_empty() or e.attack.age<e.attack.from): return 15
 	if e.turnTicks: return 2
 	if not e.attack.is_empty():
@@ -87,7 +91,7 @@ func hit_box(f: Dictionary,p: Array) -> Array:
 
 func body_rect(f: Dictionary,p: Array) -> Rect2:
 	var l=layout(p)
-	var s=l.rig.scale if f.player else HEIGHTS[f.kind]/data.atlases[p[0]].cels[0].height if f.kind!="legion" else 292*l.atlas.scale/l.atlas.cellWidth
+	var s=l.rig.scale if f.player else HEIGHTS[f.kind]/data.atlases[p[0]].cels[0].height
 	return Rect2((l.cel.left-l.atlas.cellWidth*.5)*s,-l.cel.height*s,l.cel.width*s,l.cel.height*s)
 
 func paint_body(node: Node2D,f: Dictionary,p: Array):
@@ -101,7 +105,7 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	node.draw_set_transform(Vector2.ZERO)
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
-	if f.gearDropped or f.kind=="archer": return
+	if f.gearDropped or f.kind in ["archer","legion"]: return
 	var l=layout(p)
 	if f.player:
 		if l.rig.behind!=behind: return
