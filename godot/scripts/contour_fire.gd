@@ -84,6 +84,7 @@ func _process(dt: float):
 	flow.set_shader_parameter("strength",strength)
 	viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	if thermal:
+		thermal.set_shader_parameter("emitting",emitting)
 		thermal.set_shader_parameter("delta",min(dt,.033333))
 		thermal.set_shader_parameter("reset",not started)
 		thermal_view.render_target_update_mode=SubViewport.UPDATE_ONCE

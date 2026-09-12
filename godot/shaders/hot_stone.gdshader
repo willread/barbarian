@@ -16,11 +16,11 @@ void fragment(){
     }
     float heat=texture(temperature,(UV*face_size+offset)/domain).r;
     float edge=stone.a*(1.-inner);
-    float glow=max(outer-stone.a,0.)*.32;
+    float glow=max(outer-stone.a,0.)*.56;
     vec3 ember=mix(vec3(.8,.07,.006),vec3(1.,.43,.065),smoothstep(.25,.85,heat));
     // Preserve the mineral detail: reflected fire catches the bevel, not the whole face.
     float grain=dot(stone.rgb,vec3(.3,.5,.2));
-    vec3 lit=stone.rgb+ember*heat*(edge*(.65+grain)+.12);
+    vec3 lit=stone.rgb+ember*heat*(edge*(1.3+grain*1.5)+.12);
     float halo=glow*heat;
     COLOR=vec4(mix(ember,lit,stone.a),max(stone.a,halo));
 }
