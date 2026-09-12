@@ -51,6 +51,7 @@ for(const [key,file,far]of [['valley','valley'],['swamp','swamp-concept-v4'],['c
 for(const name of ['fluid-fire-v2-0','fluid-fire-v2-1','fluid-fire-v2-2','fluid-fire-v2-3','fluid-smoke-v1','cairn-title-v1','hud-bronze-v1','menu-stone-material-v1'])fs.copyFileSync(`public/art/${name}.png`,path.join(out,name+'.png'));
 fs.copyFileSync('public/fonts/anton.ttf',path.join(out,'anton.ttf'));
 fs.copyFileSync('public/fonts/cinzel.ttf',path.join(out,'cinzel.ttf'));
+for(const font of ['anton','cinzel'])fs.copyFileSync(`public/fonts/${font}-OFL.txt`,path.join(out,`${font}-OFL.txt`));
 // Bake the existing dynamic stone material for the finite menu vocabulary.
 GlobalFonts.registerFromPath('public/fonts/anton.ttf','Anton');
 const materialImage=await loadImage('public/art/menu-stone-material-v1.png');

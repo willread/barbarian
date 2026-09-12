@@ -4,8 +4,22 @@ var drops: Array=[]
 var marks: Array=[]
 var wet: Dictionary={}
 var air_view: Node2D
+var floor_viewport: SubViewport
+var ink: Node2D
+var pending: Array=[]
 func _ready():
 	z_index=-10
+	floor_viewport=SubViewport.new()
+	floor_viewport.size=Vector2i(1440,810)
+	floor_viewport.disable_3d=true
+	floor_viewport.transparent_bg=true
+	floor_viewport.render_target_clear_mode=SubViewport.CLEAR_MODE_ONCE
+	floor_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
+	add_child(floor_viewport)
+	ink=Node2D.new()
+	ink.draw.connect(draw_pending)
+	floor_viewport.add_child(ink)
+	RenderingServer.frame_post_draw.connect(finish_ink)
 	air_view=Node2D.new()
 	air_view.z_index=1800
 	air_view.draw.connect(draw_air)
@@ -14,6 +28,11 @@ func reset():
 	drops.clear()
 	marks.clear()
 	wet.clear()
+	pending.clear()
+	if floor_viewport:
+		floor_viewport.render_target_clear_mode=SubViewport.CLEAR_MODE_ONCE
+		floor_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
+		ink.queue_redraw()
 	queue_redraw()
 func cell(x: float,y: float) -> Vector2i: return Vector2i(floor(x/16),floor(y/16))
 func stain(x: float,y: float,r: float,amount: float=1,track: bool=false,angle: float=0):
@@ -24,6 +43,10 @@ func stain(x: float,y: float,r: float,amount: float=1,track: bool=false,angle: f
 		var rr=r*(.72+randf()*.4)
 		points.append(Vector2(cos(a)*rr,sin(a)*rr*(.65 if track else .34)).rotated(angle)+Vector2(x,y))
 	marks.append({"points":points,"x":x,"y":y,"r":r,"alpha":min(.86,amount*.8)})
+	pending.append(marks.back())
+	if floor_viewport:
+		floor_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
+		ink.queue_redraw()
 	if not track:
 		for yy in range(int((y-r*.34)/16),int((y+r*.34)/16)+1):
 			for xx in range(int((x-r)/16),int((x+r)/16)+1): wet[Vector2i(xx,yy)]=65.0
@@ -80,10 +103,16 @@ func step(dt: float,fighters: Array):
 	while drops.size()>700: drops.pop_front()
 	if air_view: air_view.queue_redraw()
 func _draw():
-	for mark in marks:
-		draw_colored_polygon(mark.points,Color(.282,.027,.043,mark.alpha))
-		draw_set_transform(Vector2(mark.x,mark.y),0,Vector2(1,.34))
-		draw_circle(Vector2(-mark.r*.08,-mark.r*.04),mark.r*.56,Color(.45,.047,.07,mark.alpha*.65))
-		draw_set_transform(Vector2.ZERO)
+	if floor_viewport: draw_texture(floor_viewport.get_texture(),Vector2.ZERO)
+func draw_pending():
+	for mark in pending:
+		ink.draw_colored_polygon(mark.points,Color(.282,.027,.043,mark.alpha))
+		ink.draw_set_transform(Vector2(mark.x,mark.y),0,Vector2(1,.34))
+		ink.draw_circle(Vector2(-mark.r*.08,-mark.r*.04),mark.r*.56,Color(.45,.047,.07,mark.alpha*.65))
+		ink.draw_set_transform(Vector2.ZERO)
+func finish_ink():
+	if not pending.is_empty():
+		pending.clear()
+		ink.queue_redraw()
 func draw_air():
 	for d in drops: air_view.draw_line(Vector2(d.x,d.y-d.z),Vector2(d.x-d.vx*.014,d.y-d.z+d.vz*.014),Color("43060a"),d.r,true)

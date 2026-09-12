@@ -41,3 +41,10 @@ This records the known resources from the current work and conversation. It is n
 ## Selected menu font
 
 Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Runtime stone-face texturing, narrow bevels and dark textured sidewalls are rendered by project code; the font binary is unmodified. Existing generated `public/art/menu-stone-material-v1.png` is reused for front and side surfaces.
+
+## Godot port (2026-09-11)
+
+- **Godot Engine 4.7.2 Standard and matching export templates**: downloaded from https://godotengine.org/download/windows/ using the official downloads.godotengine.org endpoints. MIT license; bundled engine third-party notices apply (https://godotengine.org/license/). Tools and exports are local on E:/Cairn-build-tools, not committed binary dependencies.
+- **@napi-rs/canvas**: existing bundled runtime used by tools/godot asset-conversion scripts; upstream https://github.com/Brooooooklyn/canvas, MIT. Used only during asset preparation, not shipped as a game runtime.
+- **Anton and Cinzel**: existing unmodified SIL OFL fonts reused in Godot; notices copied into generated assets and included in exports. Cinzel replaces the old browser/system Georgia references for portable HUD and results text.
+- **Existing game artwork**: converted locally from public/art using the existing project's extraction and colour correction; no new stock art, ROM sprites, or reference video copied into the port. The scope limitations above still apply.

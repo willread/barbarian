@@ -53,12 +53,19 @@ var shake=0.0
 var font: Font
 var serif: Font
 var skull_node: Sprite2D
+var heat_node: ColorRect
+var sound_player: AudioStreamPlayer
+var scenery_shade: Node2D
 const CLOSE=.35/.49
 const OPEN=.45/.49
 const HOLD=.15
 
 func _ready():
 	art=ArtScript.new()
+	# Finish loading battle cels before exposing the menu, avoiding first-hit stalls.
+	for atlas in art.data.atlases.values():
+		for cel in atlas.cels: art.texture(cel.file)
+	for i in 48: art.texture("hero-idle-%d.png"%i)
 	m=MScript.new(art.data.attacks)
 	e_ai=EScript.new(m,art.data.roster)
 	font=load("res://assets/anton.ttf")
@@ -66,6 +73,24 @@ func _ready():
 	background=EnvironmentView.new()
 	add_child(background)
 	background.setup(art,"valley")
+	heat_node=ColorRect.new()
+	heat_node.size=Vector2(1440,810)
+	heat_node.z_index=-90
+	heat_node.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	heat_node.material=ShaderMaterial.new()
+	heat_node.material.shader=load("res://shaders/heat.gdshader")
+	add_child(heat_node)
+	scenery_shade=Node2D.new()
+	scenery_shade.z_index=-80
+	scenery_shade.draw.connect(func():
+		var dark=Color("080b0f77")
+		var clear=Color("080b0f00")
+		var bottom=Color("080b0f44")
+		scenery_shade.draw_polygon(PackedVector2Array([Vector2(0,0),Vector2(1440,0),Vector2(1440,243),Vector2(0,243)]),PackedColorArray([dark,dark,clear,clear]))
+		scenery_shade.draw_polygon(PackedVector2Array([Vector2(0,243),Vector2(1440,243),Vector2(1440,810),Vector2(0,810)]),PackedColorArray([clear,clear,bottom,bottom])))
+	add_child(scenery_shade)
+	sound_player=AudioStreamPlayer.new()
+	add_child(sound_player)
 	blood=BloodScript.new()
 	add_child(blood)
 	ground_fx=Node2D.new()
@@ -102,6 +127,7 @@ func _ready():
 	if "--smoke-test" in OS.get_cmdline_user_args(): smoke_test.call_deferred()
 	if "--capture" in OS.get_cmdline_user_args(): capture_test.call_deferred()
 	if "--effects-test" in OS.get_cmdline_user_args(): effects_test.call_deferred()
+	if "--integration-test" in OS.get_cmdline_user_args(): integration_test.call_deferred()
 
 func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	var f=m.make(next_id,x,y,hp,player)
@@ -139,6 +165,7 @@ func menu_action(label: String):
 			menu.switch_items(["BEGIN","OPTIONS"])
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
+			beep(280,.2)
 			menu.show_items(option_labels() if phase=="title" else ["RESUME BATTLE","SOUND: OFF" if muted else "SOUND: ON","RETURN TO TITLE"],phase=="title",false)
 			menu.select(0 if phase=="title" else 1,false)
 		"FULLSCREEN: ON","FULLSCREEN: OFF":
@@ -244,6 +271,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if not f.player and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
+		beep(380,.08)
 		return
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
 	f.hp=max(0,f.hp-a.damage*(100.0/48 if f.player else 1))
@@ -285,6 +313,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
 		burst(f.x,f.y-105,12,Color("e97b4f") if f.player else Color("ffc473"))
 		shake=5 if a.get("knock",false) else 2
+		beep(60 if f.player else 100,.12)
 	if f.hp<=0:
 		f.death=0
 		f.burnAge=0
@@ -362,8 +391,10 @@ func tick(dt: float):
 	var edge=-1 if pressed.has(KEY_A) else 1 if pressed.has(KEY_D) else 0
 	if spell<0 and hero.pickup.is_empty():
 		if pressed.has(KEY_J) and pressed.has(KEY_SPACE) and hero.air.is_empty(): m.begin(hero,"back")
-		elif pressed.has(KEY_SPACE): m.start_jump(hero)
-		elif pressed.has(KEY_J): m.begin(hero,m.select_strike(hero,enemies))
+		elif pressed.has(KEY_SPACE):
+			if m.start_jump(hero): beep(160,.12)
+		elif pressed.has(KEY_J):
+			if m.begin(hero,m.select_strike(hero,enemies)): beep(230,.15)
 	var busy=spell>=0 or not hero.pickup.is_empty()
 	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true)
 	if hero.attack.has("weapon"):
@@ -432,6 +463,9 @@ func _process(raw: float):
 	displayed_mana=lerpf(displayed_mana,magic,1-exp(-dt*12))
 	shake=max(0,shake-dt*35)
 	background.advance(clock)
+	heat_node.visible=background.key=="cinder" and phase!="title"
+	scenery_shade.visible=phase!="title"
+	heat_node.material.set_shader_parameter("clock",clock)
 	skull_node.visible=transition>=0
 	if transition>=0:
 		var progress=1-transition/CLOSE if transition<CLOSE else 0.0 if transition<CLOSE+HOLD else (transition-CLOSE-HOLD)/OPEN
@@ -459,6 +493,12 @@ func _process(raw: float):
 		s.y+=s.vy*dt
 		s.vy+=450*dt
 	sparks=sparks.filter(func(s):return s.life>0)
+	var offset=Vector2((randf()-.5)*shake,(randf()-.5)*shake) if phase!="paused" else Vector2.ZERO
+	for node in [background,blood,ground_fx,air_fx]: node.position=offset
+	for view in views.values(): view.position+=offset
+	for node in flame_views.values(): node.position=offset
+	for item in gear: item.node.position=offset
+	if is_instance_valid(chicken_node): chicken_node.position=offset
 	ground_fx.queue_redraw()
 	air_fx.queue_redraw()
 	hud.queue_redraw()
@@ -769,6 +809,24 @@ func draw_overlay():
 func _draw():
 	pass
 
+func beep(frequency: float,duration: float):
+	if muted: return
+	var rate=22050
+	var bytes=PackedByteArray()
+	bytes.resize(int(rate*duration)*2)
+	var phase_value=0.0
+	for i in bytes.size()/2:
+		var progress=float(i)/(bytes.size()/2)
+		phase_value+=frequency*pow(.35,progress)/rate
+		var sample=(fmod(phase_value,1)*2-1)*.035*pow(.001/.035,progress)
+		bytes.encode_s16(i*2,int(sample*32767))
+	var stream=AudioStreamWAV.new()
+	stream.format=AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate=rate
+	stream.data=bytes
+	sound_player.stream=stream
+	sound_player.play()
+
 func smoke_test():
 	start_game()
 	transition=-1
@@ -828,6 +886,71 @@ func effects_test():
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/wipe-end.png")
 	print("CAIRN_EFFECTS_OK fps=",Engine.get_frames_per_second())
+	get_tree().quit()
+
+func integration_test():
+	start_game()
+	transition=-1
+	stage_walk=""
+	hero.x=600
+	assert(magic==0)
+	var shield=make_actor(720,660,16)
+	shield.kind="shield"
+	shield.dir=-1
+	assert(e_ai.block(shield,{"damage":3,"direction":1},hero))
+	m.begin(shield,"shieldCut")
+	shield.attack.age=shield.attack.from
+	assert(not e_ai.block(shield,{"damage":3,"direction":1},hero))
+	var boss=make_actor(720,660,84)
+	boss.kind="champion"
+	boss.boss=true
+	boss.dir=-1
+	m.begin(boss,"championCleave")
+	damage(boss,{"damage":3,"direction":1},hero)
+	assert(not boss.attack.is_empty() and boss.hurtTicks==0)
+	damage(boss,{"damage":.12,"direction":1,"magic":true,"continuous":true},hero)
+	assert(boss.attack.is_empty() and boss.electricTicks==9)
+	enemies=[shield,boss]
+	magic=100
+	hero.hurtTicks=8
+	hero.recovering=65
+	pressed[KEY_K]=true
+	tick(m.STEP)
+	assert(spell==1 and magic==0 and hero.hurtTicks==0 and hero.invTicks>0)
+	for i in 89: tick(m.STEP)
+	assert(spell<0)
+	damage(shield,{"damage":100,"direction":-1,"knock":true,"magic":true},hero)
+	assert(shield.hp==0 and shield.burnAge==0)
+	tick_actor(shield,m.STEP)
+	assert(shield.burnAge==0)
+	for i in 50: tick_actor(shield,m.STEP)
+	assert(shield.down.ground>0 and shield.burnAge>0)
+	hero.hp=20
+	wave=2
+	wave_time=5
+	step_chicken(m.STEP)
+	assert(not chicken.is_empty())
+	chicken.roast=true
+	chicken.flight=false
+	chicken.x=hero.x
+	chicken.y=hero.y
+	hero.attack={}
+	hero.air={}
+	hero.down={}
+	hero.hurtTicks=0
+	step_chicken(m.STEP)
+	assert(not hero.pickup.is_empty())
+	for i in 36: step_chicken(m.STEP)
+	assert(hero.hp==100 and chicken.is_empty())
+	begin_walk("enter")
+	for i in 180: tick(m.STEP)
+	assert(hero.x==720 and stage_walk=="")
+	change_phase("paused")
+	assert(phase=="paused" and menu.visible)
+	change_phase("playing")
+	damage(hero,{"damage":100,"direction":-1,"knock":true},boss)
+	assert(phase=="dying" and wipe.age==-.5 and hero.gearDropped)
+	print("CAIRN_INTEGRATION_OK: shield windows, boss commitment, stun escape, magic duration, grounded burn, chicken pickup, stage entry, pause and death")
 	get_tree().quit()
 
 

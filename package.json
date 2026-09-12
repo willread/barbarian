@@ -10,7 +10,10 @@
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
-    "format": "oxfmt"
+    "format": "oxfmt",
+    "godot:build": "node tools/godot/build.mjs",
+    "godot:serve": "node tools/godot/serve.mjs",
+    "godot:test": "node tools/godot/build.mjs --test"
   },
   "dependencies": {
     "react": "19.2.6",
