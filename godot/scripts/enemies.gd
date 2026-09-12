@@ -191,7 +191,7 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if abs(dx)>650:return Vector2(e.dir,sign(dy)*.5)
 	if abs(dy)>28:return Vector2(0,sign(dy))
 	if not e.aiRest:
-		e.attack={"type":"archerShot","age":0,"elapsed":0.0,"ticks":54,"from":30,"to":-1,"direction":e.dir,"hits":[],"connected":false,"damage":0,"reach":0}
+		e.attack={"type":"archerShot","age":0,"elapsed":0.0,"ticks":58,"from":40,"to":-1,"direction":e.dir,"hits":[],"connected":false,"damage":0,"reach":0}
 	return Vector2.ZERO
 
 func separate(actors: Array):

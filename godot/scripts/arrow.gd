@@ -1,5 +1,6 @@
 extends Node2D
 const GRAVITY=540.0
+const SPEED=1050.0
 var game: Node2D
 var owner_actor: Dictionary
 var point=Vector3.ZERO
@@ -14,10 +15,14 @@ var angle=0.0
 func setup(source: Node2D,archer: Dictionary):
 	game=source
 	owner_actor=archer
-	point=Vector3(archer.x+archer.dir*60,archer.y,165)
+	# Registered to the release cel's bow/arrow junction in source-pixel space.
+	var cel=game.art.data.atlases["enemy-archer-v1"].cels[6]
+	var scale=255.0/game.art.data.atlases["enemy-archer-v1"].cels[0].height*archer.size
+	point=Vector3(archer.x+(320-192)*scale*archer.dir,archer.y,(cel.top+cel.height-184)*scale)
 	var target=game.hero
-	var travel=clampf(abs(target.x-point.x)/640.0,.25,1.2)
-	velocity=Vector3((target.x-point.x)/travel,(target.y-point.y)/travel,(115+target.height*4.5-point.z+.5*GRAVITY*travel*travel)/travel)
+	var travel=maxf(.15,abs(target.x-point.x)/SPEED)
+	# Leave the horizontal bow straight and fast; gravity supplies the downward arc.
+	velocity=Vector3(archer.dir*SPEED,clampf((target.y-point.y)/travel,-90,90),0)
 	update_position()
 
 func advance(dt: float):
@@ -66,21 +71,21 @@ func _draw():
 	# Embedded arrows terminate at the surface: the point and socket are buried.
 	var end=0.0 if stuck>=0 else -12.0
 	draw_line(Vector2(-87,1),Vector2(end,1),Color("281d16"),3.2,true)
-	draw_line(Vector2(-87,0),Vector2(end,0),Color("745535"),2.4,true)
-	draw_line(Vector2(-86,-.65),Vector2(end,-.65),Color("aa8554"),.65,true)
+	draw_line(Vector2(-87,0),Vector2(end,0),Color("5c432b"),2.4,true)
+	draw_line(Vector2(-86,-.65),Vector2(end,-.65),Color("8c6c44"),.65,true)
 	# Narrow nock and tightly bound feather roots.
 	draw_line(Vector2(-92,0),Vector2(-86,0),Color("51432d"),2.0,true)
 	for x in [-84,-82,-64,-62]:
-		draw_line(Vector2(x,-1.3),Vector2(x,1.3),Color("c1af82"),.65,true)
+		draw_line(Vector2(x,-1.3),Vector2(x,1.3),Color("9f906b"),.65,true)
 	for side in [-1,1]:
 		var edge=PackedVector2Array([Vector2(-86,side*.8),Vector2(-87,side*5),Vector2(-80,side*6),Vector2(-66,side*3.4),Vector2(-62,side*.7)])
-		draw_colored_polygon(edge,Color("8a8166") if side<0 else Color("514c3c"))
+		draw_colored_polygon(edge,Color("706952") if side<0 else Color("514c3c"))
 		for i in 8:
 			var x=-84+i*2.4
 			var width=5.2-float(i)*.4
-			draw_line(Vector2(x,side*.9),Vector2(x-2.4,side*width),Color("b2a383") if side<0 else Color("756b53"),.55,true)
+			draw_line(Vector2(x,side*.9),Vector2(x-2.4,side*width),Color("92876c") if side<0 else Color("756b53"),.55,true)
 	if stuck<0:
 		# Three shaded facets keep the broadhead metallic without a bright white triangle.
-		draw_colored_polygon(PackedVector2Array([Vector2(0,0),Vector2(-15,-4),Vector2(-12,0)]),Color("92938a"))
+		draw_colored_polygon(PackedVector2Array([Vector2(0,0),Vector2(-15,-4),Vector2(-12,0)]),Color("74786e"))
 		draw_colored_polygon(PackedVector2Array([Vector2(0,0),Vector2(-12,0),Vector2(-15,4)]),Color("414541"))
 		draw_line(Vector2(-16,0),Vector2(-11,0),Color("64675e"),2.5,true)

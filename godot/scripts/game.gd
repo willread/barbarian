@@ -522,7 +522,7 @@ func tick(dt: float):
 			if f.moving: f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
 		f.x=clamp(f.x,-2400,3840)
 		var finished=m.tick_attack(f,[hero],damage)
-		if f.kind=="archer" and f.attack.get("type","")=="archerShot" and f.attack.age==30:
+		if f.kind=="archer" and f.attack.get("type","")=="archerShot" and f.attack.age==40:
 			var arrow=preload("res://scripts/arrow.gd").new()
 			arena_clip.add_child(arrow)
 			arrow.setup(self,f)

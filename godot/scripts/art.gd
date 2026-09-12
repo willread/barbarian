@@ -50,7 +50,7 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 func enemy_frame(e: Dictionary) -> int:
 	if e.kind=="archer":
 		if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering:return 7
-		if not e.attack.is_empty():return 4 if e.attack.age<12 else 5 if e.attack.age<30 else 6
+		if not e.attack.is_empty():return 8 if e.attack.age<12 else 4 if e.attack.age<22 else 5 if e.attack.age<40 else 6
 		return 1+int(e.stride*4)%3 if e.moving else 0
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
 	if e.hp<=0: return 13
