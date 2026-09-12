@@ -24,6 +24,7 @@ var enemies: Array=[]
 var encounters: Array=[]
 var gear: Array=[]
 var scorches: Array=[]
+var arrows: Array=[]
 var sparks: Array=[]
 var landing_impacts: Array=[]
 var chicken: Dictionary={}
@@ -165,6 +166,7 @@ func _ready():
 	if "--integration-test" in OS.get_cmdline_user_args(): integration_test.call_deferred()
 	if "--layout-test" in OS.get_cmdline_user_args(): layout_test.call_deferred()
 	if "--moves-test" in OS.get_cmdline_user_args(): moves_test.call_deferred()
+	if "--archer-test" in OS.get_cmdline_user_args(): archer_test.call_deferred()
 
 func reveal_browser_menu():
 	# Submit the first fully textured frame before releasing the HTML loading cover.
@@ -241,6 +243,9 @@ func clear_world():
 	flame_views.clear()
 	for item in gear: item.node.queue_free()
 	gear.clear()
+	for arrow in arrows:
+		if is_instance_valid(arrow):arrow.queue_free()
+	arrows.clear()
 	if is_instance_valid(chicken_node): chicken_node.queue_free()
 	chicken={}
 	enemies.clear()
@@ -278,6 +283,9 @@ func spawn_wave():
 		if flame_views.has(enemy.id): flame_views[enemy.id].queue_free();flame_views.erase(enemy.id)
 	for item in gear: item.node.queue_free()
 	gear.clear()
+	for arrow in arrows:
+		if is_instance_valid(arrow):arrow.queue_free()
+	arrows.clear()
 	enemies.clear()
 	var next=["valley","swamp","cinder"].pick_random()
 	if next!=background.key:
@@ -439,6 +447,8 @@ func tick(dt: float):
 	if transition>=0 or phase not in ["playing","dying"]: return
 	blood.step(dt,[hero]+enemies)
 	step_gear(dt)
+	arrows=arrows.filter(func(arrow):return is_instance_valid(arrow))
+	for arrow in arrows:arrow.advance(dt)
 	if phase=="playing": step_chicken(dt)
 	if pressed.has(KEY_K) and can_cast():
 		if hero.hurtTicks or hero.recovering:
@@ -512,6 +522,11 @@ func tick(dt: float):
 			if f.moving: f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
 		f.x=clamp(f.x,-2400,3840)
 		var finished=m.tick_attack(f,[hero],damage)
+		if f.kind=="archer" and f.attack.get("type","")=="archerShot" and f.attack.age==30:
+			var arrow=preload("res://scripts/arrow.gd").new()
+			arena_clip.add_child(arrow)
+			arrow.setup(self,f)
+			arrows.append(arrow)
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)
 		if phase!="playing": break
 	if phase=="playing" and enemies.all(func(f):return f.hp<=0 and f.burnAge>3.4):
@@ -630,6 +645,7 @@ func _notification(what: int):
 
 func drop_gear(f: Dictionary):
 	f.gearDropped=true
+	if f.kind=="archer":return # Bow and quiver remain in the burning body silhouette.
 	var pieces=[]
 	if f.player or f.kind=="champion":
 		var w=art.data.weapons[weapon if f.player else "axe"]
@@ -1198,4 +1214,44 @@ func moves_test():
 	damage(guard,dive.duplicate(),hero)
 	assert(guard.hp<20 and not guard.down.is_empty() and hero.diveHit and hit_stop>0,"Exposed shield must be flattened")
 	print("CAIRN_HOLD_OK: instant slash, hold transition, interruption protection, release-to-rearm")
+	get_tree().quit()
+
+func archer_test():
+	set_process(false)
+	start_game()
+	hero.x=720
+	hero.y=660
+	hero.hp=100
+	hero.invTicks=0
+	hero.air={}
+	hero.attack={}
+	var archer=make_actor(350,660,6)
+	archer.kind="archer"
+	archer.dir=1
+	assert(e_ai.archer_intent(archer,hero).is_zero_approx() and archer.attack.type=="archerShot")
+	archer.attack={}
+	archer.x=550
+	assert(e_ai.archer_intent(archer,hero).x<0,"Archer must retreat when crowded")
+	archer.x=350
+	var arrow=load("res://scripts/arrow.gd").new()
+	arena_clip.add_child(arrow)
+	arrow.setup(self,archer)
+	for i in 90:
+		arrow.advance(1.0/120)
+		if arrow.attached:break
+	assert(arrow.attached and hero.hp<85,"Arrow must hit and embed with high damage")
+	assert(not blood.drops.is_empty(),"Arrow impact must emit blood")
+	arrow.advance(1.01)
+	assert(arrow.is_queued_for_deletion(),"Embedded arrow must expire in one second")
+	var miss=load("res://scripts/arrow.gd").new()
+	arena_clip.add_child(miss)
+	miss.setup(self,archer)
+	hero.invTicks=999
+	for i in 240:
+		miss.advance(1.0/120)
+		if miss.stuck>=0:break
+	assert(miss.stuck>=0 and not miss.attached and miss.point.z==0,"Missed arrow must land under gravity")
+	miss.advance(1.01)
+	assert(miss.is_queued_for_deletion())
+	print("CAIRN_ARCHER_OK: retreat, draw, ballistic hit, blood, embedding and expiry")
 	get_tree().quit()

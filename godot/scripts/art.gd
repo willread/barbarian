@@ -2,11 +2,12 @@ class_name CairnArt
 extends RefCounted
 var data: Dictionary
 var textures: Dictionary={}
-const HEIGHTS={"bone":270,"shield":260,"marauder":250,"champion":310}
+const HEIGHTS={"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
+	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
 	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 
 func texture(file: String) -> Texture2D:
@@ -47,6 +48,10 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 	return ["hero-actions-unarmed-v8",0] if f.player else ["enemy-walk-v4",0]
 
 func enemy_frame(e: Dictionary) -> int:
+	if e.kind=="archer":
+		if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering:return 7
+		if not e.attack.is_empty():return 4 if e.attack.age<12 else 5 if e.attack.age<30 else 6
+		return 1+int(e.stride*4)%3 if e.moving else 0
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
 	if e.hp<=0: return 13
 	if e.hurtTicks or e.recovering: return 11
@@ -97,7 +102,7 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	node.draw_set_transform(Vector2.ZERO)
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
-	if f.gearDropped: return
+	if f.gearDropped or f.kind=="archer": return
 	var l=layout(p)
 	if f.player:
 		if l.rig.behind!=behind: return

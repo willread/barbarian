@@ -4,21 +4,23 @@ var m: CairnMechanics
 var roster: Dictionary
 func _init(mechanics: CairnMechanics, data: Dictionary):
 	m=mechanics
-	roster=data
+	roster=data.duplicate(true)
+	roster["archer"]={"hp":6,"speed":1.05}
 
 func plan() -> Array:
-	var themes=["legion","bone","shield","marauder","bone","shield","marauder"]
+	var themes=["legion","bone","shield","marauder","archer","shield","archer"]
 	themes.shuffle()
 	var result=[]
 	for i in themes.size():
 		var wave=[themes[i],themes[i]]
-		for j in 1+int(i/2): wave.append(["legion","bone","shield","marauder"].pick_random())
+		for j in 1+int(i/2): wave.append(["legion","bone","shield","marauder","archer"].pick_random())
 		wave.shuffle()
 		result.append(wave)
 	result.append(["champion"])
 	return result
 
 func variant(e: Dictionary):
+	if e.kind=="archer":return
 	if e.boss:
 		e.speedFactor=.75
 		return
@@ -61,6 +63,7 @@ func block(e: Dictionary, a: Dictionary, h: Dictionary) -> bool:
 	return true
 
 func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
+	if e.kind=="archer":return archer_intent(e,h)
 	# Heavy actors notice positional changes in slower beats; combat health/state stays current.
 	if heavy(e):
 		e["noticeTicks"]=max(0,e.get("noticeTicks",0)-1)
@@ -151,6 +154,9 @@ func motion(e: Dictionary):
 		e.x+=e.velocityX*m.SCALE
 
 func finish(e: Dictionary,a: Dictionary,h: Dictionary):
+	if e.kind=="archer":
+		e.aiRest=85+randi()%35
+		return
 	if e.kind=="legion":
 		if a.connected and h.hp>0 and h.down.is_empty() and e.aiChain<2 and a.type!="enemyCharge":
 			e.aiChain+=1
@@ -170,3 +176,20 @@ func finish(e: Dictionary,a: Dictionary,h: Dictionary):
 	else:
 		e.rushCombo=false
 		e.aiRest=72 if e.kind=="marauder" else (36 if e.kind=="champion" else 20+randi()%25)
+
+func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
+	var dx=h.x-e.x
+	var dy=h.y-e.y
+	e.dir=1 if dx>=0 else -1
+	if h.hp<=0:return Vector2.ZERO
+	# Enter the arena before retreating; no firing from outside the visible playfield.
+	if e.x<95:return Vector2(1,sign(dy)*.4)
+	if e.x>1345:return Vector2(-1,sign(dy)*.4)
+	if abs(dx)<310:
+		if (e.dir==1 and e.x>110) or (e.dir==-1 and e.x<1330):return Vector2(-e.dir,sign(dy)*.3)
+	if abs(dx)>650:return Vector2(e.dir,sign(dy)*.5)
+	if abs(dy)>28:return Vector2(0,sign(dy))
+	if not e.aiRest:
+		e.attack={"type":"archerShot","age":0,"elapsed":0.0,"ticks":54,"from":30,"to":-1,"direction":e.dir,"hits":[],"connected":false,"damage":0,"reach":0}
+	return Vector2.ZERO

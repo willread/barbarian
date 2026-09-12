@@ -60,3 +60,6 @@ Anton selected by the user. Unmodified `public/fonts/anton.ttf`, SIL OFL 1.1. Ru
 
 ### Ground-impact reference (implementation guidance only)
 - Kate Kruse, Ground Impact VFX: https://frontfangs.artstation.com/projects/QrnV5Z — layered shockwave/dust/debris reference. No downloaded artwork or third-party code used; the dust shader and particles are project code.
+
+### Skeleton archer (2026-09-11)
+Built-in ImageGen created `godot/art/archer-source.png` and the chroma-key edit `archer-keyed.png`; runtime cels and metadata are baked with `godot/scripts/bake_archer.gd`. No downloaded art. Prompt: 4x2 whole-body sprite sheet, realistic dark-fantasy thin skeleton, green tattered frock, quiver and wooden bow, consistent right-facing idle/retreat/draw/release/hurt poses. Follow-up: preserve sprites and replace background with flat #FF00FF.

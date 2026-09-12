@@ -24,6 +24,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--','--smoke-test']);
  run(binary,['--headless','--path','godot','--','--integration-test']);
  run(binary,['--headless','--path','godot','--','--moves-test']);
+ run(binary,['--headless','--path','godot','--','--archer-test']);
  process.exit(0);
 }
 const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--windows')?['Windows']:['Web','Windows'];

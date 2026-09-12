@@ -34,6 +34,7 @@ func _init():
 		for wave in plan:
 			for kind in wave:
 				if not kind in types: types.append(kind)
-		assert(types.size()==5)
+		assert(types.size()==6)
 	print("CAIRN_PARITY_OK: ",checked," frame snapshots, weapon timing and 100 encounter plans")
 	quit()
+

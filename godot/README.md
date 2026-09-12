@@ -83,3 +83,5 @@ The splash crossfades to the original clean white artwork in maximum-force-refer
 - `tests/combat_moves.gd` covers move timing, momentum, recovery, shield window and spin hit uniqueness/depth. `--moves-test` covers actual press/hold/release, spin protection and shield dive outcomes. Existing ROM parity fixtures remain a baseline with extensions disabled; the shipped game enables the new move rules.
 
 Menu reveal waits for all packaged PNG assets to be cached, a submitted Godot frame, and decoded browser splash images. The six-second splash is a minimum; slow loading extends it. Menu drop animations wait behind the loading cover.
+
+Skeleton archers appear in pre-boss encounter plans: 6 HP, retreat inside 310px, fire within 650px, 0.5s visible draw, roughly 18 player-health damage per arrow. Ballistic arrows sweep for torso collisions, emit blood through normal damage, attach briefly, and expire one second after player/ground impact. `--archer-test` checks ranged behavior and projectile lifecycle.
