@@ -1,12 +1,18 @@
 shader_type canvas_item;
 uniform float clock=0.;
 uniform vec2 pixels=vec2(200.,160.);
+uniform float edge_spread=2.6;
 void fragment(){
- float heat=texture(TEXTURE,UV).a*.9;
+ // Expand the fuel around each glyph, not the word's rectangular bounds.
+ // Horizontal expansion leaves the deliberately short upward reach intact.
+ vec2 rim=vec2(edge_spread/pixels.x,0.);
+ float heat=max(texture(TEXTURE,UV).a,max(texture(TEXTURE,UV-rim).a,texture(TEXTURE,UV+rim).a)*.86)*.9;
  for(int i=1;i<14;i++){
   float y=float(i)*.55;
   float curl=.16*sin(UV.x*pixels.x*.71+UV.y*pixels.y*.33+clock*7.1)+.12*sin(UV.x*pixels.x*.37-UV.y*pixels.y*.19-clock*9.3);
-  float fuel=texture(TEXTURE,UV+vec2(curl*float(i)*.22,y)/pixels).a;
+  vec2 at=UV+vec2(curl*float(i)*.22,y)/pixels;
+  vec2 spread=rim*(.88+.12*sin(UV.y*pixels.y*.19+clock*2.1));
+  float fuel=max(texture(TEXTURE,at).a,max(texture(TEXTURE,at-spread).a,texture(TEXTURE,at+spread).a)*.86);
   float cooling=.065+.025*(.5+.5*sin(UV.x*pixels.x*.57+UV.y*pixels.y*.13-clock*6.));
   heat=max(heat,fuel*(.88+.1*sin(UV.x*pixels.x*.11+clock*3.))*pow(.96,float(i))-float(i)*cooling);
  }
