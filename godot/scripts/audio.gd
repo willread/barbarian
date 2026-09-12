@@ -1,5 +1,5 @@
 extends Node
-const CLIP_IDS=["sword","axe","flesh","heavy_hit","charge_hit","death_fire","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
+const CLIP_IDS=["gulp","sword","axe","flesh","heavy_hit","charge_hit","death_fire","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}

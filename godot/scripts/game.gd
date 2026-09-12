@@ -953,6 +953,8 @@ func step_chicken(dt: float):
 		hero_voice.request_line("dinner",.9,4.)
 		chicken={"x":90.0,"y":610.0,"dir":1,"age":0.0,"roast":false,"turn":0.0,"hop":0.0,"height":0.0,"flight":false,"picked":false}
 		chicken_node=Node2D.new()
+		chicken_node.material=ShaderMaterial.new()
+		chicken_node.material.shader=load("res://shaders/chicken_edge.gdshader")
 		chicken_node.draw.connect(draw_chicken)
 		add_child(chicken_node)
 	if chicken.is_empty(): return
@@ -962,24 +964,39 @@ func step_chicken(dt: float):
 		var p=hero.pickup
 		if hero.hp<=0 or not hero.down.is_empty() or hero.hurtTicks:
 			if p.collected: remove_chicken()
+			else:
+				c.height=0
+				c["draw_scale"]=1.0
+				c.x=clampf(c.x,70,1370)
 			hero.pickup={}
 			return
 		p.age+=dt
-		if p.age>=.28 and not p.collected:
+		# Reach, lift, toss, swallow, settle. The roast remains a separate sprite.
+		var hand=Vector2(hero.x+hero.dir*76,hero.y-278)
+		var mouth=Vector2(hero.x+hero.dir*12,hero.y-249)
+		var point=Vector2(p.start_x,hero.y)
+		if p.age>=.3 and p.age<.6:point=point.lerp(hand,smoothstep(.3,.6,p.age))
+		elif p.age>=.6:
+			var t=clampf((p.age-.6)/.32,0,1)
+			point=hand.lerp(mouth,t)+Vector2(0,-sin(t*PI)*35)
+		c.x=point.x
+		c.height=(hero.y-point.y)/4.5
+		c["draw_scale"]=lerpf(1.,.08,smoothstep(.68,.92,p.age))
+		if p.age>=.92 and not p.collected:
 			p.collected=true
-			audio.play("pickup",-6)
+			c.picked=true
+			audio.play("gulp",-3)
 			hero.hp=hero.max
-		if p.collected:
-			c.x=hero.x+hero.dir*52
-			c.height=min(16,(p.age-.28)*90)
-			c.picked=p.age>.43
-		if p.age>=.58:
+		if p.age>=1.2:
 			remove_chicken()
 			hero.pickup={}
 			return
 	elif c.roast:
 		if c.flight:
 			c.x+=c.vx*dt
+			if c.x<70 or c.x>1370:
+				c.x=clampf(c.x,70,1370)
+				c.vx=-c.vx*.55
 			c.height+=c.vz*dt/4.5
 			c.vz-=700*dt
 			c.trail-=dt
@@ -993,7 +1010,7 @@ func step_chicken(dt: float):
 				blood.stain(c.x,c.y,16)
 		elif hero.hp>0 and hero.down.is_empty() and hero.air.is_empty() and hero.attack.is_empty() and not hero.hurtTicks and spell<0 and abs(hero.x-c.x)<45 and abs(hero.y-c.y)<26:
 			hero.dir=1 if c.x>=hero.x else -1
-			hero.pickup={"age":0.0,"collected":false}
+			hero.pickup={"age":0.0,"collected":false,"start_x":c.x}
 	else:
 		if c.age>10:
 			c.x+=c.dir*350*dt
@@ -1047,7 +1064,7 @@ func draw_chicken():
 	var c=chicken
 	var atlas=art.data.atlases["chicken-v1"]
 	var cel=atlas.cels[10 if c.roast else 9 if c.hop else int(c.age*16)%8]
-	var s=132/atlas.cellWidth
+	var s=132/atlas.cellWidth*c.get("draw_scale",1.0)
 	chicken_node.draw_set_transform(Vector2(c.x,c.y-c.height*4.5),0,Vector2(c.dir,1))
 	chicken_node.draw_texture_rect(art.texture(cel.file),Rect2((cel.left-atlas.cellWidth*.5)*s,-cel.height*s,cel.width*s,cel.height*s),false,Color(0.76,0.73,0.69,1.0))
 	chicken_node.draw_set_transform(Vector2.ZERO)
@@ -1301,7 +1318,16 @@ func integration_test():
 	wave_time=5
 	step_chicken(m.STEP)
 	assert(not chicken.is_empty())
-	chicken.roast=true
+	roast_chicken(1)
+	chicken.x=1369
+	chicken.vx=500
+	step_chicken(.1)
+	assert(chicken.x<=1370 and chicken.vx<0)
+	chicken.x=71
+	chicken.vx=-500
+	step_chicken(.1)
+	assert(chicken.x>=70 and chicken.vx>0)
+	chicken.height=0
 	chicken.flight=false
 	chicken.x=hero.x
 	chicken.y=hero.y
@@ -1311,7 +1337,7 @@ func integration_test():
 	hero.hurtTicks=0
 	step_chicken(m.STEP)
 	assert(not hero.pickup.is_empty())
-	for i in 36: step_chicken(m.STEP)
+	for i in 76: step_chicken(m.STEP)
 	assert(hero.hp==100 and chicken.is_empty())
 	# A final enemy can finish burning while the player is still diving.
 	hero.recovering=0

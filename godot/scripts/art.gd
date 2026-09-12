@@ -9,6 +9,7 @@ func _init():
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
 	data.atlases["enemy-legion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/minotaur-atlas.json"))
+	data.atlases["hero-eat"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/eat-atlas.json"))
 	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 
 func texture(file: String) -> Texture2D:
@@ -18,7 +19,7 @@ func texture(file: String) -> Texture2D:
 func pose(f: Dictionary, spell: int = -1) -> Array:
 	if f.player and f.attack.get("spin",false):return ["hero-spin",min(15,int(max(0,f.attack.age-2)/2.0))%8]
 	if f.player and f.diveUsed and not f.air.is_empty():return ["hero-extra-unarmed-v8",8 if f.diveAge<2 else 9 if f.diveAge<4 else 10 if f.weapon=="axe" else 11]
-	if f.player and not f.pickup.is_empty() and f.down.is_empty() and not f.hurtTicks: return ["hero-pickup-unarmed-v1",min(7,int(f.pickup.age/.0725))]
+	if f.player and not f.pickup.is_empty() and f.down.is_empty() and not f.hurtTicks: return ["hero-eat",min(7,int(f.pickup.age/.15))]
 	if f.player and spell>=0 and f.down.is_empty() and not f.hurtTicks:
 		return ["hero-cast-unarmed-v1",0 if spell<5 else 1 if spell<9 else 2 if spell<13 else 3 if spell<17 else 4 if spell<45 else 5 if spell<77 else 6 if spell<84 else 7]
 	if not f.player: return ["enemy-"+f.kind+"-v1",enemy_frame(f)]
@@ -108,7 +109,7 @@ func has_separate_weapon(f: Dictionary) -> bool:
 	return f.player or f.kind not in ["archer","legion"]
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
-	if f.gearDropped or not has_separate_weapon(f): return
+	if f.gearDropped or not has_separate_weapon(f) or (f.player and not f.pickup.is_empty()): return
 	var l=layout(p)
 	if f.player:
 		if l.rig.behind!=behind: return
