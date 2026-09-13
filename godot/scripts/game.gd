@@ -445,6 +445,7 @@ func spawn_wave(preserve_corpses: bool=false):
 		enemies.clear()
 	var next="citadel-%d"%screen_for_wave(wave)
 	if next!=background.key:
+		remove_chicken()
 		hero.bootCoat=0.0
 		hero.bootDistance=0.0
 		hero.bootPos=Vector2(hero.x,hero.y)
