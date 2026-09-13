@@ -235,6 +235,7 @@ func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	return f
 
 func change_phase(next: String):
+	menu.compact_pause=next=="paused"
 	if next=="dying":
 		combo.reset()
 		audio.stop_gameplay()

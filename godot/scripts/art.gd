@@ -79,6 +79,14 @@ func layout(p: Array) -> Dictionary:
 	var atlas=data.atlases[p[0]]
 	var cel=atlas.cels[int(p[1])]
 	var rig=cel.get("rig",{})
+	if p[0]=="hero-walk-unarmed-v8":
+		rig=rig.duplicate(true)
+		# Near-hand carry sockets, authored in the original 512x768 cells.
+		var sockets=[Vector2(145,403),Vector2(151,402),Vector2(157,410),Vector2(158,406)]
+		var hand=sockets[int(p[1])]
+		rig.grip=[(hand.x-atlas.cellWidth*.5)*rig.scale,(hand.y-cel.top-cel.height)*rig.scale]
+		rig.angle=deg_to_rad([195.,190.,198.,193.][int(p[1])])
+		rig.behind=true
 	return {"atlas":atlas,"cel":cel,"rig":rig}
 
 func weapon_data(f: Dictionary) -> Dictionary:
