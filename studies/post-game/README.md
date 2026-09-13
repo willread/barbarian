@@ -6,7 +6,16 @@ Design exploration only; no runtime changes. Generated with the built-in imagege
 
 The post-game screen sits on top of the existing blood splatter effect. Keep the blood splatter visible behind the results panel, heading and actions; the generated battlefield scenery in the mockups is not the intended post-game background. This applies to every results state, including first scores and runs without a personal best. Judge text contrast and panel readability against the actual blood splatter during implementation. This clarification supersedes the backdrop descriptions in the original generation prompts; the images have not yet been regenerated to reflect it.
 
-Keep the large final score, six session stats, dark stone, ivory type and restrained ember focus. Remove skulls, the double border and “The Legion Endures.” Use a single plain bronze panel edge. Use the same “High Scores” label in results and the main menu. Remove the duplicated best-score badge; show a secondary record highlight only when earned.
+Keep the large final score, six session stats, dark stone, ivory type and restrained ember focus. Remove skulls, the double border and “The Legion Endures.” Use a single plain bronze panel edge. Use the same “High Scores” label in results and the main menu. There is no personal-record line or badge strip beneath the panel. Every eligible stat that beats its previous personal best gets its own “NEW PERSONAL BEST” label directly beneath its value, matching the score label's typography, amber color and restrained glow at a size appropriate to the stat cell. Multiple stat labels can appear together even when the final score is not a record. Reserve consistent space inside each cell so labels do not move the grid. Unbeaten stats show no record label or placeholder.
+
+## Motion and button treatment
+
+- Let the existing blood splatter remain the backdrop; bring in the heading and panel with a short fade and slight settling motion. Avoid continuous panel movement that makes stats harder to read.
+- Proposed timing: count the final score from zero to its exact saved total over roughly 0.9 seconds, easing out near the end. Keep digit alignment and width stable. Session values can appear with a short stagger rather than six competing count-ups.
+- Reveal earned personal-best labels as their values settle, with one brief amber emphasis, then hold them steady. The score label follows the same treatment. No looping celebration pulses across the stats.
+- Buttons use the game's existing contour fire and heated lettering treatment, including its focus and activation behavior. Do not replace it with the generated outlined button plaques or a new fire imitation. Rise Again receives initial focus; keyboard, controller and pointer focus all drive the same effect.
+- Actions remain responsive during the reveal; activating a button performs its action without waiting for the score animation. The animated number is presentation only and never changes the saved score. Returning from High Scores shows the settled results without replaying the reveal.
+- These motion timings are proposed for implementation, not present in the static images. The generated images and original prompts also predate the per-stat label change above.
 
 ## Navigation
 
@@ -29,11 +38,13 @@ Keep the large final score, six session stats, dark stone, ivory type and restra
 | Below personal best | “Personal best 128,450” / “12,250 from your best” | Show actual placement if within the top 10. No celebration styling. |
 | Equal personal best | “Personal best matched” | Keep earlier run ahead on ties; do not claim an improvement. |
 | Outside top 10 | Personal-best comparison plus “Outside your top 10” | Preserve the ranked list and show latest run separately when entering from results. |
-| Other record earned | Optional line such as “New longest combo · 36 hits” | Can occur even when final score is below the personal best. |
-| No other record | Omit highlight text | No empty badge placeholders or “No records” message. |
+| Other record earned | “NEW PERSONAL BEST” beneath each qualifying stat value, styled like the score record label; no bottom record line | Can occur for several stats, even when final score is below the personal best. |
+| No other record | Omit per-stat record labels | No empty badge placeholders or “No records” message. |
 | Victory | “The valley is free.” / Time: “Run time” | Outcome in selected details reads Victory. |
 
 For the initial design, ranks refer to comparable runs. Full runs and chapter starts should not compete in the same table; expose a scope selector only if both are score-eligible. Keep scoring-rules versions with saved records so later balance changes can preserve old records separately. These are proposed behaviors, not implemented systems.
+
+Per-stat records compare against saved records before the current run, independently of whether that run enters the score top 10. First runs establish baselines without claiming to beat a previous record; ties do not get “NEW PERSONAL BEST” labels. Proposed initial higher-is-better records are score, kills, best combo, peak multiplier and damage dealt. Time and damage taken remain descriptive until a comparable completion-based rule is defined: a quick death must not become a fastest-run or least-damage record. Keep personal stat records separately from the top-10 list so dropping a run from that list does not erase its records.
 
 ## Session data
 
