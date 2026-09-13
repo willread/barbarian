@@ -9,7 +9,7 @@ func check():
  c.advance(10.)
  assert(c.multiplier()==1 and c.hits==0)
  for i in 100:c.hit()
- assert(c.multiplier()==8)
+ assert(c.multiplier()==10)
  c.reset()
  var game=load("res://main.tscn").instantiate()
  root.add_child(game)

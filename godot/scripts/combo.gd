@@ -6,7 +6,7 @@ var timeout=5.0
 var waiting_for_combat=false
 var resume_grace=3.0
 var hits_per_tier=3
-var max_multiplier=8
+var max_multiplier=10
 var heal_threshold=5
 var heal_per_second=1.5
 func multiplier() -> int:return mini(max_multiplier,1+int(hits/hits_per_tier))

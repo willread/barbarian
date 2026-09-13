@@ -5,53 +5,68 @@ var tier=-1
 var time=0.0
 var bounds={}
 var fire_height=1.0
+var impact_age=10.0
+var score_age=10.0
+var last_score=0
 func stone(label: String,center: Vector2,height: float,max_width: float=280.0):
- var meta=game.art.data.menu[label]
+ var meta=game.art.data.menu["HUD "+label]
  var texture=game.art.texture("menu-"+meta.id+".png")
  if not bounds.has(label):bounds[label]=texture.get_image().get_used_rect()
  var rect=bounds[label]
  var factor=minf(height/rect.size.y,max_width/rect.size.x)
  var size=Vector2(rect.size)*factor
- draw_texture_rect_region(texture,Rect2(center-size*.5,size),rect,Color(1.8,1.7,1.5))
+ draw_texture_rect_region(texture,Rect2(center-size*.5,size),rect,Color(1.25,1.2,1.1))
 
 func _process(dt):
  if not game:return
  visible=game.phase!="title"
  if not visible:return
  time+=dt
+ impact_age+=dt
+ score_age+=dt
+ if last_score!=game.score:
+  last_score=game.score
+  score_age=0.0
  var current=game.combo.multiplier()
  if tier!=current:
+  if current>tier and tier>=1:impact_age=0.0
   tier=current
   if is_instance_valid(fire):fire.queue_free()
   fire=null
   if tier>=4:
-   var meta=game.art.data.menu["%dX"%tier]
+   var meta=game.art.data.menu["HUD %dX"%tier]
    fire=ContourFire.new()
    fire.menu_palette=true
    add_child(fire)
    fire.show_behind_parent=true
-   var mask=game.art.texture("menu-"+meta.id+"-fuel.png").get_image()
+   var mask=game.art.texture("menu-"+meta.id+".png").get_image()
    var used=mask.get_used_rect()
-   fire_height=used.size.y
-   fire.setup(ImageTexture.create_from_image(mask.get_region(used)),Vector2(used.size),-Vector2(used.size)*.5,false)
+   mask=mask.get_region(used)
+   var target_height=90
+   mask.resize(maxi(1,int(float(used.size.x)*target_height/used.size.y)),target_height,Image.INTERPOLATE_LANCZOS)
+   fire_height=target_height
+   fire.setup(ImageTexture.create_from_image(mask),Vector2(mask.get_size()),-Vector2(mask.get_size())*.5,false)
  if fire:
-  var meta=game.art.data.menu["%dX"%tier]
-  fire.scale=Vector2.ONE*(40.+tier*3.)/fire_height
-  fire.position=Vector2(0,133)+unrest()
-  fire.strength=.8+(tier-4)*.4
+  fire.scale=Vector2.ONE*combo_height()/fire_height
+  fire.position=Vector2(0,124)+unrest()
+  fire.strength=.65+(tier-4)*.23+exp(-impact_age*7.)*.5
   fire.emitting=game.combo.remaining>0
  queue_redraw()
+func combo_height() -> float:
+ var kick=exp(-impact_age*8.)*cos(impact_age*24.)
+ return (45.+tier*2.)*(1.+kick*(.10+tier*.018))
 func unrest() -> Vector2:
- var amount=maxf(0.,tier-2)*.35
- return Vector2(sin(time*23)+sin(time*37)*.35,cos(time*29)*.65)*amount
+ var burst=exp(-impact_age*7.)*(1.+tier*.6)
+ var idle=maxf(0.,tier-4)*.15
+ return Vector2(sin(time*43),cos(time*37)*.6)*(burst+idle)
 func _draw():
  if not game or game.phase=="title":return
- stone("AREA %d/4"%game.screen_for_wave(game.wave),Vector2(-78,10),19,125)
- stone("BOSS" if game.wave==game.encounters.size() else "WAVE %d/3"%(1+(game.wave-1)%3),Vector2(76,10),19,125)
+ stone("AREA %d/4"%game.screen_for_wave(game.wave),Vector2(-75,23),19,130)
+ stone("BOSS" if game.wave==game.encounters.size() else "WAVE %d/3"%(1+(game.wave-1)%3),Vector2(75,23),19,130)
  var digits="%06d"%game.score
  var width=minf(32.,260./digits.length())
- for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,57),39,width)
+ for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,59),48*(1.+.035*exp(-score_age*12.)),width)
  if game.combo.hits>0:
-  stone("%dX"%game.combo.multiplier(),Vector2(0,133)+unrest(),40.+game.combo.multiplier()*3.,150)
-  draw_rect(Rect2(-75,174,150,3),Color(.08,.035,.025,.8))
-  draw_rect(Rect2(-75,174,150*game.combo.remaining/game.combo.timeout,3),Color(.6,.25,.08,.9))
+  stone("%dX"%game.combo.multiplier(),Vector2(0,124)+unrest(),combo_height(),150)
+  draw_rect(Rect2(-111,173,222,6),Color(.08,.035,.025,.8))
+  draw_rect(Rect2(-110,174,220*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))
