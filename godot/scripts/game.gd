@@ -424,7 +424,7 @@ func finish_run(outcome: String):
 	if finished_run.is_empty():
 		var snapshot=run_stats.duplicate(true)
 		for key in ["damage_dealt","damage_taken"]:snapshot[key]=int(snapshot[key])
-		snapshot.merge({"score":int(score),"kills":kills,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
+		snapshot.merge({"score":int(score),"kills":kills,"episode":1,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
 		finished_run=records.finish(snapshot)
 	if is_instance_valid(results_view):return
 	results_view=preload("res://scripts/results_view.gd").new()

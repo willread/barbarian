@@ -39,6 +39,7 @@ func _ready():
 	actions=load("res://scripts/menu.gd").new()
 	add_child(actions)
 	actions.setup(art)
+	actions.action_height=96.0
 	actions.show_items(["BEGIN","BACK"] if runs.is_empty() else ["BACK"],false,false)
 	actions.activated.connect(func(label):
 		if label=="BEGIN":begin.emit()
@@ -61,10 +62,10 @@ func layout():
 	var top=122.0 if compact else clampf(viewport_size.y*.20,120,205)
 	var table_width=width-40 if compact else width*.90
 	scroll.position=Vector2((width-table_width)*.5,top)
-	scroll.size=Vector2(table_width,maxf(60,viewport_size.y-top-112))
+	scroll.size=Vector2(table_width,maxf(60,viewport_size.y-top-126))
 	row_height=110 if compact else clampf(scroll.size.y/maxi(1,runs.size()),44,86)
 	content.custom_minimum_size=Vector2(0,scroll.size.y if runs.is_empty() else runs.size()*row_height)
-	actions.layout_actions(Rect2(width*.1,viewport_size.y-82,width*.8,60))
+	actions.layout_actions(Rect2(width*.1,viewport_size.y-108,width*.8,96))
 	backdrop.queue_redraw()
 	content.queue_redraw()
 	reveal_selected.call_deferred()
@@ -116,7 +117,7 @@ func draw_table():
 				content.draw_colored_polygon(PackedVector2Array([marker+Vector2(-3,-7),marker+Vector2(5,0),marker+Vector2(-3,7)]),Color("eab95d"))
 		elif i%2==0:content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.65,.48,.025))
 		content.draw_line(Vector2(0,y),Vector2(w,y),Color(.40,.34,.24,.45))
-		var reached="AREA %d/4"%run.get("area",1)
+		var reached="EP %d · AREA %d/4"%[run.get("episode",1),run.get("area",1)]
 		var time=CairnRunRecords.duration(run.get("time",0))
 		var date=display_date(str(run.get("date","")))
 		if compact:
