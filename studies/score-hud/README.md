@@ -9,3 +9,4 @@ Three imagegen concept directions derived from the current gameplay HUD. No runt
 All three use SIL Open Font License 1.1; verified against google/fonts main/ofl/{cinzel,oswald,rajdhani}/OFL.txt. No font binaries added to the game. Review panel hierarchy, texture, spacing and font direction before implementation.
 
 Image generated with OpenAI imagegen, 2026-09-12, using a native game capture as visual reference.
+Progression preview: progression-v1.gif and progression-v1.mp4 capture the actual Godot HUD at 30 fps, with scripted hits and kill bonuses building from 1x to 10x. The timer is held full to isolate rank effects. Capture script: capture-progression.gd (writes temporary frames on E:). No gameplay changes.
