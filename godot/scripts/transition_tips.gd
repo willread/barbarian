@@ -2,7 +2,9 @@ extends CanvasLayer
 const TIPS=[
 	"Hold attack to spin and get yourself out of tight situations",
 	"double tap a direction to dash, follow with an attack to charge",
-	"remember to unleash your magic",
+	"remember to unleash your magic when the gauge is full",
+	"grab a snack when your health is low",
+	"build your score multiplier by landing hits without taking damage",
 ]
 var current=""
 var cover: ColorRect
