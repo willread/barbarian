@@ -130,12 +130,12 @@ func draw_panel():
 	var score_size=82.0 if compact else score_h*.32
 	var score_center=(85.0+score_h*.9)*.5
 	lettering.number(content,CairnRunRecords.number(float(result.get("score",0))*t),"score",Vector2(cx,score_center),score_size,score_w*.87)
-	record_label("score",Vector2(cx,score_center+score_size*.5+18),true)
+	record_label("score",Vector2(cx,score_center+score_size*.5+30),true)
 	var best=int(result.get("previous_best",0))
 	var score=int(result.get("score",0))
 	var baseline=score if result.get("first",true) else best
 	var delta=score-baseline
-	var comparison="Personal best %s (%s%s)"%[CairnRunRecords.number(baseline),"+" if delta>=0 else "-",CairnRunRecords.number(absi(delta))]
+	var comparison="Previous best %s (%s%s)"%[CairnRunRecords.number(baseline),"+" if delta>=0 else "-",CairnRunRecords.number(absi(delta))]
 	label(content,comparison,Vector2(cx,score_h*.9),18,ink,score_w*.93)
 	var rank=int(result.get("rank",0))
 	var detail="Outside your top 10" if rank==0 else ""
