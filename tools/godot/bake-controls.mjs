@@ -35,4 +35,4 @@ function crop(img){
  return {img,x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
 }
 
-for(const text of ['CONTROLS','Move','Attack','Jump','Magic','Run','Spin','Charge','Jump attack','Pause']) {const r=await lettering(text);const c=createCanvas(r.w,r.h);c.getContext('2d').drawImage(r.img,r.x,r.y,r.w,r.h,0,0,r.w,r.h);fs.writeFileSync(path.join(out,text.toLowerCase().replaceAll(' ','-')+'.png'),c.toBuffer('image/png'));}
+for(const text of (process.argv.includes('--hall')?['HALL OF LEGENDS']:['CONTROLS','Move','Attack','Jump','Magic','Run','Spin','Charge','Jump attack','Pause','HALL OF LEGENDS'])) {const r=await lettering(text);const c=createCanvas(r.w,r.h);c.getContext('2d').drawImage(r.img,r.x,r.y,r.w,r.h,0,0,r.w,r.h);fs.writeFileSync(path.join(out,text.toLowerCase().replaceAll(' ','-')+'.png'),c.toBuffer('image/png'));}

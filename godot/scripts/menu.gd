@@ -131,3 +131,24 @@ func layout_screen(size: Vector2,is_title: bool):
 	var anchor=Vector2(size.x*.5 if tall or not is_title else size.x*.32,size.y*.48 if is_title else size.y*.54)
 	position=anchor-Vector2(417.6 if is_title else 720.,380.7 if is_title else 430.)*factor
 	if not is_title: position=size*.5-bounds.get_center()*factor
+
+# Reuse the same baked letters, hit targets and contour fire in screen footers.
+func layout_actions(rect: Rect2,vertical: bool=false):
+	if items.is_empty():return
+	var widest=0.0
+	var tallest=0.0
+	var total=0.0
+	for item in items:
+		widest=maxf(widest,item.width)
+		tallest=maxf(tallest,item.height)
+		total+=item.width
+	var factor=minf(60.0/tallest,minf(rect.size.x/widest,rect.size.y/(items.size()*(tallest+18)))) if vertical else minf(64.0/tallest,minf(rect.size.x/(total+80*(items.size()-1)),rect.size.y/tallest))
+	scale=Vector2.ONE*factor
+	position=rect.position
+	var cursor=(rect.size.x/factor-total-80*(items.size()-1))*.5
+	for i in items.size():
+		var item=items[i]
+		item.x=rect.size.x/factor*.5 if vertical else cursor+item.width*.5
+		item.y=(rect.size.y/factor/items.size())*(i+.5)-item.height*.5 if vertical else (rect.size.y/factor-item.height)*.5
+		item.node.position=Vector2(item.x,item.y)
+		cursor+=item.width+80

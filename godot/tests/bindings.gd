@@ -69,5 +69,9 @@ func check():
  assert(is_instance_valid(game.controls_view))
  game._input(key(KEY_SPACE,true))
  assert(not is_instance_valid(game.controls_view))
+ # Let the audio thread release menu playback resources after freeing the game.
+ game.queue_free()
+ await process_frame
+ await create_timer(.2).timeout
  print("CAIRN_BINDINGS_OK: shared holds, key aliases, controller, dead zone, controls navigation")
  quit()

@@ -1,6 +1,6 @@
 # Results and Hall of Legends concepts
 
-Design exploration only; no runtime changes. Built-in imagegen previews use sample data. This document is the current specification and supersedes earlier prompts and images.
+Implemented in native Godot. See `IMPLEMENTATION.md` for runtime behavior, verification and local previews. The imagegen files below remain design references with sample data; `implemented-results.png` and `implemented-hall.png` are actual native captures.
 
 ## Current previews
 
@@ -75,4 +75,3 @@ Score and kills already exist. Run time excluding pauses, maximum combo, maximum
 Per-stat records compare with saved records before the current run and persist independently of top-10 retention. Proposed higher-is-better records: score, kills, best combo, peak multiplier and damage dealt. Time and damage taken stay descriptive until a comparable completion-based rule exists; quick deaths must not earn fastest-run or least-damage records.
 
 Keep full runs and chapter starts comparable within separate scopes if both are eligible. Store scoring-rules versions to preserve older records separately after balance changes. These remain implementation proposals.
-

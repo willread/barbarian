@@ -51,6 +51,11 @@ var master_volume=100
 var loading_menu=false
 var bindings=CairnBindings.new()
 var controls_view: CanvasLayer
+var results_view: CanvasLayer
+var hall_view: CanvasLayer
+var records=CairnRunRecords.new("")
+var run_stats: Dictionary={}
+var finished_run: Dictionary={}
 var run_button_active=false
 var muted=false
 const WEAPON_CHOICES=["gravecleaver","blacktooth","barrow_star","gatebreaker","candy_cane"]
@@ -99,6 +104,8 @@ const OPEN=.45/.49
 const HOLD=1.0
 
 func _ready():
+	# Command-line test/capture runs never touch the player's records.
+	if DisplayServer.get_name()!="headless" and OS.get_cmdline_user_args().is_empty():records=CairnRunRecords.new()
 	Input.joy_connection_changed.connect(func(_device,connected):
 		if not connected:
 			bindings.clear()
@@ -231,6 +238,23 @@ func _ready():
 	if "--layout-test" in OS.get_cmdline_user_args(): layout_test.call_deferred()
 	if "--moves-test" in OS.get_cmdline_user_args(): moves_test.call_deferred()
 	if "--archer-test" in OS.get_cmdline_user_args(): archer_test.call_deferred()
+	if "--results-preview" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('results-preview')")):preview_results.call_deferred()
+
+func preview_results():
+	# Explicit review mode: sample scores are isolated from real local records.
+	records=CairnRunRecords.new("")
+	for i in 10:
+		records.finish({"id":"preview-%d"%i,"score":116200-i*7000,"kills":50,"best_combo":20,"peak_multiplier":10,"damage_dealt":17000,"damage_taken":200,"time":700-i*20,"date":"2026-09-12","area":3,"outcome":"lost"})
+	start_game()
+	transition=-1
+	stage_walk=""
+	score=128450
+	kills=87
+	wave=7
+	run_stats.merge({"time":768,"best_combo":36,"peak_multiplier":10,"damage_dealt":18640,"damage_taken":240},true)
+	wipe=DeathWipe.new()
+	add_child(wipe)
+	change_phase("lost")
 
 func reveal_browser_menu():
 	# Submit the first fully textured frame before releasing the HTML loading cover.
@@ -250,6 +274,10 @@ func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	return f
 
 func change_phase(next: String):
+	if next in ["lost","won"]:finish_run(next)
+	elif is_instance_valid(results_view):
+		results_view.queue_free()
+		results_view=null
 	menu.compact_pause=next=="paused"
 	if next=="dying":
 		combo.reset()
@@ -267,17 +295,15 @@ func change_phase(next: String):
 	keys.clear()
 	pressed.clear()
 	accumulator=0
-	menu.visible=phase in ["title","paused","lost","won"]
+	menu.visible=phase in ["title","paused"]
 	if phase=="title":
 
 		options=false
 		settings_page=""
-		menu.show_items(["BEGIN","OPTIONS","QUIT"])
+		menu.show_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"])
 	else:
 
 		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],false)
-		if phase=="lost": menu.show_items(["RISE AGAIN","QUIT TO TITLE"],false)
-		if phase=="won": menu.show_items(["RISE AGAIN"],false)
 	for view in views.values(): view.visible=phase!="title"
 	hud.visible=phase!="title"
 	blood.visible=phase!="title"
@@ -286,6 +312,18 @@ func change_phase(next: String):
 	responsive_layout()
 
 func menu_action(label: String):
+	if label=="HALL OF LEGENDS":
+		if is_instance_valid(hall_view):return
+		menu.visible=false
+		if is_instance_valid(results_view):results_view.visible=false
+		hall_view=preload("res://scripts/hall_view.gd").new()
+		hall_view.art=art
+		hall_view.runs=records.board().runs.duplicate(true)
+		hall_view.current_id=finished_run.get("id","") if phase in ["lost","won"] else ""
+		add_child(hall_view)
+		hall_view.closed.connect(close_hall)
+		hall_view.begin.connect(func():close_hall();start_game())
+		return
 	if label=="CONTROLS":
 		settings_page="controls"
 		menu.visible=false
@@ -324,7 +362,7 @@ func menu_action(label: String):
 		"BACK":
 			if chapter_select:
 				chapter_select=false
-				menu.switch_items(["BEGIN","OPTIONS","QUIT"],true)
+				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"],true)
 				return
 			if settings_page in ["sound","display","game"]:
 				settings_page="root"
@@ -332,7 +370,7 @@ func menu_action(label: String):
 			else:
 				options=false
 				settings_page=""
-				menu.switch_items(["BEGIN","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],phase=="title")
+				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],phase=="title")
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
 			apply_settings()
@@ -367,6 +405,38 @@ func option_labels() -> Array:
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
 	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"CONTROLS","BACK"]
 	return ["GAME","SOUND","DISPLAY","BACK"]
+
+func close_hall():
+	if is_instance_valid(hall_view):hall_view.queue_free()
+	hall_view=null
+	if is_instance_valid(results_view):
+		results_view.visible=true
+		results_view.age=3.0
+		results_view.content.queue_redraw()
+		results_view.actions.select(0,false)
+	else:
+		menu.visible=true
+		menu.select(1,false)
+
+func finish_run(outcome: String):
+	if run_stats.is_empty():return
+	if finished_run.is_empty():
+		var snapshot=run_stats.duplicate(true)
+		for key in ["damage_dealt","damage_taken"]:snapshot[key]=int(snapshot[key])
+		snapshot.merge({"score":int(score),"kills":kills,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
+		finished_run=records.finish(snapshot)
+	if is_instance_valid(results_view):return
+	results_view=preload("res://scripts/results_view.gd").new()
+	results_view.art=art
+	results_view.result=finished_run
+	results_view.save_failed=records.save_error!=OK
+	add_child(results_view)
+	results_view.activated.connect(menu_action)
+	if outcome=="won" and not is_instance_valid(wipe):
+		wipe=DeathWipe.new()
+		add_child(wipe)
+		# Seed the same blood surface used by defeat; continue its settling below.
+		wipe.advance(.8)
 
 func refresh_settings(index: int):
 	menu.show_items(option_labels(),phase=="title",false)
@@ -407,6 +477,8 @@ func clear_world():
 	blood.reset()
 
 func start_game():
+	finished_run={}
+	run_stats={"id":str(Time.get_unix_time_from_system())+"-"+str(Time.get_ticks_usec()),"date":Time.get_date_string_from_system(),"time":0.0,"best_combo":0,"peak_multiplier":1,"damage_dealt":0.0,"damage_taken":0.0}
 	hero_voice.milestones.clear()
 	chapter_select=false
 	clear_world()
@@ -563,7 +635,9 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	var previous_hp=f.hp
 	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if f.hp<previous_hp:
-		if f.player:combo.reset()
+		if f.player:
+			if not run_stats.is_empty():run_stats.damage_taken+=previous_hp-f.hp
+			combo.reset()
 		elif attacker.player:
 			# Continuous magic sustains the chain, but awards only one hit per target per cast.
 			if a.get("magic",false) and f.id in spell_combo_targets:
@@ -573,6 +647,10 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 				combo.hit()
 				if a.get("magic",false):spell_combo_targets.append(f.id)
 			score+=(previous_hp-f.hp)*combo.multiplier()
+			if not run_stats.is_empty():
+				run_stats.damage_dealt+=previous_hp-f.hp
+				run_stats.best_combo=maxi(run_stats.best_combo,combo.hits)
+				run_stats.peak_multiplier=maxi(run_stats.peak_multiplier,combo.multiplier())
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
@@ -858,6 +936,8 @@ func _process(raw: float):
 	for child in get_children():
 		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
 	raw=min(raw,.25)
+	if phase=="playing" and not run_stats.is_empty():run_stats.time+=raw
+	if phase in ["lost","won"] and is_instance_valid(wipe) and wipe.age<3.8:wipe.advance(raw)
 	if phase=="title" and not loading_menu: title_intro=min(1.25,title_intro+raw)
 	if hit_stop>0 and phase=="playing":
 		hit_stop=max(0.,hit_stop-raw)
@@ -958,6 +1038,14 @@ func _input(event: InputEvent):
 			event.keycode={KEY_W:KEY_UP,KEY_A:KEY_LEFT,KEY_S:KEY_DOWN,KEY_D:KEY_RIGHT}[event.keycode]
 	if is_instance_valid(controls_view):
 		controls_view.handle(event)
+		if event is InputEventKey:get_viewport().set_input_as_handled()
+		return
+	if is_instance_valid(hall_view):
+		hall_view.handle(event)
+		if event is InputEventKey:get_viewport().set_input_as_handled()
+		return
+	if is_instance_valid(results_view):
+		results_view.handle(event)
 		if event is InputEventKey:get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.alt_pressed and event.keycode in [KEY_ENTER,KEY_KP_ENTER]:
@@ -1355,12 +1443,6 @@ func draw_overlay():
 		overlay.draw_set_transform(pivot,0.,Vector2.ONE*zoom)
 		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
 		overlay.draw_set_transform(Vector2.ZERO)
-	if phase=="won":
-		overlay.draw_rect(Rect2(Vector2.ZERO,screen_size),Color(.02,.025,.02,.8))
-		overlay.draw_set_transform(Vector2(0,screen_size.y*.22-220))
-		center_text(overlay,"THE LEGION ENDURES" if phase=="lost" else "THE VALLEY IS FREE",Vector2(720,250),24,Color("bda06d"))
-		center_text(overlay,"Even heroes fall." if phase=="lost" else "A legend rises.",Vector2(720,340),66,Color("e7d5b0"))
-		center_text(overlay,"%d enemies slain · %d points"%[kills,score],Vector2(720,385),24,Color("e7d5b0"))
 
 	overlay.draw_set_transform(Vector2.ZERO)
 
