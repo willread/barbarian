@@ -48,13 +48,13 @@ func _process(dt):
    fire.setup(ImageTexture.create_from_image(mask),Vector2(mask.get_size()),-Vector2(mask.get_size())*.5,false)
  if fire:
   fire.scale=Vector2.ONE*combo_height()/fire_height
-  fire.position=Vector2(0,137)+unrest()
+  fire.position=Vector2(0,151)+unrest()
   fire.strength=.65+(tier-4)*.23+exp(-impact_age*7.)*.5
   fire.emitting=game.combo.remaining>0
  queue_redraw()
 func combo_height() -> float:
  var kick=exp(-impact_age*8.)*cos(impact_age*24.)
- return (36.+tier*1.6)*(1.+kick*(.10+tier*.018))
+ return (43.+tier*1.8)*(1.+kick*(.10+tier*.018))
 func unrest() -> Vector2:
  var burst=exp(-impact_age*7.)*(1.+tier*.6)
  var idle=maxf(0.,tier-4)*.15
@@ -74,6 +74,6 @@ func _draw():
  var height=minf(38.,(width-3.)/widest)*(1.+.025*exp(-score_age*12.))
  for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width)
  if game.combo.hits>0:
-  stone("%dX"%game.combo.multiplier(),Vector2(0,137)+unrest(),combo_height(),150)
-  draw_rect(Rect2(-101,187,202,6),Color(.08,.035,.025,.8))
-  draw_rect(Rect2(-100,188,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))
+  stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),150)
+  draw_rect(Rect2(-101,198,202,6),Color(.08,.035,.025,.8))
+  draw_rect(Rect2(-100,199,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))
