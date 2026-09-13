@@ -58,7 +58,7 @@ var weapon_skin="gravecleaver"
 var weapon="axe"
 var chapter_select=false
 var wave=1
-var score=0
+var score=0.0
 var kills=0
 var magic=0.0
 var displayed_health=100.0
@@ -417,7 +417,7 @@ func start_game():
 	hero["weapon_skin"]=weapon_skin
 	hero["holiday"]=holiday
 	wave=1
-	score=0
+	score=0.0
 	combo.reset()
 	kills=0
 	magic=0
@@ -571,8 +571,8 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 				combo.waiting_for_combat=false
 			else:
 				combo.hit()
-				score+=10*combo.multiplier()
 				if a.get("magic",false):spell_combo_targets.append(f.id)
+			score+=(previous_hp-f.hp)*combo.multiplier()
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
@@ -635,7 +635,6 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			responsive_layout()
 		else:
 			kills+=1
-			score+=(1500 if f.boss else 250)*combo.multiplier()
 	if not f.player and attacker.player and not a.get("magic",false):
 		magic=min(100,magic+(6+(8 if f.hp<=0 else 0))*combo.mana_multiplier())
 		if magic>=100:hero_voice.request_once("mana_full")
