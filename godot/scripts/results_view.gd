@@ -37,6 +37,7 @@ func _ready():
 	actions=load("res://scripts/menu.gd").new()
 	add_child(actions)
 	actions.setup(art)
+	actions.yellow_flames=true
 	actions.show_items(["HALL OF LEGENDS","RISE AGAIN","QUIT TO TITLE"],false,false)
 	actions.select(1,false)
 	actions.activated.connect(func(label):activated.emit(label))

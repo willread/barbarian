@@ -2,6 +2,7 @@ extends Node2D
 signal activated(label: String)
 signal sound_requested(id: String)
 var art: CairnArt
+var yellow_flames=false
 var items: Array=[]
 const LOCKED=["EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS"]
 var selected=0
@@ -34,6 +35,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		add_child(group)
 		var fire=ContourFire.new()
 		fire.menu_palette=true
+		fire.yellow_palette=yellow_flames
 		group.add_child(fire)
 		fire.setup(art.texture("menu-"+meta.id+"-fuel.png"),Vector2(meta.fw,meta.fh),Vector2(-meta.fw*.5,-meta.pad))
 		fire.scale=Vector2.ONE*size
