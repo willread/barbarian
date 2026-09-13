@@ -641,6 +641,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			if not run_stats.is_empty():run_stats.damage_taken+=previous_hp-f.hp
 			combo.reset()
 		elif attacker.player:
+			f["combo_opportunity_seen"]=true
 			# Continuous magic sustains the chain, but awards only one hit per target per cast.
 			if a.get("magic",false) and f.id in spell_combo_targets:
 				combo.remaining=combo.timeout
@@ -778,7 +779,8 @@ func step_combo(dt: float):
 	var living=enemies.filter(func(enemy):return enemy.hp>0)
 	var ready=false
 	for enemy in living:
-		var reachable=enemy.x>=0 and enemy.x<=1440 and absf(enemy.x-hero.x)<=(260 if enemy.kind!="archer" else 500) and absf(enemy.y-hero.y)<=90 and enemy.down.is_empty()
+		# Distance and knockdown must not freeze the clock after arena entry.
+		var reachable=enemy.x>=0 and enemy.x<=1440
 		if reachable:
 			enemy["combo_opportunity_seen"]=true
 			ready=true

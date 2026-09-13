@@ -11,9 +11,9 @@ var last_score=0.0
 func combo_band(value: int) -> int:
  return 0 if value<=4 else 1 if value<=6 else 2 if value<=8 else 3
 func combo_color(value: int) -> Color:
- return [Color(1.25,1.2,1.1),Color(2.5,.42,.30),Color(2.5,1.15,.20),Color(2.5,2.1,.30)][combo_band(value)]
+ return [Color(1.25,1.2,1.1),Color(2.5,2.1,.30),Color(2.5,1.15,.20),Color(2.5,.42,.30)][combo_band(value)]
 func flame_color(value: int) -> Color:
- return [Color.TRANSPARENT,Color("ff3322"),Color("ff8614"),Color("ffe12b")][combo_band(value)]
+ return [Color.TRANSPARENT,Color("ffe12b"),Color("ff8614"),Color("ff3322")][combo_band(value)]
 func stone(label: String,center: Vector2,height: float,max_width: float=280.0,color=Color(1.25,1.2,1.1)):
  var meta=game.art.data.menu["HUD "+label]
  var texture=game.art.texture("menu-"+meta.id+".png")
@@ -84,5 +84,7 @@ func _draw():
  for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width,Color(1.9,1.95,2.0))
  stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),187.5,combo_color(tier))
  if game.combo.hits>0:
-  draw_rect(Rect2(-101,210,202,6),Color(.08,.035,.025,.8))
-  draw_rect(Rect2(-100,211,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.45,.25,.9) if tier<=4 else flame_color(tier))
+  var bar_y=151+unrest().y+combo_height()*.5+8
+  var fraction=clampf(game.combo.remaining/game.combo.timeout,0.,1.)
+  draw_rect(Rect2(-101,bar_y,202,6),Color(.08,.035,.025,.8))
+  draw_rect(Rect2(-100,bar_y+1,200*fraction,4),Color(.6,.45,.25,.9) if tier<=4 else flame_color(tier))

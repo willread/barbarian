@@ -84,12 +84,14 @@ func check():
  game.enemies.append(enemy)
  game.step_combo(10.)
  assert(game.combo.remaining==.5)
- enemy.x=820
+ enemy.x=1350
  enemy.y=game.hero.y
+ enemy.down={"age":.2}
  game.step_combo(.1)
  assert(game.combo.remaining==3.25 and game.hero.hp==50)
  game.step_combo(1.)
  assert(game.combo.remaining==2.25 and game.hero.hp==51.5)
+ enemy.down={}
  enemy.x=-450
  game.step_combo(1.)
  assert(game.combo.remaining==1.25,"Retreat must not pause an active combo")
@@ -104,5 +106,8 @@ func check():
  incoming.y=game.hero.y
  game.step_combo(.1)
  assert(game.combo.remaining==3.25 and not game.combo.waiting_for_combat)
+ game.step_combo(4.)
+ assert(game.combo.remaining==0 and game.combo.hits==0)
+ assert(panel.flame_color(5)==Color("ffe12b") and panel.flame_color(7)==Color("ff8614") and panel.flame_color(9)==Color("ff3322"))
  print("CAIRN_COMBO_OK: tiers, mana, healing, timeout, hit scores, magic continuation, pickup protection, damage reset and holiday choices")
  quit()
