@@ -12,22 +12,29 @@ func check():
 	egg.height=0
 	egg.velocity=0
 	egg.advance(.01)
+	assert(egg.eating and not egg.collected and game.hero.hp==40)
+	egg.advance(.93)
 	assert(egg.collected and game.hero.hp==65,"Regular egg restores 25% of maximum health")
 	egg.advance(.1)
 	assert(game.hero.hp==65,"Egg cannot heal twice")
+	egg.advance(.3)
 	game.hero.hp=90
 	egg=game.drop_egg(Vector2(720,660),false)
 	egg.height=0
 	egg.velocity=0
 	egg.advance(.01)
+	egg.advance(.93)
 	assert(game.hero.hp==100)
+	egg.advance(.3)
 	game.combo.reset()
 	egg=game.drop_egg(Vector2(720,660),true)
 	egg.height=0
 	egg.velocity=0
 	egg.advance(.01)
+	egg.advance(.93)
 	assert(game.combo.multiplier()==10 and game.combo.hits==0 and game.combo.remaining==5)
 	assert(game.run_stats.peak_multiplier==10 and game.run_stats.best_combo==0)
+	egg.advance(.3)
 	game.combo.suspend()
 	game.combo.advance(10.)
 	assert(game.combo.multiplier()==10)

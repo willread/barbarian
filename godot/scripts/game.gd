@@ -1216,6 +1216,19 @@ func flame(node: Node2D,point: Vector2,age: float,fade: float,s: float,width: fl
 	if age>.5:
 		node.draw_texture_rect_region(art.texture("fluid-smoke-v1.png"),Rect2(point.x-w/2,point.y-h,w,h),source,Color(1,1,1,.65*(1-clamp(age-2.3,0,1))))
 
+# Both roast and eggs drive the same hero-eat frames and hand-to-mouth path.
+func advance_food_pickup(dt: float) -> Vector2:
+	var p=hero.pickup
+	p.age+=dt
+	var hand=Vector2(hero.x+hero.dir*76,hero.y-278)
+	var mouth=Vector2(hero.x+hero.dir*12,hero.y-249)
+	var point=Vector2(p.start_x,hero.y)
+	if p.age>=.3 and p.age<.6:point=point.lerp(hand,smoothstep(.3,.6,p.age))
+	elif p.age>=.6:
+		var t=clampf((p.age-.6)/.32,0,1)
+		point=hand.lerp(mouth,t)+Vector2(0,-sin(t*PI)*35)
+	return point
+
 func step_chicken(dt: float):
 	for egg in eggs:
 		egg.advance(dt)
@@ -1235,7 +1248,7 @@ func step_chicken(dt: float):
 	if chicken.is_empty(): return
 	var c=chicken
 	c.age+=dt
-	if not hero.pickup.is_empty():
+	if not hero.pickup.is_empty() and not hero.pickup.has("egg"):
 		var p=hero.pickup
 		if hero.hp<=0 or not hero.down.is_empty() or hero.hurtTicks:
 			if p.collected: remove_chicken()
@@ -1245,15 +1258,7 @@ func step_chicken(dt: float):
 				c.x=clampf(c.x,70,1370)
 			hero.pickup={}
 			return
-		p.age+=dt
-		# Reach, lift, toss, swallow, settle. The roast remains a separate sprite.
-		var hand=Vector2(hero.x+hero.dir*76,hero.y-278)
-		var mouth=Vector2(hero.x+hero.dir*12,hero.y-249)
-		var point=Vector2(p.start_x,hero.y)
-		if p.age>=.3 and p.age<.6:point=point.lerp(hand,smoothstep(.3,.6,p.age))
-		elif p.age>=.6:
-			var t=clampf((p.age-.6)/.32,0,1)
-			point=hand.lerp(mouth,t)+Vector2(0,-sin(t*PI)*35)
+		var point=advance_food_pickup(dt)
 		c.x=point.x
 		c.height=(hero.y-point.y)/4.5
 		c["draw_scale"]=lerpf(1.,.08,smoothstep(.68,.92,p.age))
@@ -1283,7 +1288,7 @@ func step_chicken(dt: float):
 				c.flight=false
 				c.x=clamp(c.x,50,1390)
 				blood.stain(c.x,c.y,16)
-		elif hero.hp>0 and hero.down.is_empty() and hero.air.is_empty() and hero.attack.is_empty() and not hero.hurtTicks and spell<0 and abs(hero.x-c.x)<45 and abs(hero.y-c.y)<26:
+		elif hero.pickup.is_empty() and hero.hp>0 and hero.down.is_empty() and hero.air.is_empty() and hero.attack.is_empty() and not hero.hurtTicks and spell<0 and abs(hero.x-c.x)<45 and abs(hero.y-c.y)<26:
 			hero.dir=1 if c.x>=hero.x else -1
 			hero.pickup={"age":0.0,"collected":false,"start_x":c.x}
 	else:
