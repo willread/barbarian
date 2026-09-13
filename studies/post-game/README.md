@@ -19,6 +19,16 @@ Keep the large final score, six session stats, dark stone, ivory type and restra
 
 ## Navigation
 
+### High-scores and main-menu styling
+
+Use the existing controls view (`godot/scripts/controls_view.gd`) as the high-scores screen's visual reference: flat near-black backdrop, centered stone heading, muted ivory Cinzel text, thin subdued row separators, barely tinted alternating rows, and responsive scrolling content. Do not use the generated high-score mockup's framed stone slab or battlefield backdrop. Its table content and navigation remain useful references, but its visual styling is superseded by this direction. Apply the controls-view treatment to the populated list, selected-run details and empty state alike.
+
+Reuse the existing menu lettering, contour fire, focus and activation treatment for all actions on the high-scores screen, including Back and the empty state's Begin. Keep the controls view's bottom-centered Back presentation and return to the originating screen; contextual navigation does not require a new button style. No new outlined plaques, button frames or alternate button system.
+
+On the main menu, add High Scores using the same existing stone lettering and fire treatment as Begin, Options and Quit. Preserve the current background and overall menu presentation. The generated main-menu button plaques are not an approved style change.
+
+### Flow
+
 - Main menu: Begin / High Scores / Options / Quit. Begin remains the default focus.
 - Results: High Scores / Rise Again / Quit to Title. Rise Again remains the default focus.
 - Main menu -> High Scores -> Back to Menu, restoring High Scores focus.
