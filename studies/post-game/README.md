@@ -2,6 +2,8 @@
 
 Design exploration only; no runtime changes. Generated with the built-in imagegen tool on 2026-09-13. All numbers are sample data.
 
+Current previews: `results-v3.png` and `high-scores-v2.png`. These supersede the earlier images for styling and incorporate the blood backdrop, per-stat personal-best labels, free-standing stone menu lettering and controls-view high-score presentation. They show settled static states, not working animation or exact runtime fire. `prompts-v2.md` records their generation prompts. References below to images predating these changes apply to the earlier v1/v2 studies, not these current previews.
+
 ## Visual direction
 
 The post-game screen sits on top of the existing blood splatter effect. Keep the blood splatter visible behind the results panel, heading and actions; the generated battlefield scenery in the mockups is not the intended post-game background. This applies to every results state, including first scores and runs without a personal best. Judge text contrast and panel readability against the actual blood splatter during implementation. This clarification supersedes the backdrop descriptions in the original generation prompts; the images have not yet been regenerated to reflect it.
@@ -62,6 +64,9 @@ Score and kills already exist in the game. Run duration excluding pauses, maximu
 
 ## Deliverables
 
+- `results-v3.png`: current results preview over blood splatter, including per-stat personal-best labels and existing-style menu lettering.
+- `high-scores-v2.png`: current controls-style populated list with selected-run details and Back action.
+- `prompts-v2.md`: exact prompts for the current previews.
 - `results-v2.png`: revised personal-best results screen.
 - `menu-and-high-scores-v1.png`: main-menu entry and populated local list.
 - `states-v1.png`: non-record results, first-run results and empty-list designs.
