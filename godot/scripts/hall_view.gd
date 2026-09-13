@@ -83,7 +83,7 @@ func text(node: CanvasItem,value: String,at: Vector2,size: int,color: Color,cent
 	node.draw_string(font,at+Vector2(0,size*.34),value,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
 
 func draw_backdrop():
-	backdrop.draw_rect(Rect2(Vector2.ZERO,viewport_size),Color(.024,.027,.026))
+	backdrop.draw_rect(Rect2(Vector2.ZERO,viewport_size),Color(0,0,0,.9))
 	# Same stone Cinzel title treatment as the controls view.
 	var factor=minf(44.0/title_texture.get_height(),viewport_size.x*.86/title_texture.get_width())
 	var size=title_texture.get_size()*factor

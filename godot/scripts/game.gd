@@ -282,12 +282,14 @@ func change_phase(next: String):
 	elif is_instance_valid(results_view):
 		results_view.queue_free()
 		results_view=null
-	menu.compact_pause=next=="paused"
+	menu.compact_pause=false
 	if next=="dying":
 		combo.reset()
 		audio.stop_gameplay()
 		hero_voice.reset()
 	if next=="paused":
+		pause_cover=1.0
+		title_intro=1.25
 		options=false
 		settings_page=""
 	if next=="title":
@@ -307,7 +309,7 @@ func change_phase(next: String):
 		menu.show_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"])
 	else:
 
-		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],false)
+		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],true)
 	for view in views.values(): view.visible=phase!="title"
 	hud.visible=phase!="title"
 	blood.visible=phase!="title"
@@ -318,8 +320,7 @@ func change_phase(next: String):
 func menu_action(label: String):
 	if label=="HALL OF LEGENDS":
 		if is_instance_valid(hall_view):return
-		menu.visible=false
-		if is_instance_valid(results_view):results_view.visible=false
+		# Keep the previous screen visible beneath the hall overlay.
 		hall_view=preload("res://scripts/hall_view.gd").new()
 		hall_view.art=art
 		hall_view.runs=records.board(CairnRunRecords.episode_scope(current_episode)).runs.duplicate(true)
@@ -359,10 +360,10 @@ func menu_action(label: String):
 		"OPTIONS":
 			options=true
 			settings_page="root"
-			menu.switch_items(option_labels(),phase=="title")
+			menu.switch_items(option_labels(),true)
 		"SOUND","DISPLAY","GAME":
 			settings_page=label.to_lower()
-			menu.switch_items(option_labels(),phase=="title")
+			menu.switch_items(option_labels(),true)
 		"BACK":
 			if chapter_select:
 				chapter_select=false
@@ -370,11 +371,11 @@ func menu_action(label: String):
 				return
 			if settings_page in ["sound","display","game"]:
 				settings_page="root"
-				menu.switch_items(option_labels(),phase=="title")
+				menu.switch_items(option_labels(),true)
 			else:
 				options=false
 				settings_page=""
-				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],phase=="title")
+				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],true)
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
 			apply_settings()
@@ -443,7 +444,7 @@ func finish_run(outcome: String):
 		wipe.advance(.8)
 
 func refresh_settings(index: int):
-	menu.show_items(option_labels(),phase=="title",false)
+	menu.show_items(option_labels(),true,false)
 	menu.select(index,false)
 
 func apply_settings(persist: bool=true):
@@ -995,7 +996,7 @@ func _process(raw: float):
 	scenery_shade.visible=phase!="title" and background.screen.is_empty()
 	heat_node.material.set_shader_parameter("clock",clock)
 	pause_cover=move_toward(pause_cover,1.0 if phase=="paused" else 0.0,raw/.65)
-	pause_skull.visible=pause_cover>0
+	pause_skull.visible=false
 	pause_skull.position=Vector2.ZERO
 	pause_skull.scale=screen_size/512.0
 	pause_skull.material.set_shader_parameter("progress",1.0-pause_cover)
@@ -1479,7 +1480,11 @@ func draw_hud():
 	score_panel.queue_redraw()
 
 func draw_overlay():
-	if phase=="title":
+	if phase=="paused":
+		var factor=max(screen_size.x/title_background.get_width(),screen_size.y/title_background.get_height())
+		var painting_size=title_background.get_size()*factor
+		overlay.draw_texture_rect(title_background,Rect2((screen_size-painting_size)*.5,painting_size),false)
+	if phase in ["title","paused"]:
 		var tall=screen_size.y>1200
 		# Share the menu's actual anchor; keep generous gutters in the open art column.
 		var center=menu.to_global(Vector2(417.6,0)).x
@@ -1695,7 +1700,7 @@ func responsive_layout():
 	hud.position=Vector2(0,screen_size.y-1062*hud_scale)
 	overlay.position=Vector2.ZERO
 	overlay.scale=Vector2.ONE
-	menu.layout_screen(screen_size,phase=="title")
+	menu.layout_screen(screen_size,phase in ["title","paused"])
 	if is_instance_valid(wipe):
 		wipe.top_level=true
 		wipe.position=Vector2.ZERO
