@@ -4,6 +4,8 @@ Design exploration only; no runtime changes. Generated with the built-in imagege
 
 ## Visual direction
 
+The post-game screen sits on top of the existing blood splatter effect. Keep the blood splatter visible behind the results panel, heading and actions; the generated battlefield scenery in the mockups is not the intended post-game background. This applies to every results state, including first scores and runs without a personal best. Judge text contrast and panel readability against the actual blood splatter during implementation. This clarification supersedes the backdrop descriptions in the original generation prompts; the images have not yet been regenerated to reflect it.
+
 Keep the large final score, six session stats, dark stone, ivory type and restrained ember focus. Remove skulls, the double border and “The Legion Endures.” Use a single plain bronze panel edge. Use the same “High Scores” label in results and the main menu. Remove the duplicated best-score badge; show a secondary record highlight only when earned.
 
 ## Navigation
