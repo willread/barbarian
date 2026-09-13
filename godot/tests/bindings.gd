@@ -44,5 +44,30 @@ func check():
  assert(is_instance_valid(game.controls_view) and not game.menu.visible)
  game.menu_action("BACK")
  assert(game.settings_page=="game" and game.menu.visible)
+ game.phase="title"
+ game.options=true
+ game.settings_page=""
+ game.refresh_settings(0)
+ game._input(key(KEY_S,true))
+ assert(game.menu.selected==1)
+ game._input(key(KEY_W,true))
+ assert(game.menu.selected==0)
+ game._input(key(KEY_DOWN,true))
+ assert(game.menu.selected==1)
+ game._input(key(KEY_UP,true))
+ assert(game.menu.selected==0)
+ game._input(key(KEY_SPACE,true))
+ assert(game.settings_page=="game")
+ await create_timer(.7).timeout
+ var original=game.weapon_skin
+ game._input(key(KEY_D,true))
+ assert(game.weapon_skin!=original)
+ game._input(key(KEY_A,true))
+ assert(game.weapon_skin==original)
+ game.menu.select(1,false)
+ game._input(key(KEY_ENTER,true))
+ assert(is_instance_valid(game.controls_view))
+ game._input(key(KEY_SPACE,true))
+ assert(not is_instance_valid(game.controls_view))
  print("CAIRN_BINDINGS_OK: shared holds, key aliases, controller, dead zone, controls navigation")
  quit()

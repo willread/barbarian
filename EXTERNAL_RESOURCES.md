@@ -129,3 +129,5 @@ Score HUD mockups (2026-09-12): studies/score-hud/directions-v1.png generated us
 Implemented HUD font: Cinzel, The Cinzel Project Authors, SIL OFL 1.1. Source https://github.com/google/fonts/tree/main/ofl/cinzel ; font and license retained in asset-sources/fonts/cinzel.ttf and cinzel-OFL.txt.
 
 Controls approval mockup (2026-09-12): Kenney Input Prompts 1.5, CC0, https://kenney.nl/assets/input-prompts . Used Xbox and PlayStation SVG glyphs retained in studies/controls/icons with original LICENSE.txt. Reuses the existing licensed Cinzel HUD font and original stone Back artwork. No runtime integration yet.
+
+Controls runtime (2026-09-12): selected Kenney CC0 SVG glyphs copied to godot/art/controls and recolored white (geometry unchanged); ICONS-LICENSE.txt retained. Existing Cinzel OFL font and license copied beside them; action textures use the existing HUD material pipeline via tools/godot/bake-controls.mjs.

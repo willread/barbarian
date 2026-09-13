@@ -11,3 +11,5 @@ Research:
 - Kenney Input Prompts 1.5: Xbox and PlayStation SVG glyphs. CC0. Only the used icons are retained under icons/, with original license: https://kenney.nl/assets/input-prompts
 
 These are directly rendered component mockups, not generated concept lettering. Both 1920×1080 previews were visually checked. Build output and gameplay files are unchanged.
+
+Implemented v2: combat only, no tabs or footer copy, white glyphs, shared animated stone Back button. Native captures include 1920x1080 and 540x960; 1280x720 was also checked. The live responsive view is in Options > Game > Controls. Original v1 concepts remain archived.

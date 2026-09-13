@@ -284,6 +284,7 @@ func menu_action(label: String):
 		settings_page="controls"
 		menu.visible=false
 		controls_view=preload("res://scripts/controls_view.gd").new()
+		controls_view.art=art
 		add_child(controls_view)
 		controls_view.closed.connect(func():menu_action("BACK"))
 		return
@@ -927,11 +928,13 @@ func _input(event: InputEvent):
 			var translated=bindings.menu_event(event)
 			if translated:_input(translated)
 			return
+	if event is InputEventKey and phase in ["title","paused","lost","won"] and not event.alt_pressed:
+		if event.keycode in [KEY_W,KEY_A,KEY_S,KEY_D]:
+			event=event.duplicate()
+			event.keycode={KEY_W:KEY_UP,KEY_A:KEY_LEFT,KEY_S:KEY_DOWN,KEY_D:KEY_RIGHT}[event.keycode]
 	if is_instance_valid(controls_view):
-		if event is InputEventKey and event.pressed:
-			if event.keycode in [KEY_ESCAPE,KEY_ENTER,KEY_SPACE]:menu_action("BACK")
-			elif event.keycode in [KEY_UP,KEY_DOWN]:controls_view.scroll.scroll_vertical+=-80 if event.keycode==KEY_UP else 80
-			get_viewport().set_input_as_handled()
+		controls_view.handle(event)
+		if event is InputEventKey:get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.alt_pressed and event.keycode in [KEY_ENTER,KEY_KP_ENTER]:
 		if event.pressed and not event.echo:toggle_fullscreen()
