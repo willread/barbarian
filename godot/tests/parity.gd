@@ -45,6 +45,8 @@ func _init():
 			enemy_ai.variant(actor,[v])
 			if actor.variant!=v:continue
 			found=true
+			assert(is_equal_approx(actor.hp,round(16*(.85 if v=="swift" else 1.45))*.7))
+			assert(actor.max==actor.hp)
 			assert(is_equal_approx(actor.size,.72 if v=="swift" else 1.18))
 			assert(is_equal_approx(actor.speedFactor,2.05 if v=="swift" else .68))
 			assert(is_equal_approx(enemy_ai.damage_scale(actor),.65 if v=="swift" else 1.35))

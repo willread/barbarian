@@ -2,6 +2,7 @@ class_name CairnEnemies
 extends RefCounted
 var m: CairnMechanics
 var roster: Dictionary
+const HEALTH_SCALE={"legion":0.70,"shield":0.70}
 func _init(mechanics: CairnMechanics, data: Dictionary):
 	m=mechanics
 	roster=data.duplicate(true)
@@ -70,6 +71,8 @@ func variant(e: Dictionary, allowed: Array=[]):
 	e.size=1.18 if e.variant=="brute" else (.72 if e.variant=="swift" else 1.0)
 	e.speedFactor=2.05 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))
+	# Apply after variant rounding so every size receives exactly the same reduction.
+	e.hp*=HEALTH_SCALE.get(e.kind,1.0)
 	e.max=e.hp
 
 static func damage_scale(e: Dictionary) -> float:
