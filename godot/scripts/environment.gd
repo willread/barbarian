@@ -87,15 +87,29 @@ func _draw():
 
 func constrain(f: Dictionary):
 	if screen.is_empty():return
-	var x=clampf(f.x,0,1440)/1440.0
+	# Use actual interior intervals, including concave boundaries. Offscreen
+	# entrances use the nearest slice but keep their horizontal spawn position.
 	var poly=screen.walkable.polygon
+	var min_x=1.0
+	var max_x=0.0
+	for point in poly:
+		min_x=minf(min_x,point[0])
+		max_x=maxf(max_x,point[0])
+	var x=clampf(f.x/1440.0,min_x+.00001,max_x-.00001)
 	var ys: Array=[]
 	for i in poly.size():
 		var a=poly[i]
 		var b=poly[(i+1)%poly.size()]
-		if absf(a[0]-b[0])<0.000001:continue
-		if x>=minf(a[0],b[0]) and x<=maxf(a[0],b[0]):
+		if (a[0]<=x and x<b[0]) or (b[0]<=x and x<a[0]):
 			ys.append(lerpf(a[1],b[1],(x-a[0])/(b[0]-a[0]))*810)
-	if ys.size()>=2:
-		ys.sort()
-		f.y=clampf(f.y,ys[0]+2,ys[-1]-2)
+	ys.sort()
+	var nearest=f.y
+	var distance=INF
+	for i in range(0,ys.size()-1,2):
+		var padding=minf(2,(ys[i+1]-ys[i])*.25)
+		var candidate=clampf(f.y,ys[i]+padding,ys[i+1]-padding)
+		if absf(candidate-f.y)<distance:
+			nearest=candidate
+			distance=absf(candidate-f.y)
+	f.y=nearest
+	if f.get("entered_arena",false):f.x=x*1440.0

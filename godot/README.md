@@ -98,3 +98,7 @@ Every sound-lab group also offers **No sound**, saved like other choices. Footst
 Footsteps and bow draws have now been removed from runtime playback and the sound lab (assets retained). Ground and character arrow contacts share Arrow hit. Jump slam landing uses a thunderous boom with four new choices.
 
 Sound lab now includes per-event game-volume trim (-30 to +6 dB) with a reset button, persisted alongside choices. Preview volume remains separate; previews also apply the selected event trim. Blocked/resisted attacks share the Resist sound.
+
+## Seasonal equipment
+
+Candy Cane is available in Options > Game > Weapon for testing, with the Santa hat attached to that weapon. There is no separate holiday toggle. The first launch each local calendar day temporarily equips it; subsequent launches restore the saved regular weapon. Choosing another regular weapon updates that preference. The candy cane never overwrites it. `initialize_weapon` in `scripts/game.gd` controls this daily offer.

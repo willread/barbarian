@@ -11,6 +11,8 @@ const MenuScript=preload("res://scripts/menu.gd")
 const DeathWipe=preload("res://scripts/death_wipe.gd")
 var combo=CairnCombo.new()
 var holiday="off"
+var regular_weapon="gravecleaver"
+var holiday_seen_date=""
 var score_panel: Node2D
 var art: CairnArt
 var m: CairnMechanics
@@ -48,7 +50,7 @@ var bindings=CairnBindings.new()
 var controls_view: CanvasLayer
 var run_button_active=false
 var muted=false
-const WEAPON_CHOICES=["gravecleaver","blacktooth","barrow_star","gatebreaker"]
+const WEAPON_CHOICES=["gravecleaver","blacktooth","barrow_star","gatebreaker","candy_cane"]
 var weapon_skin="gravecleaver"
 var weapon="axe"
 var chapter_select=false
@@ -159,12 +161,8 @@ func _ready():
 		music_enabled=settings.get_value("audio","music",true)
 		voice_enabled=settings.get_value("audio","voice",true)
 		master_volume=clampi(settings.get_value("audio","volume",100),0,100)
-		holiday=settings.get_value("game","holiday","off")
-		if holiday not in ["off","christmas","halloween"]:holiday="off"
-		weapon_skin=settings.get_value("game","weapon","gravecleaver")
-		if weapon_skin not in WEAPON_CHOICES:weapon_skin="gravecleaver"
-	weapon="sword" if weapon_skin=="sword" else "axe"
-	apply_settings(false)
+	initialize_weapon(settings,Time.get_date_string_from_system())
+	apply_settings()
 	var soundboard=preload("res://scripts/soundboard.gd").new()
 	soundboard.audio=audio
 	add_child(soundboard)
@@ -292,10 +290,6 @@ func menu_action(label: String):
 		controls_view=null
 		settings_page="game"
 		menu.visible=true
-		refresh_settings(2)
-		return
-	if label.begins_with("HOLIDAY: "):
-		cycle_holiday(1)
 		refresh_settings(1)
 		return
 	if label.begins_with("WEAPON: "):
@@ -362,7 +356,7 @@ func menu_action(label: String):
 func option_labels() -> Array:
 	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
-	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"HOLIDAY: "+holiday.to_upper(),"CONTROLS","BACK"]
+	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"CONTROLS","BACK"]
 	return ["GAME","SOUND","DISPLAY","BACK"]
 
 func refresh_settings(index: int):
@@ -374,8 +368,8 @@ func apply_settings(persist: bool=true):
 	AudioServer.set_bus_mute(0,master_volume==0)
 	if persist:
 		var config=ConfigFile.new()
-		config.set_value("game","weapon",weapon_skin)
-		config.set_value("game","holiday",holiday)
+		config.set_value("game","weapon",regular_weapon)
+		config.set_value("game","holiday_seen_date",holiday_seen_date)
 		config.set_value("audio","muted",muted)
 		config.set_value("audio","music",music_enabled)
 		config.set_value("audio","voice",voice_enabled)
@@ -730,7 +724,10 @@ func tick(dt: float):
 				if f.hp>0 and f.x>=0 and f.x<=1440: damage(f,{"damage":.12,"knock":false,"magic":true,"continuous":true,"direction":1 if f.x>hero.x else -1},hero)
 		if spell>=90: spell=-1
 	tick_actor(hero,dt)
-	for f in enemies: tick_actor(f,dt)
+	for f in enemies:
+		tick_actor(f,dt)
+		e_ai.keep_in_arena(f)
+		background.constrain(f)
 	if phase=="dying":
 		pressed.clear()
 		return
@@ -942,9 +939,8 @@ func _input(event: InputEvent):
 			apply_settings()
 			refresh_settings(3)
 			return
-		if options and settings_page=="game" and menu.selected in [0,1] and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
-			if menu.selected==0:cycle_weapon(-1 if event.keycode==KEY_LEFT else 1)
-			else:cycle_holiday(-1 if event.keycode==KEY_LEFT else 1)
+		if options and settings_page=="game" and menu.selected==0 and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
+			cycle_weapon(-1 if event.keycode==KEY_LEFT else 1)
 			refresh_settings(menu.selected)
 			return
 		menu.handle(event)
@@ -957,14 +953,23 @@ func _input(event: InputEvent):
 			if not keys.has(code):pressed[code]=true
 			keys[code]=true
 
-func cycle_holiday(direction: int):
-	var modes=["off","christmas","halloween"]
-	holiday=modes[posmod(modes.find(holiday)+direction,3)]
-	hero["holiday"]=holiday
-	apply_settings()
+# Seasonal auto-equip never overwrites the player's regular preference.
+func initialize_weapon(settings: ConfigFile,today: String):
+	regular_weapon=settings.get_value("game","weapon","gravecleaver")
+	if regular_weapon not in WEAPON_CHOICES or regular_weapon=="candy_cane":regular_weapon="gravecleaver"
+	holiday_seen_date=settings.get_value("game","holiday_seen_date","")
+	weapon_skin=regular_weapon
+	# Keep available every day while testing the Christmas equipment.
+	if holiday_seen_date!=today:
+		weapon_skin="candy_cane"
+		holiday_seen_date=today
+	holiday="christmas" if weapon_skin=="candy_cane" else "off"
+	weapon="axe"
 
 func cycle_weapon(direction: int):
 	weapon_skin=WEAPON_CHOICES[posmod(WEAPON_CHOICES.find(weapon_skin)+direction,WEAPON_CHOICES.size())]
+	if weapon_skin!="candy_cane":regular_weapon=weapon_skin
+	holiday="christmas" if weapon_skin=="candy_cane" else "off"
 	weapon="sword" if weapon_skin=="sword" else "axe"
 	hero.weapon=weapon
 	hero["weapon_skin"]=weapon_skin

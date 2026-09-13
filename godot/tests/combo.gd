@@ -26,11 +26,8 @@ func check():
  game.damage(game.hero,{"damage":1,"direction":-1},enemy)
  assert(game.combo.hits==0)
  game.settings_page="game"
- for mode in ["off","christmas","halloween"]:
-  game.holiday=mode
-  game.hero.holiday=mode
-  assert(game.option_labels()[1]=="HOLIDAY: "+mode.to_upper())
-  assert(game.art.weapon_data(game.hero).length>0)
+ assert(game.option_labels()[1]=="CONTROLS")
+ assert(game.art.weapon_data(game.hero).length>0)
  for i in 12:game.combo.hit()
  game.combo.remaining=.5
  game.hero.x=720

@@ -68,7 +68,7 @@ func variant(e: Dictionary, allowed: Array=[]):
 		return
 	e.variant=allowed.pick_random() if not allowed.is_empty() and randf()<.25 else "regular"
 	e.size=1.18 if e.variant=="brute" else (.72 if e.variant=="swift" else 1.0)
-	e.speedFactor=1.65 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
+	e.speedFactor=2.05 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))
 	e.max=e.hp
 
@@ -108,6 +108,10 @@ func block(e: Dictionary, a: Dictionary, h: Dictionary) -> bool:
 
 func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 	if e.kind=="archer":return archer_intent(e,h)
+	var swift=e.get("variant", "regular")=="swift"
+	if swift:
+		engaged=true
+		e.aiRest=max(0,e.aiRest-1)
 	# Heavy actors notice positional changes in slower beats; combat health/state stays current.
 	if heavy(e):
 		e["noticeTicks"]=max(0,e.get("noticeTicks",0)-1)
@@ -150,14 +154,14 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 	if e.aiRest and e.kind=="marauder": return Vector2.ZERO
 	if e.dir!=face:
 		e.turnTicks+=1
-		if e.turnTicks<(22 if e.kind=="shield" else 10)+(14 if heavy(e) else 0): return Vector2.ZERO
+		if e.turnTicks<(5 if swift else (22 if e.kind=="shield" else 10)+(14 if heavy(e) else 0)): return Vector2.ZERO
 		e.dir=face
 		e.turnTicks=0
 		e.aiRest=max(e.aiRest,16 if heavy(e) else 8)
 	else: e.turnTicks=0
 	if e.aiRest or h.hp<=0 or not h.down.is_empty(): return Vector2.ZERO
 	if not engaged: return Vector2(-face if abs(x)<75 else (face if abs(x)>95 else 0),(1 if e.id%2 else -1) if abs(y)<12 else (-sign(y) if abs(y)>24 else 0))
-	if e.kind=="bone":
+	if e.kind=="bone" and not swift:
 		e.thinkTicks-=1
 		if e.thinkTicks<=0:
 			e.thinkTicks=25+randi()%45
