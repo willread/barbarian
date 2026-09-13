@@ -17,6 +17,7 @@ var heading_height=40.0
 var lettering=preload("res://scripts/results_art.gd").new()
 var slate=preload("res://art/results/slate-fine.png")
 var font=preload("res://art/controls/cinzel.ttf")
+var caption_font=FontVariation.new()
 var ink=Color("e7d5b0")
 var gold=Color("bda06d")
 const STATS=[["kills","ENEMIES SLAIN"],["time","TIME SURVIVED"],["best_combo","BEST COMBO"],["peak_multiplier","PEAK MULTIPLIER"],["damage_dealt","DAMAGE DEALT"],["damage_taken","DAMAGE TAKEN"]]
@@ -25,6 +26,8 @@ func _ready():
 	layer=2150
 	font.multichannel_signed_distance_field=false
 	font.oversampling=2.0
+	caption_font.base_font=font
+	caption_font.variation_embolden=.7
 	shade=Node2D.new()
 	add_child(shade)
 	shade.draw.connect(draw_shade)
@@ -61,22 +64,24 @@ func layout():
 	compact=false
 	heading_y=58
 	heading_height=56
-	scroll.position=Vector2(144,112)
-	scroll.size=Vector2(1152,370)
-	panel_height=370
+	var top=96.0 if result.get("outcome")=="won" else 28.0
+	scroll.position=Vector2(144,top)
+	scroll.size=Vector2(1152,498-top)
+	panel_height=scroll.size.y
 	content.custom_minimum_size=Vector2(0,panel_height)
-	actions.layout_standard_stack(Rect2(270,500,900,276))
+	actions.layout_standard_stack(Rect2(270,516,900,270))
 	shade.queue_redraw()
 	backdrop.queue_redraw()
 	content.queue_redraw()
 
 func label(node: CanvasItem,value: String,center: Vector2,size: int,color: Color=ink,max_width: float=10000):
 	var actual=size
-	while actual>12 and font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x>max_width:actual-=1
-	node.draw_string(font,center-Vector2(font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x*.5,-actual*.34),value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual,color)
+	while actual>12 and caption_font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x>max_width:actual-=1
+	node.draw_string(caption_font,center-Vector2(caption_font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x*.5,-actual*.34),value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual,color)
 
 func draw_heading():
-	var title="THE VALLEY IS FREE." if result.get("outcome")=="won" else "EVEN HEROES FALL"
+	if result.get("outcome")!="won":return
+	var title="THE VALLEY IS FREE."
 	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,heading_y),heading_height,viewport_size.x*.78,Color(1.95,2.05,2.15))
 
 func draw_shade():
@@ -157,6 +162,7 @@ func draw_panel():
 		if key=="peak_multiplier":value+="×"
 		lettering.number(content,value,"stat",Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
 		record_label(key,Vector2(x,y+row*.83))
+		if i<4:rule(Vector2(left+sw*.5*col+20,y+row),Vector2(left+sw*.5*(col+1)-20,y+row))
 
 func _process(dt: float):
 	if not visible:return

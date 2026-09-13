@@ -13,6 +13,8 @@ let source=fs.readFileSync('tools/asset-bake-source/stone-text.js','utf8');
 source=source.replace(' let frame=0;',' window.bakeStone=(el)=>{cache.clear();paint(el)}; return; let frame=0;');
 source=source.replace('size*scale*.045','size*scale*.025').replace('size*scale*.12','size*scale*.035').replace('stone*.78+shine*.72+8','stone*.9+shine+45').replace('stone*.77+shine*.73+8','stone*.82+shine*.9+36').replace('stone*.74+shine*.75+7','stone*.64+shine*.7+24');
 const document={documentElement:{dataset:{}},createElement:()=>{const c=createCanvas(1,1);c.setAttribute=()=>{};return c;}};
+// Thicken the mask before the shared material/bevel pass; keep the stone relief intact.
+source=source.replace('g.fillText(ch,x,pad*scale);','if(el.dataset.boldSmall){g.strokeStyle="#fff";g.lineJoin="round";g.lineWidth=size*scale*.028;g.strokeText(ch,x,pad*scale);}g.fillText(ch,x,pad*scale);');
 const scope={window:{},document,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};
 vm.createContext(scope);vm.runInContext(source,scope);
 const manifest={glyphs:{},labels:{}};
@@ -23,7 +25,7 @@ function bounds(c){
  return {x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
 }
 async function render(text,family,tracking=1){
- const el={textContent:text,getClientRects:()=>[1],dataset:{stoneFont:family},computed:{fontSize:'75',letterSpacing:String(tracking)},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};
+ const el={textContent:text,getClientRects:()=>[1],dataset:{stoneFont:family,boldSmall:text.length>2&&!text.startsWith('EVEN HEROES')&&!text.startsWith('THE VALLEY')},computed:{fontSize:'75',letterSpacing:String(tracking)},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};
  scope.window.bakeStone(el);
  const img=await loadImage(el._stoneFrames.url),c=createCanvas(img.width,img.height);c.getContext('2d').drawImage(img,0,0);
  return c;
