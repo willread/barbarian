@@ -73,7 +73,7 @@ func _draw():
   widest=maxf(widest,float(bounds[digit].size.x)/bounds[digit].size.y)
  var height=minf(38.,(width-3.)/widest)*(1.+.025*exp(-score_age*12.))
  for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width)
+ stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),150)
  if game.combo.hits>0:
-  stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),150)
   draw_rect(Rect2(-101,198,202,6),Color(.08,.035,.025,.8))
   draw_rect(Rect2(-100,199,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))
