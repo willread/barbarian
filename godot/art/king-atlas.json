@@ -1,0 +1,63 @@
+{
+  "cellWidth": 384,
+  "cellHeight": 512,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "enemy-king-0.png",
+      "left": 31,
+      "top": 120,
+      "width": 319,
+      "height": 392
+    },
+    {
+      "file": "enemy-king-1.png",
+      "left": 5,
+      "top": 129,
+      "width": 347,
+      "height": 383
+    },
+    {
+      "file": "enemy-king-2.png",
+      "left": 21,
+      "top": 129,
+      "width": 353,
+      "height": 383
+    },
+    {
+      "file": "enemy-king-3.png",
+      "left": 23,
+      "top": 15,
+      "width": 332,
+      "height": 497
+    },
+    {
+      "file": "enemy-king-4.png",
+      "left": 9,
+      "top": 0,
+      "width": 375,
+      "height": 435
+    },
+    {
+      "file": "enemy-king-5.png",
+      "left": 0,
+      "top": 0,
+      "width": 376,
+      "height": 439
+    },
+    {
+      "file": "enemy-king-6.png",
+      "left": 27,
+      "top": 0,
+      "width": 357,
+      "height": 438
+    },
+    {
+      "file": "enemy-king-7.png",
+      "left": 0,
+      "top": 0,
+      "width": 378,
+      "height": 458
+    }
+  ]
+}

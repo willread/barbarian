@@ -1,0 +1,114 @@
+[
+  {
+    "key": "ashen-1",
+    "title": "Ashfall Road",
+    "regions": [],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.73
+        ],
+        [
+          1,
+          0.73
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  },
+  {
+    "key": "ashen-2",
+    "title": "The Furnace Mouth",
+    "regions": [],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.73
+        ],
+        [
+          1,
+          0.73
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  },
+  {
+    "key": "ashen-3",
+    "title": "The Black Crucible",
+    "regions": [],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.73
+        ],
+        [
+          1,
+          0.73
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  },
+  {
+    "key": "ashen-4",
+    "title": "Saint’s Reliquary",
+    "regions": [],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.73
+        ],
+        [
+          1,
+          0.73
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  }
+]

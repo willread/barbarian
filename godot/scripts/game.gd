@@ -55,6 +55,7 @@ var controls_view: CanvasLayer
 var results_view: CanvasLayer
 var hall_view: CanvasLayer
 var records=CairnRunRecords.new("")
+var episode_combat=preload("res://scripts/episode_combat.gd").new()
 var current_episode=1
 var run_stats: Dictionary={}
 var finished_run: Dictionary={}
@@ -350,10 +351,10 @@ func menu_action(label: String):
 		"BEGIN":
 			chapter_select=true
 			menu.switch_items(["EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS","BACK"],true)
-		"EP 1: THE FALLEN CITADEL":
+		"EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS":
+			current_episode=int(label.substr(3,1))
 			chapter_select=false
 			start_game()
-		"EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS":pass
 		"RISE AGAIN": start_game()
 		"OPTIONS":
 			options=true
@@ -459,6 +460,7 @@ func apply_settings(persist: bool=true):
 		config.save("user://settings.cfg")
 
 func clear_world():
+	episode_combat.clear()
 	clear_eggs()
 	if hero_voice:hero_voice.reset()
 	for view in views.values(): view.queue_free()
@@ -502,7 +504,7 @@ func start_game():
 	displayed_health=100
 	displayed_mana=0
 	used_chickens.clear()
-	encounters=e_ai.plan()
+	encounters=e_ai.plan(current_episode)
 	change_phase("playing")
 	spawn_wave()
 	begin_walk("enter")
@@ -525,7 +527,8 @@ func spawn_wave(preserve_corpses: bool=false):
 			if is_instance_valid(arrow):arrow.queue_free()
 		arrows.clear()
 		enemies.clear()
-	var next="citadel-%d"%screen_for_wave(wave)
+	var next="%s-%d"%[["citadel","swamp","ashen"][current_episode-1],screen_for_wave(wave)]
+	episode_combat.clear()
 	if next!=background.key:
 		remove_chicken()
 		clear_eggs()
@@ -551,7 +554,7 @@ func spawn_encounter_enemy():
 	var left=randf()<.5
 	var f=make_actor(randf_range(-360,-270) if left else randf_range(1710,1800),randf_range(570,730),e_ai.roster[kind].hp)
 	f.kind=kind
-	f.boss=kind=="champion"
+	f.boss=kind in ["champion","king","saint"]
 	f.dir=1 if left else -1
 	var allowed=e_ai.wave_variants[wave-1] if wave<=e_ai.wave_variants.size() else []
 	# Never stack several advanced variants in one reinforcement group.
@@ -565,9 +568,9 @@ func step_reinforcements(dt: float):
 	reinforcement_wait-=dt
 	var living=enemies.filter(func(enemy):return enemy.hp>0)
 	var pressure=0
-	for enemy in living:pressure+=2 if enemy.kind in ["shield","archer","marauder"] else 1
+	for enemy in living:pressure+=2 if enemy.kind in ["shield","archer","marauder","witch","bearer"] else 1
 	var next=pending_enemies[0]
-	var cost=2 if next in ["shield","archer","marauder"] else 1
+	var cost=2 if next in ["shield","archer","marauder","witch","bearer"] else 1
 	if living.is_empty() or reinforcement_wait<=0 and living.size()<NORMAL_ENEMY_CAP and pressure+cost<=screen_for_wave(wave)+3:
 		spawn_encounter_enemy()
 		reinforcement_wait=randf_range(.8,1.9)
@@ -637,6 +640,9 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			a.knock=true
 		else:a.knock=false
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
+	if f.kind in ["king","saint"] and not e_ai.boss_open(f) and not a.get("magic",false):
+		a=a.duplicate()
+		a.damage*=.2
 	var previous_hp=f.hp
 	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if f.hp<previous_hp:
@@ -674,9 +680,9 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if not a.get("continuous",false) or f.hp<=0:
 		var impact=f.duplicate()
 		var committed=f.kind=="marauder" and not f.attack.is_empty() and f.attack.age>=f.attack.from and f.attack.age<=f.attack.to and not a.get("knock",false)
-		var boss_committed=f.kind=="champion" and f.down.is_empty() and (f.attack.is_empty() or f.attack.age<=f.attack.to)
+		var boss_committed=f.boss and f.down.is_empty() and ((f.attack.is_empty() or f.attack.age<=f.attack.to) if f.kind=="champion" else not e_ai.boss_open(f))
 		var saved=f.attack
-		var recovery=f.kind=="champion" and not f.attack.is_empty() and f.attack.age>f.attack.to
+		var recovery=f.boss and not f.attack.is_empty() and f.attack.age>max(f.attack.to,f.attack.from+7)
 		var reaction=a.duplicate()
 		if boss_committed: reaction.knock=false
 		if not a.get("no_stun",false) or f.hp<=0:m.hurt(f,reaction)
@@ -870,7 +876,9 @@ func tick(dt: float):
 	var busy=spell>=0 or not hero.pickup.is_empty()
 	var was_diving=hero.diveUsed and not hero.air.is_empty() and hero.air.land==0
 	var landing_strike=hero.attack.duplicate() if was_diving else {}
+	var hero_before=Vector2(hero.x,hero.y)
 	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true)
+	episode_combat.movement(hero,hero_before)
 	if was_diving and not hero.air.is_empty() and hero.air.land>0:
 		var impact=preload("res://scripts/landing_impact.gd").new()
 		arena_clip.add_child(impact)
@@ -895,6 +903,7 @@ func tick(dt: float):
 		if not nearest.is_empty(): engaged.append(nearest.id)
 	for f in enemies:
 		if f.hp<=0: continue
+		var enemy_before=Vector2(f.x,f.y)
 		var intent=e_ai.intent(f,hero,f.id in engaged)
 		if not f.attack.is_empty(): e_ai.motion(f)
 		elif not f.hurtTicks and f.down.is_empty() and not f.recovering:
@@ -905,6 +914,7 @@ func tick(dt: float):
 			f.y=clamp(f.y+f.velocityY*m.SCALE,560,755)
 			f.moving=intent!=Vector2.ZERO
 			if f.moving: f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
+		episode_combat.movement(f,enemy_before)
 		f.x=clamp(f.x,-2400,3840)
 		var finished=m.tick_attack(f,[hero],damage)
 		if f.kind=="archer" and f.attack.get("type","")=="archerShot" and f.attack.age==40:
@@ -915,6 +925,7 @@ func tick(dt: float):
 			audio.play("bow_release",-8)
 		if not finished.is_empty(): e_ai.finish(f,finished,hero)
 		if phase!="playing": break
+	episode_combat.step(self,dt)
 	e_ai.separate(enemies)
 	background.constrain(hero)
 	if not chicken.is_empty():background.constrain(chicken)
@@ -1363,6 +1374,7 @@ func draw_chicken():
 	chicken_node.draw_set_transform(Vector2.ZERO)
 
 func draw_ground():
+	if phase!="title":episode_combat.draw_ground(self,ground_fx)
 	if phase=="title": return
 	for s in scorches: shadow(ground_fx,Vector2(s.x,s.y),s.r,.32,.9)
 	for f in [hero]+enemies:
@@ -1396,6 +1408,7 @@ func lightning(node: Node2D,start: Vector2,end: Vector2,seed_value: int,progress
 
 func draw_air():
 	if phase=="title": return
+	episode_combat.draw_air(air_fx)
 	for s in sparks:
 		var color=s.color
 		color.a=clamp(s.life*2,0,1)
@@ -1415,10 +1428,11 @@ func draw_air():
 	if not chicken.is_empty() and clock<chicken.get("lightning_until",-1.0):
 		lightning(air_fx,Vector2(chicken.x,-55),Vector2(chicken.x,chicken.y-chicken.height*4.5-25),7193+int(clock/.04)*7919,1.0)
 	for f in enemies:
-		if f.boss and f.hp>0 and clock<f.get("healthBarUntil",-1.0):
-			center_text(air_fx,"Cairn Champion · Unbound" if f.phaseTwo else "Cairn Champion",Vector2(720,43),20,Color("e6d2aa"))
-			air_fx.draw_rect(Rect2(510,54,420,8),Color("000000"))
-			air_fx.draw_rect(Rect2(510,54,420*f.hp/f.max,8),Color("b51219"))
+		if f.boss and f.hp>0:
+			var top=43-position.y
+			center_text(air_fx,{"champion":"Cairn Champion","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(720,top),20,Color("e6d2aa"))
+			air_fx.draw_rect(Rect2(510,top+11,420,8),Color("000000"))
+			air_fx.draw_rect(Rect2(510,top+11,420*f.hp/f.max,8),Color("b51219"))
 
 func center_text(node: Node2D,text: String,p: Vector2,size: int,color: Color):
 	node.draw_string(serif,p-Vector2(serif.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x*.5,0),text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)

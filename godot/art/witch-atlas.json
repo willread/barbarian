@@ -1,0 +1,63 @@
+{
+  "cellWidth": 384,
+  "cellHeight": 512,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "enemy-witch-0.png",
+      "left": 1,
+      "top": 34,
+      "width": 342,
+      "height": 478
+    },
+    {
+      "file": "enemy-witch-1.png",
+      "left": 44,
+      "top": 91,
+      "width": 312,
+      "height": 421
+    },
+    {
+      "file": "enemy-witch-2.png",
+      "left": 10,
+      "top": 76,
+      "width": 374,
+      "height": 436
+    },
+    {
+      "file": "enemy-witch-3.png",
+      "left": 0,
+      "top": 9,
+      "width": 360,
+      "height": 503
+    },
+    {
+      "file": "enemy-witch-4.png",
+      "left": 28,
+      "top": 0,
+      "width": 356,
+      "height": 451
+    },
+    {
+      "file": "enemy-witch-5.png",
+      "left": 0,
+      "top": 0,
+      "width": 356,
+      "height": 451
+    },
+    {
+      "file": "enemy-witch-6.png",
+      "left": 41,
+      "top": 0,
+      "width": 343,
+      "height": 465
+    },
+    {
+      "file": "enemy-witch-7.png",
+      "left": 0,
+      "top": 0,
+      "width": 370,
+      "height": 498
+    }
+  ]
+}

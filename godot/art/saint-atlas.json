@@ -1,0 +1,63 @@
+{
+  "cellWidth": 417,
+  "cellHeight": 470,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "enemy-saint-0.png",
+      "left": 11,
+      "top": 102,
+      "width": 404,
+      "height": 368
+    },
+    {
+      "file": "enemy-saint-1.png",
+      "left": 9,
+      "top": 111,
+      "width": 408,
+      "height": 359
+    },
+    {
+      "file": "enemy-saint-2.png",
+      "left": 0,
+      "top": 107,
+      "width": 417,
+      "height": 363
+    },
+    {
+      "file": "enemy-saint-3.png",
+      "left": 0,
+      "top": 19,
+      "width": 380,
+      "height": 451
+    },
+    {
+      "file": "enemy-saint-4.png",
+      "left": 9,
+      "top": 0,
+      "width": 408,
+      "height": 425
+    },
+    {
+      "file": "enemy-saint-5.png",
+      "left": 0,
+      "top": 0,
+      "width": 417,
+      "height": 432
+    },
+    {
+      "file": "enemy-saint-6.png",
+      "left": 0,
+      "top": 0,
+      "width": 417,
+      "height": 434
+    },
+    {
+      "file": "enemy-saint-7.png",
+      "left": 0,
+      "top": 0,
+      "width": 413,
+      "height": 444
+    }
+  ]
+}

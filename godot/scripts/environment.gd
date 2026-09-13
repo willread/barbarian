@@ -5,18 +5,28 @@ var layers: Array=[]
 var clock=0.0
 var screen: Dictionary={}
 var chapter_screens=JSON.parse_string(FileAccess.get_file_as_string("res://worlds/citadel.json"))
+var episode_screens={"swamp":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/swamp.json")),"ashen":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/ashen.json"))}
+var decorations: Array=[]
 func setup(source: CairnArt,name: String):
 	art=source
 	key=name
 	for child in get_children(): child.queue_free()
 	layers.clear()
+	decorations.clear()
 	screen={}
-	if name.begins_with("citadel-"):
-		screen=chapter_screens[int(name.get_slice("-",1))-1]
+	if name.get_slice("-",0) in ["citadel","swamp","ashen"]:
+		var chapter=name.get_slice("-",0)
+		screen=(chapter_screens if chapter=="citadel" else episode_screens[chapter])[int(name.get_slice("-",1))-1]
 		var painting=Sprite2D.new()
 		painting.texture=art.texture(key+"-base.png")
 		painting.centered=false
 		painting.scale=Vector2(1440,810)/painting.texture.get_size()
+		if chapter=="ashen":
+			var heat=ShaderMaterial.new()
+			heat.shader=preload("res://shaders/ashen_heat.gdshader")
+			heat.set_shader_parameter("area",float(name.get_slice("-",1)))
+			painting.material=heat
+			layers.append(heat)
 		add_child(painting)
 		for region in screen.regions:
 			var a=region.animation
@@ -27,16 +37,33 @@ func setup(source: CairnArt,name: String):
 			sprite.scale=Vector2(a.rect[2],a.rect[3])*1.125/sprite.texture.get_size()
 			var mat=ShaderMaterial.new()
 			mat.shader=preload("res://shaders/region_loop.gdshader")
+			mat.set_shader_parameter("grid",Vector2(a.get("columns",8),a.get("rows",8)))
+			mat.set_shader_parameter("frame_count",float(a.get("count",60)))
+			mat.set_shader_parameter("fps",float(a.get("fps",30)))
 			sprite.material=mat
+			if region.get("foreground",false):
+				sprite.z_as_relative=false
+				sprite.z_index=1805
 			add_child(sprite)
 			layers.append(mat)
-		var foreground=Sprite2D.new()
-		foreground.centered=false
-		foreground.texture=art.texture(key+"-foreground.png")
-		foreground.scale=Vector2(1.125,1.125)
-		foreground.z_as_relative=false
-		foreground.z_index=1805
-		add_child(foreground)
+		if chapter=="citadel":
+			var foreground=Sprite2D.new()
+			foreground.centered=false
+			foreground.texture=art.texture(key+"-foreground.png")
+			foreground.scale=Vector2(1.125,1.125)
+			foreground.z_as_relative=false
+			foreground.z_index=1805
+			add_child(foreground)
+		if chapter=="ashen":
+			for front in [false,true]:
+				var decoration=preload("res://scripts/ashen_scenery.gd").new()
+				decoration.area=int(name.get_slice("-",1))
+				decoration.foreground=front
+				if front:
+					decoration.z_as_relative=false
+					decoration.z_index=1805
+				add_child(decoration)
+				decorations.append(decoration)
 		z_index=-100
 		return
 	var base=Sprite2D.new()
@@ -73,6 +100,9 @@ func setup(source: CairnArt,name: String):
 func advance(t: float):
 	clock=t
 	for mat in layers: mat.set_shader_parameter("clock",fmod(t,24))
+	for decoration in decorations:
+		decoration.clock=fmod(t,24)
+		decoration.queue_redraw()
 	queue_redraw()
 
 func _draw():

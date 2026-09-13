@@ -7,14 +7,8 @@ func check():
 	await create_timer(.6).timeout
 	assert(game.chapter_select and game.phase=="title")
 	assert(game.menu.items.size()==4)
-	assert(game.menu.items[1].node.modulate.a<1.0)
-	assert(game.menu.items[1].face.material==null)
-	var sounds=[]
-	game.menu.sound_requested.connect(func(id):sounds.append(id))
-	game.menu.select(1,false)
-	game.menu.activate()
-	assert(sounds.back()=="resist")
-	assert(game.phase=="title" and game.chapter_select)
+	assert(not game.menu.is_locked("EP 2: THE SUNKEN WILDS"))
+	assert(not game.menu.is_locked("EP 3: THE ASHEN DEPTHS"))
 	game.menu_action("BACK")
 	await create_timer(.6).timeout
 	assert(not game.chapter_select and game.menu.items[0].label=="BEGIN")
@@ -74,5 +68,5 @@ func check():
 	game.enemies[0].hp=0
 	game.step_reinforcements(10.)
 	assert(game.enemies.size()==4 and game.pending_enemies.size()==2)
-	print("CAIRN_CHAPTER_OK: selection, locked chapters, ordered screens, walk limits and final boss")
+	print("CAIRN_CHAPTER_OK: selection, ordered screens, walk limits and final boss")
 	quit()

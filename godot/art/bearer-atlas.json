@@ -1,0 +1,63 @@
+{
+  "cellWidth": 418,
+  "cellHeight": 470,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "enemy-bearer-0.png",
+      "left": 31,
+      "top": 59,
+      "width": 315,
+      "height": 406
+    },
+    {
+      "file": "enemy-bearer-1.png",
+      "left": 28,
+      "top": 58,
+      "width": 328,
+      "height": 406
+    },
+    {
+      "file": "enemy-bearer-2.png",
+      "left": 28,
+      "top": 64,
+      "width": 324,
+      "height": 399
+    },
+    {
+      "file": "enemy-bearer-3.png",
+      "left": 37,
+      "top": 57,
+      "width": 363,
+      "height": 406
+    },
+    {
+      "file": "enemy-bearer-4.png",
+      "left": 17,
+      "top": 62,
+      "width": 401,
+      "height": 362
+    },
+    {
+      "file": "enemy-bearer-5.png",
+      "left": 0,
+      "top": 65,
+      "width": 383,
+      "height": 358
+    },
+    {
+      "file": "enemy-bearer-6.png",
+      "left": 29,
+      "top": 70,
+      "width": 389,
+      "height": 356
+    },
+    {
+      "file": "enemy-bearer-7.png",
+      "left": 0,
+      "top": 250,
+      "width": 400,
+      "height": 196
+    }
+  ]
+}

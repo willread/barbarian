@@ -7,7 +7,7 @@ var action_emphasis: Dictionary={}
 var action_height=64.0
 var centered_action=""
 var items: Array=[]
-const LOCKED=["EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS"]
+const LOCKED=[]
 var unavailable: Callable
 var selected=0
 var compact_pause=false

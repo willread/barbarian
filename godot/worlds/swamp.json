@@ -1,0 +1,278 @@
+[
+  {
+    "key": "swamp-1",
+    "title": "Leechwater Crossing",
+    "regions": [
+      {
+        "foreground": false,
+        "animation": {
+          "atlas": "swamp-1-ambient.png",
+          "rect": [
+            340,
+            265,
+            790,
+            190
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-1-front-0.png",
+          "rect": [
+            0,
+            610,
+            365,
+            110
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-1-front-1.png",
+          "rect": [
+            1220,
+            620,
+            60,
+            100
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.72
+        ],
+        [
+          1,
+          0.72
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  },
+  {
+    "key": "swamp-2",
+    "title": "The Witch’s Hollow",
+    "regions": [
+      {
+        "foreground": false,
+        "animation": {
+          "atlas": "swamp-2-ambient.png",
+          "rect": [
+            180,
+            130,
+            510,
+            315
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-2-front-0.png",
+          "rect": [
+            970,
+            65,
+            310,
+            325
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.72
+        ],
+        [
+          1,
+          0.72
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  },
+  {
+    "key": "swamp-3",
+    "title": "The Drowned Procession",
+    "regions": [
+      {
+        "foreground": false,
+        "animation": {
+          "atlas": "swamp-3-ambient.png",
+          "rect": [
+            190,
+            70,
+            875,
+            380
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-3-front-0.png",
+          "rect": [
+            0,
+            640,
+            150,
+            80
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.72
+        ],
+        [
+          1,
+          0.72
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  },
+  {
+    "key": "swamp-4",
+    "title": "The Sunken Throne",
+    "regions": [
+      {
+        "foreground": false,
+        "animation": {
+          "atlas": "swamp-4-ambient.png",
+          "rect": [
+            180,
+            200,
+            930,
+            260
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-4-front-0.png",
+          "rect": [
+            0,
+            565,
+            430,
+            155
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-4-front-1.png",
+          "rect": [
+            915,
+            585,
+            365,
+            135
+          ],
+          "columns": 8,
+          "rows": 12,
+          "count": 96,
+          "fps": 4
+        }
+      }
+    ],
+    "walkable": {
+      "polygon": [
+        [
+          0,
+          0.72
+        ],
+        [
+          1,
+          0.72
+        ],
+        [
+          1,
+          0.92
+        ],
+        [
+          0,
+          0.92
+        ]
+      ]
+    },
+    "framing": {
+      "bottom_crop": 0.03
+    }
+  }
+]

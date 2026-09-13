@@ -7,12 +7,18 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	m=mechanics
 	roster=data.duplicate(true)
 	roster["archer"]={"hp":6,"speed":1.05}
+	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":105,"speed":.8},"saint":{"hp":120,"speed":.8}})
+	for attack in [
+		["mireCast",96,52,-1,0,0],["clinkerThrow",92,48,-1,0,0],
+		["rootSlam",108,56,62,9,64],["kingSweep",82,38,45,8,72],
+		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
+		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
 
 var unlock_order: Array=[]
 var variant_order: Array=[]
 var wave_variants: Array=[]
 
-func plan() -> Array:
+func plan(episode: int=1) -> Array:
 	unlock_order=["shield","archer","marauder"]
 	unlock_order.shuffle()
 	variant_order=["brute","swift"]
@@ -20,9 +26,11 @@ func plan() -> Array:
 	wave_variants.clear()
 	var result: Array=[]
 	var pool=["bone","legion"]
+	var newcomer="witch" if episode==2 else "bearer"
+	if episode>1:pool.append(newcomer)
 	var previous=""
 	var seen: Array=[]
-	var costs={"bone":1,"legion":2,"shield":3,"archer":3,"marauder":3}
+	var costs={"bone":1,"legion":2,"shield":3,"archer":3,"marauder":3,"witch":3,"bearer":3}
 	for screen in 4:
 		if screen>0:pool.append(unlock_order[screen-1])
 		for local_wave in 3:
@@ -31,13 +39,14 @@ func plan() -> Array:
 			# Guarantee unlocked types by the area end, preserving random mixes otherwise.
 			var missing=pool.filter(func(kind):return kind not in seen)
 			if local_wave==2 and not missing.is_empty():focus=missing.pick_random()
+			if episode>1 and screen==0 and local_wave==0:focus=newcomer
 			previous=focus
 			var budget=6+screen*3+local_wave+randi_range(0,2)
 			var encounter: Array=[focus]
 			budget-=costs[focus]
 			var population_cap=local_wave+2 if screen==0 else 9
 			while budget>0 and encounter.size()<population_cap:
-				var choices=pool.filter(func(kind):return costs[kind]<=budget and encounter.count(kind)<(3 if kind=="shield" else (2 if kind in ["archer","marauder"] else 4)))
+				var choices=pool.filter(func(kind):return costs[kind]<=budget and encounter.count(kind)<(3 if kind=="shield" else (2 if kind in ["archer","marauder","witch","bearer"] else 4)))
 				if choices.is_empty():break
 				var kind=choices.pick_random()
 				encounter.append(kind)
@@ -47,7 +56,7 @@ func plan() -> Array:
 			encounter.shuffle()
 			result.append(encounter)
 			wave_variants.append([] if screen<2 else ([variant_order[0]] if screen==2 else variant_order.duplicate()))
-	result.append(["champion"])
+	result.append([["champion","king","saint"][episode-1]])
 	wave_variants.append([])
 	return result
 
@@ -63,7 +72,7 @@ static func shield_limit(area: int) -> int:
 	return clampi(area-1,0,3)
 
 func variant(e: Dictionary, allowed: Array=[]):
-	if e.kind=="archer":return
+	if e.kind in ["archer","witch","bearer"]:return
 	if e.boss:
 		e.speedFactor=.75
 		return
@@ -110,6 +119,7 @@ func block(e: Dictionary, a: Dictionary, h: Dictionary) -> bool:
 	return true
 
 func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
+	if e.kind in ["witch","bearer","king","saint"]:return episode_intent(e,h)
 	if e.kind=="archer":return archer_intent(e,h)
 	var swift=e.get("variant", "regular")=="swift"
 	if swift:
@@ -205,6 +215,9 @@ func motion(e: Dictionary):
 		e.x+=e.velocityX*m.SCALE
 
 func finish(e: Dictionary,a: Dictionary,h: Dictionary):
+	if e.kind in ["witch","bearer","king","saint"]:
+		e.aiRest=40 if e.boss and e.phaseTwo else 85
+		return
 	if e.kind=="archer":
 		e.aiRest=85+randi()%35
 		return
@@ -242,6 +255,28 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if not e.aiRest:
 		e.attack={"type":"archerShot","age":0,"elapsed":0.0,"ticks":58,"from":40,"to":-1,"direction":e.dir,"hits":[],"connected":false,"damage":0,"reach":0}
 	return Vector2.ZERO
+
+func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.boss and e.hp<=e.max*.5:e.phaseTwo=true
+	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty() or h.hp<=0:return Vector2.ZERO
+	var dx=h.x-e.x
+	var dy=h.y-e.y
+	e.dir=1 if dx>=0 else -1
+	var ranged=e.kind in ["witch","bearer"]
+	var reach=530.0 if ranged else 270.0
+	if not e.aiRest and abs(dx)<reach and abs(dy)<(130 if e.kind=="witch" else 26):
+		var type="mireCast" if e.kind=="witch" else "clinkerThrow" if e.kind=="bearer" else ("kingSweep" if e.phaseTwo and e.moveIndex%2 else "rootSlam") if e.kind=="king" else ("furnaceBlast" if e.moveIndex%2 else "saintSweep")
+		if ranged and e.get("hazard_live",false):return Vector2.ZERO
+		if m.begin(e,type):
+			e.attack["target"]=Vector2(h.x,h.y)
+			e.moveIndex+=1
+		return Vector2.ZERO
+	if e.aiRest and not e.phaseTwo and not ranged:return Vector2.ZERO
+	var away=ranged and abs(dx)<250 and e.x>160 and e.x<1280
+	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
+
+static func boss_open(e: Dictionary) -> bool:
+	return e.phaseTwo or (not e.attack.is_empty() and e.attack.age>max(e.attack.to,e.attack.from+7)) or e.get("open_ticks",0)>0
 
 func separate(actors: Array):
 	# Elliptical footprints respect the shallow walkable lane and sprite width.

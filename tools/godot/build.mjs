@@ -17,6 +17,7 @@ if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepar
  run(process.execPath,['tools/godot/bake-extras.mjs']);
 }
 run(process.execPath,['tools/godot/bake-world.mjs']);
+run(process.execPath,['tools/godot/bake-episodes.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
 if(!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['tools/godot/bake-results.mjs']);
@@ -37,6 +38,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/settings_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
  run(binary,['--headless','--path','godot','--script','tests/combo.gd']);
  run(binary,['--headless','--path','godot','--script','tests/eggs.gd']);
  run(binary,['--headless','--path','godot','--script','tests/wave_audio.gd']);

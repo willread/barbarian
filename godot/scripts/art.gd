@@ -4,7 +4,7 @@ var data: Dictionary
 var textures: Dictionary={}
 var armory: Dictionary={}
 var holiday_anchors: Dictionary={}
-const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310}
+const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310,"witch":250,"bearer":260,"king":390,"saint":420}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
@@ -14,6 +14,8 @@ func _init():
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
 	data.atlases["enemy-legion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/minotaur-atlas.json"))
 	data.atlases["hero-eat"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/eat-atlas.json"))
+	for kind in ["witch","bearer","king","saint"]:
+		data.atlases["enemy-"+kind+"-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/"+kind+"-atlas.json"))
 	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 
 func texture(file: String) -> Texture2D:
@@ -54,6 +56,12 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 	return ["hero-actions-unarmed-v8",0] if f.player else ["enemy-walk-v4",0]
 
 func enemy_frame(e: Dictionary) -> int:
+	if e.kind in ["witch","bearer","king","saint"]:
+		if e.hp<=0:return 7
+		if not e.down.is_empty() or e.hurtTicks or e.recovering:return 6
+		if not e.attack.is_empty():return 3 if e.attack.age<e.attack.from else 4 if e.attack.age<=e.attack.from+8 else 5
+		if e.boss and e.phaseTwo and not e.moving:return 5
+		return 1+int(e.stride*4)%2 if e.moving else 0
 	if e.kind=="archer":
 		if not e.down.is_empty():return 12 if e.down.ground else 10 if e.down.vz<0 else 11
 		if e.hp<=0:return 12
@@ -129,7 +137,7 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	node.draw_set_transform(Vector2.ZERO)
 
 func has_separate_weapon(f: Dictionary) -> bool:
-	return f.player or f.kind not in ["archer","legion"]
+	return f.player or f.kind not in ["archer","legion","witch","bearer","king","saint"]
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 	if f.gearDropped or not has_separate_weapon(f) or (f.player and not f.pickup.is_empty()): return
