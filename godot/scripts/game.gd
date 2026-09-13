@@ -547,7 +547,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			hit_stop=.065 if attacker.weapon=="axe" else .045
 			for other in enemies:
 				if other.id!=f.id and other.hp>0 and other.down.is_empty() and abs(other.x-f.x)<120 and abs(other.y-f.y)<30 and not e_ai.guarding(other):
-					other.attack={}
+					m.interrupt_attack(other)
 					other.hurtTicks=max(other.hurtTicks,16)
 					other.velocityX=0
 			a.knock=true
@@ -565,7 +565,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
 		f.arrowKick={"age":0.0,"offset":0.0,"direction":a.direction}
 	if a.get("magic",false) and f.hp>0:
-		f.attack={}
+		m.interrupt_attack(f)
 		f.electricTicks=9
 		if f.down.is_empty():
 			f.hurtTicks=9

@@ -34,9 +34,18 @@ func check():
 	voice.observe_milestones()
 	voice.observe_milestones()
 	assert(voice.pending.size()==1 and voice.pending[0].id=="big_enemy")
+	foe.variant="swift"
+	foe.size=.72
+	foe.x=-200
+	voice.observe_milestones()
+	assert(not voice.milestones.has("tiny_enemy"))
+	foe.x=300
+	voice.observe_milestones()
+	voice.observe_milestones()
+	assert(voice.pending.size()==2 and voice.milestones.has("tiny_enemy"))
 	game.magic=100
 	voice.observe_milestones()
-	assert(voice.pending.size()==2)
+	assert(voice.pending.size()==3)
 	voice.reset()
 	voice.observe_milestones()
 	assert(voice.pending.is_empty())

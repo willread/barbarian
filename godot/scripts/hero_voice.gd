@@ -32,11 +32,11 @@ func request_once(id: String):
 func observe_milestones():
 	if game.phase!="playing" or game.hero.hp<=0:return
 	if game.magic>=100:request_once("mana_full")
-	if milestones.has("big_enemy"):return
+	if milestones.has("big_enemy") and milestones.has("tiny_enemy"):return
 	for enemy in game.enemies:
-		if enemy.hp>0 and enemy.x>=0 and enemy.x<=1440 and game.e_ai.heavy(enemy):
-			request_once("big_enemy")
-			break
+		if enemy.hp>0 and enemy.x>=0 and enemy.x<=1440:
+			if game.e_ai.heavy(enemy):request_once("big_enemy")
+			elif enemy.get("variant","regular")=="swift":request_once("tiny_enemy")
 func reset():
 	pending.clear()
 	player.stop()

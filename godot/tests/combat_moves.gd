@@ -81,6 +81,17 @@ func _init():
 	staggered.attack={}
 	staggered.hp=0
 	assert(not m.begin(staggered,"spin"),"Spin cannot resurrect player")
+	var leaper=m.make(13,720,660,100)
+	m.begin(leaper,"enemyCharge")
+	m.motion(leaper,0,0)
+	assert(leaper.height>0)
+	m.interrupt_attack(leaper)
+	assert(leaper.height==0 and leaper.attack.is_empty(),"Interrupted charge cannot leave floating enemy")
+	m.hurt(leaper,{"direction":1,"knock":true})
+	m.reaction(leaper)
+	var airborne=leaper.height
+	m.interrupt_attack(leaper)
+	assert(leaper.height==airborne and not leaper.down.is_empty(),"Do not cancel real knockdown physics")
 	var slow=m.make(20,800,660,100)
 	slow.size=1.18
 	slow.dir=1

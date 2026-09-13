@@ -222,6 +222,13 @@ func tick_attack(f: Dictionary, targets: Array, hit: Callable) -> Dictionary:
 		return a
 	return {}
 
+func interrupt_attack(f: Dictionary):
+	f.attack={}
+	# Charge lift belongs to its attack; real jumps/knockdowns own their height.
+	if f.air.is_empty() and f.down.is_empty():
+		f.height=0.0
+		f.hopTicks=0
+
 func hurt(f: Dictionary, a: Dictionary):
 	f.attack={}
 	f.running=false

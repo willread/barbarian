@@ -5,3 +5,6 @@ Add clips and entries to lines.json: file, priority (higher first), cooldown in 
 User-provided ElevenLabs Cairn recordings (September 13 filename timestamps) replace dinner and register-unlock and add big-enemy and mana-full. Exact source filenames and transcripts are recorded in lines.json. Encoded as Vorbis at -18 LUFS / -2 dB true peak, with refreshed 30 Hz mouth envelopes.
 
 The first visible living heavy enemy and the first full mana bar each queue a line once per new game. These flags survive area changes, pauses and voice resets; they reset only for a new run. Clips respect Voice/Sound settings and share the existing priority, interruption and no-overlap queue.
+
+The tiny_enemy cue uses the new user-provided Cairn recording and fires once per run when a living swift variant enters the visible play area. It shares the existing voice settings, queue and milestone reset rules.
+

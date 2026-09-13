@@ -139,3 +139,6 @@ Four user-supplied ElevenLabs Cairn voice recordings from Downloads (2026-09-13 
 ## Enemy impact sound pool
 Twelve independently generated ElevenLabs text-to-sound v2 effects, September 12, 2026. Detailed individual prompts, labels and durations are recorded in soundboard/enemy-impact/manifest.json and godot/audio_options/manifest.json. Source recordings are retained beside that manifest; normalized Vorbis game assets live in godot/audio_options. Reproduce with tools/audio/enemy-impact.mjs (reads ignored local credentials).
 
+
+Tiny-enemy voice: user-provided ElevenLabs_2026-09-13T04_33_13_Cairn_gen_sp100_s50_sb75_se0_b_m2.mp3, line 'Aw, he is so cute.' Normalized Ogg and refreshed 30 Hz mouth envelope; original filename and transcript in godot/voice/lines.json.
+
