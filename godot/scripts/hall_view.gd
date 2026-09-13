@@ -62,10 +62,17 @@ func layout():
 	var top=122.0 if compact else clampf(viewport_size.y*.20,120,205)
 	var table_width=width-40 if compact else width*.90
 	scroll.position=Vector2((width-table_width)*.5,top)
-	scroll.size=Vector2(table_width,maxf(60,viewport_size.y-top-126))
+	scroll.size=Vector2(table_width,maxf(60,viewport_size.y-top-158))
 	row_height=110 if compact else clampf(scroll.size.y/maxi(1,runs.size()),44,86)
 	content.custom_minimum_size=Vector2(0,scroll.size.y if runs.is_empty() else runs.size()*row_height)
-	actions.layout_actions(Rect2(width*.1,viewport_size.y-108,width*.8,96))
+	# Match the title menu's 1.0 lettering size (these items are created at .71).
+	var factor=minf(1.0/.71,width*.8/maxf(1,actions.items[0].width))
+	if runs.is_empty():
+		actions.layout_actions(Rect2(width*.1,viewport_size.y-140,width*.8,128))
+	else:
+		var item=actions.items[0]
+		actions.scale=Vector2.ONE*factor
+		actions.position=Vector2(width*.5,viewport_size.y-78)-Vector2(item.x,item.y+item.height*.5)*factor
 	backdrop.queue_redraw()
 	content.queue_redraw()
 	reveal_selected.call_deferred()

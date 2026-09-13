@@ -7,6 +7,11 @@ var path: String
 var scopes: Dictionary={}
 var save_error=OK
 var last_result: Dictionary={}
+var last_result_scope=""
+
+static func episode_scope(episode: int) -> String:
+	# Existing saves belong to episode 1; retain their original key and stat bests.
+	return RULES if episode==1 else "episode-%d-v1"%episode
 
 func _init(save_path: String="user://records.json"):
 	path=save_path
@@ -28,8 +33,9 @@ func board(scope: String=RULES) -> Dictionary:
 	if not value.get("bests") is Dictionary:value.bests={}
 	return value
 
-func finish(snapshot: Dictionary,scope: String=RULES) -> Dictionary:
-	if last_result.get("id")==snapshot.id:return last_result
+func finish(snapshot: Dictionary,scope: String="") -> Dictionary:
+	if scope.is_empty():scope=episode_scope(int(snapshot.get("episode",1)))
+	if last_result_scope==scope and last_result.get("id")==snapshot.id:return last_result
 	var data=board(scope)
 	for run in data.runs:
 		if run.id==snapshot.id:return run
@@ -48,6 +54,7 @@ func finish(snapshot: Dictionary,scope: String=RULES) -> Dictionary:
 	data.runs.insert(rank,result.duplicate(true))
 	if data.runs.size()>10:data.runs.resize(10)
 	last_result=result
+	last_result_scope=scope
 	save_error=persist()
 	return result
 

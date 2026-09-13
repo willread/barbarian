@@ -48,8 +48,8 @@ func _ready():
 	actions.setup(art)
 	actions.yellow_flames=true
 	actions.compact_pause=true
-	actions.show_items(["HALL OF LEGENDS","RISE AGAIN","QUIT TO TITLE"],false,false)
-	actions.select(1,false)
+	actions.show_items(["RISE AGAIN","HALL OF LEGENDS","QUIT TO TITLE"],false,false)
+	actions.select(0,false)
 	actions.activated.connect(func(label):activated.emit(label))
 	actions.sound_requested.connect(func(id):get_parent().audio.play(id,-8))
 	get_viewport().size_changed.connect(layout)
@@ -133,12 +133,12 @@ func draw_panel():
 	record_label("score",Vector2(cx,score_center+score_size*.5+18),true)
 	var best=int(result.get("previous_best",0))
 	var score=int(result.get("score",0))
-	var comparison="First score recorded" if result.get("first",true) else "Personal best matched" if score==best else "Previous best %s (+%s)"%[CairnRunRecords.number(best),CairnRunRecords.number(score-best)] if score>best else "Personal best %s"%CairnRunRecords.number(best)
+	var baseline=score if result.get("first",true) else best
+	var delta=score-baseline
+	var comparison="Personal best %s (%s%s)"%[CairnRunRecords.number(baseline),"+" if delta>=0 else "-",CairnRunRecords.number(absi(delta))]
 	label(content,comparison,Vector2(cx,score_h*.9),18,ink,score_w*.93)
 	var rank=int(result.get("rank",0))
-	var detail="%s from your best"%CairnRunRecords.number(best-score) if score<best else ""
-	if rank==0:detail+=" · Outside your top 10" if not detail.is_empty() else "Outside your top 10"
-	elif score<best:detail+=" · #%d run"%rank
+	var detail="Outside your top 10" if rank==0 else ""
 	if save_failed:detail="Could not save this run on this device"
 	label(content,detail,Vector2(cx,score_h*.97),13,gold,score_w*.93)
 	var left=0.0 if compact else score_w

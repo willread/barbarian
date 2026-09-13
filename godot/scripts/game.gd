@@ -54,6 +54,7 @@ var controls_view: CanvasLayer
 var results_view: CanvasLayer
 var hall_view: CanvasLayer
 var records=CairnRunRecords.new("")
+var current_episode=1
 var run_stats: Dictionary={}
 var finished_run: Dictionary={}
 var run_button_active=false
@@ -205,7 +206,7 @@ func _ready():
 	add_child(menu)
 	menu.top_level=true
 	menu.setup(art)
-	menu.unavailable=func(label):return label=="HALL OF LEGENDS" and records.board().runs.is_empty()
+	menu.unavailable=func(label):return label=="HALL OF LEGENDS" and records.board(CairnRunRecords.episode_scope(current_episode)).runs.is_empty()
 	menu.activated.connect(menu_action)
 	menu.sound_requested.connect(func(id):
 		audio.play(id,-8)
@@ -319,7 +320,7 @@ func menu_action(label: String):
 		if is_instance_valid(results_view):results_view.visible=false
 		hall_view=preload("res://scripts/hall_view.gd").new()
 		hall_view.art=art
-		hall_view.runs=records.board().runs.duplicate(true)
+		hall_view.runs=records.board(CairnRunRecords.episode_scope(current_episode)).runs.duplicate(true)
 		hall_view.current_id=finished_run.get("id","") if phase in ["lost","won"] else ""
 		add_child(hall_view)
 		hall_view.closed.connect(close_hall)
@@ -414,7 +415,7 @@ func close_hall():
 		results_view.visible=true
 		results_view.age=3.0
 		results_view.content.queue_redraw()
-		results_view.actions.select(0,false)
+		results_view.actions.select(1,false)
 	else:
 		menu.visible=true
 		menu.select(1,false)
@@ -424,7 +425,7 @@ func finish_run(outcome: String):
 	if finished_run.is_empty():
 		var snapshot=run_stats.duplicate(true)
 		for key in ["damage_dealt","damage_taken"]:snapshot[key]=int(snapshot[key])
-		snapshot.merge({"score":int(score),"kills":kills,"episode":1,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
+		snapshot.merge({"score":int(score),"kills":kills,"episode":current_episode,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
 		finished_run=records.finish(snapshot)
 	if is_instance_valid(results_view):return
 	results_view=preload("res://scripts/results_view.gd").new()

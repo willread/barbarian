@@ -47,6 +47,7 @@ func check():
 	game.change_phase("won")
 	await process_frame
 	assert(game.finished_run.rank==1 and "score" in game.finished_run.new_stats)
+	assert(game.results_view.actions.items[0].label=="RISE AGAIN" and game.results_view.actions.selected==0)
 	assert(game.results_view.actions.items[2].drop_offset<0)
 	await create_timer(.42).timeout
 	assert(absf(game.results_view.actions.items[0].drop_offset)<6)

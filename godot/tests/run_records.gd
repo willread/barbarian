@@ -21,6 +21,17 @@ func check():
 	var loaded=CairnRunRecords.new(path)
 	assert(loaded.board().runs.size()==10 and loaded.board().bests.best_combo==90)
 	assert(loaded.board("future-rules").runs.is_empty())
+	var ep2=sample("episode-two",50,2)
+	ep2.episode=2
+	var ep2_first=loaded.finish(ep2)
+	assert(ep2_first.first and ep2_first.previous_best==0 and ep2_first.rank==1)
+	assert(loaded.board().bests.best_combo==90)
+	var ep2_next=sample("episode-two-next",60,3)
+	ep2_next.episode=2
+	assert(loaded.finish(ep2_next).previous_best==50)
+	var reloaded=CairnRunRecords.new(path)
+	assert(reloaded.board(CairnRunRecords.episode_scope(2)).runs.size()==2)
+	assert(reloaded.board().runs.size()==10 and reloaded.board().bests.best_combo==90)
 	# Corrupt primary must recover the previous complete backup.
 	var file=FileAccess.open(path,FileAccess.WRITE)
 	file.store_string("interrupted")
