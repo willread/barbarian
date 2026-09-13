@@ -20,7 +20,8 @@ var gold=Color(.64,.58,.45)
 
 func _ready():
 	layer=2200
-	font.multichannel_signed_distance_field=true
+	font.multichannel_signed_distance_field=false
+	font.oversampling=2.0
 	backdrop=Node2D.new()
 	add_child(backdrop)
 	backdrop.draw.connect(draw_backdrop)

@@ -100,6 +100,10 @@ func check():
 	game.results_view.age=2
 	game.results_view.content.queue_redraw()
 	await snap("results-final")
+	if capture:
+		game.menu_action("QUIT TO TITLE")
+		game.menu_action("CONTROLS")
+		await snap("controls-font-check")
 	game.free()
 	print("CAIRN_RESULTS_UI_OK: tracking, empty and populated navigation, responsive bounds, scrolling and stable results")
 	quit()

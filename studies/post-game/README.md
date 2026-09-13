@@ -1,6 +1,6 @@
 # Results and Hall of Legends concepts
 
-Implemented in native Godot. See `IMPLEMENTATION.md` for runtime behavior, verification and local previews. The imagegen files below remain design references with sample data; `implemented-results.png` and `implemented-hall.png` are actual native captures.
+Implemented in native Godot. See `IMPLEMENTATION.md` for runtime behavior, verification and local previews. The imagegen files below remain design references with sample data; `implemented-results.png` and `implemented-hall.png` are actual game captures.
 
 ## Current previews
 
