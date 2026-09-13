@@ -1,0 +1,32 @@
+{
+  "tool": "built-in image_gen",
+  "assets": [
+    {
+      "file": "fallen-branch.png",
+      "output": "exec-23813695-f162-42c7-9650-a975357bb6d6.png",
+      "prompt": "Game foreground sprite asset, transparent background with real alpha, no ground, no scenery, no text or shadow backdrop. One long fallen dead cypress branch, entering thick from LOWER LEFT and extending diagonally toward upper right, a few sharp thin twig offshoots, sparse hanging olive moss, realistic weathered wet dark brown bark with subtle muted highlights. Side view, dark naturalistic sword-and-sorcery painted realism, desaturated olive brown, crisp organic silhouette, no leaves except a few decayed scraps. Wide landscape canvas, whole branch visible with 5% transparent margin. Intended to frame only lower corner of a realistic swamp beat-em-up arena. Near-black shadows, fine bark texture, not vector or cartoon."
+    },
+    {
+      "file": "hanging-bough.png",
+      "output": "exec-966aba18-3de5-478d-8a83-f4d62a829855.png",
+      "prompt": "One game foreground sprite on actual transparent alpha background. A dark crooked cypress bough enters from the UPPER RIGHT and arcs across the top, thin twig tips reach down and toward left. Long hanging strands of sparse olive Spanish moss, one small weathered ivory bone talisman dangling near middle on a thin string, light ragged moss fringe. No ground, scenery, frame, lettering, checkered pattern or background shadow. Realistic dark sword-and-sorcery painted asset for swamp game, tactile cracked bark, damp desaturated olive brown with black shadows, muted highlights. Wide canvas, isolated complete bough with transparent margins. Most mass at top right; lower left mostly transparent. Thin elegant irregular silhouette, not bulky foliage, not cartoon."
+    },
+    {
+      "file": "roots.png",
+      "output": "exec-77147a84-1daa-40fa-8cf8-edf6061750d5.png",
+      "prompt": "One transparent-background foreground sprite for a realistic dark fantasy swamp game: heavy gnarled cypress ROOT CLUSTER curling from lower-left corner along the bottom edge, like a low claw gripping the earth. Thick base at far left, 3 tapering roots reaching rightward, low profile horizontal silhouette. Rich dark cracked bark, olive moss crevices, subdued brown highlights, near-black shadows, physically real wood, no face or magical glow. Isolate entire root mass on genuine transparent alpha background; no ground, scenery, backdrop, vignette, cast shadow, text or border. Wide landscape composition, spare transparent space above, all edges cleanly cut out. This will frame a boss arena from its bottom corners; keep the shape low and heavy, not a tree or upright stump."
+    },
+    {
+      "file": "procession-clean.png",
+      "reference": "../swamp-v1/03-procession.png",
+      "output": "exec-aeaa3a2d-83f7-434d-9203-11b98934b3c7.png",
+      "prompt": "Precise clean-plate edit of this exact game background. REMOVE ONLY the LEFT hanging bronze bell and its central suspension chain, located around x=19%-26%, y=13%-34%. Fill the removed bell and chain with matching distant misty forest seen through the left arch. Preserve absolutely everything else: left arch masonry, hanging moss at edges, all other vegetation, pool, right bell, stone tombs, fighting floor, light, camera, dimensions, and composition. No new objects, no extra alteration, no text. This is a clean background plate for compositing an animated version of that left bell over it later."
+    },
+    {
+      "file": "bell.png",
+      "reference": "../swamp-v1/03-procession.png",
+      "output": "exec-0f635e89-f60a-4e8b-8a54-c78f6747c377.png",
+      "prompt": "Extract/recreate ONLY the LEFT bronze funeral bell from this reference as one isolated game sprite on a genuine transparent alpha background. Same front view and matching weathered dark olive bronze metal, flared lower rim, cylindrical shoulder, small loop at top, thin strands of wet moss and a small clapper below. The complete bell centered with transparent margins, no chain (drawn separately by game), no arch, no forest, no background, no shadow backdrop, no text. Realistic dark muted natural materials matching this exact painting, comparable proportions, not golden or polished. Single bell, portrait or square asset."
+    }
+  ]
+}
