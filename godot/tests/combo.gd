@@ -15,6 +15,21 @@ func check():
  root.add_child(game)
  game.set_process(false)
  game.start_game()
+ var panel=game.score_panel
+ var previous_strength=0.0
+ for value in range(1,11):
+  game.combo.hits=(value-1)*3
+  game.combo.remaining=5
+  panel._process(0)
+  assert(panel.combo_band(value)==(0 if value<=4 else 1 if value<=6 else 2 if value<=8 else 3))
+  if value<=4:assert(panel.fire==null)
+  else:
+   assert(panel.fire.accent_color==panel.flame_color(value))
+   assert(panel.fire.strength>previous_strength)
+   previous_strength=panel.fire.strength
+ game.combo.reset()
+ panel._process(0)
+ assert(panel.fire==null and panel.combo_band(panel.tier)==0)
  game.hero.pickup={"age":.4,"collected":false,"start_x":game.hero.x}
  var health=game.hero.hp
  var attacker=game.make_actor(900,660,100)

@@ -8,14 +8,20 @@ var fire_height=1.0
 var impact_age=10.0
 var score_age=10.0
 var last_score=0.0
-func stone(label: String,center: Vector2,height: float,max_width: float=280.0):
+func combo_band(value: int) -> int:
+ return 0 if value<=4 else 1 if value<=6 else 2 if value<=8 else 3
+func combo_color(value: int) -> Color:
+ return [Color(1.25,1.2,1.1),Color(2.5,.42,.30),Color(2.5,1.15,.20),Color(2.5,2.1,.30)][combo_band(value)]
+func flame_color(value: int) -> Color:
+ return [Color.TRANSPARENT,Color("ff3322"),Color("ff8614"),Color("ffe12b")][combo_band(value)]
+func stone(label: String,center: Vector2,height: float,max_width: float=280.0,color=Color(1.25,1.2,1.1)):
  var meta=game.art.data.menu["HUD "+label]
  var texture=game.art.texture("menu-"+meta.id+".png")
  if not bounds.has(label):bounds[label]=texture.get_image().get_used_rect()
  var rect=bounds[label]
  var factor=minf(height/rect.size.y,max_width/rect.size.x)
  var size=Vector2(rect.size)*factor
- draw_texture_rect_region(texture,Rect2(center-size*.5,size),rect,Color(1.25,1.2,1.1))
+ draw_texture_rect_region(texture,Rect2(center-size*.5,size),rect,color)
 
 func _process(dt):
  if not game:return
@@ -33,10 +39,11 @@ func _process(dt):
   tier=current
   if is_instance_valid(fire):fire.queue_free()
   fire=null
-  if tier>=4:
+  if tier>=5:
    var meta=game.art.data.menu["HUD %dX"%tier]
    fire=ContourFire.new()
    fire.menu_palette=true
+   fire.accent_color=flame_color(tier)
    add_child(fire)
    fire.show_behind_parent=true
    var mask=game.art.texture("menu-"+meta.id+".png").get_image()
@@ -49,7 +56,9 @@ func _process(dt):
  if fire:
   fire.scale=Vector2.ONE*combo_height()/fire_height
   fire.position=Vector2(0,151)+unrest()
-  fire.strength=.65+(tier-4)*.23+exp(-impact_age*7.)*.5
+  fire.strength=.65+(tier-5)*.30+exp(-impact_age*7.)*.5
+  fire.interior=.025+(tier-5)*.025
+  fire.animation_speed=1.0+(tier-5)*.04
   fire.emitting=game.combo.remaining>0
  queue_redraw()
 func combo_height() -> float:
@@ -61,8 +70,8 @@ func unrest() -> Vector2:
  return Vector2(sin(time*43),cos(time*37)*.6)*(burst+idle)
 func _draw():
  if not game or game.phase=="title":return
- stone("AREA %d/4"%game.screen_for_wave(game.wave),Vector2(-72,25),17,120)
- stone("BOSS" if game.wave==game.encounters.size() else "WAVE %d/3"%(1+(game.wave-1)%3),Vector2(72,25),17,120)
+ stone("AREA %d/4"%game.screen_for_wave(game.wave),Vector2(-72,25),17,120,Color(1.65,1.75,1.9))
+ stone("BOSS" if game.wave==game.encounters.size() else "WAVE %d/3"%(1+(game.wave-1)%3),Vector2(72,25),17,120,Color(1.8,1.5,.85))
  var digits="%06d"%game.score
  var width=minf(33.,230./digits.length())
  # One shared glyph scale preserves the numeral baseline and balanced tracking.
@@ -72,8 +81,8 @@ func _draw():
   if not bounds.has(digit):bounds[digit]=game.art.texture("menu-"+meta.id+".png").get_image().get_used_rect()
   widest=maxf(widest,float(bounds[digit].size.x)/bounds[digit].size.y)
  var height=minf(38.,(width-3.)/widest)*(1.+.025*exp(-score_age*12.))
- for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width)
- stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),187.5)
+ for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width,Color(1.9,1.95,2.0))
+ stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),187.5,combo_color(tier))
  if game.combo.hits>0:
   draw_rect(Rect2(-101,210,202,6),Color(.08,.035,.025,.8))
-  draw_rect(Rect2(-100,211,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))
+  draw_rect(Rect2(-100,211,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.45,.25,.9) if tier<=4 else flame_color(tier))

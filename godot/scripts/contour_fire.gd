@@ -6,6 +6,7 @@ var thermal_view: SubViewport
 var thermal: ShaderMaterial
 var menu_palette=false
 var yellow_palette=false
+var accent_color=Color.TRANSPARENT
 var emitting=true
 var strength=0.6
 var animation_speed=1.0
@@ -48,6 +49,7 @@ func setup(mask: Texture2D,source_size: Vector2,origin=Vector2.ZERO,with_heat=tr
 	surface.material.shader=load("res://shaders/contour_fire_surface.gdshader")
 	surface.material.set_shader_parameter("menu_palette",menu_palette)
 	surface.material.set_shader_parameter("yellow_palette",yellow_palette)
+	surface.material.set_shader_parameter("accent_color",accent_color)
 	add_child(surface)
 	if not with_heat:return
 	# A separate persistent temperature field keeps hot stone cooling after flames move.

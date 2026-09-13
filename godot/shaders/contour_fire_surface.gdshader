@@ -1,6 +1,7 @@
 shader_type canvas_item;
 uniform bool menu_palette=false;
 uniform bool yellow_palette=false;
+uniform vec4 accent_color : source_color = vec4(0.);
 uniform float opacity=1.0;
 void fragment(){
  float heat=texture(TEXTURE,UV).b;
@@ -17,6 +18,10 @@ void fragment(){
  if(yellow_palette){
   color=mix(vec3(.72,.30,.008),vec3(1.,.83,.035),smoothstep(.08,.42,heat));
   color=mix(color,vec3(1.,.98,.70),smoothstep(.55,.95,heat));
+ }
+ if(accent_color.a>0.){
+  color=mix(accent_color.rgb*.38,accent_color.rgb,smoothstep(.08,.45,heat));
+  color=mix(color,mix(accent_color.rgb,vec3(1.,.98,.84),.58),smoothstep(.65,1.,heat));
  }
  COLOR=vec4(color,smoothstep(.035,.3,heat)*.94*opacity);
 }
