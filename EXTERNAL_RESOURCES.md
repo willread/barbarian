@@ -127,3 +127,5 @@ Generated via the user's ElevenLabs account: 26 sound effects (`eleven_text_to_s
 
 Score HUD mockups (2026-09-12): studies/score-hud/directions-v1.png generated using OpenAI imagegen with current game reference. Suggested fonts Cinzel, Oswald and Rajdhani are SIL OFL 1.1; licenses: https://github.com/google/fonts/blob/main/ofl/cinzel/OFL.txt , https://github.com/google/fonts/blob/main/ofl/oswald/OFL.txt , https://github.com/google/fonts/blob/main/ofl/rajdhani/OFL.txt . Concept lettering is illustrative; no runtime font changes.
 Implemented HUD font: Cinzel, The Cinzel Project Authors, SIL OFL 1.1. Source https://github.com/google/fonts/tree/main/ofl/cinzel ; font and license retained in asset-sources/fonts/cinzel.ttf and cinzel-OFL.txt.
+
+Controls approval mockup (2026-09-12): Kenney Input Prompts 1.5, CC0, https://kenney.nl/assets/input-prompts . Used Xbox and PlayStation SVG glyphs retained in studies/controls/icons with original LICENSE.txt. Reuses the existing licensed Cinzel HUD font and original stone Back artwork. No runtime integration yet.
