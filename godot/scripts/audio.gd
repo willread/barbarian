@@ -19,7 +19,7 @@ func setup(source: Node2D):
 	game=source
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
 	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
-	for id in CLIP_IDS:
+	for id in CLIP_IDS+["egg_lay"]:
 		clips[id]=load("res://audio/"+("slam_boom" if id=="landing" else id)+".ogg")
 	clips["menu_activate"]=clips["menu_land"]
 	clips["enemy_impact"]=clips["flesh"]

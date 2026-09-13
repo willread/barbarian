@@ -83,7 +83,7 @@ func _draw():
  var height=minf(38.,(width-3.)/widest)*(1.+.025*exp(-score_age*12.))
  for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width,Color(1.9,1.95,2.0))
  stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),187.5,combo_color(tier))
- if game.combo.hits>0:
+ if game.combo.hits>0 or game.combo.bonus_multiplier>1:
   var bar_y=151+unrest().y+combo_height()*.5+8
   var fraction=clampf(game.combo.remaining/game.combo.timeout,0.,1.)
   draw_rect(Rect2(-101,bar_y,202,6),Color(.08,.035,.025,.8))

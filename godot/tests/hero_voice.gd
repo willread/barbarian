@@ -67,5 +67,7 @@ func check():
 	game.queue_free()
 	await process_frame
 	await process_frame
+	# Let the audio thread release the death stream before headless teardown.
+	await create_timer(.1).timeout
 	print("CAIRN_VOICE_OK: clip, envelope, deduplication, damage reaction, pause, expiration and reset")
 	quit()

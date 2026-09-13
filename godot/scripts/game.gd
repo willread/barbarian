@@ -41,6 +41,7 @@ var sparks: Array=[]
 var landing_impacts: Array=[]
 var chicken: Dictionary={}
 var chicken_node: Node2D
+var eggs: Array=[]
 var used_chickens: Array=[]
 var phase="title"
 var options=false
@@ -458,6 +459,7 @@ func apply_settings(persist: bool=true):
 		config.save("user://settings.cfg")
 
 func clear_world():
+	clear_eggs()
 	if hero_voice:hero_voice.reset()
 	for view in views.values(): view.queue_free()
 	for view in flame_views.values(): view.queue_free()
@@ -526,6 +528,7 @@ func spawn_wave(preserve_corpses: bool=false):
 	var next="citadel-%d"%screen_for_wave(wave)
 	if next!=background.key:
 		remove_chicken()
+		clear_eggs()
 		hero.bootCoat=0.0
 		hero.bootDistance=0.0
 		hero.bootPos=Vector2(hero.x,hero.y)
@@ -1200,17 +1203,21 @@ func flame(node: Node2D,point: Vector2,age: float,fade: float,s: float,width: fl
 		node.draw_texture_rect_region(art.texture("fluid-smoke-v1.png"),Rect2(point.x-w/2,point.y-h,w,h),source,Color(1,1,1,.65*(1-clamp(age-2.3,0,1))))
 
 func step_chicken(dt: float):
+	for egg in eggs:
+		egg.advance(dt)
+		if egg.expired:egg.queue_free()
+	eggs=eggs.filter(func(egg):return not egg.expired)
 	wave_time+=dt
 	var schedule={2:5,5:7,8:6,11:9}
 	if schedule.has(wave) and wave_time>=schedule[wave] and not wave in used_chickens and chicken.is_empty():
 		used_chickens.append(wave)
 		hero_voice.request_line("dinner",.9,4.)
-		chicken={"x":90.0,"y":610.0,"dir":1,"age":0.0,"roast":false,"turn":0.0,"hop":0.0,"height":0.0,"flight":false,"picked":false}
+		chicken={"x":90.0,"y":610.0,"dir":1,"age":0.0,"roast":false,"turn":0.0,"hop":0.0,"height":0.0,"flight":false,"picked":false,"egg_check":2.0,"egg_count":0,"lay":-1.0,"laid":false}
 		chicken_node=Node2D.new()
 		chicken_node.material=ShaderMaterial.new()
 		chicken_node.material.shader=load("res://shaders/chicken_edge.gdshader")
 		chicken_node.draw.connect(draw_chicken)
-		add_child(chicken_node)
+		arena_clip.add_child(chicken_node)
 	if chicken.is_empty(): return
 	var c=chicken
 	c.age+=dt
@@ -1266,7 +1273,22 @@ func step_chicken(dt: float):
 			hero.dir=1 if c.x>=hero.x else -1
 			hero.pickup={"age":0.0,"collected":false,"start_x":c.x}
 	else:
-		if c.age>10:
+		c["egg_check"]=c.get("egg_check",2.)-dt
+		if c.get("lay",-1.)<0 and c.egg_check<=0 and c.age<9 and c.height<=0:
+			c.egg_check=2.
+			if c.get("egg_count",0)<2 and randf()<.35:
+				c["lay"]=0.
+				c["laid"]=false
+				c.hop=0.
+		if c.get("lay",-1.)>=0:
+			c.lay+=dt
+			if c.lay>=.32 and not c.laid:
+				c.laid=true
+				c["egg_count"]=c.get("egg_count",0)+1
+				drop_egg(Vector2(c.x-c.dir*26,c.y),randf()<.1,-c.dir)
+				audio.play("egg_lay",-7)
+			if c.lay>=.65:c.lay=-1.;c.hop=.3
+		elif c.age>10:
 			c.x+=c.dir*350*dt
 			if c.x< -80 or c.x>1520: remove_chicken();return
 		else:
@@ -1313,13 +1335,30 @@ func remove_chicken():
 	chicken={}
 	if is_instance_valid(chicken_node): chicken_node.queue_free()
 
+func drop_egg(point: Vector2,golden: bool,direction: float=1.) -> Node2D:
+	var egg=preload("res://scripts/egg_pickup.gd").new()
+	egg.game=self
+	egg.golden=golden
+	egg.position=point
+	egg.drift=direction*35
+	arena_clip.add_child(egg)
+	eggs.append(egg)
+	return egg
+
+func clear_eggs():
+	for egg in eggs:
+		if is_instance_valid(egg):egg.queue_free()
+	eggs.clear()
+
 func draw_chicken():
 	if chicken.is_empty() or chicken.picked: return
 	var c=chicken
 	var atlas=art.data.atlases["chicken-v1"]
-	var cel=atlas.cels[10 if c.roast else 9 if c.hop else int(c.age*16)%8]
+	var laying=c.get("lay",-1.)>=0 and not c.roast
+	var cel=atlas.cels[10 if c.roast else 9 if c.hop or laying else int(c.age*16)%8]
 	var s=132/atlas.cellWidth*c.get("draw_scale",1.0)
-	chicken_node.draw_set_transform(Vector2(c.x,c.y-c.height*4.5),0,Vector2(c.dir,1))
+	var crouch=sin(clampf(c.get("lay",0.)/.65,0.,1.)*PI) if laying else 0.
+	chicken_node.draw_set_transform(Vector2(c.x,c.y-c.height*4.5),c.dir*crouch*.12,Vector2(c.dir*(1.+crouch*.12),1.-crouch*.28))
 	chicken_node.draw_texture_rect(art.texture(cel.file),Rect2((cel.left-atlas.cellWidth*.5)*s,-cel.height*s,cel.width*s,cel.height*s),false,Color(0.76,0.73,0.69,1.0))
 	chicken_node.draw_set_transform(Vector2.ZERO)
 
