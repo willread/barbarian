@@ -1,5 +1,13 @@
 # Results and Hall of Legends implementation
 
+## Mockup comparison revision
+
+Compared the live screens directly with `results-v4.png` and `hall-of-legends-v1.png`. Results now uses the reference's fine cellular cracked material (`slate-fine.png`), small-cap headline, wider section lettering, larger stat labels and numbers, fissured ivory score glyphs, and a prominent Rise Again action. The shared menu renderer accepts per-action emphasis and a footer height limit; the existing lettering, hit targets and fire remain in use. Portrait footers equalize the three actions and reserve more height. Post-game flames retain their requested yellow palette.
+
+Hall now has the reference's title/table spacing, brighter table text, selection triangle, readable day/month/year dates, and a two-line stone title in narrow windows. Its title assets use the Controls baker. Ten rows fit at 1280×720; smaller windows scroll. Hall remains disabled on the main menu until a run has established a score.
+
+Verification for this revision: native regression suite and real browser renders/navigation at 1280×720 and 540×960. The local Web export is updated. The Windows executable update remains pending while the player's Cairn process is open. The reference's generated lettering and simulated fire are interpreted through the game's existing fonts and interactive effects; these are actual runtime captures, not the concept images.
+
 The native game now uses the results panel above its existing blood splatter, a 0.9-second score count-up, per-stat NEW markers, and existing stone/fire menu actions. Both defeat and victory end in this view. Hall of Legends is available from the title and results, and Back restores the originating view without adding another score or replaying the results reveal.
 
 The visual parity revision replaces the initial flat text and nearly black panel with carved Cinzel headline/score glyphs, condensed Oswald stat numerals, cracked-slate material, a single bevelled bronze edge, section rules and amber record halos. Layout proportions now follow the approved results-v4 reference. The slate is cropped without distortion in wide and portrait panels. The lettering is baked from the project's fonts, remains live during score animation, and preserves its texture and bevels at arbitrary score values. Rebuild it with `node tools/godot/bake-results.mjs`; the material's exact imagegen prompt is recorded in `godot/art/results/README.md`.

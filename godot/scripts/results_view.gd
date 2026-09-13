@@ -12,7 +12,7 @@ var viewport_size=Vector2.ZERO
 var compact=false
 var panel_height=360.0
 var lettering=preload("res://scripts/results_art.gd").new()
-var slate=preload("res://art/results/slate.png")
+var slate=preload("res://art/results/slate-fine.png")
 var font=preload("res://art/controls/cinzel.ttf")
 var ink=Color("e7d5b0")
 var gold=Color("bda06d")
@@ -38,6 +38,8 @@ func _ready():
 	add_child(actions)
 	actions.setup(art)
 	actions.yellow_flames=true
+	actions.action_emphasis={"RISE AGAIN":1.6}
+	actions.action_height=110.0
 	actions.show_items(["HALL OF LEGENDS","RISE AGAIN","QUIT TO TITLE"],false,false)
 	actions.select(1,false)
 	actions.activated.connect(func(label):activated.emit(label))
@@ -52,12 +54,12 @@ func layout():
 	transform=Transform2D(0,Vector2.ZERO).scaled(Vector2.ONE*(get_viewport().get_visible_rect().size.x/width))
 	compact=width<900
 	var vertical=width<600
-	var footer=164.0 if vertical else clampf(viewport_size.y*.22,100,190)
+	var footer=210.0 if vertical else clampf(viewport_size.y*.22,100,190)
 	var top=112.0 if compact else clampf(viewport_size.y*.265,130,270)
 	var gutter=.055 if compact else .098
 	scroll.position=Vector2(width*gutter,top)
 	scroll.size=Vector2(width*(1.-gutter*2),maxf(60,viewport_size.y-top-footer))
-	panel_height=maxf(552,scroll.size.y-8) if compact else maxf(340,viewport_size.y*.47)
+	panel_height=maxf(600,scroll.size.y-8) if compact else maxf(350,viewport_size.y*.48)
 	content.custom_minimum_size=Vector2(0,panel_height)
 	actions.layout_actions(Rect2(width*.085,viewport_size.y-footer,width*.83,footer-42),vertical)
 	backdrop.queue_redraw()
@@ -72,7 +74,7 @@ func draw_heading():
 	var title="THE VALLEY IS FREE." if result.get("outcome")=="won" else "EVEN HEROES FALL."
 	var y=50.0 if compact else scroll.position.y*.52
 	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,y),34 if compact else clampf(viewport_size.x*.044,40,80),viewport_size.x*.78)
-	label(backdrop,"CITADEL  ·  AREA %d OF 4"%result.get("area",1),Vector2(viewport_size.x*.5,88 if compact else scroll.position.y*.82),18 if compact else 21,ink)
+	label(backdrop,"C I T A D E L   ·   A R E A   %d   O F   4"%result.get("area",1),Vector2(viewport_size.x*.5,88 if compact else scroll.position.y*.82),14 if compact else 20,ink,viewport_size.x*.9)
 
 func rule(a: Vector2,b: Vector2,bright=false):
 	content.draw_line(a+Vector2(0,1),b+Vector2(0,1),Color(.05,.02,.005,.9),2)
@@ -89,14 +91,14 @@ func record_label(key: String,at: Vector2,large=false):
 		content.draw_set_transform(at,0,Vector2(1,.18))
 		content.draw_circle(Vector2.ZERO,width*i/12,Color(1,.22,.005,alpha))
 	content.draw_set_transform(Vector2.ZERO)
-	lettering.label(content,"NEW",at,20 if large else 12,100,Color(1.2,.70,.12))
+	lettering.label(content,"NEW",at,20 if large else 12,100,Color(1.2,.85,.12))
 
 func draw_panel():
 	var w=content.size.x
 	if w<=0:return
 	var rect=Rect2(3,3,w-6,panel_height-12)
 	var source_size=rect.size*minf(slate.get_width()/rect.size.x,slate.get_height()/rect.size.y)
-	content.draw_texture_rect_region(slate,rect,Rect2((slate.get_size()-source_size)*.5,source_size),Color(.65,.65,.65))
+	content.draw_texture_rect_region(slate,rect,Rect2((slate.get_size()-source_size)*.5,source_size),Color(.70,.70,.70))
 	# One narrow bevelled bronze edge, not nested frames.
 	content.draw_line(rect.position,Vector2(rect.end.x,rect.position.y),Color("eed49a"),3)
 	content.draw_line(rect.position,Vector2(rect.position.x,rect.end.y),Color("bc8a45"),3)
@@ -105,10 +107,10 @@ func draw_panel():
 	var score_h=240.0 if compact else rect.size.y
 	var score_w=w if compact else w*.50
 	var cx=score_w*.5
-	lettering.label(content,"FINAL SCORE",Vector2(cx,32),17,score_w*.8)
+	lettering.label(content,"FINAL SCORE",Vector2(cx,32),19 if compact else 22,score_w*.8)
 	rule(Vector2(30,53),Vector2(score_w-30,53))
 	var t=1.-pow(1.-clampf(age/.9,0,1),3)
-	lettering.number(content,CairnRunRecords.number(float(result.get("score",0))*t),"score",Vector2(cx,score_h*.46),98 if compact else score_h*.35,score_w*.87)
+	lettering.number(content,CairnRunRecords.number(float(result.get("score",0))*t),"score",Vector2(cx,score_h*.46),98 if compact else score_h*.32,score_w*.87)
 	var new_score="score" in result.get("new_stats",[])
 	if new_score and age>=.9:
 		rule(Vector2(30,score_h*.78),Vector2(cx-43,score_h*.78),true)
@@ -129,7 +131,7 @@ func draw_panel():
 	var sw=w-left
 	if compact:rule(Vector2(20,top),Vector2(w-20,top))
 	else:rule(Vector2(left,20),Vector2(left,rect.end.y-20))
-	lettering.label(content,"THIS RUN",Vector2(left+sw*.5,top+32),17,sw*.8)
+	lettering.label(content,"THIS RUN",Vector2(left+sw*.5,top+32),19 if compact else 22,sw*.8)
 	rule(Vector2(left+20,top+53),Vector2(w-20,top+53))
 	var row=(rect.end.y-top-62)/3
 	rule(Vector2(left+sw*.5,top+62),Vector2(left+sw*.5,rect.end.y-15))
@@ -139,11 +141,11 @@ func draw_panel():
 		var x=left+sw*(.25+.5*col)
 		var key=STATS[i][0]
 		var title="RUN TIME" if key=="time" and result.get("outcome")=="won" else STATS[i][1]
-		lettering.label(content,title,Vector2(x,y+11),10 if compact else 11,sw*.43)
+		lettering.label(content,title,Vector2(x,y+11),12 if compact else 14,sw*.43)
 		var value=CairnRunRecords.duration(result.get(key,0)) if key=="time" else CairnRunRecords.number(result.get(key,0))
 		if key=="best_combo":value+=" HITS"
 		if key=="peak_multiplier":value+="×"
-		lettering.number(content,value,"stat",Vector2(x,y+row*.50),32 if compact else minf(43,row*.43),sw*.41)
+		lettering.number(content,value,"stat",Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
 		record_label(key,Vector2(x,y+row*.83))
 		if i<4:rule(Vector2(left+sw*.5*col+15,y+row),Vector2(left+sw*.5*(col+1)-15,y+row))
 

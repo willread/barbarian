@@ -3,6 +3,8 @@ signal activated(label: String)
 signal sound_requested(id: String)
 var art: CairnArt
 var yellow_flames=false
+var action_emphasis: Dictionary={}
+var action_height=64.0
 var items: Array=[]
 const LOCKED=["EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS"]
 var unavailable: Callable
@@ -26,11 +28,12 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 	selected=0
 	title_mode=is_title
 	var options=not labels.has("BEGIN") and labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
-	var size=1.0 if is_title and labels.has("BEGIN") else .58 if labels.size()>3 else .71
+	var base_size=1.0 if is_title and labels.has("BEGIN") else .58 if labels.size()>3 else .71
 	var center=417.6 if is_title else 720.0
 	var top=380.7 if is_title else 430.0
 	for i in labels.size():
 		var label=labels[i]
+		var size=base_size*float(action_emphasis.get(label,1.0))
 		var meta=art.data.menu[label]
 		var group=Node2D.new()
 		var spacing=.75 if is_title and labels.has("BEGIN") else (.83 if compact_pause else 1.0)
@@ -141,6 +144,14 @@ func layout_screen(size: Vector2,is_title: bool):
 # Reuse the same baked letters, hit targets and contour fire in screen footers.
 func layout_actions(rect: Rect2,vertical: bool=false):
 	if items.is_empty():return
+	for item in items:
+		if not item.has("action_width"):
+			item.action_width=item.width
+			item.action_height=item.height
+		var emphasis=1.0/float(action_emphasis.get(item.label,1.0)) if vertical else 1.0
+		item.node.scale=Vector2.ONE*emphasis
+		item.width=item.action_width*emphasis
+		item.height=item.action_height*emphasis
 	var widest=0.0
 	var tallest=0.0
 	var total=0.0
@@ -148,7 +159,7 @@ func layout_actions(rect: Rect2,vertical: bool=false):
 		widest=maxf(widest,item.width)
 		tallest=maxf(tallest,item.height)
 		total+=item.width
-	var factor=minf(60.0/tallest,minf(rect.size.x/widest,rect.size.y/(items.size()*(tallest+18)))) if vertical else minf(64.0/tallest,minf(rect.size.x/(total+80*(items.size()-1)),rect.size.y/tallest))
+	var factor=minf(60.0/tallest,minf(rect.size.x/widest,rect.size.y/(items.size()*(tallest+18)))) if vertical else minf(action_height/tallest,minf(rect.size.x/(total+80*(items.size()-1)),rect.size.y/tallest))
 	scale=Vector2.ONE*factor
 	position=rect.position
 	var cursor=(rect.size.x/factor-total-80*(items.size()-1))*.5

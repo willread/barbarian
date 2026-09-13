@@ -1,5 +1,9 @@
 # Results materials and lettering
 
+`slate-fine.png` is the revised runtime panel material, generated from the approved `results-v4.png` reference to match its fine cellular fissures rather than the earlier material's broad marble-like veins. The original `slate.png` remains the reproducible glyph baker's mineral source. Ivory glyph fissures are deterministic, mask-clipped strokes in `bake-results.mjs`.
+
+Exact revised material prompt: "Use case: stylized-concept. Production game material asset. Use the attached approved UI mockup solely as the material reference. Create a flat orthographic texture of ONLY the black finely cracked surface inside its score panel, edge-to-edge, landscape 3:2. Closely match its small irregular cellular cracks, subtle dark bronze hairline fissures and charcoal stone islands with quiet rough highlights. Dense fine irregular craquelure, not long diagonal veins, not marble, not gold streaks. Muted near-black overall, subtle tactile detail; no large-scale lighting gradient. Absolutely no text, numbers, borders, frame, blood, buttons or other UI. The result will be a texture behind separately drawn live text."
+
 `slate.png` is a project-bound material generated with built-in imagegen from the approved `studies/post-game/results-v4.png` reference. It is used as a texture behind live UI, not as a static screenshot.
 
 `lettering.json`, `score-*.png`, `stat-*.png` and `label-*.png` are reproducible raster lettering baked by `node tools/godot/bake-results.mjs` from the existing project Cinzel and Oswald fonts and this stone material. Score glyphs preserve their baseline and bevel during live count-up; stat glyphs use condensed Oswald. The existing font licenses remain in `asset-sources/fonts/`. Menu actions continue to use the original menu/font/fire pipeline.

@@ -34,7 +34,20 @@ function render(text,family,size,weight,tracking=0){
   pixels.data[i]=232+texture+light;pixels.data[i+1]=216+texture+light;pixels.data[i+2]=180+texture+light;
   pixels.data[i+3]=a;
  }
- const face=createCanvas(w,h);face.getContext('2d').putImageData(pixels,0,0);
+ const face=createCanvas(w,h),fg=face.getContext('2d');fg.putImageData(pixels,0,0);
+ // Fine angular fissures in the ivory face, clipped to the live glyph mask.
+ // Fixed seeds keep the material stable during score count-up.
+ if(family==='Cinzel' && size>100){
+  fg.globalCompositeOperation='source-atop';
+  let seed=[...text].reduce((n,ch)=>n*31+ch.codePointAt(0),17)>>>0;
+  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
+  for(let i=0;i<Math.ceil(advance/size*9);i++){
+   let x=pad+random()*advance,y=baseline-cap+random()*cap;
+   fg.beginPath();fg.moveTo(x,y);
+   for(let j=0;j<4;j++){x+=(random()-.5)*size*.14;y+=size*(.025+random()*.06);fg.lineTo(x,y)}
+   fg.strokeStyle='rgba(74,47,25,.52)';fg.lineWidth=size*.0035;fg.stroke();
+  }
+ }
  const side=createCanvas(w,h),sg=side.getContext('2d');sg.putImageData(mask,0,0);sg.globalCompositeOperation='source-in';sg.fillStyle='#493323';sg.fillRect(0,0,w,h);
  g.clearRect(0,0,w,h);g.shadowColor='#000c';g.shadowBlur=size*.028;g.shadowOffsetY=size*.024;
  for(let z=Math.ceil(size*.035);z>0;z--)g.drawImage(side,z*.45,z);
@@ -50,7 +63,10 @@ for(const [kind,family,size,weight,chars] of [['score','Cinzel',240,600,'0123456
  }
 }
 for(const text of ['EVEN HEROES FALL.','THE VALLEY IS FREE.','FINAL SCORE','THIS RUN','ENEMIES SLAIN','TIME SURVIVED','RUN TIME','BEST COMBO','PEAK MULTIPLIER','DAMAGE DEALT','DAMAGE TAKEN','NEW']){
- const headline=text.endsWith('.'),r=render(text,'Cinzel',headline?110:54,600,headline?1.5:6);
+ const headline=text.endsWith('.');
+ const display=headline?text.toLowerCase().replace(/\b\w/g,ch=>ch.toUpperCase()):text;
+ const tracking=['FINAL SCORE','THIS RUN','NEW'].includes(text)?10:6;
+ const r=render(display,'Cinzel',headline?110:54,600,headline?1.5:tracking);
  const file=`label-${text.toLowerCase().replace(/[^a-z]+/g,'-').replace(/-$/,'')}.png`;
  fs.writeFileSync(`${out}/${file}`,r.canvas.toBuffer('image/png'));
  manifest.labels[text]={file,width:r.canvas.width,height:r.canvas.height,advance:r.advance,pad:r.pad,baseline:r.baseline,cap:r.cap};
