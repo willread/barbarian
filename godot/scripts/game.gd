@@ -64,6 +64,7 @@ var magic=0.0
 var displayed_health=100.0
 var displayed_mana=0.0
 var spell=-1
+var spell_combo_targets: Array=[]
 var next_id=0
 var hero_voice: Node
 var title_intro=0.0
@@ -421,6 +422,7 @@ func start_game():
 	kills=0
 	magic=0
 	spell=-1
+	spell_combo_targets.clear()
 	displayed_health=100
 	displayed_mana=0
 	used_chickens.clear()
@@ -532,6 +534,7 @@ func can_cast() -> bool:
 
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
+	if f.player and not f.pickup.is_empty():return
 	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
 	if attacker.player and not f.player and a.get("type","")=="charge" and e_ai.heavy(f):
 		m.rebound_charge(attacker,int(a.direction))
@@ -561,9 +564,15 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if f.hp<previous_hp:
 		if f.player:combo.reset()
-		elif attacker.player and not a.get("magic",false):
-			combo.hit()
-			score+=10*combo.multiplier()
+		elif attacker.player:
+			# Continuous magic sustains the chain, but awards only one hit per target per cast.
+			if a.get("magic",false) and f.id in spell_combo_targets:
+				combo.remaining=combo.timeout
+				combo.waiting_for_combat=false
+			else:
+				combo.hit()
+				score+=10*combo.multiplier()
+				if a.get("magic",false):spell_combo_targets.append(f.id)
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
 	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
@@ -733,6 +742,7 @@ func tick(dt: float):
 			hero.recoil=0
 			hero.stagger=0
 			hero.invTicks=max(hero.invTicks,24)
+		spell_combo_targets.clear()
 		spell=0
 		magic=0
 	if spell>=0:
@@ -827,6 +837,7 @@ func tick(dt: float):
 	for f in enemies:
 		e_ai.keep_in_arena(f)
 		background.constrain(f)
+	if not hero.pickup.is_empty():return # Finish eating before an area transition can clear the pickup.
 	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0):
 		wave_clear_time+=dt
 		if wave<encounters.size() and screen_for_wave(wave+1)==screen_for_wave(wave):

@@ -15,6 +15,27 @@ func check():
  root.add_child(game)
  game.set_process(false)
  game.start_game()
+ game.hero.pickup={"age":.4,"collected":false,"start_x":game.hero.x}
+ var health=game.hero.hp
+ var attacker=game.make_actor(900,660,100)
+ for strike in [{"damage":100,"direction":1,"knock":true},{"damage":3,"direction":1,"no_stun":true}]:
+  game.damage(game.hero,strike,attacker)
+  assert(game.hero.hp==health and game.hero.hurtTicks==0 and game.hero.down.is_empty())
+  assert(not game.hero.pickup.is_empty())
+ game.hero.pickup={}
+ var magic_target=game.make_actor(900,660,100)
+ game.combo.reset()
+ game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
+ assert(game.combo.hits==1)
+ var magic_score=game.score
+ game.combo.remaining=.01
+ game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
+ assert(game.combo.hits==1 and game.score==magic_score and game.combo.remaining==game.combo.timeout)
+ game.spell_combo_targets.clear()
+ game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
+ assert(game.combo.hits==2)
+ game.combo.reset()
+ game.score=0
  var enemy=game.make_actor(900,660,100)
  enemy.kind="bone"
  for i in 3:game.damage(enemy,{"damage":1,"direction":1},game.hero)
@@ -22,7 +43,7 @@ func check():
  var points=game.score
  var mana=game.magic
  game.damage(enemy,{"damage":.1,"direction":1,"magic":true,"continuous":true},game.hero)
- assert(game.score==points and game.combo.hits==3 and game.magic==mana)
+ assert(game.score==points+20 and game.combo.hits==4 and game.magic==mana)
  game.damage(game.hero,{"damage":1,"direction":-1},enemy)
  assert(game.combo.hits==0)
  game.settings_page="game"
@@ -60,5 +81,5 @@ func check():
  incoming.y=game.hero.y
  game.step_combo(.1)
  assert(game.combo.remaining==3.25 and not game.combo.waiting_for_combat)
- print("CAIRN_COMBO_OK: tiers, mana, healing, timeout, hit scores, magic exclusion, damage reset and holiday choices")
+ print("CAIRN_COMBO_OK: tiers, mana, healing, timeout, hit scores, magic continuation, pickup protection, damage reset and holiday choices")
  quit()
