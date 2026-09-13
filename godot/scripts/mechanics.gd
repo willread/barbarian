@@ -5,6 +5,7 @@ extends RefCounted
 const HZ = 59.92274340431231
 const STEP = 1.0 / HZ
 const SCALE = 4.5
+const MELEE_LANE = 8 * SCALE
 const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":48}}
 var combat_extensions=false
 var attacks: Dictionary
@@ -126,7 +127,7 @@ func select_strike(f: Dictionary, targets: Array) -> String:
 	var nearest={}
 	for e in targets:
 		var distance=(e.x-f.x)*f.dir
-		if standing(e) and abs(e.y-f.y)<8*SCALE and distance>=0 and distance<=WEAPONS[f.weapon].reach*SCALE:
+		if standing(e) and abs(e.y-f.y)<MELEE_LANE and distance>=0 and distance<=WEAPONS[f.weapon].reach*SCALE:
 			if nearest.is_empty() or distance<abs(nearest.x-f.x): nearest=e
 	if not nearest.is_empty() and nearest.stagger>=2 and nearest.hurtTicks>0:
 		if abs(nearest.x-f.x)/SCALE+4<44: return "kick" if nearest.stagger>=4 else "pommel"
@@ -192,14 +193,23 @@ func rect(f: Dictionary, box: Array, direction: int) -> Rect2:
 
 func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
 	if a.get("dive",false):return false # Slam damage is resolved once, at ground contact.
-	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=a.get("lane",8*SCALE): return false
+	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=minf(a.get("lane",MELEE_LANE),MELEE_LANE): return false
 	var body=[-15,18,-47,47]
 	if e.player:
 		body=([-16,32,-56,56] if e.stagger==1 else [-8,24,-40,40]) if e.recovering or e.hurtTicks else [-16,28,-60,60]
 	elif e.hurtTicks: body=[-19,25,-37,37]
 	elif not e.attack.is_empty(): body=[-25,24,-45,45]
 	var box=a.get("box",[-4,a.reach+4,-48,64 if a.type=="air" else 48])
-	return rect(f,box,a.direction).intersects(rect(e,body,e.dir),true)
+	var strike=rect(f,box,a.direction)
+	var target=rect(e,body,e.dir)
+	# Floor depth is checked once above, independently of the drawn weapon height.
+	# Grounded actors in the same lane can trade blows from either side of it.
+	if f.height<=0 and e.height<=0:
+		return strike.position.x<=target.end.x and strike.end.x>=target.position.x
+	# Airborne contact still needs height overlap, measured from a shared floor.
+	strike.position.y-=f.y/SCALE
+	target.position.y-=e.y/SCALE
+	return strike.intersects(target,true)
 
 func tick_attack(f: Dictionary, targets: Array, hit: Callable) -> Dictionary:
 	if f.attack.is_empty(): return {}
