@@ -1,5 +1,7 @@
 # Results and Hall of Legends implementation
 
+Latest layout: post-game actions always form a centered vertical stack, retaining their sequential drop-in and yellow fire. Heading, panel and menu are sized together and vertically centered, with panel scrolling reserved for short/narrow windows. `AREA X/4` is inside the score half below FINAL SCORE, at the same 71px local baseline center and 14px lettering height as the top stat labels (12px in compact layout). The defeat heading is `EVEN HEROES FALL` without a period. Tests verify centered, non-overlapping stacked actions at every supported test size; these changes supersede the horizontal-action notes below.
+
 Latest text treatment: the right-hand section is **STATS**. `bake-results.mjs` now invokes the same `stone-text.js` renderer, menu stone material, bevel, extrusion and palette transforms used by the Hall/Controls heading and HUD score baker. Runtime brightness matches the HUD. Cinzel headings/score and Oswald stats retain live content and shared glyph baselines. This replaces the custom ivory renderer described in earlier revision notes below. NEW combines a letter-shaped, multi-radius amber bloom with broader reflected light and a brighter stone core.
 
 ## Mockup comparison revision

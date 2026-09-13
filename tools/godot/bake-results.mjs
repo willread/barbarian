@@ -37,9 +37,9 @@ for(const [kind,family,chars] of [['score','Cinzel','0123456789,'],['stat','Oswa
   manifest.glyphs[kind][ch]={file,width:c.width,height:c.height,advance:ch===' '?50:c.width-pad*2+3,pad,baseline:box.y+box.h,cap:box.h};
  }
 }
-for(const text of ['EVEN HEROES FALL.','THE VALLEY IS FREE.','FINAL SCORE','STATS','ENEMIES SLAIN','TIME SURVIVED','RUN TIME','BEST COMBO','PEAK MULTIPLIER','DAMAGE DEALT','DAMAGE TAKEN','NEW']){
- const c=await render(text,'Cinzel',text.endsWith('.')?1:3),box=bounds(c);
- const file=`label-${text.toLowerCase().replace(/[^a-z]+/g,'-').replace(/-$/,'')}.png`;
+for(const text of ['EVEN HEROES FALL','THE VALLEY IS FREE.','FINAL SCORE','STATS','AREA 1/4','AREA 2/4','AREA 3/4','AREA 4/4','ENEMIES SLAIN','TIME SURVIVED','RUN TIME','BEST COMBO','PEAK MULTIPLIER','DAMAGE DEALT','DAMAGE TAKEN','NEW']){
+ const c=await render(text,'Cinzel',text.startsWith('EVEN HEROES')||text.endsWith('.')?1:3),box=bounds(c);
+ const file=`label-${text.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'')}.png`;
  fs.writeFileSync(`${out}/${file}`,c.toBuffer('image/png'));
  manifest.labels[text]={file,width:c.width,height:c.height,advance:box.w,pad:box.x,baseline:box.y+box.h,cap:box.h};
  if(text==='NEW'){

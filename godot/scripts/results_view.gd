@@ -11,6 +11,8 @@ var actions: Node2D
 var viewport_size=Vector2.ZERO
 var compact=false
 var panel_height=360.0
+var heading_y=50.0
+var heading_height=40.0
 var lettering=preload("res://scripts/results_art.gd").new()
 var slate=preload("res://art/results/slate-fine.png")
 var font=preload("res://art/controls/cinzel.ttf")
@@ -38,9 +40,6 @@ func _ready():
 	add_child(actions)
 	actions.setup(art)
 	actions.yellow_flames=true
-	actions.action_emphasis={"RISE AGAIN":1.6}
-	actions.action_height=110.0
-	actions.centered_action="RISE AGAIN"
 	actions.show_items(["HALL OF LEGENDS","RISE AGAIN","QUIT TO TITLE"],false,false)
 	actions.select(1,false)
 	actions.activated.connect(func(label):activated.emit(label))
@@ -55,15 +54,23 @@ func layout():
 	viewport_size=Vector2(width,pixels.y*width/maxf(1,pixels.x))
 	transform=Transform2D(0,Vector2.ZERO).scaled(Vector2.ONE*(get_viewport().get_visible_rect().size.x/width))
 	compact=width<900
-	var vertical=width<600
-	var footer=210.0 if vertical else clampf(viewport_size.y*.22,100,190)
-	var top=112.0 if compact else clampf(viewport_size.y*.265,130,270)
+	var margin=clampf(viewport_size.y*.04,12,40)
+	var gap=clampf(viewport_size.y*.025,12,28)
+	var heading_space=clampf(viewport_size.y*.08,28,70)
+	var footer=clampf(viewport_size.y*.28,150,240)
+	var desired_panel=630.0 if compact else clampf(viewport_size.y*.46,340,500)
+	var panel_space=minf(desired_panel,maxf(60,viewport_size.y-2*margin-heading_space-2*gap-footer))
+	var group_height=heading_space+2*gap+panel_space+footer
+	var group_top=maxf(margin,(viewport_size.y-group_height)*.5)
+	heading_y=group_top+heading_space*.5
+	heading_height=heading_space*.8
+	var top=group_top+heading_space+gap
 	var gutter=.055 if compact else .098
 	scroll.position=Vector2(width*gutter,top)
-	scroll.size=Vector2(width*(1.-gutter*2),maxf(60,viewport_size.y-top-footer))
-	panel_height=maxf(600,scroll.size.y-8) if compact else maxf(350,viewport_size.y*.48)
+	scroll.size=Vector2(width*(1.-gutter*2),panel_space)
+	panel_height=maxf(630 if compact else 340,panel_space)
 	content.custom_minimum_size=Vector2(0,panel_height)
-	actions.layout_actions(Rect2(width*.085,viewport_size.y-footer,width*.83,footer-42),vertical)
+	actions.layout_actions(Rect2(width*.085,top+panel_space+gap,width*.83,footer),true)
 	backdrop.queue_redraw()
 	content.queue_redraw()
 
@@ -73,10 +80,8 @@ func label(node: CanvasItem,value: String,center: Vector2,size: int,color: Color
 	node.draw_string(font,center-Vector2(font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x*.5,-actual*.34),value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual,color)
 
 func draw_heading():
-	var title="THE VALLEY IS FREE." if result.get("outcome")=="won" else "EVEN HEROES FALL."
-	var y=50.0 if compact else scroll.position.y*.52
-	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,y),34 if compact else clampf(viewport_size.x*.044,40,80),viewport_size.x*.78)
-	label(backdrop,"AREA %d/4"%result.get("area",1),Vector2(viewport_size.x*.5,88 if compact else scroll.position.y*.82),18 if compact else 21,ink,viewport_size.x*.9)
+	var title="THE VALLEY IS FREE." if result.get("outcome")=="won" else "EVEN HEROES FALL"
+	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,heading_y),heading_height,viewport_size.x*.78)
 
 func rule(a: Vector2,b: Vector2,bright=false):
 	content.draw_line(a+Vector2(0,1),b+Vector2(0,1),Color(.05,.02,.005,.9),2)
@@ -107,14 +112,15 @@ func draw_panel():
 	content.draw_line(rect.position,Vector2(rect.position.x,rect.end.y),Color("bc8a45"),3)
 	content.draw_line(Vector2(rect.position.x,rect.end.y),rect.end,Color("a47235"),3)
 	content.draw_line(Vector2(rect.end.x,rect.position.y),rect.end,Color("775025"),3)
-	var score_h=240.0 if compact else rect.size.y
+	var score_h=270.0 if compact else rect.size.y
 	var score_w=w if compact else w*.50
 	var cx=score_w*.5
 	lettering.label(content,"FINAL SCORE",Vector2(cx,32),19 if compact else 22,score_w*.8)
 	rule(Vector2(30,53),Vector2(score_w-30,53))
+	lettering.label(content,"AREA %d/4"%result.get("area",1),Vector2(cx,71),12 if compact else 14,score_w*.8)
 	var t=1.-pow(1.-clampf(age/.9,0,1),3)
 	var score_size=82.0 if compact else score_h*.32
-	var score_center=(53.0+score_h*.9)*.5
+	var score_center=(85.0+score_h*.9)*.5
 	lettering.number(content,CairnRunRecords.number(float(result.get("score",0))*t),"score",Vector2(cx,score_center),score_size,score_w*.87)
 	record_label("score",Vector2(cx,score_center+score_size*.5+18),true)
 	var best=int(result.get("previous_best",0))

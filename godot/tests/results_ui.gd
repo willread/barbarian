@@ -64,11 +64,10 @@ func check():
 		await process_frame
 		var view=game.results_view
 		assert(is_equal_approx(view.actions.position.x+view.actions.items[1].x*view.actions.scale.x,view.viewport_size.x*.5))
-		if dimensions.x>=600:
-			var items=view.actions.items
-			var left_gap=items[1].x-items[1].width*.5-(items[0].x+items[0].width*.5)
-			var right_gap=items[2].x-items[2].width*.5-(items[1].x+items[1].width*.5)
-			assert(is_equal_approx(left_gap,right_gap) and left_gap>0)
+		for i in view.actions.items.size():
+			var item=view.actions.items[i]
+			assert(is_equal_approx(view.actions.position.x+item.x*view.actions.scale.x,view.viewport_size.x*.5))
+			if i>0:assert(item.y>view.actions.items[i-1].y+view.actions.items[i-1].height)
 		assert(view.scroll.position.y+view.scroll.size.y<view.viewport_size.y)
 		for item in view.actions.items:
 			var rect=Rect2(view.actions.position+item.node.position*view.actions.scale,Vector2(item.width,item.height)*view.actions.scale)
