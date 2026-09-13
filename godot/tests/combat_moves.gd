@@ -68,6 +68,19 @@ func _init():
 	assert(runner.attack.is_empty() and runner.hurtTicks==24 and runner.hp==100)
 	for i in 5:m.reaction(runner)
 	assert(runner.x<700 and runner.hurtTicks>0,"Rebound moves backward while stunned")
+	assert(m.begin(runner,"spin"),"Spin must escape charge recoil")
+	assert(runner.hurtTicks==0 and runner.recovering==0 and runner.chargeRebound==0)
+	var trapped=m.make(11,720,660,100,true)
+	m.hurt(trapped,{"direction":1,"knock":true})
+	assert(m.begin(trapped,"spin"),"Spin must escape knockdown")
+	assert(trapped.down.is_empty() and trapped.attack.spin)
+	var staggered=m.make(12,720,660,100,true)
+	m.hurt(staggered,{"direction":1,"knock":false})
+	assert(m.begin(staggered,"spin"),"Spin must escape ordinary stun")
+	assert(staggered.hurtTicks==0 and staggered.recovering==0)
+	staggered.attack={}
+	staggered.hp=0
+	assert(not m.begin(staggered,"spin"),"Spin cannot resurrect player")
 	var slow=m.make(20,800,660,100)
 	slow.size=1.18
 	slow.dir=1

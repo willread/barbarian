@@ -102,3 +102,7 @@ Sound lab now includes per-event game-volume trim (-30 to +6 dB) with a reset bu
 ## Seasonal equipment
 
 Candy Cane is available in Options > Game > Weapon for testing, with the Santa hat attached to that weapon. There is no separate holiday toggle. The first launch each local calendar day temporarily equips it; subsequent launches restore the saved regular weapon. Choosing another regular weapon updates that preference. The candy cane never overwrites it. `initialize_weapon` in `scripts/game.gd` controls this daily offer.
+
+Enemy hit sounds: F8 > Enemy hit impacts offers 12 independently generated impact clips. Check any subset for random successful melee-hit playback (no immediate repeat); uncheck all to silence. Preview buttons audition without changing selection. Pool choices persist in soundboard.cfg and are included in exported choices. Charge and arrow hits retain their dedicated sounds.
+Spin can escape living-player hit-stun, knockdown and charge recoil after the normal attack hold threshold. A normal swing still finishes first, and releasing attack is required before the next spin.
+

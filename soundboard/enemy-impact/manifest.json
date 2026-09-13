@@ -1,0 +1,112 @@
+{
+  "jobs": [
+    {
+      "id": "enemy-impact-1",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Meaty hammerblow",
+      "description": "Dense wet meat impact with a short low thump.",
+      "prompt": "A single extremely heavy blunt strike into a thick slab of raw meat: immediate bassy THUD, compact wet compression, brief sticky release. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-2",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Rib crusher",
+      "description": "Brittle ribs break beneath a deep fleshy impact.",
+      "prompt": "One brutal impact on a fleshy rib cage: deep rounded body thud followed immediately by two tiny brittle rib fractures and a damp squelch. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-3",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Deep cleave",
+      "description": "Heavy blade contact and a short wet tear.",
+      "prompt": "One heavy cleaver sinks into thick raw meat: abrupt low chunky CHUNK, dense wet split, short fibrous tear ending dead. Contact only, absolutely no blade swoosh. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-4",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Gut punch",
+      "description": "Soft visceral collapse with substantial bass.",
+      "prompt": "One powerful punch into a soaked heavy meat sack: low hollow WHUMP with a thick internal liquid churn and a tiny wet slap, compact and violent. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-5",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Skull crunch",
+      "description": "Hard dry crunch with a dark wet body.",
+      "prompt": "One crushing blow to a monster skull: deep solid KLOCK, coarse bone crunch, tiny damp debris fall. Heavy and tactile rather than metallic. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-6",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Tendon rip",
+      "description": "A quick dense hit followed by fibrous tearing.",
+      "prompt": "Single close combat impact: weighty low THOCK into flesh followed by one short gritty tendon tear and sticky snap. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-7",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Wet backbreaker",
+      "description": "Broad low crack and compressed flesh.",
+      "prompt": "One massive blow crushing a bone inside thick muscle: bassy padded slam, broad woody bone crack, compressed wet pulp. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-8",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Butcher block",
+      "description": "Short percussive chop, thick and grounded.",
+      "prompt": "One butcher cleaver impact on a heavy raw carcass resting on wood: dark low CHOCK, wet meat compression, tiny dry wooden undertone. No swing before contact. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-9",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Organ rupture",
+      "description": "Muffled internal burst under a heavy hit.",
+      "prompt": "One brutal body impact ruptures a fluid filled organ: muted bass THUMP, short thick bubbling splat and immediate silence. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-10",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Armor and flesh",
+      "description": "Dull armor dent backed by a gruesome crunch.",
+      "prompt": "One heavy blow dents leather covered armor into meat: dull low knock, coarse crunch, compact wet squish underneath. No ringing metal. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-11",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Bone shear",
+      "description": "Sharp small fracture above a bassy meat hit.",
+      "prompt": "One powerful strike shears a thick bone inside a raw joint: bassy meaty THUD with one tight dry fracture and a very short sticky recoil. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    },
+    {
+      "id": "enemy-impact-12",
+      "group": "enemy_impact",
+      "label": "Enemy hit impacts · random selection",
+      "name": "Pulpy execution",
+      "description": "A deep crushing impact with a restrained splatter.",
+      "prompt": "One devastating heavy weapon contact with a thick carcass: deep dense CRUMP, pulpy wet crush and several tiny droplets, all tightly clustered as one impact. Dark fantasy melee contact. Close dry gruesome foley, strong bass and low-mid weight, subdued treble. Immediate onset, decay under one second. ONE hit only. No swoosh, sequence, vocals, music, ambience, riser or reverb.",
+      "duration": 1
+    }
+  ]
+}

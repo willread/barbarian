@@ -134,6 +134,17 @@ func select_strike(f: Dictionary, targets: Array) -> String:
 	return "slash"
 
 func begin(f: Dictionary, type: String) -> bool:
+	# A held spin is the escape from hit-stun, including knockdown and charge recoil.
+	# Ordinary swings still finish before a spin; release is still required to repeat.
+	if type=="spin" and f.player and f.hp>0 and f.attack.is_empty() and f.air.is_empty() and not f.spinUsed:
+		f.down={}
+		f.hurtTicks=0
+		f.hurtAge=0
+		f.recovering=0
+		f.recoil=0.0
+		f.stagger=0
+		f.chargeRebound=0.0
+		f.height=0.0
 	if (not attacks.has(type) and type!="spin") or not standing(f) or not f.attack.is_empty() or f.hurtTicks or (not f.air.is_empty() and type!="air"): return false
 	if type=="air" and (f.air.is_empty() or f.diveUsed or (f.air.land>0 if combat_extensions else (f.air.vz>=0 and f.height<24))): return false
 	var direction=-f.dir if type=="back" else f.dir
@@ -240,7 +251,6 @@ func rebound_charge(f: Dictionary, direction: int):
 	f.recovering=8
 	f.recoil=24*STEP
 	f.chargeRebound=-direction*3.2
-	f.spinUsed=true
 
 func reaction(f: Dictionary):
 	if abs(f.chargeRebound)>.02:

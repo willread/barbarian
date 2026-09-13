@@ -103,6 +103,31 @@ func _ready():
 			reset.pressed.connect(func():gain.value=0)
 			mix.add_child(reset)
 			buttons[id]=[]
+			if audio.pools.has(id):
+				var hint=Label.new()
+				hint.text="Checked sounds play randomly on hits. Uncheck all to silence. Preview does not change selection."
+				hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+				box.add_child(hint)
+				for job in groups[group]:
+					var row=HBoxContainer.new()
+					box.add_child(row)
+					var check=CheckBox.new()
+					check.text=job.name+" - "+job.description
+					check.tooltip_text=job.prompt
+					check.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+					check.toggled.connect(func(enabled):audio.set_pool_variant(id,job.id,enabled))
+					row.add_child(check)
+					buttons[id].append([check,job.id])
+					var listen=Button.new()
+					listen.text="Preview"
+					listen.pressed.connect(func():
+						preview.stop()
+						preview_id=id
+						preview.volume_db=preview_base+audio.volumes.get(id,0.0)
+						preview.stream=load("res://audio_options/"+job.id+".ogg")
+						preview.play())
+					row.add_child(listen)
+				continue
 			var original=Button.new()
 			original.text="Original game sound"
 			original.toggle_mode=true
@@ -131,7 +156,7 @@ func _ready():
 	panel.hide()
 func refresh():
 	for id in buttons:
-		for entry in buttons[id]:entry[0].set_pressed_no_signal(audio.choices.get(id,"original")==entry[1])
+		for entry in buttons[id]:entry[0].set_pressed_no_signal(entry[1] in audio.pools[id] if audio.pools.has(id) else audio.choices.get(id,"original")==entry[1])
 func choose(id: String,variant: String):
 	audio.set_variant(id,variant)
 	refresh()

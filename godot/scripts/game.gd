@@ -603,7 +603,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
 		burst(f.x,f.y-105,12,Color("e97b4f") if f.player else Color("ffc473"))
 		shake=7 if a.get("dive",false) else (5 if a.get("knock",false) else 2)
-		audio.play("charge_hit" if a.get("type","")=="charge" else "arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "bone" if f.kind in ["bone","archer"] else "heavy_hit" if a.get("knock",false) else "flesh")
+		audio.play("charge_hit" if a.get("type","")=="charge" else "arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "enemy_impact")
 		if f.player and not a.get("no_stun",false):audio.play("hero_pain",-6)
 	if f.hp<=0:
 		f.death=0

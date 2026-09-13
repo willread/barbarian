@@ -4,7 +4,7 @@ func _init():
 	var audio=load("res://scripts/audio.gd").new()
 	source.add_child(audio)
 	audio.setup(source)
-	assert(audio.clips.size()==30,"Expected 30 active sound slots")
+	assert(audio.clips.size()==31,"Expected 31 active sound slots")
 	for id in audio.originals:
 		var stream=audio.originals[id]
 		assert(stream is AudioStreamOggVorbis and stream.get_length()>.08,"Invalid audio: "+id)
@@ -13,3 +13,4 @@ func _init():
 	source.free()
 	print("CAIRN_AUDIO_OK: runtime loader resolves all active Ogg assets and both music tracks")
 	quit()
+

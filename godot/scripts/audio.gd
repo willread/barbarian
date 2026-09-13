@@ -4,6 +4,8 @@ var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}
 var choices: Dictionary={}
+var pools: Dictionary={}
+var last_pool_pick: Dictionary={}
 var volumes: Dictionary={}
 var voices: Array=[]
 var tracks: Array=[]
@@ -20,14 +22,20 @@ func setup(source: Node2D):
 	for id in CLIP_IDS:
 		clips[id]=load("res://audio/"+("slam_boom" if id=="landing" else id)+".ogg")
 	clips["menu_activate"]=clips["menu_land"]
+	clips["enemy_impact"]=clips["flesh"]
 	originals=clips.duplicate()
+	pools["enemy_impact"]=[]
+	for i in 12:pools.enemy_impact.append("enemy-impact-"+str(i+1))
 	var defaults=JSON.parse_string(FileAccess.get_file_as_string("res://audio_defaults.json"))
 	for id in defaults.get("choices",{}): set_variant(id,defaults.choices[id],false)
 	for id in defaults.get("volumes",{}): set_volume(id,float(defaults.volumes[id]),false)
+	for id in defaults.get("pools",{}):pools[id]=defaults.pools[id]
 	var saved=ConfigFile.new()
 	if saved.load("user://soundboard.cfg")==OK:
 		for id in saved.get_section_keys("choices"):
 			set_variant(id,saved.get_value("choices",id),false)
+	if saved.has_section("pools"):
+		for id in saved.get_section_keys("pools"):pools[id]=saved.get_value("pools",id)
 	if saved.has_section("volumes"):
 		for id in saved.get_section_keys("volumes"):volumes[id]=clampf(float(saved.get_value("volumes",id)), -30,6)
 	for i in 16:
@@ -57,6 +65,20 @@ func set_variant(id: String,variant: String,persist: bool=true):
 		if track.stream:track.stream.loop=true
 	if persist:save_choices()
 
+func set_pool_variant(id: String,variant: String,enabled: bool):
+	if not pools.has(id):pools[id]=[]
+	if enabled and variant not in pools[id]:pools[id].append(variant)
+	if not enabled:pools[id].erase(variant)
+	save_choices()
+
+func pool_clip(id: String):
+	var candidates=pools.get(id,[]).duplicate()
+	if candidates.is_empty():return null
+	if candidates.size()>1:candidates.erase(last_pool_pick.get(id,""))
+	var variant=candidates.pick_random()
+	last_pool_pick[id]=variant
+	return load("res://audio_options/"+variant+".ogg")
+
 func set_volume(id: String,db: float,persist: bool=true):
 	volumes[id]=clampf(db,-30,6)
 	for voice in voices:
@@ -65,6 +87,7 @@ func set_volume(id: String,db: float,persist: bool=true):
 
 func save_choices():
 	var saved=ConfigFile.new()
+	for key in pools:saved.set_value("pools",key,pools[key])
 	for key in choices:saved.set_value("choices",key,choices[key])
 	for key in volumes:saved.set_value("volumes",key,volumes[key])
 	saved.set_value("settings","quiet_foley",true)
@@ -87,7 +110,8 @@ func play(id: String,db: float=-4,pitch: float=1.0):
 	gates[id]=now
 	for voice in voices:
 		if not voice.playing:
-			voice.stream=clips[id]
+			voice.stream=pool_clip(id) if pools.has(id) else clips[id]
+			if voice.stream==null:return
 			voice.set_meta("sound_id",id)
 			voice.set_meta("base_db",db)
 			voice.volume_db=db+volumes.get(id,0.0)
@@ -140,7 +164,7 @@ func _exit_tree():
 	clips.clear()
 
 func export_choices() -> String:
-	var preset={"version":1,"choices":{},"volumes":{}}
+	var preset={"version":2,"choices":{},"volumes":{},"pools":pools}
 	for id in originals:
 		preset.choices[id]=choices.get(id,"original")
 		preset.volumes[id]=volumes.get(id,0.0)

@@ -135,3 +135,7 @@ Controls runtime (2026-09-12): selected Kenney CC0 SVG glyphs copied to godot/ar
 ## Cairn voice refresh
 Four user-supplied ElevenLabs Cairn voice recordings from Downloads (2026-09-13 filename timestamps): register-unlock, dinner, first big enemy, and first full mana. Exact original filenames and transcripts: godot/voice/lines.json. Converted to normalized Ogg Vorbis; no new third-party recording assets downloaded.
 
+
+## Enemy impact sound pool
+Twelve independently generated ElevenLabs text-to-sound v2 effects, September 12, 2026. Detailed individual prompts, labels and durations are recorded in soundboard/enemy-impact/manifest.json and godot/audio_options/manifest.json. Source recordings are retained beside that manifest; normalized Vorbis game assets live in godot/audio_options. Reproduce with tools/audio/enemy-impact.mjs (reads ignored local credentials).
+
