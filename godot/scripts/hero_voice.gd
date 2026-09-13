@@ -17,6 +17,8 @@ func setup(source):
 	game=source
 	definitions=JSON.parse_string(FileAccess.get_file_as_string("res://voice/lines.json"))
 	player=AudioStreamPlayer.new()
+	player.bus=&"Voice"
+	player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 	add_child(player)
 func request_line(id: String,delay: float=0.,expires: float=5.):
 	if game.muted or not game.voice_enabled:return

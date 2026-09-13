@@ -32,6 +32,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/variant_holiday.gd']);
  run(binary,['--headless','--path','godot','--script','tests/combat_moves.gd']);
  run(binary,['--headless','--path','godot','--script','tests/audio_assets.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/audio_mix.gd']);
  run(binary,['--headless','--path','godot','--script','tests/creature_art.gd']);
  run(binary,['--headless','--path','godot','--script','tests/settings_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);

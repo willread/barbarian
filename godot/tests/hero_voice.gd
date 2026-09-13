@@ -64,6 +64,9 @@ func check():
 	assert(game.phase=="dying")
 	assert(game.audio.voices.any(func(v):return v.playing and v.get_meta("sound_id","")=="death" and v.stream==game.audio.clips.magic_shout),"Death shout must survive the dying transition and match the selected player voice")
 	game.audio.stop_gameplay()
+	game.process_mode=Node.PROCESS_MODE_DISABLED
+	for track in game.audio.tracks:track.stop()
+	await create_timer(.2).timeout
 	game.queue_free()
 	await process_frame
 	await process_frame

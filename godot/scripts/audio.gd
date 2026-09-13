@@ -1,4 +1,6 @@
 extends Node
+const Mix=preload("res://scripts/audio_mix.gd")
+const BURN_GAIN_DB=6.0206 # Twice the original amplitude, before shared bus processing.
 const CLIP_IDS=["gulp","sword","axe","flesh","heavy_hit","charge_hit","death_fire","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
 var game: Node2D
 var clips: Dictionary={}
@@ -17,6 +19,7 @@ var watched: Dictionary={}
 
 func setup(source: Node2D):
 	game=source
+	Mix.setup()
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
 	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
 	for id in CLIP_IDS+["egg_lay"]:
@@ -40,10 +43,13 @@ func setup(source: Node2D):
 		for id in saved.get_section_keys("volumes"):volumes[id]=clampf(float(saved.get_value("volumes",id)), -30,6)
 	for i in 16:
 		var player=AudioStreamPlayer.new()
+		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
 		voices.append(player)
 	for id in ["music_menu","music_game"]:
 		var player=AudioStreamPlayer.new()
+		player.bus=Mix.bus_for(id)
+		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
 		if clips.get(id)!=null:
 			player.stream=clips[id]
@@ -114,6 +120,7 @@ func play(id: String,db: float=-4,pitch: float=1.0):
 			# Reuse the selected player shout so death retains the same voice identity.
 			if id=="death":voice.stream=clips.get("magic_shout",originals.get("magic_shout"))
 			if voice.stream==null:return
+			voice.bus=Mix.bus_for(id)
 			voice.set_meta("sound_id",id)
 			voice.set_meta("base_db",db)
 			voice.volume_db=db+volumes.get(id,0.0)
@@ -148,7 +155,7 @@ func _process(dt: float):
 		var burning=actor.burnAge>0
 		var ground=not actor.down.is_empty() and actor.down.ground>0
 		var attack=actor.attack.get("type","")
-		if burning and not state.burn:play("death_fire",-10)
+		if burning and not state.burn:play("death_fire",-10+BURN_GAIN_DB)
 		if ground and not state.ground:play("body_fall",-8)
 		if attack!=state.attack:
 			if attack=="marauderRush":play("roar",-8)
