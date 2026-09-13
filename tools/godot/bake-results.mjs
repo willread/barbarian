@@ -1,76 +1,53 @@
-// Bake live UI glyphs using the project's fonts and stone material. No screenshot text.
+// Use the same stone renderer and material as Controls, Hall and the score HUD.
 import fs from 'node:fs';
+import vm from 'node:vm';
 import {createCanvas,loadImage,GlobalFonts} from '@napi-rs/canvas';
 const out='godot/art/results';
-fs.mkdirSync(out,{recursive:true});
 GlobalFonts.registerFromPath('asset-sources/fonts/cinzel.ttf','Cinzel');
 GlobalFonts.registerFromPath('asset-sources/fonts/oswald.ttf','Oswald');
-const material=await loadImage(`${out}/slate.png`);
+const image=await loadImage('asset-sources/art/menu-stone-material-v1.png');
+const material=createCanvas(image.width,image.height);material.getContext('2d').drawImage(image,0,0);
+Object.defineProperty(material,'naturalWidth',{value:material.width});
+Object.defineProperty(material,'complete',{value:true});
+let source=fs.readFileSync('tools/asset-bake-source/stone-text.js','utf8');
+source=source.replace(' let frame=0;',' window.bakeStone=(el)=>{cache.clear();paint(el)}; return; let frame=0;');
+source=source.replace('size*scale*.045','size*scale*.025').replace('size*scale*.12','size*scale*.035').replace('stone*.78+shine*.72+8','stone*.9+shine+45').replace('stone*.77+shine*.73+8','stone*.82+shine*.9+36').replace('stone*.74+shine*.75+7','stone*.64+shine*.7+24');
+const document={documentElement:{dataset:{}},createElement:()=>{const c=createCanvas(1,1);c.setAttribute=()=>{};return c;}};
+const scope={window:{},document,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};
+vm.createContext(scope);vm.runInContext(source,scope);
 const manifest={glyphs:{},labels:{}};
-function render(text,family,size,weight,tracking=0){
- const pad=Math.ceil(size*.16),c=createCanvas(1,1);let g=c.getContext('2d');
- const font=`${weight} ${size}px "${family}"`;g.font=font;
- const advance=[...text].reduce((sum,ch)=>sum+g.measureText(ch).width+tracking,0)-tracking;
- const cap=g.measureText('0').actualBoundingBoxAscent;
- c.width=Math.ceil(advance+pad*2+size*.06);c.height=Math.ceil(size*1.5);
- g=c.getContext('2d');g.font=font;g.textBaseline='alphabetic';g.fillStyle='white';
- const baseline=size*1.15;let x=pad;
- for(const ch of text){g.fillText(ch,x,baseline);x+=g.measureText(ch).width+tracking;}
- const w=c.width,h=c.height,mask=g.getImageData(0,0,w,h),dist=new Float32Array(w*h);
- for(let i=0;i<dist.length;i++)dist[i]=mask.data[i*4+3]>127?10000:0;
- for(let y=1;y<h;y++)for(let x=1;x<w;x++){const i=y*w+x;dist[i]=Math.min(dist[i],dist[i-1]+1,dist[i-w]+1,dist[i-w-1]+1.414);}
- for(let y=h-2;y>=0;y--)for(let x=w-2;x>=0;x--){const i=y*w+x;dist[i]=Math.min(dist[i],dist[i+1]+1,dist[i+w]+1,dist[i+w+1]+1.414);}
- const tx=createCanvas(w,h),tg=tx.getContext('2d');tg.drawImage(material,0,0,material.width,material.height,0,0,material.width*.55,material.height*.55);
- const stone=tg.getImageData(0,0,w,h).data,pixels=g.createImageData(w,h),bevel=Math.max(1,size*.012);
- const tint=family==='Oswald'?[214,207,194]:size>200?[229,213,191]:size>100?[234,220,201]:[235,229,216];
- const height=(x,y)=>Math.min(bevel,dist[Math.max(0,Math.min(h-1,y))*w+Math.max(0,Math.min(w-1,x))]);
- for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-  const i=(y*w+x)*4,a=mask.data[i+3];if(!a)continue;
-  const dx=height(x+1,y)-height(x-1,y),dy=height(x,y+1)-height(x,y-1);
-  const normal=(dx*.65+dy*.85)/Math.sqrt(1+dx*dx+dy*dy);
-  const edge=dist[y*w+x]<bevel,light=edge?normal*80-16:0;
-  const grain=((Math.imul(x+7,374761393)^Math.imul(y+31,668265263))>>>24)/255;
-  const mineral=stone[i]*.3+stone[i+1]*.5+stone[i+2]*.2;
-  const texture=(mineral-30)*.25+(grain-.5)*6+Math.sin(x/size*17+y/size*9)*3;
-  pixels.data[i]=tint[0]+texture+light;pixels.data[i+1]=tint[1]+texture+light;pixels.data[i+2]=tint[2]+texture+light;
-  pixels.data[i+3]=a;
- }
- const face=createCanvas(w,h),fg=face.getContext('2d');fg.putImageData(pixels,0,0);
- // Fine angular fissures in the ivory face, clipped to the live glyph mask.
- // Fixed seeds keep the material stable during score count-up.
- if(family==='Cinzel' && size>100){
-  fg.globalCompositeOperation='source-atop';
-  let seed=[...text].reduce((n,ch)=>n*31+ch.codePointAt(0),17)>>>0;
-  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
-  for(let i=0;i<Math.ceil(advance/size*9);i++){
-   let x=pad+random()*advance,y=baseline-cap+random()*cap;
-   fg.beginPath();fg.moveTo(x,y);
-   for(let j=0;j<4;j++){x+=(random()-.5)*size*.14;y+=size*(.025+random()*.06);fg.lineTo(x,y)}
-   fg.strokeStyle='rgba(74,47,25,.52)';fg.lineWidth=size*.0035;fg.stroke();
-  }
- }
- const side=createCanvas(w,h),sg=side.getContext('2d');sg.putImageData(mask,0,0);sg.globalCompositeOperation='source-in';sg.fillStyle='#493323';sg.fillRect(0,0,w,h);
- g.clearRect(0,0,w,h);g.shadowColor='#0008';g.shadowBlur=size*.018;g.shadowOffsetY=size*.012;
- for(let z=Math.ceil(size*.018);z>0;z--)g.drawImage(side,z*.45,z);
- g.shadowBlur=0;g.shadowOffsetY=0;g.drawImage(face,0,0);
- return {canvas:c,advance,pad,baseline,cap};
+function bounds(c){
+ const p=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+ let x0=c.width,y0=c.height,x1=0,y1=0;
+ for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++)if(p[(y*c.width+x)*4+3]>8){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+ return {x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
 }
-for(const [kind,family,size,weight,chars] of [['score','Cinzel',240,500,'0123456789,'],['stat','Oswald',150,500,'0123456789,:×HITS ']]){
+async function render(text,family,tracking=1){
+ const el={textContent:text,getClientRects:()=>[1],dataset:{stoneFont:family},computed:{fontSize:'75',letterSpacing:String(tracking)},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};
+ scope.window.bakeStone(el);
+ const img=await loadImage(el._stoneFrames.url),c=createCanvas(img.width,img.height);c.getContext('2d').drawImage(img,0,0);
+ return c;
+}
+for(const [kind,family,chars] of [['score','Cinzel','0123456789,'],['stat','Oswald','0123456789,:×HITS ']]){
  manifest.glyphs[kind]={};
+ const zero=await render('0',family),box=bounds(zero),pad=75*.28*3;
  for(const ch of chars){
-  const r=render(ch,family,size,weight),file=`${kind}-${ch.codePointAt(0)}.png`;
-  fs.writeFileSync(`${out}/${file}`,r.canvas.toBuffer('image/png'));
-  manifest.glyphs[kind][ch]={file,width:r.canvas.width,height:r.canvas.height,advance:r.advance,pad:r.pad,baseline:r.baseline,cap:r.cap};
+  const c=ch===' '?createCanvas(70,zero.height):await render(ch,family),file=`${kind}-${ch.codePointAt(0)}.png`;
+  fs.writeFileSync(`${out}/${file}`,c.toBuffer('image/png'));
+  manifest.glyphs[kind][ch]={file,width:c.width,height:c.height,advance:ch===' '?50:c.width-pad*2+3,pad,baseline:box.y+box.h,cap:box.h};
  }
 }
-for(const text of ['EVEN HEROES FALL.','THE VALLEY IS FREE.','FINAL SCORE','THIS RUN','ENEMIES SLAIN','TIME SURVIVED','RUN TIME','BEST COMBO','PEAK MULTIPLIER','DAMAGE DEALT','DAMAGE TAKEN','NEW']){
- const headline=text.endsWith('.');
- const display=headline?text.toLowerCase().replace(/\b\w/g,ch=>ch.toUpperCase()):text;
- const tracking=['FINAL SCORE','THIS RUN','NEW'].includes(text)?10:6;
- const r=render(display,'Cinzel',headline?110:54,headline?400:500,headline?1.5:tracking);
+for(const text of ['EVEN HEROES FALL.','THE VALLEY IS FREE.','FINAL SCORE','STATS','ENEMIES SLAIN','TIME SURVIVED','RUN TIME','BEST COMBO','PEAK MULTIPLIER','DAMAGE DEALT','DAMAGE TAKEN','NEW']){
+ const c=await render(text,'Cinzel',text.endsWith('.')?1:3),box=bounds(c);
  const file=`label-${text.toLowerCase().replace(/[^a-z]+/g,'-').replace(/-$/,'')}.png`;
- fs.writeFileSync(`${out}/${file}`,r.canvas.toBuffer('image/png'));
- manifest.labels[text]={file,width:r.canvas.width,height:r.canvas.height,advance:r.advance,pad:r.pad,baseline:r.baseline,cap:r.cap};
+ fs.writeFileSync(`${out}/${file}`,c.toBuffer('image/png'));
+ manifest.labels[text]={file,width:c.width,height:c.height,advance:box.w,pad:box.x,baseline:box.y+box.h,cap:box.h};
+ if(text==='NEW'){
+  const glow=createCanvas(c.width,c.height),g=glow.getContext('2d');
+  for(const [blur,color] of [[30,'#ff7600'],[12,'#ffb82b'],[4,'#ffeab0']]){g.shadowColor=color;g.shadowBlur=blur;g.drawImage(c,0,0)}
+  g.globalCompositeOperation='destination-out';g.drawImage(c,0,0);
+  fs.writeFileSync(`${out}/new-glow.png`,glow.toBuffer('image/png'));
+ }
 }
 fs.writeFileSync(`${out}/lettering.json`,JSON.stringify(manifest));
-console.log('Baked results typography: textured Cinzel score/headings and Oswald stat glyphs.');
+console.log('Baked results with shared Hall/HUD stone material and glyph-shaped NEW bloom.');

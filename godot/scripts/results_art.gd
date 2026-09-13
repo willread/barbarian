@@ -7,11 +7,17 @@ func texture(file: String) -> Texture2D:
 	if not textures.has(file):textures[file]=load("res://art/results/"+file)
 	return textures[file]
 
-func label(node: CanvasItem,value: String,center: Vector2,height: float,max_width: float,color=Color.WHITE):
+func label(node: CanvasItem,value: String,center: Vector2,height: float,max_width: float,color=Color(1.25,1.2,1.1)):
 	var meta=data.labels[value]
 	var factor=minf(height/meta.cap,max_width/meta.advance)
 	var origin=center-Vector2(meta.advance*.5,meta.cap*.5)*factor
 	node.draw_texture_rect(texture(meta.file),Rect2(origin-Vector2(meta.pad,meta.baseline-meta.cap)*factor,Vector2(meta.width,meta.height)*factor),false,color)
+
+func glow(node: CanvasItem,center: Vector2,height: float,intensity: float):
+	var meta=data.labels["NEW"]
+	var factor=height/meta.cap
+	var origin=center-Vector2(meta.advance*.5,meta.cap*.5)*factor
+	node.draw_texture_rect(texture("new-glow.png"),Rect2(origin-Vector2(meta.pad,meta.baseline-meta.cap)*factor,Vector2(meta.width,meta.height)*factor),false,Color(1,1,1,intensity))
 
 func number(node: CanvasItem,value: String,kind: String,center: Vector2,height: float,max_width: float):
 	var glyphs=data.glyphs[kind]
@@ -23,5 +29,5 @@ func number(node: CanvasItem,value: String,kind: String,center: Vector2,height: 
 	for ch in value:
 		var meta=glyphs[ch]
 		var at=Vector2(x-meta.pad*factor,center.y-cap*factor*.5-(meta.baseline-cap)*factor)
-		node.draw_texture_rect(texture(meta.file),Rect2(at,Vector2(meta.width,meta.height)*factor),false)
+		node.draw_texture_rect(texture(meta.file),Rect2(at,Vector2(meta.width,meta.height)*factor),false,Color(1.25,1.2,1.1))
 		x+=meta.advance*factor

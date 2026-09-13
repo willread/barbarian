@@ -1,5 +1,7 @@
 # Results materials and lettering
 
+Current lettering is baked using the existing `tools/asset-bake-source/stone-text.js` renderer and `asset-sources/art/menu-stone-material-v1.png`, with the exact Hall/Controls/HUD relief and palette settings. `new-glow.png` is a multi-radius bloom following the NEW glyph alpha. The earlier custom ivory/fissure implementation described below has been superseded; `slate-fine.png` is still the panel material.
+
 `slate-fine.png` is the revised runtime panel material, generated from the approved `results-v4.png` reference to match its fine cellular fissures rather than the earlier material's broad marble-like veins. The original `slate.png` remains the reproducible glyph baker's mineral source. Ivory glyph fissures are deterministic, mask-clipped strokes in `bake-results.mjs`.
 
 Exact revised material prompt: "Use case: stylized-concept. Production game material asset. Use the attached approved UI mockup solely as the material reference. Create a flat orthographic texture of ONLY the black finely cracked surface inside its score panel, edge-to-edge, landscape 3:2. Closely match its small irregular cellular cracks, subtle dark bronze hairline fissures and charcoal stone islands with quiet rough highlights. Dense fine irregular craquelure, not long diagonal veins, not marble, not gold streaks. Muted near-black overall, subtle tactile detail; no large-scale lighting gradient. Absolutely no text, numbers, borders, frame, blood, buttons or other UI. The result will be a texture behind separately drawn live text."

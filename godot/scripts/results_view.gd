@@ -87,13 +87,14 @@ func rule(a: Vector2,b: Vector2,bright=false):
 func record_label(key: String,at: Vector2,large=false):
 	if key not in result.get("new_stats",[]) or age<.9:return
 	var width=130.0 if large else 82.0
-	# Warm, restrained halo behind the raised amber lettering.
+	# Wide reflected light and a tighter bloom following the stone letter shapes.
 	for i in range(12,0,-1):
-		var alpha=(.008 if large else .005)*(1.+.4*exp(-(age-.9)*5.))
-		content.draw_set_transform(at,0,Vector2(1,.18))
+		var alpha=(.028 if large else .020)*(1.+.4*exp(-(age-.9)*5.))
+		content.draw_set_transform(at,0,Vector2(1,.28))
 		content.draw_circle(Vector2.ZERO,width*i/12,Color(1,.22,.005,alpha))
 	content.draw_set_transform(Vector2.ZERO)
-	lettering.label(content,"NEW",at,20 if large else 12,100,Color(1.2,.85,.12))
+	lettering.glow(content,at,20 if large else 12,.9)
+	lettering.label(content,"NEW",at,20 if large else 12,100,Color(2.6,1.9,.8))
 
 func draw_panel():
 	var w=content.size.x
@@ -131,7 +132,7 @@ func draw_panel():
 	var sw=w-left
 	if compact:rule(Vector2(20,top),Vector2(w-20,top))
 	else:rule(Vector2(left,20),Vector2(left,rect.end.y-20))
-	lettering.label(content,"THIS RUN",Vector2(left+sw*.5,top+32),19 if compact else 22,sw*.8)
+	lettering.label(content,"STATS",Vector2(left+sw*.5,top+32),19 if compact else 22,sw*.8)
 	rule(Vector2(left+20,top+53),Vector2(w-20,top+53))
 	var row=(rect.end.y-top-62)/3
 	rule(Vector2(left+sw*.5,top+62),Vector2(left+sw*.5,rect.end.y-15))

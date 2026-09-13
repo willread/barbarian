@@ -1,5 +1,7 @@
 # Results and Hall of Legends implementation
 
+Latest text treatment: the right-hand section is **STATS**. `bake-results.mjs` now invokes the same `stone-text.js` renderer, menu stone material, bevel, extrusion and palette transforms used by the Hall/Controls heading and HUD score baker. Runtime brightness matches the HUD. Cinzel headings/score and Oswald stats retain live content and shared glyph baselines. This replaces the custom ivory renderer described in earlier revision notes below. NEW combines a letter-shaped, multi-radius amber bloom with broader reflected light and a brighter stone core.
+
 ## Mockup comparison revision
 
 The subsequent refinement removes horizontal rules between individual stats and the decorative rules beside score NEW. The score is vertically centered above its comparison, with NEW directly below it. Results and Hall use the HUD's `AREA X/4` wording. Score comparisons use parentheses around the positive delta. The lettering baker uses medium score/stat weights, lighter headline weight, less saturated ivory, finer grain and shallower bevels/shadows.
