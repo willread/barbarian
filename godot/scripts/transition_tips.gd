@@ -29,7 +29,7 @@ func choose():
 func update(age: float,close_time: float,hold: float,size: Vector2):
 	cover.visible=age>=close_time and age<close_time+hold and current!=""
 	cover.size=size
-	label.position=Vector2(size.x*.12,size.y*.3)
-	label.size=Vector2(size.x*.76,size.y*.4)
-	label.add_theme_font_size_override("font_size",32)
+	label.position=Vector2(size.x*.05,size.y*.3)
+	label.size=Vector2(size.x*.90,size.y*.4)
+	label.add_theme_font_size_override("font_size",clampi(int(size.x/36),24,44))
 	label.text=current

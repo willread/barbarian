@@ -102,7 +102,7 @@ var title_background=preload("res://art/title-background.png")
 var title_logo=preload("res://art/cairn-logo.png")
 const CLOSE=.35/.49
 const OPEN=.45/.49
-const HOLD=1.0
+const HOLD=3.0
 
 func _ready():
 	# Command-line test/capture runs never touch the player's records.
