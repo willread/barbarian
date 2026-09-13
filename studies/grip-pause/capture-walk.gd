@@ -15,7 +15,7 @@ func capture():
    f.holiday="off"
    f.weapon_skin="gravecleaver"
    var holder=Node2D.new()
-   holder.position=Vector2(200+i*330,630)
+   holder.position=Vector2(245+i*320,630)
    holder.scale=Vector2.ONE*1.5
    panel.add_child(holder)
    var pose=["hero-walk-unarmed-v8",i]
