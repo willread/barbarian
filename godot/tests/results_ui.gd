@@ -18,6 +18,12 @@ func check():
 	root.add_child(game)
 	game.set_process(false)
 	game.records=CairnRunRecords.new("")
+	game.change_phase("title")
+	game.menu.select(1,false)
+	assert(game.menu.is_locked("HALL OF LEGENDS"))
+	assert(game.menu.items[1].node.modulate.a<.5 and not game.menu.items[1].fire.emitting)
+	game.menu.activate()
+	assert(game.hall_view==null)
 	game.menu_action("HALL OF LEGENDS")
 	await process_frame
 	assert(game.hall_view.runs.is_empty() and game.hall_view.actions.items.size()==2)
@@ -35,6 +41,7 @@ func check():
 		game.records.finish({"id":"old-%d"%i,"score":116200-i*7000,"kills":50,"best_combo":20,"peak_multiplier":10,"damage_dealt":17000,"damage_taken":200,"time":700-i*20,"date":"2026-09-12","area":3,"outcome":"lost"})
 	game.run_stats.merge({"time":768,"best_combo":36,"peak_multiplier":10,"damage_dealt":18640,"damage_taken":240},true)
 	game.score=128450
+	assert(not game.menu.is_locked("HALL OF LEGENDS"))
 	game.kills=87
 	game.wave=7
 	game.change_phase("won")

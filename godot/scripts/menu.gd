@@ -5,6 +5,7 @@ var art: CairnArt
 var yellow_flames=false
 var items: Array=[]
 const LOCKED=["EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS"]
+var unavailable: Callable
 var selected=0
 var compact_pause=false
 var clock=0.0
@@ -15,6 +16,9 @@ var screen_size=Vector2(1440,810)
 func setup(source: CairnArt):
 	art=source
 	z_index=2100
+
+func is_locked(label: String) -> bool:
+	return label in LOCKED or (unavailable.is_valid() and unavailable.call(label))
 
 func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 	for item in items: item.node.queue_free()
@@ -45,9 +49,9 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		face.position=Vector2(-meta.width*.5*size,0)
 		face.scale=Vector2(meta.width,meta.height)*size/face.texture.get_size()
 		group.add_child(face)
-		if label in LOCKED:group.modulate=Color(1,1,1,.48)
+		if is_locked(label):group.modulate=Color(1,1,1,.48)
 		# Locked text uses the ordinary sprite material so inherited alpha is respected.
-		if label not in LOCKED:fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
+		if not is_locked(label):fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})
 		if animate:
 			group.position.y=y-1224
@@ -78,7 +82,7 @@ func select(index: int, shake: bool=true):
 	if items.is_empty(): return
 	selected=posmod(index,items.size())
 	for i in items.size():
-		items[i].fire.emitting=i==selected and not items[i].label in LOCKED
+		items[i].fire.emitting=i==selected and not is_locked(items[i].label)
 	if shake:
 		quake()
 		sound_requested.emit("menu_select")
@@ -91,7 +95,7 @@ func quake():
 
 func activate():
 	if switching or items.is_empty(): return
-	if items[selected].label in LOCKED:
+	if is_locked(items[selected].label):
 		quake()
 		sound_requested.emit("resist")
 		return

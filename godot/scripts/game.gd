@@ -205,6 +205,7 @@ func _ready():
 	add_child(menu)
 	menu.top_level=true
 	menu.setup(art)
+	menu.unavailable=func(label):return label=="HALL OF LEGENDS" and records.board().runs.is_empty()
 	menu.activated.connect(menu_action)
 	menu.sound_requested.connect(func(id):
 		audio.play(id,-8)
