@@ -30,7 +30,7 @@
     "sword": "sword-1",
     "transition": "none"
   },
-  "version": 1,
+  "version": 2,
   "volumes": {
     "arrow_hit": 0.0,
     "axe": 0.0,
@@ -61,5 +61,11 @@
     "shield": -1.0,
     "sword": 0.0,
     "transition": 0.0
+  },
+  "pools": {
+    "enemy_impact": [
+      "enemy-impact-5",
+      "enemy-impact-7"
+    ]
   }
 }
