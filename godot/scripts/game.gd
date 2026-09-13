@@ -44,6 +44,9 @@ var music_enabled=true
 var voice_enabled=true
 var master_volume=100
 var loading_menu=false
+var bindings=CairnBindings.new()
+var controls_view: CanvasLayer
+var run_button_active=false
 var muted=false
 const WEAPON_CHOICES=["gravecleaver","blacktooth","barrow_star","gatebreaker"]
 var weapon_skin="gravecleaver"
@@ -89,6 +92,12 @@ const OPEN=.45/.49
 const HOLD=.15
 
 func _ready():
+	Input.joy_connection_changed.connect(func(_device,connected):
+		if not connected:
+			bindings.clear()
+			keys.clear()
+			pressed.clear()
+			if phase=="playing":change_phase("paused"))
 	if "--enemy-fire-study" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('enemy-fire-study')")):
 		get_tree().change_scene_to_file.call_deferred("res://enemy_fire_study.tscn")
 		return
@@ -248,6 +257,7 @@ func change_phase(next: String):
 		title_intro=0.0
 	phase=next
 	overlay.z_index=2090 if next in ["lost","won","paused"] else 2000
+	bindings.clear()
 	keys.clear()
 	pressed.clear()
 	accumulator=0
@@ -270,6 +280,20 @@ func change_phase(next: String):
 	responsive_layout()
 
 func menu_action(label: String):
+	if label=="CONTROLS":
+		settings_page="controls"
+		menu.visible=false
+		controls_view=preload("res://scripts/controls_view.gd").new()
+		add_child(controls_view)
+		controls_view.closed.connect(func():menu_action("BACK"))
+		return
+	if label=="BACK" and settings_page=="controls":
+		controls_view.queue_free()
+		controls_view=null
+		settings_page="game"
+		menu.visible=true
+		refresh_settings(2)
+		return
 	if label.begins_with("HOLIDAY: "):
 		cycle_holiday(1)
 		refresh_settings(1)
@@ -338,7 +362,7 @@ func menu_action(label: String):
 func option_labels() -> Array:
 	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
-	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"HOLIDAY: "+holiday.to_upper(),"BACK"]
+	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"HOLIDAY: "+holiday.to_upper(),"CONTROLS","BACK"]
 	return ["GAME","SOUND","DISPLAY","BACK"]
 
 func refresh_settings(index: int):
@@ -467,6 +491,7 @@ func begin_walk(kind: String):
 	combo.suspend()
 	stage_walk=kind
 	if audio:audio.play("transition",-14)
+	bindings.clear()
 	keys.clear()
 	pressed.clear()
 	spell=-1
@@ -711,6 +736,12 @@ func tick(dt: float):
 		return
 	var dx=int(keys.has(KEY_D))-int(keys.has(KEY_A))
 	var dy=int(keys.has(KEY_S))-int(keys.has(KEY_W))
+	var run_held=keys.has(KEY_SHIFT)
+	if run_held and dx!=0 and hero.air.is_empty() and hero.attack.is_empty():
+		hero.running=true
+		hero.runDir=dx
+	elif run_button_active and not run_held:hero.running=false
+	run_button_active=run_held
 	var edge=-1 if pressed.has(KEY_A) else 1 if pressed.has(KEY_D) else 0
 	if spell<0 and hero.pickup.is_empty():
 		if pressed.has(KEY_J) and pressed.has(KEY_SPACE) and hero.air.is_empty(): m.begin(hero,"back")
@@ -878,6 +909,18 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+		audio.unlocked=true
+		if phase in ["title","paused","lost","won"] or event is InputEventJoypadButton and event.button_index==JOY_BUTTON_START:
+			var translated=bindings.menu_event(event)
+			if translated:_input(translated)
+			return
+	if is_instance_valid(controls_view):
+		if event is InputEventKey and event.pressed:
+			if event.keycode in [KEY_ESCAPE,KEY_ENTER,KEY_SPACE]:menu_action("BACK")
+			elif event.keycode in [KEY_UP,KEY_DOWN]:controls_view.scroll.scroll_vertical+=-80 if event.keycode==KEY_UP else 80
+			get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.alt_pressed and event.keycode in [KEY_ENTER,KEY_KP_ENTER]:
 		if event.pressed and not event.echo:toggle_fullscreen()
 		get_viewport().set_input_as_handled()
@@ -906,17 +949,12 @@ func _input(event: InputEvent):
 			return
 		menu.handle(event)
 		return
-	if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
-		var point=hud.get_local_mouse_position()
-		point.x-=screen_size.x/hud.scale.x-1440.
-		if point.y>810 and point.x>820 and point.x<1030: toggle_weapon()
-	if event is InputEventKey:
-		var code=event.keycode
-		code={KEY_LEFT:KEY_A,KEY_RIGHT:KEY_D,KEY_UP:KEY_W,KEY_DOWN:KEY_S}.get(code,code)
-		if not event.pressed: keys.erase(code)
-		elif not event.echo and phase=="playing":
-			if code==KEY_Q: toggle_weapon()
-			if not keys.has(code): pressed[code]=true
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode==KEY_Q and phase=="playing":toggle_weapon()
+	for change in bindings.gameplay(event):
+		var code=change[0]
+		if not change[1]:keys.erase(code)
+		elif phase=="playing":
+			if not keys.has(code):pressed[code]=true
 			keys[code]=true
 
 func cycle_holiday(direction: int):
