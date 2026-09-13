@@ -7,6 +7,7 @@ const stamp=out+'episodes-bake.json';
 const inputs=[import.meta.filename,...fs.readdirSync(source).map(f=>source+f),...fs.readdirSync('studies/backgrounds/ashen-v1').map(f=>'studies/backgrounds/ashen-v1/'+f),'studies/backgrounds/swamp-v2/scene.js'];
 const version=inputs.map(f=>[f,fs.statSync(f).mtimeMs]);
 if(fs.existsSync(stamp)&&fs.readFileSync(stamp,'utf8')===JSON.stringify(version)&&fs.existsSync(out+'ashen-4-base.png'))process.exit(0);
+fs.copyFileSync(source+'mire-effect-v1.png',out+'mire-effect-v1.png');
 for(const kind of ['witch','bearer','king','saint']){
  const sheet=await loadImage(source+kind+'.png'),cw=Math.floor(sheet.width/4),ch=Math.floor(sheet.height/2),cels=[];
  for(let i=0;i<8;i++){

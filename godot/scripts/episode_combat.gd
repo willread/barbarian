@@ -1,9 +1,45 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
+const MIRE_RADIUS=Vector2(190,58)
+const MIRE_SPEED=.28
+var mire_views: Dictionary={}
 
 func clear():
 	hazards.clear()
+	for view in mire_views.values():
+		if is_instance_valid(view):view.queue_free()
+	mire_views.clear()
+
+func sync_views(game):
+	var visible_ids=[]
+	for enemy in game.enemies:
+		var a=enemy.attack
+		if enemy.hp>0 and a.get("type","")=="mireCast" and a.age<a.from:
+			show_mire(game,enemy.id,a.target,0,float(a.age)/a.from,game.clock)
+			visible_ids.append(enemy.id)
+	for h in hazards:
+		if h.kind!="mire":continue
+		show_mire(game,h.owner.id,h.p,1,h.life-h.age,h.age)
+		visible_ids.append(h.owner.id)
+	for id in mire_views.keys():
+		if id not in visible_ids:
+			mire_views[id].queue_free()
+			mire_views.erase(id)
+
+func show_mire(game,id: int,p: Vector2,mode: int,progress: float,time: float):
+	if not mire_views.has(id):
+		var view=preload("res://scripts/mire_effect.gd").new()
+		view.texture=game.art.texture("mire-effect-v1.png")
+		game.arena_clip.add_child(view)
+		mire_views[id]=view
+	var view=mire_views[id]
+	view.position=p
+	view.z_index=-4 if mode==0 else int(p.y)*2+1
+	view.mode=mode
+	view.progress=progress
+	view.clock=time
+	view.queue_redraw()
 
 func step(game,dt: float):
 	for enemy in game.enemies:
@@ -55,11 +91,13 @@ func step(game,dt: float):
 	hazards=hazards.filter(func(h):return h.age<h.life)
 
 func movement(actor: Dictionary,before: Vector2):
+	actor["mired"]=false
 	if actor.height>12 or not actor.down.is_empty():return
 	for h in hazards:
-		if h.kind=="mire" and h.owner.hp>0 and abs(actor.x-h.p.x)<120 and abs(actor.y-h.p.y)<46:
-			actor.x=lerpf(before.x,actor.x,.45)
-			actor.y=lerpf(before.y,actor.y,.45)
+		if h.kind=="mire" and h.owner.hp>0 and not actor.mired and ((Vector2(actor.x,actor.y)-h.p)/MIRE_RADIUS).length_squared()<1:
+			actor.x=lerpf(before.x,actor.x,MIRE_SPEED)
+			actor.y=lerpf(before.y,actor.y,MIRE_SPEED)
+			actor.mired=true
 		if h.kind=="root" and h.owner.hp>0 and abs(actor.y-h.p.y)<60 and abs(actor.x-h.p.x)<28:
 			actor.x=h.p.x+(28 if before.x>=h.p.x else -28)
 
@@ -75,9 +113,9 @@ func draw_ground(game,node: Node2D):
 		if e.hp<=0 or a.is_empty() or a.age>=a.from or not a.has("target"):continue
 		var p=a.target
 		var pulse=.35+.35*float(a.age)/a.from
-		if a.type in ["mireCast","clinkerThrow"]:
-			ellipse(node,p,Vector2(120,46) if a.type=="mireCast" else Vector2(105,42),Color(.9,.65,.25,pulse))
-			ellipse(node,p,Vector2(120,46)*(1.-float(a.age)/a.from),Color(.9,.7,.3,pulse))
+		if a.type=="clinkerThrow":
+			ellipse(node,p,Vector2(105,42),Color(.9,.65,.25,pulse))
+			ellipse(node,p,Vector2(105,42)*(1.-float(a.age)/a.from),Color(.9,.7,.3,pulse))
 		elif a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
 		elif a.type=="rootSlam":
@@ -85,9 +123,6 @@ func draw_ground(game,node: Node2D):
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
-			"mire":
-				ellipse(node,h.p,Vector2(120,46),Color(.19,.29,.09,.65*fade),true)
-				for i in 4:ellipse(node,h.p+Vector2(sin(i*18.)*65,cos(i*7.)*20),Vector2(20,7)*(1+sin(h.age*3+i)*.12),Color(.65,.68,.3,.4*fade))
 			"clinker":ellipse(node,h.p,Vector2(105,42),Color(1,.4,.07,(.25+.15*sin(h.age*15))*fade))
 			"root":
 				for i in 7:

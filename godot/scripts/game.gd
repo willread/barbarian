@@ -988,6 +988,7 @@ func _process(raw: float):
 	displayed_mana=lerpf(displayed_mana,magic,1-exp(-dt*12))
 	shake=max(0,shake-dt*35)
 	background.advance(clock)
+	episode_combat.sync_views(self)
 	screen_backdrop.queue_redraw()
 	heat_node.visible=background.key=="cinder" and phase!="title"
 	scenery_shade.visible=phase!="title" and background.screen.is_empty()

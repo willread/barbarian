@@ -40,10 +40,10 @@ func check():
 	for actor in [game.hero,owner]:
 		actor.x=730.;actor.y=670.;actor.height=0.;actor.down={}
 		combat.movement(actor,Vector2(720,670))
-		assert(is_equal_approx(actor.x,724.5))
+		assert(is_equal_approx(actor.x,722.8) and actor.mired)
 		actor.x=730.;actor.height=30.
 		combat.movement(actor,Vector2(720,670))
-		assert(actor.x==730.)
+		assert(actor.x==730. and not actor.mired)
 	owner.hp=0
 	combat.step(game,.01)
 	assert(combat.hazards[0].life<.2,"Witch death collapses mire")

@@ -59,6 +59,7 @@ func enemy_frame(e: Dictionary) -> int:
 	if e.kind in ["witch","bearer","king","saint"]:
 		if e.hp<=0:return 7
 		if not e.down.is_empty() or e.hurtTicks or e.recovering:return 6
+		if e.kind=="witch" and e.get("hazard_live",false) and not e.moving and e.attack.is_empty():return 4
 		if not e.attack.is_empty():return 3 if e.attack.age<e.attack.from else 4 if e.attack.age<=e.attack.from+8 else 5
 		if e.boss and e.phaseTwo and not e.moving:return 5
 		return 1+int(e.stride*4)%2 if e.moving else 0
