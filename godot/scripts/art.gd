@@ -85,7 +85,7 @@ func layout(p: Array) -> Dictionary:
 		var sockets=[Vector2(145,403),Vector2(151,402),Vector2(157,410),Vector2(158,406)]
 		var hand=sockets[int(p[1])]
 		rig.grip=[(hand.x-atlas.cellWidth*.5)*rig.scale,(hand.y-cel.top-cel.height)*rig.scale]
-		rig.angle=deg_to_rad([-35.,-32.,-38.,-34.][int(p[1])])
+		rig.angle=deg_to_rad([-125.,-122.,-128.,-124.][int(p[1])])
 		rig.behind=false
 	return {"atlas":atlas,"cel":cel,"rig":rig}
 
