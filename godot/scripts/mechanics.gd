@@ -24,8 +24,9 @@ func standing(f: Dictionary) -> bool:
 func start_jump(f: Dictionary) -> bool:
 	if not f.air.is_empty() or not f.attack.is_empty() or f.hurtTicks or not f.down.is_empty() or f.recovering:
 		return false
-	f.jumpLaunch=5.5
-	f.air={"age":0,"launch":5.5,"vz":0.0,"land":0,"carry":combat_extensions and f.running}
+	var jump_scale=f.get("mire_jump_scale",1.0)
+	f.jumpLaunch=5.5*jump_scale
+	f.air={"age":0,"launch":f.jumpLaunch,"vz":0.0,"land":0,"carry":combat_extensions and f.running and jump_scale>=1.0}
 	f.diveUsed=false
 	f.diveHit=false
 	f.diveAge=0

@@ -9,7 +9,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster["archer"]={"hp":6,"speed":1.05}
 	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":105,"speed":.8},"saint":{"hp":120,"speed":.8}})
 	for attack in [
-		["mireCast",96,52,-1,0,0],["clinkerThrow",92,48,-1,0,0],
+		["mireCast",96,52,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
 		["rootSlam",108,56,62,9,64],["kingSweep",82,38,45,8,72],
 		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
@@ -257,6 +257,7 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	return Vector2.ZERO
 
 func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.kind=="witch":return hag_intent(e,h)
 	if e.boss and e.hp<=e.max*.5:e.phaseTwo=true
 	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty() or h.hp<=0:return Vector2.ZERO
 	var dx=h.x-e.x
@@ -274,6 +275,23 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.aiRest and not e.phaseTwo and not ranged:return Vector2.ZERO
 	var away=ranged and abs(dx)<250 and e.x>160 and e.x<1280
 	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
+
+func hag_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
+	# Enter the arena, then defend the chosen position without chasing the hero.
+	if not e.get("entered_arena",false):
+		if e.x<170:return Vector2(1,0)
+		if e.x>1270:return Vector2(-1,0)
+	var dx=h.x-e.x
+	var dy=h.y-e.y
+	e.dir=1 if dx>=0 else -1
+	if not e.aiRest:
+		if abs(dx)<190 and abs(dy)<36:
+			m.begin(e,"hagClaw")
+		elif abs(dx)<650 and abs(dy)<140 and e.get("mire_count",0)<3:
+			if m.begin(e,"mireCast"):e.attack["target"]=Vector2(h.x,h.y)
+	if e.attack.is_empty() and abs(dx)<220 and e.x>190 and e.x<1250:return Vector2(-e.dir*.6,0)
+	return Vector2.ZERO
 
 static func boss_open(e: Dictionary) -> bool:
 	return e.phaseTwo or (not e.attack.is_empty() and e.attack.age>max(e.attack.to,e.attack.from+7)) or e.get("open_ticks",0)>0

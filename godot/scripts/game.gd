@@ -665,7 +665,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 				run_stats.peak_multiplier=maxi(run_stats.peak_multiplier,combo.multiplier())
 	if not f.player and f.hp<previous_hp:
 		f.healthBarUntil=clock+1.4
-	if f.player and a.get("no_stun",false) and f.hp>0 and f.hp<previous_hp:
+	if f.player and a.get("no_stun",false) and not a.get("continuous",false) and f.hp>0 and f.hp<previous_hp:
 		f.arrowKick={"age":0.0,"offset":0.0,"direction":a.direction}
 	if a.get("magic",false) and f.hp>0:
 		m.interrupt_attack(f)
@@ -853,6 +853,7 @@ func tick(dt: float):
 		pressed.clear()
 		return
 	var dx=int(keys.has(KEY_D))-int(keys.has(KEY_A))
+	episode_combat.prepare_actor(hero)
 	var dy=int(keys.has(KEY_S))-int(keys.has(KEY_W))
 	var run_held=keys.has(KEY_SHIFT)
 	if run_held and dx!=0 and hero.air.is_empty() and hero.attack.is_empty():
