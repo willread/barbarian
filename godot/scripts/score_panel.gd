@@ -54,7 +54,7 @@ func _process(dt):
  queue_redraw()
 func combo_height() -> float:
  var kick=exp(-impact_age*8.)*cos(impact_age*24.)
- return (43.+tier*1.8)*(1.+kick*(.10+tier*.018))
+ return 1.25*(43.+tier*1.8)*(1.+kick*(.10+tier*.018))
 func unrest() -> Vector2:
  var burst=exp(-impact_age*7.)*(1.+tier*.6)
  var idle=maxf(0.,tier-4)*.15
@@ -73,7 +73,7 @@ func _draw():
   widest=maxf(widest,float(bounds[digit].size.x)/bounds[digit].size.y)
  var height=minf(38.,(width-3.)/widest)*(1.+.025*exp(-score_age*12.))
  for i in digits.length():stone(digits[i],Vector2((i-(digits.length()-1)*.5)*width,69),height,width)
- stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),150)
+ stone("%dX"%game.combo.multiplier(),Vector2(0,151)+unrest(),combo_height(),187.5)
  if game.combo.hits>0:
-  draw_rect(Rect2(-101,198,202,6),Color(.08,.035,.025,.8))
-  draw_rect(Rect2(-100,199,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))
+  draw_rect(Rect2(-101,210,202,6),Color(.08,.035,.025,.8))
+  draw_rect(Rect2(-100,211,200*game.combo.remaining/game.combo.timeout,4),Color(.6,.25,.08,.9))

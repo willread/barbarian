@@ -43,11 +43,22 @@ func check():
  enemy.x=820
  enemy.y=game.hero.y
  game.step_combo(.1)
- assert(game.combo.remaining==3. and game.hero.hp==50)
+ assert(game.combo.remaining==3.25 and game.hero.hp==50)
  game.step_combo(1.)
- assert(game.combo.remaining==2. and game.hero.hp==51.5)
+ assert(game.combo.remaining==2.25 and game.hero.hp==51.5)
  enemy.x=-450
  game.step_combo(1.)
- assert(game.combo.remaining==1.,"Retreat must not pause an active combo")
+ assert(game.combo.remaining==1.25,"Retreat must not pause an active combo")
+ # An offscreen reinforcement must not consume the previous foe's final timer.
+ enemy.hp=0
+ var incoming=game.make_actor(-300,660,20)
+ incoming.kind="bone"
+ game.enemies.append(incoming)
+ game.step_combo(2.)
+ assert(game.combo.remaining==1.25 and game.combo.waiting_for_combat)
+ incoming.x=800
+ incoming.y=game.hero.y
+ game.step_combo(.1)
+ assert(game.combo.remaining==3.25 and not game.combo.waiting_for_combat)
  print("CAIRN_COMBO_OK: tiers, mana, healing, timeout, hit scores, magic exclusion, damage reset and holiday choices")
  quit()

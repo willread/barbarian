@@ -31,6 +31,8 @@ var enemies: Array=[]
 var encounters: Array=[]
 var pending_enemies: Array=[]
 var reinforcement_wait=0.0
+var wave_clear_time=0.0
+const WAVE_GAP=0.65
 var gear: Array=[]
 var scorches: Array=[]
 var arrows: Array=[]
@@ -425,17 +427,19 @@ func start_game():
 func screen_for_wave(number: int) -> int:
 	return clampi(1+int((number-1)/3),1,4)
 
-func spawn_wave():
+func spawn_wave(preserve_corpses: bool=false):
 	combo.suspend()
-	for enemy in enemies:
-		if views.has(enemy.id): views[enemy.id].queue_free();views.erase(enemy.id)
-		if flame_views.has(enemy.id): flame_views[enemy.id].queue_free();flame_views.erase(enemy.id)
-	for item in gear: item.node.queue_free()
-	gear.clear()
-	for arrow in arrows:
-		if is_instance_valid(arrow):arrow.queue_free()
-	arrows.clear()
-	enemies.clear()
+	wave_clear_time=0.0
+	if not preserve_corpses:
+		for enemy in enemies:
+			if views.has(enemy.id): views[enemy.id].queue_free();views.erase(enemy.id)
+			if flame_views.has(enemy.id): flame_views[enemy.id].queue_free();flame_views.erase(enemy.id)
+		for item in gear: item.node.queue_free()
+		gear.clear()
+		for arrow in arrows:
+			if is_instance_valid(arrow):arrow.queue_free()
+		arrows.clear()
+		enemies.clear()
 	var next="citadel-%d"%screen_for_wave(wave)
 	if next!=background.key:
 		hero.bootCoat=0.0
@@ -443,13 +447,13 @@ func spawn_wave():
 		hero.bootPos=Vector2(hero.x,hero.y)
 		blood.reset()
 		scorches.clear()
-	background.setup(art,next)
+	if background.key!=next:background.setup(art,next)
 	last_window_size=Vector2i.ZERO
 	responsive_layout()
 	pending_enemies=encounters[wave-1].duplicate()
 	var initial=min(pending_enemies.size(),2+randi()%2)
 	for i in initial:spawn_encounter_enemy()
-	reinforcement_wait=randf_range(2.0,4.0)
+	reinforcement_wait=randf_range(1.0,2.0)
 	wave_time=0
 
 func spawn_encounter_enemy():
@@ -458,7 +462,7 @@ func spawn_encounter_enemy():
 	if pending_enemies[0]=="shield" and enemies.filter(func(enemy):return enemy.hp>0 and enemy.kind=="shield").size()>=e_ai.shield_limit(screen_for_wave(wave)):return
 	var kind=pending_enemies.pop_front()
 	var left=randf()<.5
-	var f=make_actor(randf_range(-650,-420) if left else randf_range(1860,2090),randf_range(570,730),e_ai.roster[kind].hp)
+	var f=make_actor(randf_range(-360,-270) if left else randf_range(1710,1800),randf_range(570,730),e_ai.roster[kind].hp)
 	f.kind=kind
 	f.boss=kind=="champion"
 	f.dir=1 if left else -1
@@ -479,7 +483,7 @@ func step_reinforcements(dt: float):
 	var cost=2 if next in ["shield","archer","marauder"] else 1
 	if living.is_empty() or reinforcement_wait<=0 and living.size()<min(4,2+screen_for_wave(wave)) and pressure+cost<=screen_for_wave(wave)+3:
 		spawn_encounter_enemy()
-		reinforcement_wait=randf_range(1.6,3.8)
+		reinforcement_wait=randf_range(.8,1.9)
 
 func begin_walk(kind: String):
 	combo.suspend()
@@ -674,12 +678,19 @@ func tick_actor(f: Dictionary,dt: float):
 # Waiting is latched between encounters, not whenever the player backs away.
 func step_combo(dt: float):
 	var living=enemies.filter(func(enemy):return enemy.hp>0)
-	if living.is_empty():combo.suspend()
+	var ready=false
+	for enemy in living:
+		var reachable=enemy.x>=0 and enemy.x<=1440 and absf(enemy.x-hero.x)<=(260 if enemy.kind!="archer" else 500) and absf(enemy.y-hero.y)<=90 and enemy.down.is_empty()
+		if reachable:
+			enemy["combo_opportunity_seen"]=true
+			ready=true
+	# Only protect spawn/transition gaps, never voluntary retreat from known foes.
+	if living.is_empty() or not living.any(func(enemy):return enemy.get("combo_opportunity_seen",false)):
+		combo.suspend()
 	if combo.waiting_for_combat:
-		var ready=living.any(func(enemy):return enemy.x>=0 and enemy.x<=1440 and absf(enemy.x-hero.x)<=(650. if enemy.kind=="archer" else 260.) and absf(enemy.y-hero.y)<=90.)
 		if not ready:return
 		combo.resume()
-		return # Keep the full grace period on the first combat frame.
+		return
 	hero.hp=minf(hero.max,hero.hp+combo.advance(dt))
 
 func tick(dt: float):
@@ -806,14 +817,18 @@ func tick(dt: float):
 	for f in enemies:
 		e_ai.keep_in_arena(f)
 		background.constrain(f)
-	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0 and f.burnAge>=BurningSprite.finished_at(f.engulf)):
+	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0):
+		wave_clear_time+=dt
 		if wave<encounters.size() and screen_for_wave(wave+1)==screen_for_wave(wave):
+			if wave_clear_time<WAVE_GAP:return
 			wave+=1
-			spawn_wave()
+			spawn_wave(true)
 			return
-		begin_walk("exit")
-		transition=0
-		swapped=false
+		if enemies.all(func(f):return f.burnAge>=BurningSprite.finished_at(f.engulf)):
+			begin_walk("exit")
+			transition=0
+			swapped=false
+	else:wave_clear_time=0.0
 
 func _process(raw: float):
 	if not art: return
