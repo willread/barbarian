@@ -48,6 +48,7 @@ func _ready():
 		if runs[i].get("id")==current_id:selected=i
 	get_viewport().size_changed.connect(layout)
 	layout()
+	actions.drop_actions()
 	reveal_selected.call_deferred()
 
 func layout():
@@ -115,7 +116,7 @@ func draw_table():
 				content.draw_colored_polygon(PackedVector2Array([marker+Vector2(-3,-7),marker+Vector2(5,0),marker+Vector2(-3,7)]),Color("eab95d"))
 		elif i%2==0:content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.65,.48,.025))
 		content.draw_line(Vector2(0,y),Vector2(w,y),Color(.40,.34,.24,.45))
-		var reached="Citadel · Cleared" if run.get("outcome")=="won" else "Citadel · Area %d/4"%run.get("area",1)
+		var reached="AREA %d/4"%run.get("area",1)
 		var time=CairnRunRecords.duration(run.get("time",0))
 		var date=display_date(str(run.get("date","")))
 		if compact:

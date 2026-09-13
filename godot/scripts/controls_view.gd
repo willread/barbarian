@@ -46,6 +46,7 @@ func _ready():
  back_menu.sound_requested.connect(func(id):get_parent().audio.play(id))
  get_viewport().size_changed.connect(layout)
  layout()
+ back_menu.drop_actions()
 func tex(name: String):
  if not textures.has(name):textures[name]=load("res://art/controls/"+name)
  return textures[name]

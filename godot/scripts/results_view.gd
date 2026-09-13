@@ -40,12 +40,14 @@ func _ready():
 	actions.yellow_flames=true
 	actions.action_emphasis={"RISE AGAIN":1.6}
 	actions.action_height=110.0
+	actions.centered_action="RISE AGAIN"
 	actions.show_items(["HALL OF LEGENDS","RISE AGAIN","QUIT TO TITLE"],false,false)
 	actions.select(1,false)
 	actions.activated.connect(func(label):activated.emit(label))
 	actions.sound_requested.connect(func(id):get_parent().audio.play(id,-8))
 	get_viewport().size_changed.connect(layout)
 	layout()
+	actions.drop_actions()
 
 func layout():
 	var pixels=Vector2(get_window().size)
@@ -74,7 +76,7 @@ func draw_heading():
 	var title="THE VALLEY IS FREE." if result.get("outcome")=="won" else "EVEN HEROES FALL."
 	var y=50.0 if compact else scroll.position.y*.52
 	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,y),34 if compact else clampf(viewport_size.x*.044,40,80),viewport_size.x*.78)
-	label(backdrop,"C I T A D E L   ·   A R E A   %d   O F   4"%result.get("area",1),Vector2(viewport_size.x*.5,88 if compact else scroll.position.y*.82),14 if compact else 20,ink,viewport_size.x*.9)
+	label(backdrop,"AREA %d/4"%result.get("area",1),Vector2(viewport_size.x*.5,88 if compact else scroll.position.y*.82),18 if compact else 21,ink,viewport_size.x*.9)
 
 func rule(a: Vector2,b: Vector2,bright=false):
 	content.draw_line(a+Vector2(0,1),b+Vector2(0,1),Color(.05,.02,.005,.9),2)
@@ -110,15 +112,13 @@ func draw_panel():
 	lettering.label(content,"FINAL SCORE",Vector2(cx,32),19 if compact else 22,score_w*.8)
 	rule(Vector2(30,53),Vector2(score_w-30,53))
 	var t=1.-pow(1.-clampf(age/.9,0,1),3)
-	lettering.number(content,CairnRunRecords.number(float(result.get("score",0))*t),"score",Vector2(cx,score_h*.46),98 if compact else score_h*.32,score_w*.87)
-	var new_score="score" in result.get("new_stats",[])
-	if new_score and age>=.9:
-		rule(Vector2(30,score_h*.78),Vector2(cx-43,score_h*.78),true)
-		rule(Vector2(cx+43,score_h*.78),Vector2(score_w-30,score_h*.78),true)
-	record_label("score",Vector2(cx,score_h*.78),true)
+	var score_size=82.0 if compact else score_h*.32
+	var score_center=(53.0+score_h*.9)*.5
+	lettering.number(content,CairnRunRecords.number(float(result.get("score",0))*t),"score",Vector2(cx,score_center),score_size,score_w*.87)
+	record_label("score",Vector2(cx,score_center+score_size*.5+18),true)
 	var best=int(result.get("previous_best",0))
 	var score=int(result.get("score",0))
-	var comparison="First score recorded" if result.get("first",true) else "Personal best matched" if score==best else "Previous best %s · +%s"%[CairnRunRecords.number(best),CairnRunRecords.number(score-best)] if score>best else "Personal best %s"%CairnRunRecords.number(best)
+	var comparison="First score recorded" if result.get("first",true) else "Personal best matched" if score==best else "Previous best %s (+%s)"%[CairnRunRecords.number(best),CairnRunRecords.number(score-best)] if score>best else "Personal best %s"%CairnRunRecords.number(best)
 	label(content,comparison,Vector2(cx,score_h*.9),18,ink,score_w*.93)
 	var rank=int(result.get("rank",0))
 	var detail="%s from your best"%CairnRunRecords.number(best-score) if score<best else ""
@@ -147,7 +147,6 @@ func draw_panel():
 		if key=="peak_multiplier":value+="×"
 		lettering.number(content,value,"stat",Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
 		record_label(key,Vector2(x,y+row*.83))
-		if i<4:rule(Vector2(left+sw*.5*col+15,y+row),Vector2(left+sw*.5*(col+1)-15,y+row))
 
 func _process(dt: float):
 	if not visible:return

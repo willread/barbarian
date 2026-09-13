@@ -5,6 +5,7 @@ var art: CairnArt
 var yellow_flames=false
 var action_emphasis: Dictionary={}
 var action_height=64.0
+var centered_action=""
 var items: Array=[]
 const LOCKED=["EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS"]
 var unavailable: Callable
@@ -80,6 +81,24 @@ func switch_items(labels: Array,is_title: bool=true):
 	await get_tree().create_timer(duration).timeout
 	show_items(labels,is_title)
 	switching=false
+
+# Footer items land individually after their responsive positions are known.
+# Animate an offset so resizing cannot leave a tween targeting an obsolete row.
+func drop_actions():
+	for i in items.size():
+		var item=items[i]
+		item.drop_offset=-maxf(1224,get_viewport_rect().size.y/maxf(.01,scale.y)*2)
+		item.node.position.y=item.y+item.drop_offset
+		var move=func(offset):
+			item.drop_offset=offset
+			item.node.position.y=item.y+offset
+		var tween=create_tween()
+		tween.tween_interval(i*.50)
+		tween.tween_method(move,float(item.drop_offset),0.0,.3264).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_callback(func():sound_requested.emit("menu_land"))
+		tween.tween_method(move,0.0,2.6,.024)
+		tween.tween_method(move,2.6,-4.9,.048).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_method(move,-4.9,0.0,.0816).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 func select(index: int, shake: bool=true):
 	if items.is_empty(): return
@@ -159,13 +178,18 @@ func layout_actions(rect: Rect2,vertical: bool=false):
 		widest=maxf(widest,item.width)
 		tallest=maxf(tallest,item.height)
 		total+=item.width
-	var factor=minf(60.0/tallest,minf(rect.size.x/widest,rect.size.y/(items.size()*(tallest+18)))) if vertical else minf(action_height/tallest,minf(rect.size.x/(total+80*(items.size()-1)),rect.size.y/tallest))
+	var centered=not vertical and items.size()==3 and items[1].label==centered_action
+	var required=items[1].width+2*(maxf(items[0].width,items[2].width)+80) if centered else total+80*(items.size()-1)
+	var factor=minf(60.0/tallest,minf(rect.size.x/widest,rect.size.y/(items.size()*(tallest+18)))) if vertical else minf(action_height/tallest,minf(rect.size.x/required,rect.size.y/tallest))
 	scale=Vector2.ONE*factor
 	position=rect.position
 	var cursor=(rect.size.x/factor-total-80*(items.size()-1))*.5
 	for i in items.size():
 		var item=items[i]
 		item.x=rect.size.x/factor*.5 if vertical else cursor+item.width*.5
+		if centered:
+			item.x=rect.size.x/factor*.5
+			if i!=1:item.x+=(-1 if i==0 else 1)*(items[1].width*.5+80+item.width*.5)
 		item.y=(rect.size.y/factor/items.size())*(i+.5)-item.height*.5 if vertical else (rect.size.y/factor-item.height)*.5
-		item.node.position=Vector2(item.x,item.y)
+		item.node.position=Vector2(item.x,item.y+item.get("drop_offset",0.0))
 		cursor+=item.width+80

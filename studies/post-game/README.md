@@ -16,6 +16,8 @@ The post-game UI overlays the existing blood splatter, visible around the headin
 
 Each qualifying value, including the final score, gets a compact amber **NEW** label directly beneath it. All labels use matching typography and restrained glow, scaled to fit their cells. Multiple stat records can appear independently of the score record. Reserve room within cells so labels never shift the grid. No bottom personal-record line, record strip, duplicate score badge, or placeholder labels.
 
+Latest runtime refinements supersede the generated reference where specified: omit horizontal dividers between individual stats; vertically center the main score with NEW immediately below; use the HUD's `AREA X/4` copy with no chapter name. Previous-best comparisons use `Previous best 116,200 (+12,250)`. Center Rise Again on the viewport with equal edge gaps to the two side actions. Footer actions drop and land one at a time, including Hall and Controls Back actions, without replaying on return to an existing results view.
+
 Actions: Hall of Legends / Rise Again / Quit to Title. Rise Again has initial focus. Preserve the game's existing free-standing stone lettering, contour fire, focus and activation behavior. No generated button plaques or new button styles.
 
 ### Motion
@@ -60,7 +62,7 @@ The populated screen contains only its heading, ranked table, overflow scrollbar
 | --- | --- |
 | No saved runs | In the table area: “No scores yet.” / “Finish your first run to set a score.” Existing-style Begin and Back actions. No fake zero rows, subtitle or place counter. |
 | First run | “First score recorded”; no invented previous best, delta or NEW labels for beating a nonexistent record. |
-| New best score | NEW below score; “Previous best 116,200 · +12,250” comparison remains. |
+| New best score | NEW below score; “Previous best 116,200 (+12,250)” comparison remains. |
 | Below best | “Personal best 128,450” / “12,250 from your best”; show actual placement on results if applicable. No score celebration. |
 | Tied best | “Personal best matched”; no NEW label. |
 | Outside top 10 | Results show “Outside your top 10”; no separate summary in the list. |

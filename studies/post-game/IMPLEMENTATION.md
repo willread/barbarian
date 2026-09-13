@@ -2,6 +2,10 @@
 
 ## Mockup comparison revision
 
+The subsequent refinement removes horizontal rules between individual stats and the decorative rules beside score NEW. The score is vertically centered above its comparison, with NEW directly below it. Results and Hall use the HUD's `AREA X/4` wording. Score comparisons use parentheses around the positive delta. The lettering baker uses medium score/stat weights, lighter headline weight, less saturated ivory, finer grain and shallower bevels/shadows.
+
+Rise Again is anchored to the viewport center; symmetric space is reserved using the wider side action so both edge gaps stay equal. Footer drop-ins use staggered relative offsets, preserving their responsive destinations during resizing, with existing landing sounds. Results, Hall and Controls opt into this entrance; returning to the existing results screen does not restart it. Tests cover stagger timing, center alignment, equal gaps, responsive bounds and exported-pack loading. The native regression suite passes; Web and the single Windows executable were rebuilt after the game closed, including the preceding yellow-flame and Hall-lock changes.
+
 Compared the live screens directly with `results-v4.png` and `hall-of-legends-v1.png`. Results now uses the reference's fine cellular cracked material (`slate-fine.png`), small-cap headline, wider section lettering, larger stat labels and numbers, fissured ivory score glyphs, and a prominent Rise Again action. The shared menu renderer accepts per-action emphasis and a footer height limit; the existing lettering, hit targets and fire remain in use. Portrait footers equalize the three actions and reserve more height. Post-game flames retain their requested yellow palette.
 
 Hall now has the reference's title/table spacing, brighter table text, selection triangle, readable day/month/year dates, and a two-line stone title in narrow windows. Its title assets use the Controls baker. Ten rows fit at 1280×720; smaller windows scroll. Hall remains disabled on the main menu until a run has established a score.
