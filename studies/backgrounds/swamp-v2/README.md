@@ -15,6 +15,8 @@ Every phase is deterministic and repeats over the 24-second common cycle. Partic
 
 Layer order: base painting → local moving scenery → atmosphere → actor guide → foreground → review guides. Click anywhere on the canvas to position the actor's feet, constrained to the draft y=.68–.90 lane. Only the edges receive foreground coverage; the central x=.30–.70 combat corridor stays completely clear. Thin edge elements may overlap feet. The native upper crop guide remains available; composition and animation are still drafts for review.
 
+The preview now uses four separate stacked canvases: scene, actors, transparent foreground, and review guides. Each shares the same dimensions and stage transform. Foreground never gets flattened into the background canvas. **Foreground only** hides the scene and actors to expose the alpha layer over a CSS checkerboard. **Export foreground PNG** downloads that layer's current frame with transparency, without the checkerboard or guides. Fullscreen targets the whole stack. Existing edge vegetation painted into the original v1 backgrounds is still part of those paintings; the new branches, bough, reeds and roots are the separate foreground assets.
+
 ## Assets and generation
 
 Built-in OpenAI ImageGen was used, with original generated PNGs copied unchanged here:
