@@ -81,12 +81,12 @@ func layout(p: Array) -> Dictionary:
 	var rig=cel.get("rig",{})
 	if p[0]=="hero-walk-unarmed-v8":
 		rig=rig.duplicate(true)
-		# Near-hand carry sockets, authored in the original 512x768 cells.
+		# Attack-hand carry sockets, authored in the original 512x768 cells.
 		var sockets=[Vector2(145,403),Vector2(151,402),Vector2(157,410),Vector2(158,406)]
 		var hand=sockets[int(p[1])]
 		rig.grip=[(hand.x-atlas.cellWidth*.5)*rig.scale,(hand.y-cel.top-cel.height)*rig.scale]
-		rig.angle=deg_to_rad([195.,190.,198.,193.][int(p[1])])
-		rig.behind=true
+		rig.angle=deg_to_rad([-35.,-32.,-38.,-34.][int(p[1])])
+		rig.behind=false
 	return {"atlas":atlas,"cel":cel,"rig":rig}
 
 func weapon_data(f: Dictionary) -> Dictionary:
@@ -167,6 +167,13 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 	node.draw_set_transform(Vector2.ZERO)
 	if f.player and p[0]!="hero-spin" and not behind and not l.rig.behind:
 		node.draw_texture_rect(texture(l.cel.file.replace(".png","-hands.png")),body_rect(f,p),false)
+		if p[0]=="hero-walk-unarmed-v8":
+			# Repaint the actual clenched fist over the shaft at the revised socket.
+			var body=body_rect(f,p)
+			var hand=Vector2(l.rig.grip[0],l.rig.grip[1])
+			var patch=Rect2(hand-Vector2(9,9),Vector2(18,18))
+			var source=Rect2((patch.position-body.position)/l.rig.scale,patch.size/l.rig.scale)
+			node.draw_texture_rect_region(texture(l.cel.file),patch,source)
 
 func draw_equipment(node: Node2D,index: int,height: float):
 	var atlas=data.atlases["enemy-equipment-v1"]

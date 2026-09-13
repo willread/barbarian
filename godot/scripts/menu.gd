@@ -28,7 +28,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		var label=labels[i]
 		var meta=art.data.menu[label]
 		var group=Node2D.new()
-		var spacing=.75 if is_title and labels.has("BEGIN") else (.78 if compact_pause else 1.0)
+		var spacing=.75 if is_title and labels.has("BEGIN") else (.83 if compact_pause else 1.0)
 		var y=top+i*(meta.height*size-(20.16 if not options else 15.84))*spacing
 		group.position=Vector2(center,y)
 		add_child(group)
