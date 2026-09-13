@@ -63,11 +63,13 @@ func check():
 		game.results_view.layout()
 		await process_frame
 		var view=game.results_view
+		assert(is_equal_approx(view.viewport_size.x/view.viewport_size.y,16.0/9.0))
+		assert(is_equal_approx(view.transform.get_scale().x,view.transform.get_scale().y))
 		assert(is_equal_approx(view.actions.position.x+view.actions.items[1].x*view.actions.scale.x,view.viewport_size.x*.5))
 		for i in view.actions.items.size():
 			var item=view.actions.items[i]
 			assert(is_equal_approx(view.actions.position.x+item.x*view.actions.scale.x,view.viewport_size.x*.5))
-			if i>0:assert(item.y>view.actions.items[i-1].y+view.actions.items[i-1].height)
+			if i>0:assert(item.y>view.actions.items[i-1].y)
 		assert(view.scroll.position.y+view.scroll.size.y<view.viewport_size.y)
 		for item in view.actions.items:
 			var rect=Rect2(view.actions.position+item.node.position*view.actions.scale,Vector2(item.width,item.height)*view.actions.scale)

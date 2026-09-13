@@ -29,5 +29,5 @@ func number(node: CanvasItem,value: String,kind: String,center: Vector2,height: 
 	for ch in value:
 		var meta=glyphs[ch]
 		var at=Vector2(x-meta.pad*factor,center.y-cap*factor*.5-(meta.baseline-cap)*factor)
-		node.draw_texture_rect(texture(meta.file),Rect2(at,Vector2(meta.width,meta.height)*factor),false,Color(1.25,1.2,1.1))
+		node.draw_texture_rect(texture(meta.file),Rect2(at,Vector2(meta.width,meta.height)*factor),false,Color(1.8,1.75,1.65) if kind=="score" else Color(1.65,1.75,1.9))
 		x+=meta.advance*factor

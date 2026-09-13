@@ -5,6 +5,7 @@ var result: Dictionary={}
 var save_failed=false
 var age=0.0
 var backdrop: Node2D
+var shade: Node2D
 var scroll: ScrollContainer
 var content: Control
 var actions: Node2D
@@ -24,6 +25,9 @@ func _ready():
 	layer=2150
 	font.multichannel_signed_distance_field=false
 	font.oversampling=2.0
+	shade=Node2D.new()
+	add_child(shade)
+	shade.draw.connect(draw_shade)
 	backdrop=Node2D.new()
 	add_child(backdrop)
 	backdrop.draw.connect(draw_heading)
@@ -40,6 +44,7 @@ func _ready():
 	add_child(actions)
 	actions.setup(art)
 	actions.yellow_flames=true
+	actions.compact_pause=true
 	actions.show_items(["HALL OF LEGENDS","RISE AGAIN","QUIT TO TITLE"],false,false)
 	actions.select(1,false)
 	actions.activated.connect(func(label):activated.emit(label))
@@ -49,28 +54,19 @@ func _ready():
 	actions.drop_actions()
 
 func layout():
-	var pixels=Vector2(get_window().size)
-	var width=minf(1920,pixels.x)
-	viewport_size=Vector2(width,pixels.y*width/maxf(1,pixels.x))
-	transform=Transform2D(0,Vector2.ZERO).scaled(Vector2.ONE*(get_viewport().get_visible_rect().size.x/width))
-	compact=width<900
-	var margin=clampf(viewport_size.y*.04,12,40)
-	var gap=clampf(viewport_size.y*.025,12,28)
-	var heading_space=clampf(viewport_size.y*.08,28,70)
-	var footer=clampf(viewport_size.y*.28,150,240)
-	var desired_panel=630.0 if compact else clampf(viewport_size.y*.46,340,500)
-	var panel_space=minf(desired_panel,maxf(60,viewport_size.y-2*margin-heading_space-2*gap-footer))
-	var group_height=heading_space+2*gap+panel_space+footer
-	var group_top=maxf(margin,(viewport_size.y-group_height)*.5)
-	heading_y=group_top+heading_space*.5
-	heading_height=heading_space*.8
-	var top=group_top+heading_space+gap
-	var gutter=.055 if compact else .098
-	scroll.position=Vector2(width*gutter,top)
-	scroll.size=Vector2(width*(1.-gutter*2),panel_space)
-	panel_height=maxf(630 if compact else 340,panel_space)
+	viewport_size=Vector2(1440,810)
+	var available=get_viewport().get_visible_rect().size
+	var fit=minf(available.x/viewport_size.x,available.y/viewport_size.y)
+	transform=Transform2D(0,Vector2.ONE*fit,0,(available-viewport_size*fit)*.5)
+	compact=false
+	heading_y=58
+	heading_height=56
+	scroll.position=Vector2(144,112)
+	scroll.size=Vector2(1152,370)
+	panel_height=370
 	content.custom_minimum_size=Vector2(0,panel_height)
-	actions.layout_actions(Rect2(width*.085,top+panel_space+gap,width*.83,footer),true)
+	actions.layout_standard_stack(Rect2(270,500,900,276))
+	shade.queue_redraw()
 	backdrop.queue_redraw()
 	content.queue_redraw()
 
@@ -81,7 +77,14 @@ func label(node: CanvasItem,value: String,center: Vector2,size: int,color: Color
 
 func draw_heading():
 	var title="THE VALLEY IS FREE." if result.get("outcome")=="won" else "EVEN HEROES FALL"
-	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,heading_y),heading_height,viewport_size.x*.78)
+	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,heading_y),heading_height,viewport_size.x*.78,Color(1.95,2.05,2.15))
+
+func draw_shade():
+	var inverse=transform.affine_inverse()
+	var full=Rect2(inverse*Vector2.ZERO,get_viewport().get_visible_rect().size/transform.get_scale())
+	shade.draw_rect(full,Color(0,0,0,.42))
+	var bottom=Rect2(full.position.x,482,full.size.x,maxf(0,full.end.y-482))
+	shade.draw_polygon(PackedVector2Array([bottom.position,Vector2(bottom.end.x,bottom.position.y),bottom.end,Vector2(bottom.position.x,bottom.end.y)]),PackedColorArray([Color(0,0,0,0),Color(0,0,0,0),Color(0,0,0,.65),Color(0,0,0,.65)]))
 
 func rule(a: Vector2,b: Vector2,bright=false):
 	content.draw_line(a+Vector2(0,1),b+Vector2(0,1),Color(.05,.02,.005,.9),2)
@@ -115,7 +118,7 @@ func draw_panel():
 	var score_h=270.0 if compact else rect.size.y
 	var score_w=w if compact else w*.50
 	var cx=score_w*.5
-	lettering.label(content,"FINAL SCORE",Vector2(cx,32),19 if compact else 22,score_w*.8)
+	lettering.label(content,"FINAL SCORE",Vector2(cx,32),19 if compact else 22,score_w*.8,Color(1.7,1.6,1.35))
 	rule(Vector2(30,53),Vector2(score_w-30,53))
 	lettering.label(content,"AREA %d/4"%result.get("area",1),Vector2(cx,71),12 if compact else 14,score_w*.8)
 	var t=1.-pow(1.-clampf(age/.9,0,1),3)
@@ -138,7 +141,7 @@ func draw_panel():
 	var sw=w-left
 	if compact:rule(Vector2(20,top),Vector2(w-20,top))
 	else:rule(Vector2(left,20),Vector2(left,rect.end.y-20))
-	lettering.label(content,"STATS",Vector2(left+sw*.5,top+32),19 if compact else 22,sw*.8)
+	lettering.label(content,"STATS",Vector2(left+sw*.5,top+32),19 if compact else 22,sw*.8,Color(1.7,1.6,1.35))
 	rule(Vector2(left+20,top+53),Vector2(w-20,top+53))
 	var row=(rect.end.y-top-62)/3
 	rule(Vector2(left+sw*.5,top+62),Vector2(left+sw*.5,rect.end.y-15))
@@ -148,7 +151,7 @@ func draw_panel():
 		var x=left+sw*(.25+.5*col)
 		var key=STATS[i][0]
 		var title="RUN TIME" if key=="time" and result.get("outcome")=="won" else STATS[i][1]
-		lettering.label(content,title,Vector2(x,y+11),12 if compact else 14,sw*.43)
+		lettering.label(content,title,Vector2(x,y+11),12 if compact else 14,sw*.43,Color(1.6,1.65,1.7))
 		var value=CairnRunRecords.duration(result.get(key,0)) if key=="time" else CairnRunRecords.number(result.get(key,0))
 		if key=="best_combo":value+=" HITS"
 		if key=="peak_multiplier":value+="×"
@@ -159,6 +162,7 @@ func _process(dt: float):
 	if not visible:return
 	age+=dt
 	var reveal=smoothstep(0,.3,age)
+	shade.modulate.a=smoothstep(0,.8,age)
 	backdrop.modulate.a=reveal
 	backdrop.position.y=(1.-reveal)*8
 	content.modulate.a=reveal

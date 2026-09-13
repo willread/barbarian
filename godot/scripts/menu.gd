@@ -161,6 +161,21 @@ func layout_screen(size: Vector2,is_title: bool):
 	if not is_title: position=size*.5-bounds.get_center()*factor
 
 # Reuse the same baked letters, hit targets and contour fire in screen footers.
+func layout_standard_stack(rect: Rect2):
+	if items.is_empty():return
+	var bounds=Rect2()
+	for item in items:
+		if not item.has("stack_y"):item.stack_y=item.y
+		var item_rect=Rect2(-item.width*.5,item.stack_y,item.width,item.height)
+		bounds=item_rect if bounds.size==Vector2.ZERO else bounds.merge(item_rect)
+	var factor=minf(rect.size.x/bounds.size.x,rect.size.y/bounds.size.y)
+	scale=Vector2.ONE*factor
+	position=rect.position
+	for item in items:
+		item.x=rect.size.x/factor*.5
+		item.y=item.stack_y-bounds.position.y+(rect.size.y/factor-bounds.size.y)*.5
+		item.node.position=Vector2(item.x,item.y+item.get("drop_offset",0.0))
+
 func layout_actions(rect: Rect2,vertical: bool=false):
 	if items.is_empty():return
 	for item in items:
