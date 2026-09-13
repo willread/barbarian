@@ -33,6 +33,7 @@ var pending_enemies: Array=[]
 var reinforcement_wait=0.0
 var wave_clear_time=0.0
 const WAVE_GAP=0.65
+const NORMAL_ENEMY_CAP=3
 var gear: Array=[]
 var scorches: Array=[]
 var arrows: Array=[]
@@ -459,7 +460,7 @@ func spawn_wave(preserve_corpses: bool=false):
 
 func spawn_encounter_enemy():
 	if pending_enemies.is_empty():return
-	if enemies.filter(func(enemy):return enemy.hp>0).size()>=4:return
+	if enemies.filter(func(enemy):return enemy.hp>0).size()>=NORMAL_ENEMY_CAP:return
 	if pending_enemies[0]=="shield" and enemies.filter(func(enemy):return enemy.hp>0 and enemy.kind=="shield").size()>=e_ai.shield_limit(screen_for_wave(wave)):return
 	var kind=pending_enemies.pop_front()
 	var left=randf()<.5
@@ -482,7 +483,7 @@ func step_reinforcements(dt: float):
 	for enemy in living:pressure+=2 if enemy.kind in ["shield","archer","marauder"] else 1
 	var next=pending_enemies[0]
 	var cost=2 if next in ["shield","archer","marauder"] else 1
-	if living.is_empty() or reinforcement_wait<=0 and living.size()<min(4,2+screen_for_wave(wave)) and pressure+cost<=screen_for_wave(wave)+3:
+	if living.is_empty() or reinforcement_wait<=0 and living.size()<NORMAL_ENEMY_CAP and pressure+cost<=screen_for_wave(wave)+3:
 		spawn_encounter_enemy()
 		reinforcement_wait=randf_range(.8,1.9)
 

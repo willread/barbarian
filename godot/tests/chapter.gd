@@ -68,11 +68,11 @@ func check():
 	game.enemies.clear()
 	game.pending_enemies=["bone","bone","bone","bone","bone","bone"]
 	for attempt in 6:game.spawn_encounter_enemy()
-	assert(game.enemies.size()==4 and game.pending_enemies.size()==2)
+	assert(game.enemies.size()==3 and game.pending_enemies.size()==3)
 	game.step_reinforcements(10.)
-	assert(game.enemies.size()==4)
+	assert(game.enemies.size()==3)
 	game.enemies[0].hp=0
 	game.step_reinforcements(10.)
-	assert(game.enemies.size()==5 and game.pending_enemies.size()==1)
+	assert(game.enemies.size()==4 and game.pending_enemies.size()==2)
 	print("CAIRN_CHAPTER_OK: selection, locked chapters, ordered screens, walk limits and final boss")
 	quit()
