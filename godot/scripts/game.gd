@@ -74,6 +74,7 @@ var keys: Dictionary={}
 var pressed: Dictionary={}
 var stage_walk=""
 var transition=-1.0
+var transition_tips: CanvasLayer
 var swapped=false
 var wipe: Node2D
 var shake=0.0
@@ -94,7 +95,7 @@ var title_background=preload("res://art/title-background.png")
 var title_logo=preload("res://art/cairn-logo.png")
 const CLOSE=.35/.49
 const OPEN=.45/.49
-const HOLD=.15
+const HOLD=1.0
 
 func _ready():
 	Input.joy_connection_changed.connect(func(_device,connected):
@@ -201,9 +202,12 @@ func _ready():
 		audio.play(id,-8)
 		if id=="resist":hero_voice.request_line("register_unlock",0.,2.)
 	)
+	transition_tips=preload("res://scripts/transition_tips.gd").new()
+	add_child(transition_tips)
 	skull_node=Sprite2D.new()
 	skull_node.texture=art.texture("skull-mask.png")
 	skull_node.centered=false
+	skull_node.top_level=true
 	skull_node.scale=Vector2(1440.0/512,810.0/512)
 	skull_node.z_index=2040
 	skull_node.material=ShaderMaterial.new()
@@ -832,6 +836,8 @@ func tick(dt: float):
 			return
 		if enemies.all(func(f):return f.burnAge>=BurningSprite.finished_at(f.engulf)):
 			begin_walk("exit")
+			if wave<encounters.size():transition_tips.choose()
+			else:transition_tips.current=""
 			transition=0
 			swapped=false
 	else:wave_clear_time=0.0
@@ -885,6 +891,9 @@ func _process(raw: float):
 	pause_skull.material.set_shader_parameter("progress",1.0-pause_cover)
 	if phase=="paused": menu.modulate.a=smoothstep(.8,1.0,pause_cover)
 	else: menu.modulate.a=1.0
+	transition_tips.update(transition if phase=="playing" else -1.0,CLOSE,HOLD,screen_size)
+	skull_node.position=Vector2.ZERO
+	skull_node.scale=screen_size/512.0
 	skull_node.visible=transition>=0
 	if transition>=0:
 		var progress=1-transition/CLOSE if transition<CLOSE else 0.0 if transition<CLOSE+HOLD else (transition-CLOSE-HOLD)/OPEN
