@@ -53,7 +53,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		face.position=Vector2(-meta.width*.5*size,0)
 		face.scale=Vector2(meta.width,meta.height)*size/face.texture.get_size()
 		group.add_child(face)
-		if is_locked(label):group.modulate=Color(1,1,1,.48)
+		if is_locked(label):group.modulate=Color(1,1,1,.62)
 		# Locked text uses the ordinary sprite material so inherited alpha is respected.
 		if not is_locked(label):fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})

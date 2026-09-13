@@ -21,7 +21,7 @@ func check():
 	game.change_phase("title")
 	game.menu.select(1,false)
 	assert(game.menu.is_locked("HALL OF LEGENDS"))
-	assert(game.menu.items[1].node.modulate.a<.5 and not game.menu.items[1].fire.emitting)
+	assert(game.menu.items[1].node.modulate.a<1.0 and not game.menu.items[1].fire.emitting)
 	game.menu.activate()
 	assert(game.hall_view==null)
 	game.menu_action("HALL OF LEGENDS")
