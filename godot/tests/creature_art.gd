@@ -15,5 +15,13 @@ func _init():
 	var atlas=art.data.atlases["enemy-archer-v1"]
 	assert(atlas.cels[12].width>atlas.cels[12].height*2,"Archer corpse must be horizontal")
 	assert(art.data.atlases["enemy-legion-v1"].cels.size()==16)
+	for engulf in [.8,1.,1.3]:
+		var end=.15+engulf+.6
+		assert(BurningSprite.flare_envelope(0.,engulf)==0.)
+		assert(BurningSprite.flare_envelope(.6,engulf)==1.)
+		assert(BurningSprite.flare_envelope(end,engulf)==0.)
+		for step in range(1,6):
+			var age=step*.1
+			assert(is_equal_approx(BurningSprite.flare_envelope(age,engulf),BurningSprite.flare_envelope(end-age,engulf)),"Ignition mirrors the existing fade-down")
 	print("CAIRN_CREATURES_OK: archer ascending/falling/prone death poses and minotaur atlas")
 	quit()

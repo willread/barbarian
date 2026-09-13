@@ -5,6 +5,10 @@ var burn: ShaderMaterial
 var fire: ContourFire
 var anchor=Vector2.ZERO
 const SPEED=1.3
+const FLARE_TIME=.6
+static func flare_envelope(age: float,engulf: float) -> float:
+	var end=.15+engulf+.6
+	return smoothstep(0.,FLARE_TIME,age)*(1.-smoothstep(end-.6,end,age))
 static func finished_at(engulf: float) -> float:
 	return .15+engulf+.6+.45
 func setup(texture: Texture2D,rect: Rect2,flip: bool,seed_value: float):
@@ -31,6 +35,9 @@ func setup(texture: Texture2D,rect: Rect2,flip: bool,seed_value: float):
 	add_child(body)
 	anchor=rect.get_center()
 	fire=ContourFire.new()
+	# Stay in the corpse's depth group, including when another fighter crosses it.
+	fire.z_as_relative=true
+	fire.z_index=0
 	fire.animation_speed=SPEED
 	add_child(fire)
 	fire.setup(mask_view.get_texture(),Vector2(mask_view.size),rect.position,false)
@@ -39,7 +46,7 @@ func update_burn(age: float,engulf: float):
 	burn.set_shader_parameter("engulf",engulf)
 	var end=.15+engulf+.6
 	fire.emitting=age>0 and age<end
-	fire.strength=1.8*(1.-smoothstep(end-.6,end,age))
+	fire.strength=1.8*flare_envelope(age,engulf)
 	# The live body mask recedes downward; never scale or move the flame field.
-	fire.interior=1.0
+	fire.interior=smoothstep(0.,FLARE_TIME,age)
 	fire.opacity=1.-smoothstep(end-.2,finished_at(engulf),age)

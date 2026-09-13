@@ -997,7 +997,7 @@ func _process(raw: float):
 			var view=FighterView.new()
 			view.actor=f
 			view.art=art
-			add_child(view)
+			arena_clip.add_child(view)
 			views[f.id]=view
 		views[f.id].visible=phase!="title"
 		views[f.id].update_view(spell if f.player else -1)
