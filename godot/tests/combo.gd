@@ -45,7 +45,7 @@ func check():
  var magic_score=game.score
  game.combo.remaining=.01
  game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
- assert(game.combo.hits==1 and is_equal_approx(game.score,magic_score+.12*game.damage_multiplier) and game.combo.remaining==game.combo.timeout)
+ assert(game.combo.hits==1 and is_equal_approx(game.score,magic_score+1.2*game.damage_multiplier) and game.combo.remaining==game.combo.timeout)
  game.spell_combo_targets.clear()
  game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
  assert(game.combo.hits==2)
@@ -54,16 +54,16 @@ func check():
  var enemy=game.make_actor(900,660,100)
  enemy.kind="bone"
  for i in 3:game.damage(enemy,{"damage":1,"direction":1},game.hero)
- assert(is_equal_approx(game.score,4*game.damage_multiplier) and game.combo.multiplier()==2)
+ assert(is_equal_approx(game.score,40*game.damage_multiplier) and game.combo.multiplier()==2)
  var points=game.score
  var mana=game.magic
  game.damage(enemy,{"damage":.1,"direction":1,"magic":true,"continuous":true},game.hero)
- assert(is_equal_approx(game.score,points+.1*game.damage_multiplier*2) and game.combo.hits==4 and game.magic==mana)
+ assert(is_equal_approx(game.score,points+game.damage_multiplier*2) and game.combo.hits==4 and game.magic==mana)
  var dying=game.make_actor(900,660,.25)
  dying.kind="bone"
  var before_kill=game.score
  game.damage(dying,{"damage":1000,"direction":1},game.hero)
- assert(is_equal_approx(game.score-before_kill,.25*game.combo.multiplier()),"Only remaining health scores; no kill bonus or overkill")
+ assert(is_equal_approx(game.score-before_kill,2.5*game.combo.multiplier()),"Only remaining health scores; no kill bonus or overkill")
  var after_kill=game.score
  game.damage(dying,{"damage":1000,"direction":1},game.hero)
  assert(game.score==after_kill,"Dead enemies cannot award score")

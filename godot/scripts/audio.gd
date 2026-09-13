@@ -99,7 +99,7 @@ func stop_gameplay():
 	chicken_clock=0.0
 
 func play(id: String,db: float=-4,pitch: float=1.0):
-	if game.get("phase") in ["dying","lost"] and id not in ["menu_select","menu_activate","menu_land","resist"]:return
+	if game.get("phase") in ["dying","lost"] and id not in ["menu_select","menu_activate","menu_land","resist","death"]:return
 	if game.get("voice_enabled")==false and id in ["hero_effort","hero_pain","magic_shout","roar","death"]:return
 	if not unlocked or game.muted or clips.get(id)==null:return
 	if game.get("hero_voice") and game.hero_voice.player.playing:
@@ -111,6 +111,8 @@ func play(id: String,db: float=-4,pitch: float=1.0):
 	for voice in voices:
 		if not voice.playing:
 			voice.stream=pool_clip(id) if pools.has(id) else clips[id]
+			# Reuse the selected player shout so death retains the same voice identity.
+			if id=="death":voice.stream=clips.get("magic_shout",originals.get("magic_shout"))
 			if voice.stream==null:return
 			voice.set_meta("sound_id",id)
 			voice.set_meta("base_db",db)

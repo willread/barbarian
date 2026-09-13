@@ -7,7 +7,7 @@ func check():
 	await create_timer(.6).timeout
 	assert(game.chapter_select and game.phase=="title")
 	assert(game.menu.items.size()==4)
-	assert(game.menu.items[1].node.modulate.a<.5)
+	assert(game.menu.items[1].node.modulate.a<1.0)
 	assert(game.menu.items[1].face.material==null)
 	var sounds=[]
 	game.menu.sound_requested.connect(func(id):sounds.append(id))

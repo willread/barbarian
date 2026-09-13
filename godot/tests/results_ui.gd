@@ -40,7 +40,7 @@ func check():
 	for i in 10:
 		game.records.finish({"id":"old-%d"%i,"score":116200-i*7000,"kills":50,"best_combo":20,"peak_multiplier":10,"damage_dealt":17000,"damage_taken":200,"time":700-i*20,"date":"2026-09-12","area":3,"outcome":"lost"})
 	game.run_stats.merge({"time":768,"best_combo":36,"peak_multiplier":10,"damage_dealt":18640,"damage_taken":240},true)
-	game.score=128450
+	game.score=128450000000
 	assert(not game.menu.is_locked("HALL OF LEGENDS"))
 	game.kills=87
 	game.wave=7
@@ -113,7 +113,7 @@ func check():
 		game.results_view.content.queue_redraw()
 		await snap("results-first" if i==0 else "results-tied")
 	game.preview_results()
-	assert(game.records.path.is_empty() and game.finished_run.score==128450)
+	assert(game.records.path.is_empty() and game.finished_run.score==1284500)
 	for frame in 34:
 		game.wipe.advance(.13)
 		await process_frame

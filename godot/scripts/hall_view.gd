@@ -77,7 +77,8 @@ func layout():
 	content.queue_redraw()
 	reveal_selected.call_deferred()
 
-func text(node: CanvasItem,value: String,at: Vector2,size: int,color: Color,center=false):
+func text(node: CanvasItem,value: String,at: Vector2,size: int,color: Color,center=false,max_width=10000.0):
+	while size>1 and font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x>max_width:size-=1
 	if center:at.x-=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x*.5
 	node.draw_string(font,at+Vector2(0,size*.34),value,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
 
@@ -130,12 +131,14 @@ func draw_table():
 		if compact:
 			text(content,str(i+1),Vector2(18,y+22),22,ink)
 			var score=CairnRunRecords.number(run.score)
-			text(content,score,Vector2(w-18-font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,24).x,y+22),24,ink)
-			text(content,reached,Vector2(18,y+55),18,ink)
-			text(content,time+" · "+date,Vector2(18,y+81),16,ink)
+			var score_size=24
+			while score_size>1 and font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,score_size).x>w-90:score_size-=1
+			text(content,score,Vector2(w-18-font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,score_size).x,y+22),score_size,ink)
+			text(content,reached,Vector2(18,y+55),18,ink,false,w-36)
+			text(content,time+" · "+date,Vector2(18,y+81),16,ink,false,w-36)
 		else:
 			var values=[str(i+1),CairnRunRecords.number(run.score),reached,time,date]
-			for j in values.size():text(content,values[j],Vector2(w*[.048,.17,.36,.68,.84][j],y+row_height*.5),text_size,ink)
+			for j in values.size():text(content,values[j],Vector2(w*[.048,.17,.36,.68,.84][j],y+row_height*.5),text_size,ink,false,w*[.122,.19,.32,.16,.16][j]-16)
 	content.draw_line(Vector2(0,runs.size()*row_height),Vector2(w,runs.size()*row_height),gold)
 
 func reveal_selected():

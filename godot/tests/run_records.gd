@@ -37,6 +37,13 @@ func check():
 	file.store_string("interrupted")
 	file.close()
 	assert(CairnRunRecords.new(path).board().runs.size()==10)
+	file=FileAccess.open(path,FileAccess.WRITE)
+	file.store_string(JSON.stringify({"version":1,"scopes":{CairnRunRecords.RULES:{"runs":[sample("legacy",123)],"bests":{"score":123,"kills":10}}}}))
+	file.close()
+	var migrated=CairnRunRecords.new(path)
+	assert(migrated.board().runs[0].score==1230 and migrated.board().bests.score==1230 and migrated.board().bests.kills==10)
+	migrated.persist()
+	assert(CairnRunRecords.new(path).board().bests.score==1230,"Score migration must only apply once")
 	for suffix in ["",".bak",".tmp"]:
 		if FileAccess.file_exists(path+suffix):DirAccess.remove_absolute(path+suffix)
 	assert(CairnRunRecords.number(128450)=="128,450" and CairnRunRecords.duration(768)=="12:48")

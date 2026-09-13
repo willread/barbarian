@@ -246,11 +246,11 @@ func preview_results():
 	# Explicit review mode: sample scores are isolated from real local records.
 	records=CairnRunRecords.new("")
 	for i in 10:
-		records.finish({"id":"preview-%d"%i,"score":116200-i*7000,"kills":50,"best_combo":20,"peak_multiplier":10,"damage_dealt":17000,"damage_taken":200,"time":700-i*20,"date":"2026-09-12","area":3,"outcome":"lost"})
+		records.finish({"id":"preview-%d"%i,"score":1162000-i*70000,"kills":50,"best_combo":20,"peak_multiplier":10,"damage_dealt":17000,"damage_taken":200,"time":700-i*20,"date":"2026-09-12","area":3,"outcome":"lost"})
 	start_game()
 	transition=-1
 	stage_walk=""
-	score=128450
+	score=1284500
 	kills=87
 	wave=7
 	run_stats.merge({"time":768,"best_combo":36,"peak_multiplier":10,"damage_dealt":18640,"damage_taken":240},true)
@@ -649,7 +649,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			else:
 				combo.hit()
 				if a.get("magic",false):spell_combo_targets.append(f.id)
-			score+=(previous_hp-f.hp)*combo.multiplier()
+			score+=(previous_hp-f.hp)*combo.multiplier()*10.0
 			if not run_stats.is_empty():
 				run_stats.damage_dealt+=previous_hp-f.hp
 				run_stats.best_combo=maxi(run_stats.best_combo,combo.hits)
@@ -706,10 +706,10 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		f.engulf=.8+randf()*.5
 		drop_gear(f)
 		if f.player:
-			audio.play("death",-4)
 			stage_walk=""
 			spell=-1
 			change_phase("dying")
+			audio.play("death",-4)
 			wipe=DeathWipe.new()
 			add_child(wipe)
 			last_window_size=Vector2i.ZERO

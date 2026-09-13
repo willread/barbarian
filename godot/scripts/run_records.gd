@@ -21,8 +21,15 @@ func _init(save_path: String="user://records.json"):
 		var parser=JSON.new()
 		if parser.parse(FileAccess.get_file_as_string(candidate))!=OK:continue
 		var data=parser.data
-		if data is Dictionary and data.get("version",0)==1 and data.get("scopes") is Dictionary:
+		if data is Dictionary and (data.get("version",0)==1 or data.get("version",0)==2) and data.get("scopes") is Dictionary:
 			scopes=data.scopes
+			if data.version==1:
+				for scope in scopes:
+					var old=board(scope)
+					if old.bests.has("score"):old.bests.score*=10
+					for run in old.runs:
+						run.score*=10
+						if run.has("previous_best"):run.previous_best*=10
 			break
 
 func board(scope: String=RULES) -> Dictionary:
@@ -62,7 +69,7 @@ func persist() -> Error:
 	if path.is_empty():return OK
 	var file=FileAccess.open(path+".tmp",FileAccess.WRITE)
 	if file==null:return FileAccess.get_open_error()
-	file.store_string(JSON.stringify({"version":1,"scopes":scopes}))
+	file.store_string(JSON.stringify({"version":2,"scopes":scopes}))
 	file.flush()
 	var error=file.get_error()
 	file.close()

@@ -57,5 +57,15 @@ func check():
 	for id in voice.definitions:
 		assert(load(voice.definitions[id].file).get_length()>0)
 		assert(voice.definitions[id].envelope.size()>1)
+	game.voice_enabled=true
+	game.muted=false
+	game.audio.unlocked=true
+	game.damage(game.hero,{"damage":1000,"direction":-1,"knock":true},game.enemies[0])
+	assert(game.phase=="dying")
+	assert(game.audio.voices.any(func(v):return v.playing and v.get_meta("sound_id","")=="death" and v.stream==game.audio.clips.magic_shout),"Death shout must survive the dying transition and match the selected player voice")
+	game.audio.stop_gameplay()
+	game.queue_free()
+	await process_frame
+	await process_frame
 	print("CAIRN_VOICE_OK: clip, envelope, deduplication, damage reaction, pause, expiration and reset")
 	quit()
