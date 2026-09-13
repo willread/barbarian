@@ -166,7 +166,8 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 			draw_equipment(node,3,158)
 	node.draw_set_transform(Vector2.ZERO)
 	if f.player and p[0]!="hero-spin" and not behind and not l.rig.behind:
-		node.draw_texture_rect(texture(l.cel.file.replace(".png","-hands.png")),body_rect(f,p),false)
+		if p[0]!="hero-walk-unarmed-v8":
+			node.draw_texture_rect(texture(l.cel.file.replace(".png","-hands.png")),body_rect(f,p),false)
 		if p[0]=="hero-walk-unarmed-v8":
 			# Repaint the actual clenched fist over the shaft at the revised socket.
 			var body=body_rect(f,p)

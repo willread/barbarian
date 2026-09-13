@@ -1,6 +1,6 @@
 # Grip and pause spacing approval preview
 
-Pending visual approval; standard exports have not been updated.
+Approved for shipping. Walking uses only the gripping fist overlay, preventing the unused hand from showing through the blade.
 
 Walking: source-cell hand sockets are authored per frame in CairnArt.layout. Proposed near-hand carry uses a downward 190–198 degree angle and draws behind the body so fingers naturally cover the handle. Body art, weapon proportions, attack poses and colors are unchanged. walk-proposed.png shows all four walking frames; walk-before.png records the earlier far-hand carry.
 
