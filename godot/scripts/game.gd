@@ -402,6 +402,7 @@ func clear_world():
 	blood.reset()
 
 func start_game():
+	hero_voice.milestones.clear()
 	chapter_select=false
 	clear_world()
 	if is_instance_valid(wipe): wipe.queue_free()
@@ -621,7 +622,9 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		else:
 			kills+=1
 			score+=(1500 if f.boss else 250)*combo.multiplier()
-	if not f.player and attacker.player and not a.get("magic",false): magic=min(100,magic+(6+(8 if f.hp<=0 else 0))*combo.mana_multiplier())
+	if not f.player and attacker.player and not a.get("magic",false):
+		magic=min(100,magic+(6+(8 if f.hp<=0 else 0))*combo.mana_multiplier())
+		if magic>=100:hero_voice.request_once("mana_full")
 
 func burst(x: float,y: float,count: int,color: Color):
 	for i in count: sparks.append({"x":x,"y":y,"vx":(randf()-.5)*460,"vy":(randf()-.65)*390,"life":.3+randf()*.4,"color":color})

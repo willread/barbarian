@@ -3,6 +3,7 @@ var game: Node
 var player: AudioStreamPlayer
 var definitions: Dictionary={}
 var pending: Array=[]
+var milestones: Dictionary={}
 var cooldowns={}
 var active=""
 var time=0.0
@@ -24,6 +25,18 @@ func request_line(id: String,delay: float=0.,expires: float=5.):
 		if item.id==id:return
 	pending.append({"id":id,"due":time+delay,"expires":time+delay+expires})
 	pending.sort_custom(func(a,b):return definitions[a.id].priority>definitions[b.id].priority)
+func request_once(id: String):
+	if milestones.has(id):return
+	milestones[id]=true
+	request_line(id,.25,10.)
+func observe_milestones():
+	if game.phase!="playing" or game.hero.hp<=0:return
+	if game.magic>=100:request_once("mana_full")
+	if milestones.has("big_enemy"):return
+	for enemy in game.enemies:
+		if enemy.hp>0 and enemy.x>=0 and enemy.x<=1440 and game.e_ai.heavy(enemy):
+			request_once("big_enemy")
+			break
 func reset():
 	pending.clear()
 	player.stop()
@@ -36,6 +49,7 @@ func _process(dt):
 	var paused=game.phase=="paused" or get_tree().paused
 	player.stream_paused=paused
 	if paused:return
+	observe_milestones()
 	time+=dt
 	gap=max(0.,gap-dt)
 	pain=max(0.,pain-dt)

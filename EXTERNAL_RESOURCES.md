@@ -131,3 +131,7 @@ Implemented HUD font: Cinzel, The Cinzel Project Authors, SIL OFL 1.1. Source ht
 Controls approval mockup (2026-09-12): Kenney Input Prompts 1.5, CC0, https://kenney.nl/assets/input-prompts . Used Xbox and PlayStation SVG glyphs retained in studies/controls/icons with original LICENSE.txt. Reuses the existing licensed Cinzel HUD font and original stone Back artwork. No runtime integration yet.
 
 Controls runtime (2026-09-12): selected Kenney CC0 SVG glyphs copied to godot/art/controls and recolored white (geometry unchanged); ICONS-LICENSE.txt retained. Existing Cinzel OFL font and license copied beside them; action textures use the existing HUD material pipeline via tools/godot/bake-controls.mjs.
+
+## Cairn voice refresh
+Four user-supplied ElevenLabs Cairn voice recordings from Downloads (2026-09-13 filename timestamps): register-unlock, dinner, first big enemy, and first full mana. Exact original filenames and transcripts: godot/voice/lines.json. Converted to normalized Ogg Vorbis; no new third-party recording assets downloaded.
+
