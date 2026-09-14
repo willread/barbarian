@@ -1,6 +1,7 @@
 extends Node2D
 const W=320
 const H=180
+var letter_mask: Texture2D
 var age=-.5
 var deposits: Array=[]
 var viewport: SubViewport
@@ -42,6 +43,9 @@ func _ready():
 	surface.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
 	var shade=ShaderMaterial.new()
 	shade.shader=load("res://shaders/blood_surface.gdshader")
+	if letter_mask:
+		shade.set_shader_parameter("use_mask",true)
+		shade.set_shader_parameter("letter_mask",letter_mask)
 	surface.material=shade
 	add_child(surface)
 	surface.visible=false
@@ -50,6 +54,7 @@ func advance(dt: float):
 	age=min(3.8,age+dt)
 	if age<0: return
 	surface.visible=true
+	if letter_mask:surface.material.set_shader_parameter("letter_fill",smoothstep(.25,1.0,age)*.3)
 	var positions=PackedVector4Array()
 	var shapes=PackedVector4Array()
 	var amounts=PackedFloat32Array()
@@ -75,5 +80,8 @@ func advance(dt: float):
 	queue_redraw()
 func _draw():
 	if age<0: return
+	if letter_mask:
+		draw_rect(Rect2(0,0,1440,1062),Color(0,0,0,smoothstep(0,.4,age)*.60))
+		return
 	var fade=clamp((age-.25)/1.3,0,1)
 	draw_rect(Rect2(0,0,1440,1062),Color(.439,.035,.063,fade*fade*(3-2*fade)))

@@ -70,6 +70,7 @@ var weapon_skin="gravecleaver"
 var weapon="axe"
 var chapter_select=false
 var wave=1
+var victory_age=0.0
 var difficulty="normal"
 var difficulty_select=false
 var score=0.0
@@ -285,6 +286,22 @@ func make_actor(x: float,y: float,hp: float,player: bool=false) -> Dictionary:
 	var f=m.make(next_id,x,y,hp,player)
 	next_id+=1
 	return f
+
+func begin_victory():
+	change_phase("victory")
+	stage_walk=""
+	transition=-1
+	victory_age=0.0
+	audio.stop_gameplay()
+	hero_voice.reset()
+	if is_instance_valid(wipe):wipe.queue_free()
+	wipe=DeathWipe.new()
+	wipe.letter_mask=preload("res://art/victory-blood-mask.png")
+	wipe.age=-.1
+	add_child(wipe)
+	last_window_size=Vector2i.ZERO
+	responsive_layout()
+	audio.play("flesh",-2)
 
 func change_phase(next: String):
 	if next in ["lost","won"]:finish_run(next)
@@ -973,6 +990,9 @@ func tick(dt: float):
 			spawn_wave(true)
 			return
 		if enemies.all(func(f):return f.burnAge>=BurningSprite.finished_at(f.engulf)):
+			if wave==encounters.size():
+				begin_victory()
+				return
 			begin_walk("exit")
 			if wave<encounters.size():transition_tips.choose()
 			else:transition_tips.current=""
@@ -988,6 +1008,14 @@ func _process(raw: float):
 	raw=min(raw,.25)
 	if phase=="playing" and not run_stats.is_empty():run_stats.time+=raw
 	if phase in ["lost","won"] and is_instance_valid(wipe) and wipe.age<3.8:wipe.advance(raw)
+	if phase=="victory":
+		victory_age+=raw
+		wipe.advance(raw)
+		wipe.modulate.a=1.0-smoothstep(4.2,4.8,victory_age)
+		if victory_age>=4.8:
+			wipe.queue_free()
+			wipe=null
+			change_phase("won")
 	if phase=="title" and not loading_menu: title_intro=min(1.25,title_intro+raw)
 	if hit_stop>0 and phase=="playing":
 		hit_stop=max(0.,hit_stop-raw)
@@ -1007,7 +1035,7 @@ func _process(raw: float):
 				spawn_wave()
 				begin_walk("enter")
 		if transition>=CLOSE+HOLD+OPEN: transition=-1
-	var frozen=phase in ["paused","lost","won"] or pause_cover>0
+	var frozen=phase in ["paused","lost","won","victory"] or pause_cover>0
 	var dt=0.0 if frozen else raw*(.3 if phase=="dying" and hero.death<1.3 else 1)
 	clock+=dt
 	if not frozen:
@@ -1015,7 +1043,7 @@ func _process(raw: float):
 		while accumulator+1e-10>=m.STEP:
 			tick(m.STEP)
 			accumulator-=m.STEP
-			if phase in ["lost","won"]: break
+			if phase in ["lost","won","victory"]: break
 	displayed_health=lerpf(displayed_health,float(hero.hp),1-exp(-dt*12))
 	displayed_mana=lerpf(displayed_mana,magic,1-exp(-dt*12))
 	shake=max(0,shake-dt*35)
@@ -1079,6 +1107,7 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	if phase=="victory":return
 	if is_instance_valid(debug_console) and debug_console.visible:return
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		audio.unlocked=true

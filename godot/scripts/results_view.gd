@@ -80,9 +80,7 @@ func label(node: CanvasItem,value: String,center: Vector2,size: int,color: Color
 	node.draw_string(caption_font,center-Vector2(caption_font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual).x*.5,-actual*.34),value,HORIZONTAL_ALIGNMENT_LEFT,-1,actual,color)
 
 func draw_heading():
-	if result.get("outcome")!="won":return
-	var title="THE VALLEY IS FREE."
-	lettering.label(backdrop,title,Vector2(viewport_size.x*.5,heading_y),heading_height,viewport_size.x*.78,Color(1.95,2.05,2.15))
+	pass
 
 func draw_shade():
 	var inverse=transform.affine_inverse()
