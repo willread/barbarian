@@ -65,7 +65,7 @@ func sync_views(game,dt: float=0.0):
 func show_mire(game,id: String,p: Vector2,mode: int,progress: float,time: float):
 	if not mire_views.has(id):
 		var view=preload("res://scripts/mire_effect.gd").new()
-		view.texture=game.art.texture("mire-effect-v1.png")
+		view.texture=game.art.texture("mire-oil-v2.png")
 		game.arena_clip.add_child(view)
 		mire_views[id]=view
 	var view=mire_views[id]
