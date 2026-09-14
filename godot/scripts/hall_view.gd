@@ -58,6 +58,7 @@ func _ready():
 		button.add_theme_font_override("font",font)
 		button.add_theme_color_override("font_color",gold)
 		button.pressed.connect(func():sort_by(column[0]))
+		button.draw.connect(func():draw_sort_indicator(button,column[0]))
 		add_child(button)
 		headers.append(button)
 	update_headers()
@@ -184,7 +185,16 @@ func sort_by(key: String):
 func update_headers():
 	for i in headers.size():
 		var column=COLUMNS[i]
-		headers[i].text=column[1]+((" v" if descending else " ^") if column[0]==sort_key else "")
+		headers[i].text=column[1]
+		headers[i].queue_redraw()
+func draw_sort_indicator(button: Button,key: String):
+	if key!=sort_key:return
+	var size=button.get_theme_font_size("font_size")
+	var x=font.get_string_size(button.text,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x+12
+	var center=Vector2(x,button.size.y*.5)
+	var flip=-1.0 if descending else 1.0
+	button.draw_polyline(PackedVector2Array([center+Vector2(-4,2.5*flip),center+Vector2(0,-2.5*flip),center+Vector2(4,2.5*flip)]),gold,1.5,true)
+
 func handle(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		if event.keycode==KEY_ESCAPE:closed.emit();return
