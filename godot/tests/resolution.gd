@@ -57,8 +57,16 @@ func check():
 		var fitted=prefs.fit_window_size(requested,Vector2i(1920,1032))
 		assert(fitted.x*9==fitted.y*16 and fitted.x<=1920 and fitted.y<=1032)
 	prefs.enabled=true
+	prefs.set_process(false)
 	root.size=Vector2i(1100,800)
-	prefs.constrain_window()
+	prefs.queue_window_constraint()
+	prefs._process(.06)
+	assert(root.size==Vector2i(1100,800),"No corrective resizing during an active resize burst")
+	root.size=Vector2i(1120,820)
+	prefs.queue_window_constraint()
+	prefs._process(.06)
+	assert(root.size==Vector2i(1120,820),"Each new resize resets the settling delay")
+	prefs._process(.07)
 	assert(root.size.x*9==root.size.y*16,"Native window resize is constrained to 16:9")
 	prefs.enabled=false
 	print("CAIRN_RESOLUTION_OK: boot, fixed composition, wide/tall masonry, pause, keyboard input and window constraint")
