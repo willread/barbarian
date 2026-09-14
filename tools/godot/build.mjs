@@ -21,7 +21,7 @@ run(process.execPath,['tools/godot/bake-episodes.mjs']);
 run(process.execPath,['tools/godot/bake-mire-oil.mjs']);
 if(!fs.existsSync('godot/assets/cheat-letters.json'))run(process.execPath,['tools/godot/bake-cheats.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
-if(!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
+if(!menuManifest.menu['EASY']||!menuManifest.menu['NORMAL']||!menuManifest.menu['HARD']||!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['tools/godot/bake-results.mjs']);
 if(!fs.existsSync('godot/art/controls/hall-of-legends.png'))run(process.execPath,['tools/godot/bake-controls.mjs','--hall']);
 if(!menuManifest.menu['HUD 10X']||menuManifest.hudSmallLabelVersion!==1)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
@@ -30,6 +30,7 @@ if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/check-episode-sprites.mjs']);
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
  run(binary,['--headless','--path','godot','--script','tests/run_records.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/difficulty.gd']);
  run(binary,['--headless','--path','godot','--script','tests/results_ui.gd']);
  run(binary,['--headless','--path','godot','--script','tests/parity.gd']);
  run(binary,['--headless','--path','godot','--script','tests/bindings.gd']);

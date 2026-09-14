@@ -67,6 +67,8 @@ var weapon_skin="gravecleaver"
 var weapon="axe"
 var chapter_select=false
 var wave=1
+var difficulty="normal"
+var difficulty_select=false
 var score=0.0
 var kills=0
 var magic=0.0
@@ -330,7 +332,7 @@ func menu_action(label: String):
 		hall_view.current_id=finished_run.get("id","") if phase in ["lost","won"] else ""
 		add_child(hall_view)
 		hall_view.closed.connect(close_hall)
-		hall_view.begin.connect(func():close_hall();start_game())
+		hall_view.begin.connect(func():close_hall();menu_action("BEGIN"))
 		return
 	if label=="CONTROLS":
 		settings_page="controls"
@@ -358,6 +360,11 @@ func menu_action(label: String):
 		"EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS":
 			current_episode=int(label.substr(3,1))
 			chapter_select=false
+			difficulty_select=true
+			menu.switch_items(["EASY","NORMAL","HARD","BACK"],true)
+		"EASY","NORMAL","HARD":
+			difficulty=label.to_lower()
+			difficulty_select=false
 			start_game()
 		"RISE AGAIN": start_game()
 		"OPTIONS":
@@ -368,6 +375,10 @@ func menu_action(label: String):
 			settings_page=label.to_lower()
 			menu.switch_items(option_labels(),true)
 		"BACK":
+			if difficulty_select:
+				difficulty_select=false
+				menu_action("BEGIN")
+				return
 			if chapter_select:
 				chapter_select=false
 				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"],true)
@@ -431,7 +442,7 @@ func finish_run(outcome: String):
 	if finished_run.is_empty():
 		var snapshot=run_stats.duplicate(true)
 		for key in ["damage_dealt","damage_taken"]:snapshot[key]=int(snapshot[key])
-		snapshot.merge({"score":int(score),"kills":kills,"episode":current_episode,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
+		snapshot.merge({"score":int(score),"kills":kills,"episode":current_episode,"difficulty":difficulty,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
 		finished_run=records.finish(snapshot)
 	if is_instance_valid(results_view):return
 	results_view=preload("res://scripts/results_view.gd").new()
@@ -486,7 +497,13 @@ func clear_world():
 	landing_impacts.clear()
 	blood.reset()
 
+func difficulty_damage(taken: bool) -> float:
+	if difficulty=="easy":return .75 if taken else 1.25
+	if difficulty=="hard":return 1.25 if taken else .75
+	return 1.0
+
 func start_game():
+	difficulty_select=false
 	finished_run={}
 	run_stats={"id":str(Time.get_unix_time_from_system())+"-"+str(Time.get_ticks_usec()),"date":Time.get_date_string_from_system(),"time":0.0,"best_combo":0,"peak_multiplier":1,"damage_dealt":0.0,"damage_taken":0.0}
 	hero_voice.milestones.clear()
@@ -648,7 +665,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		a=a.duplicate()
 		a.damage*=.65 if f.kind=="king" else .2
 	var previous_hp=f.hp
-	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
+	f.hp=max(0,f.hp-a.damage*damage_multiplier*difficulty_damage(f.player)*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if f.hp<previous_hp:
 		if f.player:
 			if not run_stats.is_empty():run_stats.damage_taken+=previous_hp-f.hp
@@ -1084,7 +1101,7 @@ func _input(event: InputEvent):
 	if event is InputEventKey:
 		var code=event.keycode
 		if event.pressed and not event.echo and code in [KEY_ESCAPE,KEY_P]:
-			if options or chapter_select:menu_action("BACK")
+			if options or chapter_select or difficulty_select:menu_action("BACK")
 			elif phase=="playing": change_phase("paused")
 			elif phase=="paused": change_phase("playing")
 			elif phase=="title" and options: menu_action("BACK")

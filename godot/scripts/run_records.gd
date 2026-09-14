@@ -1,6 +1,6 @@
 class_name CairnRunRecords
 extends RefCounted
-# Versioned local records. Personal stat bests survive top-ten eviction.
+# Versioned local records. Personal stat bests survive top-twenty eviction.
 const RULES="citadel-v1"
 const BEST_KEYS=["score","kills","best_combo","peak_multiplier","damage_dealt"]
 var path: String
@@ -47,6 +47,7 @@ func finish(snapshot: Dictionary,scope: String="") -> Dictionary:
 	for run in data.runs:
 		if run.id==snapshot.id:return run
 	var result=snapshot.duplicate(true)
+	result.difficulty=snapshot.get("difficulty","normal")
 	result.previous_best=int(data.bests.get("score",0))
 	result.first=data.bests.is_empty()
 	result.new_stats=[]
@@ -57,9 +58,9 @@ func finish(snapshot: Dictionary,scope: String="") -> Dictionary:
 	# Insert after equal scores so ties preserve their existing order.
 	var rank=0
 	while rank<data.runs.size() and float(data.runs[rank].score)>=float(result.score):rank+=1
-	result.rank=rank+1 if rank<10 else 0
+	result.rank=rank+1 if rank<20 else 0
 	data.runs.insert(rank,result.duplicate(true))
-	if data.runs.size()>10:data.runs.resize(10)
+	if data.runs.size()>20:data.runs.resize(20)
 	last_result=result
 	last_result_scope=scope
 	save_error=persist()

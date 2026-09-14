@@ -16,7 +16,9 @@ func check():
 				assert(waves[i].count(kind)<=2)
 				if i<6:assert(game.e_ai.wave_variants[i].is_empty())
 		game.menu_action("EP 2: THE SUNKEN WILDS" if episode==2 else "EP 3: THE ASHEN DEPTHS")
-		assert(game.current_episode==episode and game.phase=="playing")
+		assert(game.current_episode==episode and game.difficulty_select)
+		game.menu_action("NORMAL")
+		assert(game.phase=="playing")
 		for area in 4:
 			game.wave=area*3+1
 			game.spawn_wave()

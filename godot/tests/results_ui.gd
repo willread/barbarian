@@ -37,7 +37,7 @@ func check():
 	var enemy=game.make_actor(900,660,100)
 	game.damage(game.hero,{"damage":2,"direction":1},enemy)
 	assert(game.run_stats.damage_taken>0 and game.combo.hits==0 and game.run_stats.best_combo==1)
-	for i in 10:
+	for i in 20:
 		game.records.finish({"id":"old-%d"%i,"score":116200-i*7000,"kills":50,"best_combo":20,"peak_multiplier":10,"damage_dealt":17000,"damage_taken":200,"time":700-i*20,"date":"2026-09-12","area":3,"outcome":"lost"})
 	game.run_stats.merge({"time":768,"best_combo":36,"peak_multiplier":10,"damage_dealt":18640,"damage_taken":240},true)
 	game.score=128450000000
@@ -79,14 +79,14 @@ func check():
 		game.menu_action("HALL OF LEGENDS")
 		await process_frame
 		var hall=game.hall_view
-		assert(hall.runs.size()==10 and hall.runs[hall.selected].id==saved_id)
+		assert(hall.runs.size()==20 and hall.runs[hall.selected].id==saved_id)
 		key(KEY_END)
-		assert(hall.selected==9)
-		assert(hall.scroll.scroll_vertical+hall.scroll.size.y>=10*hall.row_height-2)
+		assert(hall.runs[hall.selected].id==saved_id,"Scrolling must not select rows")
+		assert(hall.scroll.scroll_vertical+hall.scroll.size.y>=20*hall.row_height-2)
 		await snap("hall-%d"%dimensions.x)
 		key(KEY_ESCAPE)
 		assert(game.results_view.visible and game.results_view.age>=2 and game.finished_run.id==saved_id)
-		assert(game.records.board().runs.size()==10)
+		assert(game.records.board().runs.size()==20)
 	game.menu_action("QUIT TO TITLE")
 	assert(game.results_view==null and game.phase=="title")
 	root.size=Vector2i(1280,720)

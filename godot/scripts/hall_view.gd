@@ -5,6 +5,10 @@ var art: CairnArt
 var runs: Array=[]
 var current_id=""
 var selected=0
+var headers: Array=[]
+var sort_key="score"
+var descending=true
+const COLUMNS=[["rank","RANK",.0,.08],["score","SCORE",.08,.20],["reached","REACHED",.28,.28],["difficulty","DIFFICULTY",.56,.16],["time","TIME",.72,.12],["date","DATE",.84,.16]]
 var scroll: ScrollContainer
 var content: Control
 var backdrop: Node2D
@@ -31,10 +35,9 @@ func _ready():
 	add_child(scroll)
 	content=Control.new()
 	content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	content.mouse_filter=Control.MOUSE_FILTER_PASS
+	content.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	scroll.add_child(content)
 	content.draw.connect(draw_table)
-	content.gui_input.connect(row_input)
 	content.resized.connect(func():content.queue_redraw())
 	actions=load("res://scripts/menu.gd").new()
 	add_child(actions)
@@ -46,7 +49,18 @@ func _ready():
 		else:closed.emit())
 	actions.sound_requested.connect(func(id):get_parent().audio.play(id,-8))
 	for i in runs.size():
+		runs[i]["table_rank"]=i+1
 		if runs[i].get("id")==current_id:selected=i
+	for column in COLUMNS:
+		var button=Button.new()
+		button.flat=true
+		button.alignment=HORIZONTAL_ALIGNMENT_LEFT
+		button.add_theme_font_override("font",font)
+		button.add_theme_color_override("font_color",gold)
+		button.pressed.connect(func():sort_by(column[0]))
+		add_child(button)
+		headers.append(button)
+	update_headers()
 	get_viewport().size_changed.connect(layout)
 	layout()
 	actions.drop_actions()
@@ -59,7 +73,7 @@ func layout():
 	transform=Transform2D(0,Vector2.ZERO).scaled(Vector2.ONE*(get_viewport().get_visible_rect().size.x/width))
 	compact=width<760
 	text_size=clampi(int(width/52),20,30)
-	var top=122.0 if compact else clampf(viewport_size.y*.20,120,205)
+	var top=158.0 if compact else clampf(viewport_size.y*.20,120,205)
 	var table_width=width-40 if compact else width*.90
 	scroll.position=Vector2((width-table_width)*.5,top)
 	scroll.size=Vector2(table_width,maxf(60,viewport_size.y-top-158))
@@ -73,6 +87,12 @@ func layout():
 		var item=actions.items[0]
 		actions.scale=Vector2.ONE*factor
 		actions.position=Vector2(width*.5,viewport_size.y-78)-Vector2(item.x,item.y+item.height*.5)*factor
+	for i in headers.size():
+		var column=COLUMNS[i]
+		headers[i].visible=not runs.is_empty()
+		headers[i].position=Vector2(scroll.position.x+table_width*column[2]+8,top-36)
+		headers[i].size=Vector2(table_width*column[3]-8,32)
+		headers[i].add_theme_font_size_override("font_size",10 if compact else 16)
 	backdrop.queue_redraw()
 	content.queue_redraw()
 	reveal_selected.call_deferred()
@@ -94,10 +114,6 @@ func draw_backdrop():
 			backdrop.draw_texture_rect(line_texture,Rect2(Vector2(viewport_size.x*.5,37+i*42)-line_size*.5,line_size),false,Color(1.3,1.3,1.3))
 	else:
 		backdrop.draw_texture_rect(title_texture,Rect2(Vector2(viewport_size.x*.5,scroll.position.y*.40)-size*.5,size),false,Color(1.3,1.3,1.3))
-	if not compact and not runs.is_empty():
-		var w=scroll.size.x
-		for col in [["RANK",.018],["SCORE",.17],["REACHED",.36],["TIME",.68],["DATE",.84]]:
-			text(backdrop,col[0],Vector2(scroll.position.x+w*col[1],scroll.position.y-23),18,gold)
 
 func display_date(value: String) -> String:
 	var parts=value.left(10).split("-")
@@ -118,27 +134,25 @@ func draw_table():
 	for i in runs.size():
 		var run=runs[i]
 		var y=i*row_height
-		if i==selected:
+		if run.get("id")==current_id:
 			content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.48,.15,.12))
-			if not compact:
-				var marker=Vector2(w*.016,y+row_height*.5)
-				content.draw_colored_polygon(PackedVector2Array([marker+Vector2(-3,-7),marker+Vector2(5,0),marker+Vector2(-3,7)]),Color("eab95d"))
+
 		elif i%2==0:content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.65,.48,.025))
 		content.draw_line(Vector2(0,y),Vector2(w,y),Color(.40,.34,.24,.45))
 		var reached="EP %d · AREA %d/4"%[run.get("episode",1),run.get("area",1)]
 		var time=CairnRunRecords.duration(run.get("time",0))
 		var date=display_date(str(run.get("date","")))
 		if compact:
-			text(content,str(i+1),Vector2(18,y+22),22,ink)
+			text(content,str(run.table_rank),Vector2(18,y+22),22,ink)
 			var score=CairnRunRecords.number(run.score)
 			var score_size=24
 			while score_size>1 and font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,score_size).x>w-90:score_size-=1
 			text(content,score,Vector2(w-18-font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,score_size).x,y+22),score_size,ink)
-			text(content,reached,Vector2(18,y+55),18,ink,false,w-36)
+			text(content,reached+" / "+str(run.get("difficulty","normal")).capitalize(),Vector2(18,y+55),18,ink,false,w-36)
 			text(content,time+" · "+date,Vector2(18,y+81),16,ink,false,w-36)
 		else:
-			var values=[str(i+1),CairnRunRecords.number(run.score),reached,time,date]
-			for j in values.size():text(content,values[j],Vector2(w*[.048,.17,.36,.68,.84][j],y+row_height*.5),text_size,ink,false,w*[.122,.19,.32,.16,.16][j]-16)
+			var values=[str(run.table_rank),CairnRunRecords.number(run.score),reached,str(run.get("difficulty","normal")).capitalize(),time,date]
+			for j in values.size():text(content,values[j],Vector2(w*COLUMNS[j][2]+8,y+row_height*.5),text_size,ink,false,w*COLUMNS[j][3]-16)
 	content.draw_line(Vector2(0,runs.size()*row_height),Vector2(w,runs.size()*row_height),gold)
 
 func reveal_selected():
@@ -147,25 +161,46 @@ func reveal_selected():
 	if top<scroll.scroll_vertical:scroll.scroll_vertical=int(top)
 	elif top+row_height>scroll.scroll_vertical+scroll.size.y:scroll.scroll_vertical=int(top+row_height-scroll.size.y)
 
-func row_input(event: InputEvent):
-	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed and not runs.is_empty():
-		selected=clampi(int(event.position.y/row_height),0,runs.size()-1)
-		content.queue_redraw()
-
+func sort_value(run: Dictionary,key: String):
+	match key:
+		"rank":return run.table_rank
+		"reached":return int(run.get("episode",1))*100+int(run.get("area",1))*2+int(run.get("outcome","")=="won")
+		"difficulty":return ["easy","normal","hard"].find(run.get("difficulty","normal"))
+		"date":return str(run.get("date",""))
+	return float(run.get(key,0))
+func sort_by(key: String):
+	if sort_key==key:descending=not descending
+	else:
+		sort_key=key
+		descending=key not in ["rank","time"]
+	runs.sort_custom(func(a,b):
+		var av=sort_value(a,key)
+		var bv=sort_value(b,key)
+		if av==bv:return a.table_rank<b.table_rank
+		return av>bv if descending else av<bv)
+	scroll.scroll_vertical=0
+	content.queue_redraw()
+	update_headers()
+func update_headers():
+	for i in headers.size():
+		var column=COLUMNS[i]
+		headers[i].text=column[1]+((" v" if descending else " ^") if column[0]==sort_key else "")
 func handle(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		if event.keycode==KEY_ESCAPE:closed.emit();return
 		if not runs.is_empty():
-			var step=0
-			if event.keycode in [KEY_UP,KEY_W]:step=-1
-			if event.keycode in [KEY_DOWN,KEY_S]:step=1
-			if event.keycode==KEY_PAGEUP:step=-maxi(1,int(scroll.size.y/row_height))
-			if event.keycode==KEY_PAGEDOWN:step=maxi(1,int(scroll.size.y/row_height))
-			if event.keycode==KEY_HOME:step=-runs.size()
-			if event.keycode==KEY_END:step=runs.size()
-			if step!=0:
-				selected=clampi(selected+step,0,runs.size()-1)
-				reveal_selected()
-				content.queue_redraw()
+			var focused=get_viewport().gui_get_focus_owner()
+			if event.keycode==KEY_TAB:
+				headers[posmod(headers.find(focused)+(-1 if event.shift_pressed else 1),headers.size())].grab_focus()
 				return
+			if event.keycode in [KEY_ENTER,KEY_SPACE] and focused in headers:
+				focused.pressed.emit()
+				return
+			match event.keycode:
+				KEY_UP,KEY_W:scroll.scroll_vertical-=int(row_height);return
+				KEY_DOWN,KEY_S:scroll.scroll_vertical+=int(row_height);return
+				KEY_PAGEUP:scroll.scroll_vertical-=int(scroll.size.y);return
+				KEY_PAGEDOWN:scroll.scroll_vertical+=int(scroll.size.y);return
+				KEY_HOME:scroll.scroll_vertical=0;return
+				KEY_END:scroll.scroll_vertical=int(content.size.y);return
 	actions.handle(event)
