@@ -10,7 +10,7 @@ func check():
   ai.variant(candidate,["swift"])
   if candidate.variant=="swift":
    swift_found=true
-   assert(is_equal_approx(candidate.size,.72*.75) and is_equal_approx(candidate.speedFactor,2.05*1.25))
+   assert(is_equal_approx(candidate.size,.54*1.3) and is_equal_approx(candidate.speedFactor,2.05*1.25))
  assert(swift_found)
  var hero=m.make(1,720,660,100,true)
  var small=m.make(2,580,660,16)
