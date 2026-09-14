@@ -503,6 +503,9 @@ func clear_world():
 	landing_impacts.clear()
 	blood.reset()
 
+func enemy_cap() -> int:
+	return NORMAL_ENEMY_CAP+(-1 if difficulty=="easy" else 1 if difficulty=="hard" else 0)
+
 func difficulty_damage(taken: bool) -> float:
 	if difficulty=="easy":return .75 if taken else 1.25
 	if difficulty=="hard":return 1.25 if taken else .75
@@ -576,7 +579,7 @@ func spawn_wave(preserve_corpses: bool=false):
 
 func spawn_encounter_enemy():
 	if pending_enemies.is_empty():return
-	if enemies.filter(func(enemy):return enemy.hp>0).size()>=NORMAL_ENEMY_CAP:return
+	if enemies.filter(func(enemy):return enemy.hp>0).size()>=enemy_cap():return
 	if pending_enemies[0]=="shield" and enemies.filter(func(enemy):return enemy.hp>0 and enemy.kind=="shield").size()>=e_ai.shield_limit(screen_for_wave(wave)):return
 	var kind=pending_enemies.pop_front()
 	var left=randf()<.5
@@ -599,7 +602,7 @@ func step_reinforcements(dt: float):
 	for enemy in living:pressure+=2 if enemy.kind in ["shield","archer","marauder","witch","bearer"] else 1
 	var next=pending_enemies[0]
 	var cost=2 if next in ["shield","archer","marauder","witch","bearer"] else 1
-	if living.is_empty() or reinforcement_wait<=0 and living.size()<NORMAL_ENEMY_CAP and pressure+cost<=screen_for_wave(wave)+3:
+	if living.is_empty() or reinforcement_wait<=0 and living.size()<enemy_cap() and pressure+cost<=screen_for_wave(wave)+3:
 		spawn_encounter_enemy()
 		reinforcement_wait=randf_range(.8,1.9)
 

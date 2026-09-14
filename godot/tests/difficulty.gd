@@ -13,6 +13,13 @@ func check():
   game.menu_action("EP 2: THE SUNKEN WILDS")
   game.menu_action(setting.to_upper())
   assert(game.phase=="playing" and game.difficulty==setting)
+  var cap={"easy":2,"normal":3,"hard":4}[setting]
+  assert(game.enemy_cap()==cap)
+  game.wave=10
+  game.enemies.clear()
+  game.pending_enemies=["bone","bone","bone","bone","bone","bone"]
+  for i in 6:game.spawn_encounter_enemy()
+  assert(game.enemies.size()==cap and game.pending_enemies.size()==6-cap)
   var foe=game.make_actor(900,660,100)
   var outgoing={"easy":1.25,"normal":1.0,"hard":.75}[setting]
   var incoming={"easy":.75,"normal":1.0,"hard":1.25}[setting]
