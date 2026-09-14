@@ -314,7 +314,7 @@ func change_phase(next: String):
 
 		options=false
 		settings_page=""
-		menu.show_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"])
+		menu.show_items(["NEW JOURNEY","HALL OF LEGENDS","OPTIONS","QUIT"])
 	else:
 
 		if phase=="paused": menu.show_items(["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],true)
@@ -357,7 +357,7 @@ func menu_action(label: String):
 		refresh_settings(0)
 		return
 	match label:
-		"BEGIN":
+		"BEGIN","NEW JOURNEY":
 			chapter_select=true
 			menu.switch_items(["EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS","BACK"],true)
 		"EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS":
@@ -384,7 +384,7 @@ func menu_action(label: String):
 				return
 			if chapter_select:
 				chapter_select=false
-				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"],true)
+				menu.switch_items(["NEW JOURNEY","HALL OF LEGENDS","OPTIONS","QUIT"],true)
 				return
 			if settings_page in ["sound","display","game"]:
 				settings_page="root"
@@ -392,7 +392,7 @@ func menu_action(label: String):
 			else:
 				options=false
 				settings_page=""
-				menu.switch_items(["BEGIN","HALL OF LEGENDS","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],true)
+				menu.switch_items(["NEW JOURNEY","HALL OF LEGENDS","OPTIONS","QUIT"] if phase=="title" else ["RETURN TO BATTLE","OPTIONS","QUIT TO TITLE"],true)
 		"SOUND: ON","SOUND: OFF":
 			muted=not muted
 			apply_settings()

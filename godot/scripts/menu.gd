@@ -28,8 +28,8 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 	items.clear()
 	selected=0
 	title_mode=is_title
-	var options=not labels.has("BEGIN") and labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
-	var base_size=1.0 if is_title and labels.has("BEGIN") else .58 if labels.size()>3 else .71
+	var options=not (labels.has("BEGIN") or labels.has("NEW JOURNEY")) and labels.size()>2 or labels.has("FULLSCREEN: ON") or labels.has("FULLSCREEN: OFF")
+	var base_size=1.0 if is_title and (labels.has("BEGIN") or labels.has("NEW JOURNEY")) else .58 if labels.size()>3 else .71
 	var center=417.6 if is_title else 720.0
 	var top=380.7 if is_title else 430.0
 	for i in labels.size():
@@ -37,7 +37,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		var size=base_size*float(action_emphasis.get(label,1.0))
 		var meta=art.data.menu[label]
 		var group=Node2D.new()
-		var spacing=.75 if is_title and labels.has("BEGIN") else (.83 if compact_pause else 1.0)
+		var spacing=.75 if is_title and (labels.has("BEGIN") or labels.has("NEW JOURNEY")) else (.83 if compact_pause else 1.0)
 		var y=top+i*(meta.height*size-(20.16 if not options else 15.84))*spacing
 		group.position=Vector2(center,y)
 		add_child(group)

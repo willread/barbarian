@@ -3,7 +3,7 @@ func _init():call_deferred("check")
 func check():
 	var game=load("res://main.tscn").instantiate()
 	root.add_child(game)
-	game.menu_action("BEGIN")
+	game.menu_action("NEW JOURNEY")
 	await create_timer(.6).timeout
 	assert(game.chapter_select and game.phase=="title")
 	assert(game.menu.items.size()==4)
@@ -11,10 +11,13 @@ func check():
 	assert(not game.menu.is_locked("EP 3: THE ASHEN DEPTHS"))
 	game.menu_action("BACK")
 	await create_timer(.6).timeout
-	assert(not game.chapter_select and game.menu.items[0].label=="BEGIN")
-	game.menu_action("BEGIN")
+	assert(not game.chapter_select and game.menu.items[0].label=="NEW JOURNEY")
+	game.menu_action("NEW JOURNEY")
 	await create_timer(.6).timeout
 	game.menu_action("EP 1: THE FALLEN CITADEL")
+	await create_timer(.6).timeout
+	assert(game.difficulty_select and game.menu.items[game.menu.selected].label=="NORMAL")
+	game.menu_action("NORMAL")
 	assert(game.phase=="playing" and game.background.key=="citadel-1")
 	game.set_process(false)
 	assert(game.scale==Vector2.ONE and game.position.x==0)
