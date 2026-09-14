@@ -52,7 +52,7 @@ func _draw():
 	var edge=clampf(min(screen.x,screen.y)*.09,60.,96.)
 	var origin=screen-Vector2.ONE*(edge+24.)
 	var cycle=fmod(elapsed,2.8)/2.8
-	var regions=[Rect2(0,142,256,114),Rect2(0,88,256,54),Rect2(0,0,256,88)]
+	var regions=[Rect2(0,158,256,98),Rect2(0,102,256,56),Rect2(0,0,256,102)]
 	for i in 3:
 		var t=cycle-i*.16
 		if t<0 or cycle>.99:continue

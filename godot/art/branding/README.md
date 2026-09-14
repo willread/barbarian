@@ -1,4 +1,9 @@
 # Cairn standalone mark
-Generated with the built-in image generation tool, 2026-09-12, using the stacked stones inside the supplied Cairn A as reference. Original generated alpha preserved. PNG and multi-resolution ICO variants resized with Pillow Lanczos.
 
-Prompt: Create a polished standalone game logo symbol and application icon for CAIRN, based on the three stacked stones inside the A in the reference. Exactly three irregular flattened stones: broad heavy base, medium middle, small capstone. Remove surrounding A. No lettering, border or ground plane. Weathered dark bronze-gold stone, realistic dimensional bevels, chipped rocky surfaces, restrained warm gold edge highlights and dark crevices. Dark fantasy aesthetic. Strong readable silhouette and separation at 32 pixels. Centered square with transparent margins; actual transparent background, no cast shadow outside the object. Production raster icon, not a mockup.
+Current source: `cairn-mark-v2.png`. Three broad, slightly tiered stone-gray slabs with a wide, flat top. Generated with the built-in image tool; transparent alpha preserved. Rebuild PNG and multi-resolution Windows ICO assets with `node tools/godot/bake-branding.mjs`.
+
+Both native and browser loading animations use this icon, split at y=102 and y=158 in the 256px rendition.
+
+Prompt: Exactly three broad weathered slate-gray stone slabs; widths roughly 90%, 83%, 76%, nearly column-like silhouette, blunt flat top, chipped angular corners, dark seams, matte granite planes, cool highlights, no brown or gold, no pointed cap, transparent square canvas with generous margins.
+
+The original warm pyramidal `cairn-mark-v1.png` is retained as source history.
