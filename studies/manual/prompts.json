@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "direction": "Middle ground between fine engraving and crude felt-tip art",
+  "illustrations": [
+    {
+      "name": "hero",
+      "prompt": "Use case illustration-story. CAIRN 1980s sword-and-sorcery game manual illustration. MID-LEVEL vintage commercial pen-and-ink craft: solid anatomy and confident readable silhouettes, bold thick outer contours, medium interior lines, modest widely spaced hatching, occasional flat black shadows. Hand drawn and slightly rough, NOT crude amateur, NOT cartoon caricature, NOT intricate fine-art engraving. Between polished detailed fantasy engraving and crude felt-tip zine art. Strict black ink on plain WHITE background. No fine dense crosshatching, no grey washes, no paper texture, no color, no text. Portrait full body muscular long black-haired bare-chested barbarian in fur loincloth, ornate bracers and fur boots holding large double-headed axe atop cairn stones. Simple broken stone arch behind, one raven. Strong serious face, grounded anatomy, expressive moderately detailed bold drawing."
+    },
+    {
+      "name": "host",
+      "prompt": "Use case illustration-story. CAIRN 1980s sword-and-sorcery game manual illustration. MID-LEVEL vintage commercial pen-and-ink craft: solid anatomy and confident readable silhouettes, bold thick outer contours, medium interior lines, modest widely spaced hatching, occasional flat black shadows. Hand drawn and slightly rough, NOT crude amateur, NOT cartoon caricature, NOT intricate fine-art engraving. Between polished detailed fantasy engraving and crude felt-tip zine art. Strict black ink on plain WHITE background. No fine dense crosshatching, no grey washes, no paper texture, no color, no text. Wide landscape row five distinct full body characters separated by white space, left to right: skeleton with crude blade; undead legionary in horned skull helmet and plate with sword; skeleton revenant with round shield; skeleton archer with bow; living burly bearded marauder in round helmet and fur cloak with clenched fists."
+    },
+    {
+      "name": "bosses",
+      "prompt": "Use case illustration-story. CAIRN 1980s sword-and-sorcery game manual illustration. MID-LEVEL vintage commercial pen-and-ink craft: solid anatomy and confident readable silhouettes, bold thick outer contours, medium interior lines, modest widely spaced hatching, occasional flat black shadows. Hand drawn and slightly rough, NOT crude amateur, NOT cartoon caricature, NOT intricate fine-art engraving. Between polished detailed fantasy engraving and crude felt-tip zine art. Strict black ink on plain WHITE background. No fine dense crosshatching, no grey washes, no paper texture, no color, no text. Wide landscape row three separate full body figures: stern human crowned Cairn Champion in lion shoulder armor and tabard, fists; Drowned King crowned skeletal root monarch with massive root arm, ragged root robe; Kiln Saint masked massive executioner in riveted iron reliquary armor, box chest containing small skeleton, chains and long furnace rake."
+    },
+    {
+      "name": "wilds",
+      "prompt": "Use case illustration-story. CAIRN 1980s sword-and-sorcery game manual illustration. MID-LEVEL vintage commercial pen-and-ink craft: solid anatomy and confident readable silhouettes, bold thick outer contours, medium interior lines, modest widely spaced hatching, occasional flat black shadows. Hand drawn and slightly rough, NOT crude amateur, NOT cartoon caricature, NOT intricate fine-art engraving. Between polished detailed fantasy engraving and crude felt-tip zine art. Strict black ink on plain WHITE background. No fine dense crosshatching, no grey washes, no paper texture, no color, no text. Wide landscape pair of full body figures separated by white space: hunched old Bog Witch in root cloak with bone charm staff, a few hands reaching from small mud pool at feet; undead Furnace Bearer porter with tall slag basket backpack and long rake."
+    },
+    {
+      "name": "lands",
+      "prompt": "Use case illustration-story. CAIRN 1980s sword-and-sorcery game manual illustration. MID-LEVEL vintage commercial pen-and-ink craft: solid anatomy and confident readable silhouettes, bold thick outer contours, medium interior lines, modest widely spaced hatching, occasional flat black shadows. Hand drawn and slightly rough, NOT crude amateur, NOT cartoon caricature, NOT intricate fine-art engraving. Between polished detailed fantasy engraving and crude felt-tip zine art. Strict black ink on plain WHITE background. No fine dense crosshatching, no grey washes, no paper texture, no color, no text. Portrait three equally sized stacked horizontal environmental vignettes separated by broad white gaps: fallen gothic citadel with burial stones and broken banners; drowned marsh with crooked trees, sunken arch and reeds; underground furnace cathedral with chains and ash. Restrained medium detail, bold contours and sparse hatching."
+    },
+    {
+      "name": "relics",
+      "prompt": "Use case illustration-story. CAIRN 1980s sword-and-sorcery game manual illustration. MID-LEVEL vintage commercial pen-and-ink craft: solid anatomy and confident readable silhouettes, bold thick outer contours, medium interior lines, modest widely spaced hatching, occasional flat black shadows. Hand drawn and slightly rough, NOT crude amateur, NOT cartoon caricature, NOT intricate fine-art engraving. Between polished detailed fantasy engraving and crude felt-tip zine art. Strict black ink on plain WHITE background. No fine dense crosshatching, no grey washes, no paper texture, no color, no text. Wide atmospheric still life: broken crown upon small pile of burial stones, sword lying diagonally on ground, candle stub, raven perched on sword pommel, scattered bones and dead leaves. Plenty white space."
+    }
+  ]
+}
