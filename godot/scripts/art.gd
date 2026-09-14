@@ -21,6 +21,9 @@ func texture(file: String) -> Texture2D:
 	return textures[file]
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
+	if f.player and f.get("victory_pose",-1)>=0:
+		var salute=int(f.victory_pose)
+		return ["hero-cast-unarmed-v1",0 if salute<5 else 1 if salute<9 else 2 if salute<13 else 3 if salute<17 else 4]
 	if f.player and f.attack.get("spin",false):return ["hero-spin",min(15,int(max(0,f.attack.age-2)/2.0))%8]
 	if f.player and f.diveUsed and not f.air.is_empty():return ["hero-extra-unarmed-v8",8 if f.diveAge<2 else 9 if f.diveAge<4 else 10 if f.weapon=="axe" else 11]
 	if f.player and not f.pickup.is_empty() and f.down.is_empty() and not f.hurtTicks: return ["hero-eat",min(7,int(f.pickup.age/.15))]

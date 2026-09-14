@@ -17,11 +17,15 @@ func check():
   enemy.down={}
  game.tick(game.m.STEP)
  assert(game.phase=="victory" and game.results_view==null and game.finished_run.is_empty())
+ assert(game.art.pose(game.hero)==["hero-cast-unarmed-v1",0])
+ var mana=game.magic
  var x=game.hero.x
  for i in 150:
   game._process(1.0/60)
   await process_frame
  assert(game.phase=="victory" and game.hero.x==x and game.results_view==null)
+ assert(game.art.pose(game.hero)==["hero-cast-unarmed-v1",4],"Victory raises the weapon and holds it overhead")
+ assert(game.spell==-1 and game.magic==mana,"Victory salute does not cast lightning or consume mana")
  if "--victory-capture" in OS.get_cmdline_user_args():
   await RenderingServer.frame_post_draw
   root.get_texture().get_image().save_png("E:/Cairn-build-tools/victory-blood.png")

@@ -292,6 +292,18 @@ func begin_victory():
 	stage_walk=""
 	transition=-1
 	victory_age=0.0
+	spell=-1
+	hero.attack={}
+	hero.air={}
+	hero.down={}
+	hero.pickup={}
+	hero.height=0
+	hero.hurtTicks=0
+	hero.moving=false
+	hero.velocityX=0
+	hero.velocityY=0
+	hero["victory_pose"]=0
+	if not chicken.is_empty():chicken.lightning_until=-1.0
 	audio.stop_gameplay()
 	hero_voice.reset()
 	if is_instance_valid(wipe):wipe.queue_free()
@@ -1014,7 +1026,11 @@ func _process(raw: float):
 	if phase=="playing" and not run_stats.is_empty():run_stats.time+=raw
 	if phase in ["lost","won"] and is_instance_valid(wipe) and wipe.age<3.8:wipe.advance(raw)
 	if phase=="victory":
+		var previous_victory_age=victory_age
 		victory_age+=raw
+		hero.victory_pose=mini(17,int(victory_age/m.STEP))
+		if previous_victory_age<13*m.STEP and victory_age>=13*m.STEP:
+			audio.play("magic_shout",-3,1.0)
 		wipe.advance(raw)
 		wipe.modulate.a=1.0-smoothstep(4.2,4.8,victory_age)
 		if victory_age>=4.8:
