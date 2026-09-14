@@ -48,7 +48,7 @@ func advance(dt: float):
 		var probe=previous.lerp(point,fraction)
 		if h.hp>0 and h.down.is_empty() and not h.invTicks and abs(probe.x-h.x)<29 and abs(probe.y-h.y)<24 and probe.z>h.height*4.5+35 and probe.z<h.height*4.5+230:
 			var before=h.hp
-			game.damage(h,{"damage":8.5,"no_stun":true,"direction":1 if velocity.x>0 else -1,"knock":false},owner_actor)
+			game.damage(h,{"damage":5.95,"no_stun":true,"direction":1 if velocity.x>0 else -1,"knock":false},owner_actor)
 			if h.hp<before:
 				point=probe
 				stuck=0.0

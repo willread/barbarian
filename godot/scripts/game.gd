@@ -1853,7 +1853,7 @@ func archer_test():
 	for i in 90:
 		arrow.advance(1.0/120)
 		if arrow.attached:break
-	assert(arrow.attached and is_equal_approx(hero.hp,100.-8.5*(100./48.)*damage_multiplier),"Arrow damage must respect global tuning and embed")
+	assert(arrow.attached and is_equal_approx(hero.hp,100.-5.95*(100./48.)*damage_multiplier),"Arrow damage must respect global tuning and embed")
 	assert(not blood.drops.is_empty(),"Arrow impact must emit blood")
 	assert(hero.hurtTicks==0 and hero.recovering==0 and hero.recoil==0,"Arrow hits must not stun")
 	arrow.advance(.51)
