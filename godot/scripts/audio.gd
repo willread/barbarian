@@ -55,13 +55,13 @@ func setup(source: Node2D):
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
 		voices.append(player)
-	for id in ["music_menu","music_game"]:
+	for id in ["music_menu","music_game","music_game-3","music_game-4"]:
 		var player=AudioStreamPlayer.new()
 		player.bus=Mix.bus_for(id)
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
-		if clips.get(id)!=null:
-			player.stream=clips[id]
+		player.stream=clips.get(id) if id in ["music_menu","music_game"] else load("res://audio_options/"+id+".ogg")
+		if player.stream!=null:
 			player.stream.loop=true
 		player.volume_db=-60
 		tracks.append(player)
@@ -149,7 +149,7 @@ func _process(dt: float):
 	if game.muted or (not bubbling and not mire_loop.stream_paused and mire_loop.volume_db<=-59):mire_loop.stop()
 	for i in tracks.size():
 		var track=tracks[i]
-		var selected=game.music_enabled and ((game.phase=="title")== (i==0))
+		var selected=game.music_enabled and i==(0 if game.phase=="title" else game.current_episode)
 		var target=-10.0+volumes.get("music_menu" if i==0 else "music_game",0.0) if audible and selected else -60.0
 		if game.phase in ["paused","dying","lost","won"]:target-=8
 		track.volume_db=move_toward(track.volume_db,target,dt*35)
