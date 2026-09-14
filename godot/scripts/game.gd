@@ -646,7 +646,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
 	if f.kind in ["king","saint"] and not e_ai.boss_open(f) and not a.get("magic",false):
 		a=a.duplicate()
-		a.damage*=.2
+		a.damage*=.65 if f.kind=="king" else .2
 	var previous_hp=f.hp
 	f.hp=max(0,f.hp-a.damage*damage_multiplier*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if f.hp<previous_hp:
@@ -1439,8 +1439,7 @@ func draw_air():
 		air_fx.draw_rect(Rect2(s.x,s.y,4,2),color)
 	for f in enemies:
 		if not f.boss and f.hp>0 and clock<f.get("healthBarUntil",-1.0):
-			air_fx.draw_rect(Rect2(f.x-35,f.y-272,70,4),Color("000000"))
-			air_fx.draw_rect(Rect2(f.x-35,f.y-272,70*f.hp/f.max,4),Color("b51219"))
+			CairnGlassBar.draw(air_fx,Rect2(f.x-35,f.y-272,70,6),f.hp/f.max,Color("bf221e"))
 	if spell>=17 and spell<77:
 		var tip=art.weapon_tip(hero,["hero-cast-unarmed-v1",4 if spell<45 else 5])
 		var elapsed=(spell-17)*m.STEP
@@ -1455,8 +1454,7 @@ func draw_air():
 		if f.boss and f.hp>0:
 			var top=43-position.y
 			center_text(air_fx,{"champion":"Cairn Champion","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(720,top),20,Color("e6d2aa"))
-			air_fx.draw_rect(Rect2(510,top+11,420,8),Color("000000"))
-			air_fx.draw_rect(Rect2(510,top+11,420*f.hp/f.max,8),Color("b51219"))
+			CairnGlassBar.draw(air_fx,Rect2(510,top+11,420,12),f.hp/f.max,Color("bf221e"))
 
 func center_text(node: Node2D,text: String,p: Vector2,size: int,color: Color):
 	node.draw_string(serif,p-Vector2(serif.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x*.5,0),text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
@@ -1483,16 +1481,7 @@ func draw_hud():
 			var pulse=(.5+.5*sin(clock*TAU*1.5))*.65
 			colors[0]=colors[0].lerp(Color("d5f4ff"),pulse)
 			colors[1]=colors[1].lerp(Color("68caff"),pulse)
-		# One solid polygon survives downscaling; one-pixel scanlines can vanish in WebGL.
-		var fill_width=901*clamp(value/100.,0.,1.)
-		if fill_width>0:
-			var left=298.0
-			var right=left+fill_width
-			var upper=top+17.0
-			var lower=upper+77.0
-			var bevel=min(7.,fill_width*.5)
-			var points=PackedVector2Array([Vector2(left+bevel,upper),Vector2(right-bevel,upper),Vector2(right,upper+bevel),Vector2(right,lower-bevel),Vector2(right-bevel,lower),Vector2(left+bevel,lower),Vector2(left,lower-bevel),Vector2(left,upper+bevel)])
-			hud.draw_polygon(points,PackedColorArray([colors[0],colors[0],colors[0],colors[1],colors[1],colors[1],colors[1],colors[0]]))
+		CairnGlassBar.draw(hud,Rect2(298,top+17,901,77),value/100.,colors[0])
 		if i==1 and magic>=100: hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
 	hud.draw_set_transform(Vector2.ZERO)
 	hero_voice.draw_portrait(hud,Rect2(1400*s+extra-80,810+46,160,180))

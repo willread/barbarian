@@ -1,0 +1,1 @@
+Generated root-eruption VFX: waterlogged dark oak roots rising from shiny swamp mud, wet bark, torn fibers, moss, muddy droplets, isolated transparent background. Used for the Drowned King root slam and sweep.

@@ -11,7 +11,7 @@ if(fs.existsSync(stamp)&&fs.readFileSync(stamp,'utf8')===JSON.stringify(version)
 fs.copyFileSync(source+'mire-effect-v1.png',out+'mire-effect-v1.png');
 for(const kind of ['witch','bearer','king','saint']){
  const sheet=await loadImage(source+kind+'.png'),cw=Math.floor(sheet.width/4),ch=Math.floor(sheet.height/2),cels=[];
- if(kind==='witch'||kind==='bearer'){
+ if(kind==='witch'||kind==='bearer'||kind==='king'){
   for(const [i,frame] of splitEpisodeSheet(sheet,kind).entries()){
    const file=`enemy-${kind}-${i}.png`;fs.writeFileSync(out+file,frame.image.toBuffer('image/png'));
    cels.push({file,left:frame.left,top:frame.top,width:frame.width,height:frame.height});

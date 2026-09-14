@@ -5,18 +5,20 @@ import {createCanvas} from '@napi-rs/canvas';
 export function splitEpisodeSheet(image,kind){
  const w=image.width,h=image.height,c=createCanvas(w,h),g=c.getContext('2d');g.drawImage(image,0,0);
  const pixels=g.getImageData(0,0,w,h),d=pixels.data,labels=new Int32Array(w*h),parts=[];
+ // The falling King and corpse touch along a diagonal silhouette seam.
+ const kingSide=(p)=>{const x=p%w,y=Math.floor(p/w);if(y<h/2)return 0;const seam=y<820?1166:y<890?1166-(y-820)*1.12:y<950?1088+(y-890)*1.30:1166;return x<seam?0:1};
  let next=0;
  for(let start=0;start<labels.length;start++){
   if(labels[start]||d[start*4+3]<128)continue;
   const id=++next,stack=[start],points=[];labels[start]=id;let x0=w,y0=h,x1=0,y1=0;
   while(stack.length){
    const p=stack.pop(),x=p%w,y=Math.floor(p/w);points.push(p);x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);
-   for(const q of [x?p-1:-1,x<w-1?p+1:-1,p-w,p+w])if(q>=0&&q<labels.length&&!labels[q]&&d[q*4+3]>=128){labels[q]=id;stack.push(q)}
+   for(const q of [x?p-1:-1,x<w-1?p+1:-1,p-w,p+w])if(q>=0&&q<labels.length&&!labels[q]&&d[q*4+3]>=128){if(kind==='king'&&kingSide(p)!==kingSide(q))continue;labels[q]=id;stack.push(q)}
   }
   parts.push({id,points,x0,y0,x1,y1});
  }
  const figures=parts.sort((a,b)=>b.points.length-a.points.length).slice(0,8);
- if(figures.length!==8||figures.some(p=>p.points.length<10000))throw Error(kind+': expected eight complete figures');
+ if(figures.length!==8||figures.some(p=>p.points.length<10000))throw Error(kind+': expected eight complete figures '+JSON.stringify(figures.map(p=>[p.points.length,p.x0,p.y0,p.x1,p.y1])));
  figures.sort((a,b)=>Number(a.y0>=h/2)-Number(b.y0>=h/2)||a.x0-b.x0);
  const kept=new Set(figures.map(p=>p.id));
  for(let p=0;p<labels.length;p++)if(!kept.has(labels[p]))labels[p]=0;
@@ -24,7 +26,7 @@ export function splitEpisodeSheet(image,kind){
  let frontier=figures.flatMap(p=>p.points);
  for(let pass=0;pass<6;pass++){
   const expanded=[];
-  for(const p of frontier){const x=p%w;for(const q of [x?p-1:-1,x<w-1?p+1:-1,p-w,p+w])if(q>=0&&q<labels.length&&!labels[q]&&d[q*4+3]>1){labels[q]=labels[p];expanded.push(q)}}
+  for(const p of frontier){const x=p%w;for(const q of [x?p-1:-1,x<w-1?p+1:-1,p-w,p+w])if(q>=0&&q<labels.length&&!labels[q]&&d[q*4+3]>1){if(kind==='king'&&kingSide(p)!==kingSide(q))continue;labels[q]=labels[p];expanded.push(q)}}
   frontier=expanded;
  }
  return figures.map((part,i)=>{

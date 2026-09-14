@@ -1,6 +1,7 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
+var root_views: Array=[]
 const MireLayout=preload("res://scripts/mire_layout.gd")
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
@@ -26,6 +27,9 @@ func prepare_actor(actor: Dictionary):
 
 func clear():
 	hazards.clear()
+	for view in root_views:
+		if is_instance_valid(view):view.queue_free()
+	root_views.clear()
 	for view in mire_views.values():
 		if is_instance_valid(view):view.queue_free()
 	mire_views.clear()
@@ -34,6 +38,20 @@ func clear():
 	retiring_mire.clear()
 
 func sync_views(game,dt: float=0.0):
+	for h in hazards:
+		if h.kind not in ["root","rootSweep"]:continue
+		if not h.has("view"):
+			h.view=preload("res://scripts/king_roots.gd").new()
+			game.arena_clip.add_child(h.view)
+			root_views.append(h.view)
+		h.view.position=h.p
+		h.view.z_index=int(h.p.y)*2
+		h.view.configure(h.age,h.life,h.kind=="rootSweep",h.owner.dir)
+	for i in range(root_views.size()-1,-1,-1):
+		var view=root_views[i]
+		if not hazards.any(func(h):return h.get("view")==view):
+			view.queue_free()
+			root_views.remove_at(i)
 	var visible_ids=[]
 	for enemy in game.enemies:
 		var a=enemy.attack
@@ -118,6 +136,7 @@ func step(game,dt: float):
 		match a.type:
 			"mireCast":hazards.append({"kind":"mire","owner":enemy,"p":target,"age":0.0,"life":8.0})
 			"clinkerThrow":hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":2.25,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
+			"kingSweep":hazards.append({"kind":"rootSweep","owner":enemy,"p":Vector2(enemy.x+enemy.dir*150,enemy.y),"age":0.0,"life":.65})
 			"rootSlam":hazards.append({"kind":"root","owner":enemy,"p":Vector2(enemy.x+enemy.dir*210,enemy.y),"age":0.0,"life":3.5})
 			"furnaceBlast":
 				# The Saint ejects slag so reflection also works in the solo boss encounter.
@@ -189,15 +208,13 @@ func draw_ground(game,node: Node2D):
 		elif a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
 		elif a.type=="rootSlam":
-			ellipse(node,Vector2(e.x+a.direction*210,e.y),Vector2(28,60),Color(.75,.78,.35,pulse))
+			var p_root=Vector2(e.x+a.direction*210,e.y)
+			var texture=preload("res://art/king-roots-v1.png")
+			node.draw_texture_rect_region(texture,Rect2(p_root-Vector2(55,8),Vector2(110,22)),Rect2(Vector2(0,texture.get_height()*.82),Vector2(texture.get_width(),texture.get_height()*.12)),Color(1,1,1,pulse))
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
 			"clinker":ellipse(node,h.p,Vector2(105,42),Color(1,.4,.07,(.25+.15*sin(h.age*15))*fade))
-			"root":
-				for i in 7:
-					var p=h.p+Vector2(sin(i*8.)*13,(i-3)*16)
-					node.draw_line(p,p+Vector2(sin(i*9.)*24,-55),Color(.22,.28,.12,fade),9,true)
 			"blast":node.draw_rect(Rect2(h.p.x if h.dir>0 else 0,h.p.y-26,1440-h.p.x if h.dir>0 else h.p.x,52),Color(1,.55,.12,fade*.8))
 
 func draw_air(node: Node2D):
