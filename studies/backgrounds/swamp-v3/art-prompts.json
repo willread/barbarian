@@ -1,0 +1,33 @@
+{
+  "generator": "OpenAI built-in imagegen",
+  "backgrounds": [
+    {
+      "scene": "crossing",
+      "reference": "../swamp-v1/01-crossing.png",
+      "output": "crossing.png",
+      "prompt": "Refine this existing 16:9 photorealistic dark fantasy swamp game background. Preserve its composition almost exactly: massive left cypress, open still central pool, distant stumps, ochre overcast light and broad flat muddy fighting floor occupying bottom 38%. Sharpen the ground and all near objects. Remove the blurry foreground twigs and foliage at the very bottom; leave only very low crisp natural edge debris. Preserve the hanging moss already attached to the upper branches but keep it sparse, no large foreground silhouettes. Add one small bare flat-topped stump on the right water margin around x80%,y58% as a perch for a separately animated bird, but NO bird painted in. No characters, no UI, no moving objects painted in, no new buildings. Maintain muted olive gray and muddy brown palette, realistic fine detail, no depth-of-field blur in near or middle distance. Landscape 16:9 high resolution."
+    },
+    {
+      "scene": "hollow",
+      "reference": "../swamp-v1/02-hollow.png",
+      "output": "hollow.png",
+      "prompt": "Refine this exact 16:9 dark fantasy swamp hollow background for sharp separately animated details. Preserve the large hollow tree left of center, shelf fungi, dark opening, wet mossy forest, small right pool and broad flat muddy arena floor occupying lower 38%. Remove ALL hanging bone charms, skulls, ropes and rag strips from around the opening; clean empty bark and dark hollow there so new individual animated cutouts can be attached. Remove all blurry silhouettes along the bottom edge and the large blurry upper-right foreground bough; retain background branches. Crisp bark, fungi and detailed mud, no depth-of-field blur on near objects. Match original subdued olive, gray and brown lighting. No characters or UI. No bells. Landscape 16:9 high resolution."
+    },
+    {
+      "scene": "procession",
+      "reference": "../swamp-v1/03-procession.png",
+      "output": "procession.png",
+      "prompt": "Recompose this scene into a distinct drowned FUNERAL BELL RUIN rather than a giant-tree scene. Preserve the visual style, muted olive gray stone, misty pale overcast light and wide flat muddy fighting floor across bottom 38%. Two separated weathered stone bell arches dominate: larger left arch centered x24%, apex y17%, and smaller right arch centered x78%, apex y26%. Empty openings under the arches: REMOVE BOTH BELLS AND ALL CHAINS, since sharp animated bells will be added later. Make the two arches clearly built masonry towers with crisp chipped blocks. Remove massive flanking tree trunks and overhead tree canopy; only slender sparse dead trees at far periphery. Open airy center with broken processional stonework receding into pale misty swamp distance. Thin shallow still water strip behind arena. No oversized foreground foliage, no characters, no UI, no banners. Distinct silhouette of two separated vertical towers and open middle. Photorealistic, sharp near and middle detail, landscape 16:9 high resolution."
+    },
+    {
+      "scene": "throne",
+      "reference": "../swamp-v1/04-throne.png",
+      "output": "throne.png",
+      "prompt": "Substantially redesign this final swamp boss arena while retaining photorealistic dark medieval swamp style and muted olive/gray/brown palette. REMOVE the enormous central tree completely. Replace it with a ruined royal stone dais and broken low semicircular wall, thick roots only invading the masonry at the sides. A large imposing empty weathered green-bronze and stone THRONE is the central landmark, roughly 3 times the reference throne's apparent size: ornate crown-shaped back centered x50%, top near y25%, broad seat near y48%, base y58%. Broad worn stone steps descend to y64%. Throne must read clearly at thumbnail size. Behind: broken royal court wall and pale misty cypress forest, NO giant central trunk or giant tree canopy. Keep bottom 36% a broad clear flat muddy fighting floor, unobstructed side to side. Two bare corroded banner poles flank the dais at x34% and x66%, crossbars near y28%, NO cloth banners painted in (animated ones added later). Tiny low sharp stone fragments at extreme bottom corners, no heavy foreground root blanket. No characters or UI. Dramatic restrained diffuse light, sharp carvings and stone, landscape 16:9 high resolution."
+    }
+  ],
+  "props": {
+    "output": "props.png",
+    "prompt": "Photorealistic dark medieval swamp game ASSET SHEET on genuinely transparent background, 3 columns by 3 rows of equally sized square cells. Exactly nine separate fully visible objects, one centered in each cell, generous transparent padding, no object crosses a cell boundary. No shadows on background, no text, no grid lines. Crisp fine texture, restrained gray olive brown palette, consistent diffuse upper-left lighting. Top row left: isolated long sparse hanging Spanish moss tuft attached at its top, vertical. Top row center: a small weathered animal skull and two small bones suspended vertically from a single taut rope, witch charm. Top row right: narrow ragged faded moss-green cloth strip suspended from its top edge, vertical. Middle row left: large weathered bronze funeral bell with its crown attachment at top but NO chain and NO clapper, dark visible hollow opening at bottom, front three-quarter view with subtle depth. Middle row center: narrow aged teal-green royal standard hanging straight from a short horizontal top crossbar, tarnished gold crown emblem, torn bottom, visible woven cloth. Middle row right: slim corroded iron pendant ornament hanging vertically on a short chain, dark royal swamp artifact. Bottom row left: delicate sparse reed clump, all stalks rooted at bottom, fine sharp olive blades. Bottom row center: low thin fallen cypress branch, horizontal, chipped bark, few twigs, no foliage mound. Bottom row right: small gray marsh heron in side profile with tucked wings and feet visible, slender curved neck, sharp natural feathers. Each object fully isolated, high resolution 2048x2048 or higher. These will be cut into separate sprites, so maintain nine equally spaced cells and real transparency."
+  }
+}
