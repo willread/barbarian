@@ -25,6 +25,9 @@ func check():
  await create_timer(1.2).timeout
  assert(game.hero.hp==game.hero.max and not paused and not console.visible)
  console.toggle()
+ console.execute("HOH")
+ assert(game.candy_override and game.weapon_skin=="candy_cane" and not paused)
+ console.toggle()
  console.execute("KFC")
  assert(not game.chicken.is_empty() and not paused)
  for area in range(2,5):

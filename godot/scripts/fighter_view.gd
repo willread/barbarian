@@ -5,13 +5,7 @@ var pose: Array=[]
 var burn_material: ShaderMaterial
 var burning: BurningSprite
 var burn_finished=false
-var holiday_layer: Node2D
 func _ready():
-	holiday_layer=Node2D.new()
-	add_child(holiday_layer)
-	holiday_layer.draw.connect(func():
-		if not pose.is_empty():art.paint_holiday(holiday_layer,actor,pose)
-	)
 	burn_material=ShaderMaterial.new()
 	burn_material.shader=load("res://shaders/burn.gdshader")
 	material=burn_material
@@ -39,7 +33,6 @@ func update_view(spell: int):
 			burning.queue_free()
 			burning=null
 			burn_finished=true
-	holiday_layer.queue_redraw()
 	queue_redraw()
 func _draw():
 	if pose.is_empty(): return

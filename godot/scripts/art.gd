@@ -3,12 +3,10 @@ extends RefCounted
 var data: Dictionary
 var textures: Dictionary={}
 var armory: Dictionary={}
-var holiday_anchors: Dictionary={}
 const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310,"witch":250,"bearer":260,"king":390,"saint":420}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
 func _init():
-	holiday_anchors=JSON.parse_string(FileAccess.get_file_as_string("res://art/holiday-anchors.json"))
 	armory=JSON.parse_string(FileAccess.get_file_as_string("res://art/armory.json"))
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
@@ -99,7 +97,7 @@ func layout(p: Array) -> Dictionary:
 	return {"atlas":atlas,"cel":cel,"rig":rig}
 
 func weapon_data(f: Dictionary) -> Dictionary:
-	if f.get("holiday", "off")=="christmas":
+	if f.get("weapon_skin", "")=="candy_cane":
 		var tex=texture("../art/holiday-candy.png")
 		return {"file":"../art/holiday-candy.png","width":tex.get_width(),"height":tex.get_height(),"length":126.,"grip":.82,"pivot":.2}
 	var skin=f.get("weapon_skin","")
@@ -149,7 +147,7 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 		var cel=weapon_cel(w)
 		var width=w.length*cel.width/cel.height*(1.0 if w.has("file") else w.get("width",1))
 		node.draw_set_transform(Vector2(l.rig.grip[0],l.rig.grip[1]),l.rig.angle)
-		node.draw_texture_rect(texture(cel.file),Rect2(-width*w.get("pivot",.5),-w.length*w.grip,width,w.length),false,Color(1.65,1.65,1.65) if f.get("holiday", "off")=="christmas" else Color.WHITE)
+		node.draw_texture_rect(texture(cel.file),Rect2(-width*w.get("pivot",.5),-w.length*w.grip,width,w.length),false,Color(1.65,1.65,1.65) if f.get("weapon_skin", "")=="candy_cane" else Color.WHITE)
 	elif f.kind!="legion":
 		var meta=data.enemyArt.bodySheets[NAMES[f.kind]]
 		var s=HEIGHTS[f.kind]/data.atlases[p[0]].cels[0].height
@@ -191,26 +189,3 @@ func draw_equipment(node: Node2D,index: int,height: float):
 	var grip=data.enemyArt.equipment.grips[index]
 	var s=height/cel.height
 	node.draw_texture_rect(texture(cel.file),Rect2((cel.left-grip[0]*atlas.cellWidth)*s,(cel.top-grip[1]*atlas.cellHeight)*s,cel.width*s,height),false)
-
-func paint_holiday(node: Node2D,f: Dictionary,p: Array):
-	if not f.player or f.get("holiday","off")=="off":return
-	if not holiday_anchors.has(p[0]):return
-	var xy=holiday_anchors[p[0]][int(p[1])]
-	var head=Vector2(xy[0],xy[1])
-	# Authored head sockets override skin detection where raised hands fooled it.
-	var corrections={
-		"hero-cast-unarmed-v1":{3:Vector2(26,60),4:Vector2(43,70),5:Vector2(45,70),6:Vector2(35,48)},
-		"hero-close-unarmed-v8":{0:Vector2(23,41),1:Vector2(0,20),3:Vector2(4,29),4:Vector2(50,25),5:Vector2(5,46),10:Vector2(-28,35)},
-		"hero-extra-unarmed-v8":{4:Vector2(22,-6),8:Vector2(5,53),9:Vector2(-30,25),10:Vector2(30,0),11:Vector2(30,0)},
-		"hero-eat":{1:Vector2(40,10),2:Vector2(50,10),4:Vector2(-65,43)},
-		"hero-reactions-unarmed-v8":{6:Vector2(-20,15),7:Vector2(-20,20),10:Vector2(25,35)}
-	}
-	head+=corrections.get(p[0],{}).get(int(p[1]),Vector2.ZERO)
-	var santa=f.holiday=="christmas"
-	if not santa:head+=Vector2(18,-4)
-	var tex=texture("../art/holiday-santa.png" if santa else "../art/holiday-pumpkin.png")
-	var size=Vector2(65,48) if santa else Vector2(64,66)
-	var tilt=deg_to_rad(-55) if p[0]=="hero-reactions-unarmed-v8" and int(p[1]) in [6,7] else 0.0
-	node.draw_set_transform(head,tilt)
-	node.draw_texture_rect(tex,Rect2(-Vector2(size.x*.56,size.y*.92 if santa else size.y*.53),size),false)
-	node.draw_set_transform(Vector2.ZERO)

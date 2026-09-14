@@ -70,7 +70,7 @@ func check():
  game.damage(game.hero,{"damage":1,"direction":-1},enemy)
  assert(game.combo.hits==0)
  game.settings_page="game"
- assert(game.option_labels()[1]=="CONTROLS")
+ assert("CONTROLS" in game.option_labels())
  assert(game.art.weapon_data(game.hero).length>0)
  for i in 12:game.combo.hit()
  game.combo.remaining=.5

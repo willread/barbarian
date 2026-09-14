@@ -11,6 +11,9 @@ const MenuScript=preload("res://scripts/menu.gd")
 const DeathWipe=preload("res://scripts/death_wipe.gd")
 var combo=CairnCombo.new()
 var holiday="off"
+var unlocked_episodes: Array=[]
+var candy_override=false
+var weapon_day=""
 var regular_weapon="gravecleaver"
 var holiday_seen_date=""
 var score_panel: Node2D
@@ -420,9 +423,10 @@ func menu_action(label: String):
 			change_phase("title")
 
 func option_labels() -> Array:
+	refresh_weapon_day()
 	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
-	if settings_page=="game":return ["WEAPON: "+weapon_skin.replace("_"," ").to_upper(),"CONTROLS","BACK"]
+	if settings_page=="game":return (["WEAPON: "+weapon_skin.replace("_"," ").to_upper()] if available_weapons().size()>1 else [])+["CONTROLS","BACK"]
 	return ["GAME","SOUND","DISPLAY","BACK"]
 
 func close_hall():
@@ -444,6 +448,7 @@ func finish_run(outcome: String):
 		for key in ["damage_dealt","damage_taken"]:snapshot[key]=int(snapshot[key])
 		snapshot.merge({"score":int(score),"kills":kills,"episode":current_episode,"difficulty":difficulty,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
 		finished_run=records.finish(snapshot)
+		if outcome=="won":unlock_episode_weapon(current_episode)
 	if is_instance_valid(results_view):return
 	results_view=preload("res://scripts/results_view.gd").new()
 	results_view.art=art
@@ -467,6 +472,7 @@ func apply_settings(persist: bool=true):
 	if persist:
 		var config=ConfigFile.new()
 		config.set_value("game","weapon",regular_weapon)
+		config.set_value("game","unlocked_episodes",unlocked_episodes)
 		config.set_value("game","holiday_seen_date",holiday_seen_date)
 		config.set_value("audio","muted",muted)
 		config.set_value("audio","music",music_enabled)
@@ -503,6 +509,7 @@ func difficulty_damage(taken: bool) -> float:
 	return 1.0
 
 func start_game():
+	refresh_weapon_day()
 	difficulty_select=false
 	finished_run={}
 	run_stats={"id":str(Time.get_unix_time_from_system())+"-"+str(Time.get_ticks_usec()),"date":Time.get_date_string_from_system(),"time":0.0,"best_combo":0,"peak_multiplier":1,"damage_dealt":0.0,"damage_taken":0.0}
@@ -1113,7 +1120,7 @@ func _input(event: InputEvent):
 			apply_settings()
 			refresh_settings(3)
 			return
-		if options and settings_page=="game" and menu.selected==0 and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
+		if options and settings_page=="game" and available_weapons().size()>1 and menu.selected==0 and not menu.switching and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_LEFT,KEY_RIGHT]:
 			cycle_weapon(-1 if event.keycode==KEY_LEFT else 1)
 			refresh_settings(menu.selected)
 			return
@@ -1127,28 +1134,68 @@ func _input(event: InputEvent):
 			if not keys.has(code):pressed[code]=true
 			keys[code]=true
 
-# Seasonal auto-equip never overwrites the player's regular preference.
+# Permanent episode rewards and session-only seasonal access are kept separate.
+func available_weapons() -> Array:
+	var choices=["gravecleaver"]
+	for episode in [1,2,3]:
+		if episode in unlocked_episodes:choices.append(WEAPON_CHOICES[episode])
+	if candy_override or weapon_day.ends_with("-12-25"):choices.append("candy_cane")
+	return choices
+
 func initialize_weapon(settings: ConfigFile,today: String):
+	unlocked_episodes=[]
+	for episode in settings.get_value("game","unlocked_episodes",[]):
+		if int(episode) in [1,2,3] and int(episode) not in unlocked_episodes:unlocked_episodes.append(int(episode))
+	# Credit victories already present in saves from before weapon progression.
+	for episode in [1,2,3]:
+		if episode not in unlocked_episodes and records.board(CairnRunRecords.episode_scope(episode)).runs.any(func(run):return run.get("outcome")=="won"):
+			unlocked_episodes.append(episode)
+	weapon_day=today
 	regular_weapon=settings.get_value("game","weapon","gravecleaver")
-	if regular_weapon not in WEAPON_CHOICES or regular_weapon=="candy_cane":regular_weapon="gravecleaver"
+	if regular_weapon not in available_weapons() or regular_weapon=="candy_cane":regular_weapon="gravecleaver"
 	holiday_seen_date=settings.get_value("game","holiday_seen_date","")
 	weapon_skin=regular_weapon
-	# Keep available every day while testing the Christmas equipment.
-	if holiday_seen_date!=today:
+	if today.ends_with("-12-25") and holiday_seen_date!=today:
 		weapon_skin="candy_cane"
 		holiday_seen_date=today
-	holiday="christmas" if weapon_skin=="candy_cane" else "off"
+	holiday="off"
 	weapon="axe"
 
+func refresh_weapon_day():
+	var today=Time.get_date_string_from_system()
+	if today==weapon_day:return
+	weapon_day=today
+	if today.ends_with("-12-25") and holiday_seen_date!=today:
+		holiday_seen_date=today
+		equip_weapon("candy_cane")
+	elif weapon_skin not in available_weapons():equip_weapon(regular_weapon)
+
+func equip_weapon(skin: String,persist: bool=true):
+	if skin not in available_weapons():return
+	weapon_skin=skin
+	if skin!="candy_cane":regular_weapon=skin
+	holiday="off"
+	weapon="axe"
+	if not hero.is_empty():
+		hero.weapon=weapon
+		hero["weapon_skin"]=weapon_skin
+		hero["holiday"]="off"
+	if is_instance_valid(audio):apply_settings(persist)
+
+func unlock_episode_weapon(episode: int):
+	if episode not in [1,2,3] or episode in unlocked_episodes:return
+	unlocked_episodes.append(episode)
+	equip_weapon(WEAPON_CHOICES[episode],not records.path.is_empty())
+
+func unlock_candy_session():
+	candy_override=true
+	equip_weapon("candy_cane",false)
+
 func cycle_weapon(direction: int):
-	weapon_skin=WEAPON_CHOICES[posmod(WEAPON_CHOICES.find(weapon_skin)+direction,WEAPON_CHOICES.size())]
-	if weapon_skin!="candy_cane":regular_weapon=weapon_skin
-	holiday="christmas" if weapon_skin=="candy_cane" else "off"
-	weapon="sword" if weapon_skin=="sword" else "axe"
-	hero.weapon=weapon
-	hero["weapon_skin"]=weapon_skin
-	hero["holiday"]=holiday
-	apply_settings()
+	refresh_weapon_day()
+	var choices=available_weapons()
+	if choices.size()<2:return
+	equip_weapon(choices[posmod(choices.find(weapon_skin)+direction,choices.size())])
 
 func toggle_weapon():
 	cycle_weapon(1)
