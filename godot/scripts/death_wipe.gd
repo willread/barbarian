@@ -102,9 +102,9 @@ func build_letter_splats():
 					if x+dx<0 or x+dx>=W or y+dy<0 or y+dy>=H or guide.get_pixel(x+dx,y+dy).a<.7:
 						clearance=distance
 			if clearance<2.5:continue
-			candidates.append({"point":Vector2(x,y),"radius":minf(6.,clearance*.88)})
+			candidates.append({"point":Vector2(x,y),"radius":minf(6.,clearance*.88),"priority":clearance*randf_range(.8,1.2)})
 	candidates.shuffle()
-	candidates.sort_custom(func(a,b):return a.radius>b.radius)
+	candidates.sort_custom(func(a,b):return a.priority>b.priority)
 	var placed: Array=[]
 	for candidate in candidates:
 		var covered=false
@@ -115,5 +115,7 @@ func build_letter_splats():
 		if covered:continue
 		placed.append(candidate)
 		var point=candidate.point
-		var radius=candidate.radius
-		deposits.append({"x":point.x,"y":point.y,"rx":radius,"ry":radius*randf_range(.88,1.),"angle":randf()*TAU,"phase":randf()*TAU,"lobes":3+randi()%3,"roughness":.35,"amount":randf_range(.4,.6),"at":.05+point.x/W*.8+randf()*.2})
+		var radius=candidate.radius*randf_range(.82,1.08)
+		var aspect=randf_range(.72,1.0)
+		# Broad blobs, oblong splashes and irregular lobes share the inset budget.
+		deposits.append({"x":point.x,"y":point.y,"rx":radius,"ry":radius*aspect,"angle":randf()*TAU,"phase":randf()*TAU,"lobes":2+randi()%5,"roughness":randf_range(.25,.65),"amount":randf_range(.35,.7),"at":.05+point.x/W*.8+randf()*.2})
