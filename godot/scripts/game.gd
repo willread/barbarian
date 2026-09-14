@@ -1118,8 +1118,7 @@ func _process(raw: float):
 	queue_redraw()
 
 func toggle_fullscreen():
-	var fullscreen=DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN,DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
-	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if fullscreen else DisplayServer.WINDOW_MODE_FULLSCREEN)
+	WindowPreferences.toggle_fullscreen()
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
@@ -1146,10 +1145,6 @@ func _input(event: InputEvent):
 	if is_instance_valid(results_view):
 		results_view.handle(event)
 		if event is InputEventKey:get_viewport().set_input_as_handled()
-		return
-	if event is InputEventKey and event.alt_pressed and event.keycode in [KEY_ENTER,KEY_KP_ENTER]:
-		if event.pressed and not event.echo:toggle_fullscreen()
-		get_viewport().set_input_as_handled()
 		return
 	if loading_menu:return
 	if event is InputEventKey or event is InputEventMouseButton:audio.unlocked=true

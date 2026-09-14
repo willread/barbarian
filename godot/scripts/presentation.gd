@@ -38,6 +38,10 @@ func _ready():
 	game_view.process_mode=Node.PROCESS_MODE_PAUSABLE
 	get_window().size_changed.connect(layout)
 	layout()
+	# Last child receives shortcuts before the game container can consume them.
+	var shortcuts=Node.new()
+	shortcuts.set_script(load("res://scripts/window_shortcuts.gd"))
+	add_child(shortcuts)
 	show_scene(load("res://boot.tscn"))
 
 func show_scene(packed: PackedScene):

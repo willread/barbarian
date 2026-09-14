@@ -101,3 +101,8 @@ func open_scene(path: String):
 		scene.show_scene(load(path))
 	else:
 		get_tree().change_scene_to_file(path)
+
+func toggle_fullscreen():
+	var window=get_window()
+	var fullscreen=window.mode in [Window.MODE_FULLSCREEN,Window.MODE_EXCLUSIVE_FULLSCREEN]
+	window.mode=Window.MODE_WINDOWED if fullscreen else Window.MODE_FULLSCREEN
