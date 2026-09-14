@@ -9,6 +9,7 @@ func check():
 	game.hero.y=660
 	game.hero.hp=40
 	var egg=game.drop_egg(Vector2(720,660),false)
+	assert(egg.fire==null,"Regular eggs have no flames")
 	egg.height=0
 	egg.velocity=0
 	egg.advance(.01)
@@ -28,11 +29,14 @@ func check():
 	egg.advance(.3)
 	game.combo.reset()
 	egg=game.drop_egg(Vector2(720,660),true)
+	assert(egg.fire!=null and egg.fire.yellow_palette and egg.fire.menu_palette)
+	assert(egg.fire.position==Vector2(0,-egg.height-16))
 	egg.height=0
 	egg.velocity=0
 	egg.advance(.01)
 	egg.advance(.93)
 	assert(game.combo.multiplier()==10 and game.combo.hits==0 and game.combo.remaining==5)
+	assert(not egg.fire.visible,"Flames disappear when the egg is consumed")
 	assert(game.run_stats.peak_multiplier==10 and game.run_stats.best_combo==0)
 	egg.advance(.3)
 	game.combo.suspend()

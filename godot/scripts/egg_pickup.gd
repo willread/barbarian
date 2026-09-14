@@ -10,10 +10,25 @@ var collect_age=0.0
 var expired=false
 var eating=false
 var draw_scale=1.0
+var fire: ContourFire
 func _ready():
 	material=ShaderMaterial.new()
 	material.shader=preload("res://shaders/egg_shell.gdshader")
 	material.set_shader_parameter("golden",golden)
+	if golden:
+		var mask=Image.create(32,40,false,Image.FORMAT_RGBA8)
+		for y in 40:
+			for x in 32:
+				var p=(Vector2(x+.5,y+.5)/Vector2(32,40)-Vector2(.5,.5))*2.0
+				var q=Vector2(p.x/(.72+.12*p.y),p.y/.86)
+				mask.set_pixel(x,y,Color(1,1,1,1.0-smoothstep(.96,1.0,q.length_squared())))
+		fire=ContourFire.new()
+		fire.menu_palette=true
+		fire.yellow_palette=true
+		fire.show_behind_parent=true
+		add_child(fire)
+		fire.setup(ImageTexture.create_from_image(mask),Vector2(32,40),Vector2(-16,-20),false)
+		sync_fire()
 func advance(dt: float):
 	age+=dt
 	var h=game.hero
@@ -52,7 +67,15 @@ func advance(dt: float):
 		h.pickup={"age":0.0,"collected":false,"start_x":position.x,"egg":self}
 	if age>=25. and not eating:expired=true
 	z_index=int(position.y)*2+1
+	sync_fire()
 	queue_redraw()
+func sync_fire():
+	if fire==null:return
+	fire.position=Vector2(0,-height-16)
+	fire.scale=Vector2.ONE*draw_scale
+	fire.visible=not collected and not expired
+	fire.opacity=clampf((25.-age)/2.,0.,1.) if not eating else 1.0
+
 func _draw():
 	if collected:return
 	var opacity=minf(1.,(25.-age)/2.) if not eating else 1.
