@@ -56,6 +56,7 @@ var results_view: CanvasLayer
 var hall_view: CanvasLayer
 var records=CairnRunRecords.new("")
 var episode_combat=preload("res://scripts/episode_combat.gd").new()
+var debug_console: CanvasLayer
 var current_episode=1
 var run_stats: Dictionary={}
 var finished_run: Dictionary={}
@@ -214,6 +215,9 @@ func _ready():
 		audio.play(id,-8)
 		if id=="resist":hero_voice.request_line("register_unlock",0.,2.)
 	)
+	debug_console=preload("res://scripts/debug_console.gd").new()
+	debug_console.game=self
+	add_child(debug_console)
 	transition_tips=preload("res://scripts/transition_tips.gd").new()
 	add_child(transition_tips)
 	skull_node=Sprite2D.new()
@@ -1048,6 +1052,7 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	if is_instance_valid(debug_console) and debug_console.visible:return
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		audio.unlocked=true
 		if phase in ["title","paused","lost","won"] or event is InputEventJoypadButton and event.button_index==JOY_BUTTON_START:
