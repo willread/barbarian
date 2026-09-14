@@ -1,0 +1,6 @@
+{
+  "generator": "OpenAI built-in imagegen",
+  "output": "props-revision.png",
+  "prompt": "Transparent game prop asset sheet, 2 columns x 2 rows, four fully isolated complete objects, generous padding inside each equal cell, no touching. Photorealistic dark medieval swamp, weathered olive gray and tarnished brown materials, fine crisp texture, diffuse upper left lighting. Top left: paired yellowed animal femur bones dangling from a single long thin knotted string at the top, primitive witch charm. Top right: small realistic animal ribcage and spine dangling from a long thin knotted cord, witch charm, actual irregular curved skeletal anatomy. Bottom left: freestanding ancient corroded iron funeral brazier on short heavy carved pedestal and wide foot, seen front three quarter, open dark bowl at top with short iron prongs, NO FIRE NO SMOKE so fire can animate separately. Bottom right: different small bird skull and three little dangling bones tied with cord, asymmetrical witch charm, single suspension point. No ground plane, no background, real alpha transparency. Restrained dark and aged colors, no stylized cartoon or vector appearance, no text or borders. 1536 square.",
+  "existingFireSource": "godot/assets/fluid-fire-v2-0.png"
+}

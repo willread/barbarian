@@ -1,11 +1,13 @@
 export const duration=24;
 export const screens=[
- {name:'Leechwater Crossing',file:'crossing.png',mood:'Open water. Wind in the cypress.',motion:'Moss stirs in irregular gusts, a marsh heron flexes its neck, and sparse bank reeds bow from their roots.',effects:['Hanging moss','Heron on the stump','Bank reeds'],bounds:[[.08,.1,.38,.4],[.75,.42,.12,.2],[.84,.48,.14,.15]]},
- {name:'The Witch’s Hollow',file:'hollow.png',mood:'An inhabited hollow, dense with old rituals.',motion:'Bone charms swing from fixed knots, rag strips flutter in small waves, and occasional fungal spores drift from the hollow.',effects:['Bone charms','Rag strips','Fungal spores'],bounds:[[.2,.22,.3,.32],[.29,.22,.2,.34],[.22,.3,.22,.25]]},
- {name:'The Drowned Procession',file:'procession.png',mood:'Two bell towers. A broken ceremonial route.',motion:'The great bell and the smaller bell swing with different weights and independently moving clappers. A loose chain shifts against the ruined stone.',effects:['Great funeral bell','Small funeral bell','Loose chain'],bounds:[[.14,.12,.2,.35],[.7,.2,.16,.3],[.4,.26,.05,.2]]},
+ {name:'Leechwater Crossing',file:'crossing.png',mood:'Open water. Wind in the cypress.',motion:'A flock of marsh birds crosses the water with staggered wingbeats. Longer moss strands catch the wind while reeds bow along the bank.',effects:['Hanging moss','Crossing marsh flock','Bank reeds'],bounds:[[.08,.1,.38,.4],[0,.24,1,.3],[.84,.48,.14,.15]]},
+ {name:'The Witch’s Hollow',file:'hollow.png',mood:'An inhabited hollow, dense with old rituals.',motion:'A dense mix of skull charms, paired bones and rib mobiles swings at different lengths. Rag strips flutter between them and fungal spores drift from the hollow.',effects:['Bone charms','Rag strips','Fungal spores'],bounds:[[.2,.22,.3,.32],[.29,.22,.2,.34],[.22,.3,.22,.25]]},
+ {name:'The Drowned Procession',file:'procession.png',mood:'Two bell towers. A broken ceremonial route.',motion:'Two bells swing on short iron suspension brackets, with clappers seated inside their mouths. A funeral brazier burns beside the processional route, shedding rising embers.',effects:['Great funeral bell','Small funeral bell','Funeral brazier and embers'],bounds:[[.14,.12,.2,.35],[.7,.2,.16,.3],[.58,.29,.09,.24]]},
  {name:'The Sunken Throne',file:'throne.png',mood:'The court survives. The king still rules.',motion:'Two tattered royal standards ripple below their fixed crossbars. Corroded ceremonial pendants turn and sway beside the raised throne.',effects:['Royal standards','Iron pendants'],bounds:[[.28,.25,.14,.29],[.61,.25,.13,.29]]}
 ];
 export const assetFiles=Object.fromEntries(['moss','charm','rag','bell','banner','pendant','reeds','branch','heron'].map(key=>[key,key+'.png']));
+assetFiles.fire='fire.png';
+for(const key of ['paired-bones','ribs','brazier','bird-skull'])assetFiles[key]=key+'.png';
 const TAU=Math.PI*2;
 const sine=(t,period,offset=0)=>Math.sin(TAU*(t/period+offset));
 const random=i=>{const a=Math.sin(i*127.1+311.7)*43758.5453;return a-Math.floor(a)};
@@ -44,28 +46,65 @@ function chain(g,x,y,length,t,active,phase=0){
 }
 function bell(g,image,x,y,w,h,t,period,phase,active){
  const a=active?.105*sine(t,period,phase):0;
- chain(g,x,y,20,0,false);
- g.save();g.translate(x,y+20);g.rotate(a);
- // A clapper has its own delayed pendulum, visible beneath the mouth.
- g.save();g.translate(0,h*.46);g.rotate(active?-.15*sine(t,period,phase+.14):0);
- const metal=g.createLinearGradient(-3,0,4,0);metal.addColorStop(0,'#242721');metal.addColorStop(.6,'#776d51');metal.addColorStop(1,'#30372c');g.fillStyle=metal;
- g.fillRect(-1.8,0,3.6,h*.55);g.beginPath();g.ellipse(0,h*.55,4.4,6.5,0,0,TAU);g.fill();g.restore();
- g.drawImage(image,-w/2,0,w,h);g.restore();
+ const fit=Math.min(w/image.width,h/image.height);w=image.width*fit;h=image.height*fit;
+ // Short fixed iron yoke. Only the bell and its internal clapper pivot.
+ g.save();g.translate(x,y);
+ g.strokeStyle='#232825';g.lineWidth=5;g.beginPath();g.moveTo(-9,3);g.lineTo(9,3);g.moveTo(0,0);g.lineTo(0,12);g.stroke();
+ g.strokeStyle='#8b8872';g.lineWidth=1;g.beginPath();g.moveTo(-9,1);g.lineTo(9,1);g.stroke();
+ g.translate(0,12);g.rotate(a);
+ g.drawImage(image,-w/2,0,w,h);
+ g.save();g.translate(0,h*.86);g.rotate(active?-.17*sine(t,period,phase+.14):0);
+ g.strokeStyle='#242820';g.lineWidth=2.7;g.beginPath();g.moveTo(0,0);g.lineTo(0,h*.075);g.stroke();
+ g.fillStyle='#69644b';g.beginPath();g.ellipse(0,h*.075,3.4,4.5,0,0,TAU);g.fill();g.restore();
+ g.restore();
+}
+function flock(g,t,active){
+ const ft=active?t:0;
+ for(let i=0;i<7;i++){
+  // Reset well outside the viewport; each flock follows a wide diagonal route.
+  const p=((ft/12+.2+i*.019)%1);
+  const x=-200+p*1680+i*12,y=206+Math.sin(p*Math.PI)*48+random(i+60)*76;
+  const size=19+(i%3)*3,flap=sine(ft, .75,i*.17);
+  g.save();g.translate(x,y);g.rotate(-.07);g.fillStyle='#262e2b';
+  g.beginPath();g.ellipse(0,0,7,2.8,-.08,0,TAU);g.fill();
+  g.beginPath();g.moveTo(-3,0);g.quadraticCurveTo(-size*.55,-7-flap*size*.7,-size,-3-flap*size);
+  g.lineTo(-size*.7,2-flap*size*.75);g.quadraticCurveTo(-size*.25,5,3,2);g.fill();
+  g.beginPath();g.moveTo(1,0);g.quadraticCurveTo(size*.3,-8-flap*size*.55,size*.8,-3-flap*size*.85);
+  g.lineTo(size*.6,3-flap*size*.55);g.lineTo(0,2);g.fill();
+  g.beginPath();g.moveTo(5,-1);g.lineTo(11,-4);g.lineTo(16,-3);g.lineTo(9,-1);g.lineTo(6,2);g.fill();
+  g.beginPath();g.moveTo(-5,0);g.lineTo(-14,3);g.lineTo(-6,3);g.fill();g.restore();
+ }
+}
+function brazier(g,fire,t,active,body){
+ const x=789,y=373,ft=active?t:0;
+ g.save();g.translate(x,y);
+ // Existing 8x8 game fire atlas: discrete frames, no frame blending.
+ const frame=Math.floor(ft*24)%64,sw=fire.width/8,sh=fire.height/8;
+ g.globalCompositeOperation='screen';
+ g.drawImage(fire,frame%8*sw,Math.floor(frame/8)*sh,sw,sh,-43,-159,86,99);
+ g.globalCompositeOperation='source-over';
+ sprite(g,body,0,-94,84,96);
+ if(active)for(let i=0;i<10;i++){
+  const p=(ft/3+random(i))%1;g.globalAlpha=Math.sin(p*Math.PI);
+  g.fillStyle=i%2?'#e9a94d':'#cc6629';g.fillRect(Math.sin(p*5+i)*12,-67-p*76,1.5,2.5);
+ }
+ g.restore();
 }
 export function drawScenery(g,index,image,a,time,enabled=[true,true,true]){
  const t=((time%duration)+duration)%duration;
  g.clearRect(0,0,1280,720);g.drawImage(image,0,0,1280,720);
  if(index===0){
-  for(const [x,y,w,h,p] of [[187,74,38,152,.1],[329,105,29,125,.4],[479,145,24,104,.7]])ribbon(g,a.moss,x,y,w,h,enabled[0]?t:0,p,enabled[0]?5:0);
-  ribbon(g,a.heron,1030,264,48,75,enabled[1]?t:0,.2,enabled[1]?5:0,'bird');
+  for(const [x,y,w,h,p] of [[187,74,48,184,.1],[329,105,38,154,.4],[479,145,31,128,.7]])ribbon(g,a.moss,x,y,w,h,enabled[0]?t:0,p,enabled[0]?12:0);
+  flock(g,t,enabled[1]);
   for(const [x,y,w,h,p] of [[1170,386,72,81,.1],[1219,395,46,61,.6]])ribbon(g,a.reeds,x,y,w,h,t,p,enabled[2]?4:0,'root');
  }else if(index===1){
-  for(const [x,y,w,h,p] of [[290,180,30,92,.1],[515,207,24,81,.45],[558,180,29,104,.8]])charm(g,a.charm,x,y,w,h,t,p,enabled[0]);
+  for(const [x,y,w,h,p] of [[290,180,38,122,.1],[515,207,32,108,.45],[558,180,35,133,.8],[361,124,26,104,.63],[459,149,31,139,.27]])charm(g,p===.63||p===.8?a['bird-skull']:a.charm,x,y,w,h,t,p,enabled[0]);
+  for(const [x,y,l,p,k] of [[321,154,57,.13,0],[405,126,67,.51,1],[487,185,63,.76,0],[538,186,96,.33,1]])charm(g,k===0?a['paired-bones']:a.ribs,x,y,40,l+46,t,p,enabled[0]);
   for(const [x,y,w,h,p] of [[335,171,19,103,.3],[488,183,16,88,.8]])ribbon(g,a.rag,x,y,w,h,t,p,enabled[1]?8:0);
  }else if(index===2){
   bell(g,a.bell,307,98,91,105,t,8,.06,enabled[0]);
   bell(g,a.bell,1005,180,63,77,t,6,.39,enabled[1]);
-  chain(g,470,194,86,t,enabled[2],.35);
+  brazier(g,a.fire,t,enabled[2],a.brazier);
  }else{
   for(const [x,y,w,h,p] of [[412,99,80,163,.12],[872,99,80,163,.68]])ribbon(g,a.banner,x,y,w,h,t,p,enabled[0]?11:0);
   for(const [x,y,w,h,p] of [[357,106,24,78,.2],[921,106,24,78,.7]]){
@@ -95,3 +134,4 @@ export function drawActor(g,x,y){
  g.beginPath();g.arc(0,-122,10,0,TAU);g.fill();g.stroke();
  g.beginPath();g.moveTo(-12,-108);g.lineTo(12,-108);g.lineTo(21,-74);g.lineTo(12,-68);g.lineTo(9,-84);g.lineTo(7,-56);g.lineTo(12,0);g.lineTo(1,0);g.lineTo(-2,-47);g.lineTo(-12,0);g.lineTo(-22,0);g.lineTo(-11,-57);g.lineTo(-11,-86);g.lineTo(-24,-65);g.lineTo(-30,-72);g.closePath();g.fill();g.stroke();g.restore();
 }
+
