@@ -20,7 +20,18 @@ try{
   else if(t<4.7){phase=4-(t-4.25)/.15;label='Reverse · hands withdraw';}
   else if(t<6.1){phase=1-(t-4.7)/1.4;label='Reverse · mire recedes';}
   else{phase=0;label='Gone';}
-  gl.uniform1f(gl.getUniformLocation(program,"clock"),t);gl.uniform1f(formation,Math.max(0,Math.min(1,phase)));gl.uniform1f(pose,Math.max(0,Math.min(3,phase-1)));gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.uniform1i(gl.getUniformLocation(program,'part'),0);gl.drawArrays(gl.TRIANGLES,0,6);mud.clearRect(0,0,960,480);mud.drawImage(canvas,0,0);gl.clear(gl.COLOR_BUFFER_BIT);for(const part of [2,1,4,3]){gl.uniform1i(gl.getUniformLocation(program,'part'),part);gl.drawArrays(gl.TRIANGLES,0,6);}
+  gl.uniform1f(formation,Math.max(0,Math.min(1,phase)));gl.uniform1f(pose,Math.max(0,Math.min(3,phase-1)));
+  const layout=$('clump').value, count=Number(layout.slice(-1)),vertical=layout.startsWith('v');
+  const spots=Array.from({length:count},(_,i)=>({x:vertical?Math.sin(i*7)*8:(i-(count-1)/2)*120,y:vertical?(i-(count-1)/2)*24:Math.sin(i*7)*3,seed:13+i*27})).sort((a,b)=>a.y-b.y);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+  for(const part of [0,1]){
+   for(const spot of spots){
+    gl.viewport((256+spot.x-72)*960/512,(256-(194+spot.y-98.8)-130)*480/256,144*960/512,130*480/256);
+    gl.uniform1f(gl.getUniformLocation(program,'seed'),spot.seed);gl.uniform1f(gl.getUniformLocation(program,'clock'),t+spot.seed*.01);
+    gl.uniform1i(gl.getUniformLocation(program,'part'),part);gl.drawArrays(gl.TRIANGLES,0,6);
+   }
+   if(part===0){mud.clearRect(0,0,960,480);mud.drawImage(canvas,0,0);gl.clear(gl.COLOR_BUFFER_BIT);}
+  }
   $('phase').textContent=label+' · '+t.toFixed(2)+'s';$('timeline').value=t;
   const file=t<1.4?3:t<6.1?4:0;if($('hag').dataset.frame!==String(file)){$('hag').src='/godot/assets/enemy-witch-'+file+'.png';$('hag').dataset.frame=file;}
  }

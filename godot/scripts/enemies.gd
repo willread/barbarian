@@ -285,12 +285,27 @@ func hag_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	var dx=h.x-e.x
 	var dy=h.y-e.y
 	e.dir=1 if dx>=0 else -1
-	if not e.aiRest:
-		if abs(dx)<190 and abs(dy)<36:
-			m.begin(e,"hagClaw")
-		elif abs(dx)<650 and abs(dy)<140 and e.get("mire_count",0)<3:
-			if m.begin(e,"mireCast"):e.attack["target"]=Vector2(h.x,h.y)
-	if e.attack.is_empty() and abs(dx)<220 and e.x>190 and e.x<1250:return Vector2(-e.dir*.6,0)
+	e["hag_move_cooldown"]=max(0,e.get("hag_move_cooldown",120)-1)
+	if not e.aiRest and abs(dx)<150 and abs(dy)<36:
+		m.begin(e,"hagClaw")
+		return Vector2.ZERO
+	# Retreat while crowded; slip along the lane when a wall blocks backing away.
+	if abs(dx)<300 and abs(dy)<65:
+		var away=-e.dir
+		if (away<0 and e.x<200) or (away>0 and e.x>1240):
+			return Vector2(0,1 if e.y<h.y else -1)*.7
+		return Vector2(away*.8,signf(e.y-h.y)*.25)
+	if e.get("hag_move_ticks",0)>0:
+		e.hag_move_ticks-=1
+		return e.hag_move_direction
+	if e.hag_move_cooldown==0:
+		e.hag_move_cooldown=randi_range(150,270)
+		e["hag_move_ticks"]=randi_range(25,50)
+		var side=-e.dir if abs(dx)<430 else (-1 if e.x>720 else 1)
+		e["hag_move_direction"]=Vector2(side*.55,randf_range(-.4,.4))
+		return e.hag_move_direction
+	if not e.aiRest and abs(dx)<650 and abs(dy)<140 and e.get("mire_count",0)<3:
+		if m.begin(e,"mireCast"):e.attack["target"]=Vector2(h.x,h.y)
 	return Vector2.ZERO
 
 static func boss_open(e: Dictionary) -> bool:

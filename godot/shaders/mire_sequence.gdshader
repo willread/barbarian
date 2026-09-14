@@ -19,12 +19,8 @@ void fragment(){
   row=0.0;
   float r=hash(vec2(float(part)*7.13,seed));
   float r2=hash(vec2(seed,float(part)*19.71));
-  vec2 root=vec2(.24,.755);
-  if(part==2)root=vec2(.42,.71);
-  if(part==3)root=vec2(.59,.80);
-  if(part==4)root=vec2(.77,.755);
-  root.x+=(r-.5)*.035;
-  vec2 size=vec2(.27+r*.07,.53+r2*.19);
+  vec2 root=vec2(.5,.76);
+  vec2 size=vec2(.50+r*.10,.53+r2*.19);
   // Rotate around the buried wrist, never around the sprite center.
   vec2 d=UV-root;
   float angle=(r2-.5)*.42;

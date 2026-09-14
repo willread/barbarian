@@ -2,7 +2,7 @@ extends Node2D
 # Fresh isolated oil hands and animated oil slick, with independent depth sorting.
 const FORM_SECONDS=1.4
 const HAND_STEP_SECONDS=.15
-const DRAW_RECT=Rect2(-156,-118.3,312,156)
+const DRAW_RECT=Rect2(-72,-98.8,144,130)
 var texture: Texture2D
 var mode=0
 var progress=0.0
@@ -13,31 +13,32 @@ var finished=false
 var exit_start=0.0
 var exit_age=0.0
 var layers: Array=[]
-var seed=randf()*1000.0
+var spots: Array=[]
 
 func _ready():
-	for part in 5:
-		var layer=Sprite2D.new()
-		layer.centered=false
-		layer.texture=texture
-		layer.position=DRAW_RECT.position
-		layer.scale=DRAW_RECT.size/texture.get_size()
-		layer.z_as_relative=false
-		layer.material=ShaderMaterial.new()
-		layer.material.shader=preload("res://shaders/mire_sequence.gdshader")
-		layer.material.set_shader_parameter("part",part)
-		layer.material.set_shader_parameter("seed",seed)
-		add_child(layer)
-		layers.append(layer)
+	spots=preload("res://scripts/mire_layout.gd").spots(position)
+	for spot in spots:
+		for part in 2:
+			var layer=Sprite2D.new()
+			layer.centered=false
+			layer.texture=texture
+			layer.position=DRAW_RECT.position+spot.offset
+			layer.scale=DRAW_RECT.size/texture.get_size()
+			layer.z_as_relative=false
+			layer.material=ShaderMaterial.new()
+			layer.material.shader=preload("res://shaders/mire_sequence.gdshader")
+			layer.material.set_shader_parameter("part",part)
+			layer.material.set_shader_parameter("seed",spot.seed)
+			add_child(layer)
+			layers.append(layer)
 
 func refresh_layers():
-	for part in layers.size():
-		var layer=layers[part]
+	for i in layers.size():
+		var layer=layers[i]
+		var spot=spots[i/2]
 		layer.visible=not finished
-		# Each root has its own ground depth; mud is beneath all fighters.
-		var root_y=[0.0,-.52,-7.54,6.5,-.52][part]
-		layer.z_index=-4 if part==0 else int((position.y+root_y)*2)+part
-		layer.material.set_shader_parameter("clock",clock)
+		layer.z_index=-4 if i%2==0 else int((position.y+spot.offset.y)*2)+1
+		layer.material.set_shader_parameter("clock",clock+spot.seed*.01)
 		layer.material.set_shader_parameter("formation",clampf(phase,0,1))
 		layer.material.set_shader_parameter("pose",clampf(phase-1,0,3))
 

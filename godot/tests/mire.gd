@@ -43,14 +43,13 @@ func check():
 	combat.sync_views(game)
 	assert(combat.mire_views.size()==1)
 	var view=combat.mire_views[combat.mire_id(patch)]
-	assert(view.layers.size()==5 and view.mode==1)
-	assert(view.DRAW_RECT.size==Vector2(312,156))
-	assert(view.layers[0].z_index==-4,"Mud remains behind fighters")
-	var depths=[]
-	for hand in view.layers.slice(1):
-		assert(not hand.z_as_relative and hand.z_index not in depths)
-		depths.append(hand.z_index)
-	assert(depths.min()<1360 and depths.max()>1360,"Hands straddle the player at the pool center")
+	assert(view.spots.size() in [3,4] and view.layers.size()==view.spots.size()*2)
+	assert(view.DRAW_RECT.size==Vector2(144,130))
+	for i in view.layers.size():
+		assert(not view.layers[i].z_as_relative)
+		if i%2==0:assert(view.layers[i].z_index==-4)
+	for spot in view.spots:
+		assert(combat.MireLayout.contains(patch.p,patch.p+spot.offset))
 	var pixels=view.texture.get_image()
 	assert(pixels.get_pixel(0,0).a<.01,"Effect must have real alpha, not a checkerboard")
 	game.hero.x=720;game.hero.y=680;game.hero.hp=100
@@ -100,6 +99,13 @@ func check():
 	hag.attack={};hag.aiRest=0
 	game.hero.x=100
 	assert(game.e_ai.intent(hag,game.hero,true)==Vector2.ZERO and hag.attack.is_empty(),"Hag must not chase")
+	hag.aiRest=60;game.hero.x=hag.x-220
+	assert(game.e_ai.intent(hag,game.hero,true).x>0,"Hag retreats from nearby hero")
+	hag.hag_move_cooldown=0;game.hero.x=100
+	assert(game.e_ai.intent(hag,game.hero,true)!=Vector2.ZERO,"Hag periodically repositions")
+	combat.hazards=[patch]
+	var fresh=combat.place_clump(game,hag,patch.p)
+	assert(fresh==null or not combat.MireLayout.overlaps(fresh,patch.p))
 	print("CAIRN_MIRE_OK: heavy slow, health drain, limited jump, independent patches, owner death and defensive claw")
 	game.queue_free()
 	await process_frame

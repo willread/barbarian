@@ -1,7 +1,7 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
-const MIRE_RADIUS=Vector2(123.5,37.7)
+const MireLayout=preload("res://scripts/mire_layout.gd")
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
 const MIRE_DRAIN=2.2 # About 3 player HP/s at the game's default damage tuning.
@@ -18,7 +18,7 @@ func mire_id(h: Dictionary) -> String:
 func mire_at(actor: Dictionary) -> Dictionary:
 	if actor.height>12:return {}
 	for h in hazards:
-		if h.kind=="mire" and h.owner.hp>0 and h.age<h.life and ((Vector2(actor.x,actor.y)-h.p)/MIRE_RADIUS).length_squared()<1:return h
+		if h.kind=="mire" and h.owner.hp>0 and h.age<h.life and MireLayout.contains(h.p,Vector2(actor.x,actor.y)):return h
 	return {}
 
 func prepare_actor(actor: Dictionary):
@@ -66,12 +66,36 @@ func show_mire(game,id: String,p: Vector2,mode: int,progress: float,time: float)
 	if not mire_views.has(id):
 		var view=preload("res://scripts/mire_effect.gd").new()
 		view.texture=game.art.texture("mire-oil-v2.png")
+		view.position=p
 		game.arena_clip.add_child(view)
 		mire_views[id]=view
 	var view=mire_views[id]
 	view.position=p
 	view.z_index=0
 	view.configure(mode,progress,time)
+
+func place_clump(game,owner,target: Vector2) -> Variant:
+	var occupied=[]
+	for h in hazards:
+		if h.kind=="mire":occupied.append(h.p)
+	for view in retiring_mire:occupied.append(view.position)
+	for enemy in game.enemies:
+		if enemy!=owner and enemy.attack.get("type","")=="mireCast" and enemy.attack.get("placed",false):occupied.append(enemy.attack.target)
+	var candidates=[target]
+	for ring in range(1,7):
+		for direction in [Vector2(1,0),Vector2(-1,0),Vector2(0,1),Vector2(0,-1),Vector2(1,1),Vector2(-1,-1),Vector2(1,-1),Vector2(-1,1)]:
+			candidates.append(target+direction*Vector2(100,35)*ring)
+	for point in candidates:
+		var valid=true
+		for spot in MireLayout.spots(point):
+			var center=point+spot.offset
+			if center.x<75 or center.x>1365:valid=false;break
+			for edge in [Vector2(0,-14),Vector2(0,14)]:
+				var probe={"x":center.x,"y":center.y+edge.y}
+				game.background.constrain(probe)
+				if absf(probe.y-center.y-edge.y)>1:valid=false
+		if valid and not occupied.any(func(other):return MireLayout.overlaps(point,other)):return point
+	return null
 
 func step(game,dt: float):
 	# Every patch is owned by its caster; none survive that caster's death.
@@ -81,6 +105,14 @@ func step(game,dt: float):
 		enemy["hazard_live"]=hazards.any(func(h):return h.owner.id==enemy.id)
 		enemy["mire_count"]=hazards.filter(func(h):return h.kind=="mire" and h.owner.id==enemy.id).size()
 		var a=enemy.attack
+		if a.get("type","")=="mireCast" and not a.get("placed",false):
+			var placement=place_clump(game,enemy,a.target)
+			if placement==null:
+				enemy.attack={}
+				enemy.aiRest=60
+				continue
+			a.target=placement
+			a.placed=true
 		if enemy.hp<=0 or a.is_empty() or a.age!=a.from:continue
 		var target=a.get("target",Vector2(enemy.x,enemy.y))
 		match a.type:
@@ -132,7 +164,7 @@ func movement(actor: Dictionary,before: Vector2):
 	actor["mired"]=false
 	if actor.height>12 or not actor.down.is_empty():return
 	for h in hazards:
-		if h.kind=="mire" and h.owner.hp>0 and not actor.mired and ((Vector2(actor.x,actor.y)-h.p)/MIRE_RADIUS).length_squared()<1:
+		if h.kind=="mire" and h.owner.hp>0 and not actor.mired and MireLayout.contains(h.p,Vector2(actor.x,actor.y)):
 			actor.x=lerpf(before.x,actor.x,MIRE_SPEED)
 			actor.y=lerpf(before.y,actor.y,MIRE_SPEED)
 			actor.mired=true
