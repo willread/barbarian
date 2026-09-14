@@ -229,7 +229,7 @@ func _ready():
 	pause_skull=skull_node.duplicate()
 	pause_skull.material=skull_node.material.duplicate()
 	pause_skull.top_level=true
-	pause_skull.z_index=2095
+	pause_skull.z_index=2110
 	add_child(pause_skull)
 	hero=make_actor(720,660,100,true)
 	loading_menu=OS.has_feature("web")
@@ -288,7 +288,6 @@ func change_phase(next: String):
 		audio.stop_gameplay()
 		hero_voice.reset()
 	if next=="paused":
-		pause_cover=1.0
 		title_intro=1.25
 		options=false
 		settings_page=""
@@ -296,7 +295,7 @@ func change_phase(next: String):
 		pause_cover=0.0
 		title_intro=0.0
 	phase=next
-	overlay.z_index=2090 if next in ["lost","won","paused"] else 2000
+	overlay.z_index=2090 if next in ["lost","won","paused"] or pause_cover>0 else 2000
 	bindings.clear()
 	keys.clear()
 	pressed.clear()
@@ -977,7 +976,7 @@ func _process(raw: float):
 				spawn_wave()
 				begin_walk("enter")
 		if transition>=CLOSE+HOLD+OPEN: transition=-1
-	var frozen=phase in ["paused","lost","won"]
+	var frozen=phase in ["paused","lost","won"] or pause_cover>0
 	var dt=0.0 if frozen else raw*(.3 if phase=="dying" and hero.death<1.3 else 1)
 	clock+=dt
 	if not frozen:
@@ -996,11 +995,13 @@ func _process(raw: float):
 	scenery_shade.visible=phase!="title" and background.screen.is_empty()
 	heat_node.material.set_shader_parameter("clock",clock)
 	pause_cover=move_toward(pause_cover,1.0 if phase=="paused" else 0.0,raw/.65)
-	pause_skull.visible=false
+	pause_skull.visible=pause_cover>0 and pause_cover<1
 	pause_skull.position=Vector2.ZERO
 	pause_skull.scale=screen_size/512.0
-	pause_skull.material.set_shader_parameter("progress",1.0-pause_cover)
-	if phase=="paused": menu.modulate.a=smoothstep(.8,1.0,pause_cover)
+	pause_skull.material.set_shader_parameter("progress",absf(2.0*pause_cover-1.0))
+	if phase in ["paused","playing"]:
+		menu.visible=pause_cover>=.5
+		menu.modulate.a=1.0
 	else: menu.modulate.a=1.0
 	transition_tips.update(transition if phase=="playing" else -1.0,CLOSE,HOLD,screen_size)
 	skull_node.position=Vector2.ZERO
@@ -1485,11 +1486,11 @@ func draw_hud():
 	score_panel.queue_redraw()
 
 func draw_overlay():
-	if phase=="paused":
+	if pause_cover>=.5:
 		var factor=max(screen_size.x/title_background.get_width(),screen_size.y/title_background.get_height())
 		var painting_size=title_background.get_size()*factor
 		overlay.draw_texture_rect(title_background,Rect2((screen_size-painting_size)*.5,painting_size),false)
-	if phase in ["title","paused"]:
+	if phase=="title" or pause_cover>=.5:
 		var tall=screen_size.y>1200
 		# Share the menu's actual anchor; keep generous gutters in the open art column.
 		var center=menu.to_global(Vector2(417.6,0)).x
@@ -1705,7 +1706,7 @@ func responsive_layout():
 	hud.position=Vector2(0,screen_size.y-1062*hud_scale)
 	overlay.position=Vector2.ZERO
 	overlay.scale=Vector2.ONE
-	menu.layout_screen(screen_size,phase in ["title","paused"])
+	menu.layout_screen(screen_size,phase in ["title","paused"] or pause_cover>0)
 	if is_instance_valid(wipe):
 		wipe.top_level=true
 		wipe.position=Vector2.ZERO

@@ -7,7 +7,9 @@ func check():
 	game.transition=-1
 	game.stage_walk=""
 	game.change_phase("paused")
-	await create_timer(1.1).timeout
+	await create_timer(.15).timeout
+	assert(game.pause_skull.visible and not game.menu.visible)
+	await create_timer(.95).timeout
 	assert(game.pause_cover==1.0 and not game.pause_skull.visible)
 	assert(game.menu.title_mode and not game.menu.compact_pause)
 	assert(game.menu.items[0].label=="RETURN TO BATTLE")
@@ -26,7 +28,9 @@ func check():
 	await create_timer(.6).timeout
 	assert(game.menu.items[0].label=="RETURN TO BATTLE")
 	game.menu_action("RETURN TO BATTLE")
-	await create_timer(.7).timeout
+	await create_timer(.15).timeout
+	assert(game.pause_skull.visible and game.menu.visible)
+	await create_timer(.55).timeout
 	assert(game.phase=="playing" and game.pause_cover==0.0)
 	game.change_phase("paused")
 	game.menu_action("QUIT TO TITLE")
