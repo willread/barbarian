@@ -11,7 +11,6 @@ var mask_view: SubViewport
 var burn: ShaderMaterial
 var assembly: Node2D
 func _ready():
-	get_window().content_scale_size=Vector2i(1440,810)
 	art=CairnArt.new()
 	rebuild()
 	if "--study-capture" in OS.get_cmdline_user_args():capture.call_deferred()

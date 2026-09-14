@@ -24,6 +24,9 @@ func _ready():
 	else:
 		windowed_size=window.size
 		windowed_position=window.position
+	window.min_size=Vector2i(640,360)
+	constrain_window()
+	window.size_changed.connect(constrain_window.call_deferred)
 	last_state=current_state()
 	window.close_requested.connect(save_window)
 func current_state() -> Dictionary:
@@ -45,3 +48,32 @@ func _process(dt: float):
 	if elapsed<.5:return
 	elapsed=0
 	if current_state()!=last_state:save_window()
+
+# Quantize to whole 16x9 units: no stretched client area, even after OS snapping.
+static func fit_window_size(requested: Vector2i, limit: Vector2i, previous: Vector2i=Vector2i.ZERO) -> Vector2i:
+	var units=roundi(float(requested.x)/16.0)
+	if previous!=Vector2i.ZERO and abs(requested.y-previous.y)>abs(requested.x-previous.x):
+		units=roundi(float(requested.y)/9.0)
+	var maximum=maxi(1,mini(limit.x/16,limit.y/9))
+	return Vector2i(16,9)*clampi(units,mini(40,maximum),maximum)
+
+func constrain_window():
+	if not enabled:return
+	var window=get_window()
+	if window.mode in [Window.MODE_FULLSCREEN,Window.MODE_EXCLUSIVE_FULLSCREEN,Window.MODE_MINIMIZED]:return
+	var area=DisplayServer.screen_get_usable_rect(window.current_screen)
+	# Leave room for the native title bar and resize borders.
+	var limit=area.size-Vector2i(16,48)
+	var maximized=window.mode==Window.MODE_MAXIMIZED
+	var target=fit_window_size(limit if maximized else window.size,limit,Vector2i.ZERO if maximized else windowed_size)
+	if maximized:window.mode=Window.MODE_WINDOWED
+	if window.size!=target:window.size=target
+	if maximized:window.position=area.position+(area.size-target)/2
+	windowed_size=target
+
+func open_scene(path: String):
+	var scene=get_tree().current_scene
+	if is_instance_valid(scene) and scene.has_method("show_scene"):
+		scene.show_scene(load(path))
+	else:
+		get_tree().change_scene_to_file(path)

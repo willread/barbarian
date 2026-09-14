@@ -123,10 +123,10 @@ func _ready():
 			pressed.clear()
 			if phase=="playing":change_phase("paused"))
 	if "--enemy-fire-study" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('enemy-fire-study')")):
-		get_tree().change_scene_to_file.call_deferred("res://enemy_fire_study.tscn")
+		WindowPreferences.open_scene.call_deferred("res://enemy_fire_study.tscn")
 		return
 	if "--fire-study" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('fire-study')")):
-		get_tree().change_scene_to_file.call_deferred("res://fire_study.tscn")
+		WindowPreferences.open_scene.call_deferred("res://fire_study.tscn")
 		return
 	arena_clip=Control.new()
 	arena_clip.size=Vector2(1440,810)
@@ -1798,8 +1798,7 @@ func responsive_layout():
 	var window_size=get_window().size
 	if window_size==last_window_size:return
 	last_window_size=window_size
-	screen_size=Vector2(1440,1440.0*window_size.y/max(1,window_size.x))
-	get_window().content_scale_size=Vector2i(screen_size)
+	screen_size=Vector2(1440,810)
 	var hud_scale=clamp(screen_size.y*.23/252.,.4,1.)
 	var hud_height=252*hud_scale
 	# Fit the arena width, reserving the upper painting as vertical crop space.

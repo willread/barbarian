@@ -7,7 +7,6 @@ var selected=0
 var strength=0.6
 var dark=false
 func _ready():
-	get_window().content_scale_size=Vector2i(1440,810)
 	art=CairnArt.new()
 	for i in 2:
 		var meta=art.data.menu[["BEGIN","OPTIONS"][i]]
@@ -40,7 +39,7 @@ func _input(event: InputEvent):
 			strength=clamp(strength+(.1 if event.keycode==KEY_RIGHT else -.1),.5,1.4)
 			for fire in fires:fire.strength=strength
 			queue_redraw()
-		if event.keycode==KEY_ESCAPE:get_tree().change_scene_to_file("res://main.tscn")
+		if event.keycode==KEY_ESCAPE:WindowPreferences.open_scene("res://main.tscn")
 	if event is InputEventMouseMotion:
 		var p=get_global_mouse_position()
 		if p.x>200 and p.x<640 and p.y>390 and p.y<635:select(0 if p.y<510 else 1)

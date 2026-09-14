@@ -132,7 +132,7 @@ func handle(event: InputEvent):
 		if event.keycode in [KEY_UP,KEY_W]: select(selected-1)
 		if event.keycode in [KEY_ENTER,KEY_SPACE]: activate()
 	if event is InputEventMouseMotion or event is InputEventMouseButton:
-		var mouse=get_local_mouse_position()
+		var mouse=get_global_transform_with_canvas().affine_inverse()*event.position
 		for i in items.size():
 			var item=items[i]
 			if Rect2(item.node.position-Vector2(item.width*.5,0),Vector2(item.width,item.height)).has_point(mouse):

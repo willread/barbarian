@@ -8,7 +8,7 @@ var white_layer: Node2D
 func _ready():
 	# Browser has an HTML splash while the engine itself downloads.
 	if OS.has_feature("web") or (not OS.get_cmdline_user_args().is_empty() and not "--splash-capture" in OS.get_cmdline_user_args()):
-		get_tree().change_scene_to_file.call_deferred("res://main.tscn")
+		WindowPreferences.open_scene.call_deferred("res://main.tscn")
 		return
 	get_window().size_changed.connect(fit_window)
 	fit_window()
@@ -35,7 +35,7 @@ func _process(dt: float):
 	white_layer.queue_redraw()
 	queue_redraw()
 	if elapsed>=6.0 and ResourceLoader.load_threaded_get_status("res://main.tscn")==ResourceLoader.THREAD_LOAD_LOADED:
-		get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get("res://main.tscn"))
+		WindowPreferences.open_scene("res://main.tscn")
 func _draw():
 	if not picture:return
 	var screen=get_viewport_rect().size
@@ -76,8 +76,5 @@ func draw_white_logo():
 	white_layer.draw_texture_rect(flat,Rect2((screen-size)*.5,size),false,Color(1,1,1,smoothstep(3.0,4.2,elapsed)))
 
 func fit_window():
-	var dimensions=get_window().size
-	var target=Vector2i(1440,roundi(1440.0*dimensions.y/maxi(1,dimensions.x)))
-	if get_window().content_scale_size!=target:get_window().content_scale_size=target
 	queue_redraw()
 	if is_instance_valid(white_layer):white_layer.queue_redraw()

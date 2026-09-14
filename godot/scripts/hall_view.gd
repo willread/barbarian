@@ -68,7 +68,7 @@ func _ready():
 	reveal_selected.call_deferred()
 
 func layout():
-	var pixels=Vector2(get_window().size)
+	var pixels=get_viewport().get_visible_rect().size
 	var width=minf(1920,pixels.x)
 	viewport_size=Vector2(width,pixels.y*width/maxf(1,pixels.x))
 	transform=Transform2D(0,Vector2.ZERO).scaled(Vector2.ONE*(get_viewport().get_visible_rect().size.x/width))
