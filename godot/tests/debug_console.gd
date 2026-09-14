@@ -14,6 +14,11 @@ func check():
  game.hero.hp=12
  console.execute(" healme ")
  assert(game.hero.hp==game.hero.max)
+ console.execute("kfc")
+ assert(not game.chicken.is_empty() and not game.chicken.roast and paused)
+ var chicken_node=game.chicken_node
+ console.execute("KFC")
+ assert(game.chicken_node==chicken_node,"Repeated summons preserve the existing chicken")
  for area in range(2,5):
   console.execute("FASTTRAVEL")
   assert(game.screen_for_wave(game.wave)==area)

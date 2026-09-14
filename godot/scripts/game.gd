@@ -1235,6 +1235,22 @@ func advance_food_pickup(dt: float) -> Vector2:
 		point=hand.lerp(mouth,t)+Vector2(0,-sin(t*PI)*35)
 	return point
 
+func summon_chicken(point: Vector2=Vector2(90,610)) -> bool:
+	if not chicken.is_empty():return false
+	hero_voice.request_line("dinner",.9,4.)
+	chicken={"x":90.0,"y":610.0,"dir":1,"age":0.0,"roast":false,"turn":0.0,"hop":0.0,"height":0.0,"flight":false,"picked":false,"egg_check":2.0,"egg_count":0,"lay":-1.0,"laid":false}
+	chicken_node=Node2D.new()
+	chicken_node.material=ShaderMaterial.new()
+	chicken_node.material.shader=load("res://shaders/chicken_edge.gdshader")
+	chicken_node.draw.connect(draw_chicken)
+	arena_clip.add_child(chicken_node)
+	chicken.x=point.x
+	chicken.y=point.y
+	background.constrain(chicken)
+	chicken_node.z_index=int(chicken.y)*2
+	chicken_node.queue_redraw()
+	return true
+
 func step_chicken(dt: float):
 	for egg in eggs:
 		egg.advance(dt)
@@ -1244,13 +1260,7 @@ func step_chicken(dt: float):
 	var schedule={2:5,5:7,8:6,11:9}
 	if schedule.has(wave) and wave_time>=schedule[wave] and not wave in used_chickens and chicken.is_empty():
 		used_chickens.append(wave)
-		hero_voice.request_line("dinner",.9,4.)
-		chicken={"x":90.0,"y":610.0,"dir":1,"age":0.0,"roast":false,"turn":0.0,"hop":0.0,"height":0.0,"flight":false,"picked":false,"egg_check":2.0,"egg_count":0,"lay":-1.0,"laid":false}
-		chicken_node=Node2D.new()
-		chicken_node.material=ShaderMaterial.new()
-		chicken_node.material.shader=load("res://shaders/chicken_edge.gdshader")
-		chicken_node.draw.connect(draw_chicken)
-		arena_clip.add_child(chicken_node)
+		summon_chicken()
 	if chicken.is_empty(): return
 	var c=chicken
 	c.age+=dt

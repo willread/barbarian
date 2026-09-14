@@ -22,7 +22,7 @@ func _ready():
  title.text="DEBUG CONSOLE  |  ~ or Esc to close"
  box.add_child(title)
  output=Label.new()
- output.text="HEALME - restore health    FASTTRAVEL - next area"
+ output.text="HEALME - restore health    FASTTRAVEL - next area    KFC - summon chicken"
  box.add_child(output)
  input=LineEdit.new()
  input.placeholder_text="Enter cheat code..."
@@ -61,6 +61,9 @@ func execute(text: String):
    game.hero.hp=game.hero.max
    game.displayed_health=game.hero.max
    output.text="Health restored."
+  "KFC":
+   var point=Vector2(clampf(game.hero.x+120,90,1300),game.hero.y)
+   output.text="Chicken summoned." if game.summon_chicken(point) else "There is already a chicken in this area."
   "FASTTRAVEL":
    var area=game.screen_for_wave(game.wave)
    if area>=4:
