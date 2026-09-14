@@ -1,5 +1,6 @@
 extends RefCounted
-const RADIUS=Vector2(68,14)
+const SPACING_RADIUS=Vector2(68,14)
+const RADIUS=SPACING_RADIUS*1.3
 static func spots(point: Vector2) -> Array:
  var rng=RandomNumberGenerator.new()
  rng.seed=absi(int(point.x*31+point.y*71))
@@ -11,7 +12,7 @@ static func spots(point: Vector2) -> Array:
   var angle=rotation+i*spread+rng.randf_range(-.16,.16)
   # Touch a central puddle by 5-14% of the diameter, in random directions.
   var distance=rng.randf_range(1.72,1.90)
-  var offset=Vector2(cos(angle),sin(angle))*RADIUS*distance
+  var offset=Vector2(cos(angle),sin(angle))*SPACING_RADIUS*distance
   result.append({"offset":offset,"seed":rng.randf()*1000})
  return result
 static func contains(point: Vector2,target: Vector2) -> bool:

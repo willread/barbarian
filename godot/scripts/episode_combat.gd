@@ -89,8 +89,8 @@ func place_clump(game,owner,target: Vector2) -> Variant:
 		var valid=true
 		for spot in MireLayout.spots(point):
 			var center=point+spot.offset
-			if center.x<75 or center.x>1365:valid=false;break
-			for edge in [Vector2(0,-14),Vector2(0,14)]:
+			if center.x<MireLayout.RADIUS.x+7 or center.x>1433-MireLayout.RADIUS.x:valid=false;break
+			for edge in [Vector2(0,-MireLayout.RADIUS.y),Vector2(0,MireLayout.RADIUS.y)]:
 				var probe={"x":center.x,"y":center.y+edge.y}
 				game.background.constrain(probe)
 				if absf(probe.y-center.y-edge.y)>1:valid=false

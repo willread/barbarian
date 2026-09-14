@@ -22,8 +22,9 @@ func _ready():
 			var layer=Sprite2D.new()
 			layer.centered=false
 			layer.texture=texture
-			layer.position=DRAW_RECT.position+spot.offset
-			layer.scale=DRAW_RECT.size/texture.get_size()
+			var puddle_scale=1.3 if part==0 else 1.0
+			layer.position=DRAW_RECT.position*puddle_scale+spot.offset
+			layer.scale=DRAW_RECT.size*puddle_scale/texture.get_size()
 			layer.z_as_relative=false
 			layer.material=ShaderMaterial.new()
 			layer.material.shader=preload("res://shaders/mire_sequence.gdshader")

@@ -37,7 +37,8 @@ try{
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   for(const part of [0,1]){
    for(const spot of spots){
-    gl.viewport((256+spot.x-72)*960/512,(256-(194+spot.y-98.8)-130)*480/256,144*960/512,130*480/256);
+    const scale=part===0?1.3:1;
+    gl.viewport((256+spot.x-72*scale)*960/512,(256-(194+spot.y-98.8*scale)-130*scale)*480/256,144*scale*960/512,130*scale*480/256);
     gl.uniform1f(gl.getUniformLocation(program,'seed'),spot.seed);gl.uniform1f(gl.getUniformLocation(program,'clock'),t+spot.seed*.01);
     gl.uniform1i(gl.getUniformLocation(program,'part'),part);gl.drawArrays(gl.TRIANGLES,0,6);
    }
