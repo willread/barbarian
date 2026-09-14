@@ -12,6 +12,12 @@ function run(command,args){
  if(result.error)throw result.error;
  if(result.status!==0||/^(?:SCRIPT ERROR|SHADER ERROR|ERROR):/m.test((result.stdout||'')+(result.stderr||'')))process.exit(result.status||1);
 }
+// Keep the tiny Windows resize extension reproducible; web exports exclude it.
+if(process.platform==='win32'&&!process.argv.includes('--web')){
+ const dll='godot/native/cairn_aspect.dll';
+ if(!fs.existsSync(dll)||fs.statSync('tools/native-window/aspect.c').mtimeMs>fs.statSync(dll).mtimeMs)
+  run('powershell',['-NoProfile','-ExecutionPolicy','Bypass','-File','tools/native-window/build.ps1']);
+}
 if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepare')){
  run(process.execPath,['tools/godot/bake-assets.mjs']);
  run(process.execPath,['tools/godot/bake-extras.mjs']);
@@ -66,6 +72,7 @@ const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--wi
 for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
  run(binary,['--headless','--path','godot','--export-release',target,file]);
+ if(target==='Windows')fs.copyFileSync('godot/native/cairn_aspect.dll',path.join(path.dirname(file),'cairn_aspect.dll'));
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
  // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);
