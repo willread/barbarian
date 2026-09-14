@@ -14,14 +14,15 @@ func combo_color(value: int) -> Color:
  return [Color(1.25,1.2,1.1),Color(2.5,2.1,.30),Color(2.5,1.15,.20),Color(2.5,.42,.30)][combo_band(value)]
 func flame_color(value: int) -> Color:
  return [Color.TRANSPARENT,Color("ffe12b"),Color("ff8614"),Color("ff3322")][combo_band(value)]
-func stone(label: String,center: Vector2,height: float,max_width: float=280.0,color=Color(1.25,1.2,1.1)):
+func stone(label: String,center: Vector2,height: float,max_width: float=280.0,color=Color(1.25,1.2,1.1),right_aligned: bool=false):
  var meta=game.art.data.menu["HUD "+label]
  var texture=game.art.texture("menu-"+meta.id+".png")
  if not bounds.has(label):bounds[label]=texture.get_image().get_used_rect()
  var rect=bounds[label]
  var factor=minf(height/rect.size.y,max_width/rect.size.x)
  var size=Vector2(rect.size)*factor
- draw_texture_rect_region(texture,Rect2(center-size*.5,size),rect,color)
+ var origin=center-Vector2(size.x if right_aligned else size.x*.5,size.y*.5)
+ draw_texture_rect_region(texture,Rect2(origin,size),rect,color)
 
 func _process(dt):
  if not game:return
@@ -71,7 +72,7 @@ func unrest() -> Vector2:
 func _draw():
  if not game or game.phase=="title":return
  stone("AREA %d/4"%game.screen_for_wave(game.wave),Vector2(-72,25),17,120,Color(1.65,1.75,1.9))
- stone("BOSS" if game.wave==game.encounters.size() else "WAVE %d/3"%(1+(game.wave-1)%3),Vector2(72,25),17,120,Color(1.8,1.5,.85))
+ stone("BOSS" if game.wave==game.encounters.size() else "WAVE %d/3"%(1+(game.wave-1)%3),Vector2(132,25),17,120,Color(1.8,1.5,.85),true)
  var digits="%06d"%game.score
  var width=minf(33.,230./digits.length())
  # One shared glyph scale preserves the numeral baseline and balanced tracking.
