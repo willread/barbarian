@@ -2,6 +2,8 @@ class_name CairnEnemies
 extends RefCounted
 var m: CairnMechanics
 var roster: Dictionary
+# Tiny variants are temporarily disabled; retain their behavior for later re-enabling.
+const ENABLED_VARIANTS=["brute"]
 const HEALTH_SCALE={"legion":0.70,"shield":0.70}
 func _init(mechanics: CairnMechanics, data: Dictionary):
 	m=mechanics
@@ -23,7 +25,7 @@ func plan(episode: int=1) -> Array:
 	used_variants.clear()
 	unlock_order=["shield","archer","marauder"]
 	unlock_order.shuffle()
-	variant_order=["brute","swift"]
+	variant_order=ENABLED_VARIANTS.duplicate()
 	variant_order.shuffle()
 	wave_variants.clear()
 	var result: Array=[]
@@ -78,7 +80,7 @@ func variant(e: Dictionary, allowed: Array=[]):
 	if e.boss:
 		e.speedFactor=.75
 		return
-	var available=allowed.filter(func(kind):return kind not in used_variants)
+	var available=allowed.filter(func(kind):return kind in ENABLED_VARIANTS and kind not in used_variants)
 	e.variant=available.pick_random() if not available.is_empty() and randf()<.25 else "regular"
 	if e.variant!="regular":used_variants.append(e.variant)
 	e.size=1.18 if e.variant=="brute" else (.702 if e.variant=="swift" else 1.0)

@@ -4,14 +4,10 @@ func check():
  var art=CairnArt.new()
  var m=CairnMechanics.new(art.data.attacks)
  var ai=CairnEnemies.new(m,art.data.roster)
- var swift_found=false
  for i in 100:
   var candidate=m.make(500+i,720,660,20)
   ai.variant(candidate,["swift"])
-  if candidate.variant=="swift":
-   swift_found=true
-   assert(is_equal_approx(candidate.size,.54*1.3) and is_equal_approx(candidate.speedFactor,2.05*1.25))
- assert(swift_found)
+  assert(candidate.variant=="regular","Disabled tiny variants must not spawn")
  for run in 3:
   ai.plan()
   var counts={"brute":0,"swift":0}
@@ -20,7 +16,7 @@ func check():
    ai.variant(candidate,["brute","swift"])
    if candidate.variant in counts:counts[candidate.variant]+=1
    candidate.hp=0
-  assert(counts.brute==1 and counts.swift==1,"Each variant can spawn only once per run, even after death; a new run resets the cap")
+  assert(counts.brute==1 and counts.swift==0,"Only one giant spawns per run; tiny variants remain disabled")
  var hero=m.make(1,720,660,100,true)
  var small=m.make(2,580,660,16)
  small.variant="swift"
