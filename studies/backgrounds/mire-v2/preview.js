@@ -1,10 +1,10 @@
 const $=id=>document.getElementById(id),canvas=$('effect');
 const mud=$('mud').getContext('2d');
 const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false});
-const wet=new Audio('/godot/audio/mire_loop.ogg');wet.loop=true;wet.volume=.5;
+const wet=new Audio('/studies/backgrounds/mire-v2/eleven-oil-gurgle.ogg');wet.loop=true;wet.volume=.5;
 wet.preservesPitch=false;
-const paths={original:'/godot/audio/mire_loop.ogg'};
-for(const id of ['deep-gurgle','wet-slurp','bubble-boil','thick-suction'])paths[id]='/studies/backgrounds/mire-v2/'+id+'.ogg';
+const paths={};
+for(const id of ['eleven-oil-gurgle','eleven-sticky-slurp','eleven-tar-bubbles','eleven-sludge-churn'])paths[id]='/studies/backgrounds/mire-v2/'+id+'.ogg';
 function soundSettings(){
  wet.volume=Number($('sound-volume').value)/100;
  wet.playbackRate=Number($('sound-pitch').value)/100;
