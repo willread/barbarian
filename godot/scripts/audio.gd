@@ -2,6 +2,7 @@ extends Node
 const Mix=preload("res://scripts/audio_mix.gd")
 const BURN_GAIN_DB=6.0206 # Twice the original amplitude, before shared bus processing.
 const CLIP_IDS=["gulp","sword","axe","flesh","heavy_hit","charge_hit","death_fire","bone","shield","resist","body_fall","landing","bow_release","arrow_hit","hero_effort","magic_shout","hero_pain","roar","death","lightning","fire","chicken","chicken_hit","pickup","menu_land","menu_select","transition","music_menu","music_game"]
+var mire_loop: AudioStreamPlayer
 var game: Node2D
 var clips: Dictionary={}
 var originals: Dictionary={}
@@ -20,6 +21,13 @@ var watched: Dictionary={}
 func setup(source: Node2D):
 	game=source
 	Mix.setup()
+	mire_loop=AudioStreamPlayer.new()
+	mire_loop.bus=Mix.bus_for("mire_loop")
+	mire_loop.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
+	mire_loop.stream=preload("res://audio/mire_loop.ogg")
+	mire_loop.stream.loop=true
+	mire_loop.volume_db=-60
+	add_child(mire_loop)
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
 	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
 	for id in CLIP_IDS+["egg_lay"]:
@@ -131,6 +139,13 @@ func play(id: String,db: float=-4,pitch: float=1.0):
 func _process(dt: float):
 	if not game or game.hero.is_empty():return
 	var audible=unlocked and not game.muted and not game.loading_menu
+	var hands=game.episode_combat.mire_views.values().any(func(view):return view.mode==1 and not view.exiting and not view.finished)
+	var bubbling=audible and game.phase=="playing" and hands
+	# One shared bed avoids multiplying volume with each hand or clump.
+	if bubbling and not mire_loop.playing:mire_loop.play()
+	if game.phase!="paused" and not get_tree().paused:mire_loop.volume_db=move_toward(mire_loop.volume_db,-12.0 if bubbling else -60.0,dt*(90 if bubbling else 180))
+	mire_loop.stream_paused=game.phase=="paused" or get_tree().paused
+	if game.muted or (not bubbling and not mire_loop.stream_paused and mire_loop.volume_db<=-59):mire_loop.stop()
 	for i in tracks.size():
 		var track=tracks[i]
 		var selected=game.music_enabled and ((game.phase=="title")== (i==0))

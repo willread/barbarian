@@ -1,6 +1,8 @@
 const $=id=>document.getElementById(id),canvas=$('effect');
 const mud=$('mud').getContext('2d');
 const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false});
+const wet=new Audio('/godot/audio/mire_loop.ogg');wet.loop=true;wet.volume=.5;
+$('sound').onchange=()=>{if($('sound').checked)wet.play().catch(()=>{});else wet.pause()};
 let playing=true,t=0,last=performance.now();const duration=6.8;
 function shader(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
 try{
@@ -32,6 +34,7 @@ try{
    }
    if(part===0){mud.clearRect(0,0,960,480);mud.drawImage(canvas,0,0);gl.clear(gl.COLOR_BUFFER_BIT);}
   }
+  if($('sound').checked&&playing&&t>=1.4&&t<4.25){if(wet.paused)wet.play().catch(()=>{});}else wet.pause();
   $('phase').textContent=label+' · '+t.toFixed(2)+'s';$('timeline').value=t;
   const file=t<1.4?3:t<6.1?4:0;if($('hag').dataset.frame!==String(file)){$('hag').src='/godot/assets/enemy-witch-'+file+'.png';$('hag').dataset.frame=file;}
  }
