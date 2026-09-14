@@ -44,7 +44,7 @@ func check():
 	assert(combat.mire_views.size()==1)
 	var view=combat.mire_views[combat.mire_id(patch)]
 	assert(view.layers.size()==5 and view.mode==1)
-	assert(view.DRAW_RECT.size==Vector2(240,120))
+	assert(view.DRAW_RECT.size==Vector2(312,156))
 	assert(view.layers[0].z_index==-4,"Mud remains behind fighters")
 	var depths=[]
 	for hand in view.layers.slice(1):

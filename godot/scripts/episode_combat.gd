@@ -1,7 +1,7 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
-const MIRE_RADIUS=Vector2(95,29)
+const MIRE_RADIUS=Vector2(123.5,37.7)
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
 const MIRE_DRAIN=2.2 # About 3 player HP/s at the game's default damage tuning.

@@ -2,7 +2,7 @@ extends Node2D
 # Fresh isolated oil hands and animated oil slick, with independent depth sorting.
 const FORM_SECONDS=1.4
 const HAND_STEP_SECONDS=.15
-const DRAW_RECT=Rect2(-120,-91,240,120)
+const DRAW_RECT=Rect2(-156,-118.3,312,156)
 var texture: Texture2D
 var mode=0
 var progress=0.0
@@ -13,6 +13,7 @@ var finished=false
 var exit_start=0.0
 var exit_age=0.0
 var layers: Array=[]
+var seed=randf()*1000.0
 
 func _ready():
 	for part in 5:
@@ -25,6 +26,7 @@ func _ready():
 		layer.material=ShaderMaterial.new()
 		layer.material.shader=preload("res://shaders/mire_sequence.gdshader")
 		layer.material.set_shader_parameter("part",part)
+		layer.material.set_shader_parameter("seed",seed)
 		add_child(layer)
 		layers.append(layer)
 
@@ -33,8 +35,8 @@ func refresh_layers():
 		var layer=layers[part]
 		layer.visible=not finished
 		# Each root has its own ground depth; mud is beneath all fighters.
-		var root_y=[0.0,1.0,-4.0,6.0,3.0][part]
-		layer.z_index=-4 if part==0 else int((position.y+root_y)*2)+1
+		var root_y=[0.0,-.52,-7.54,6.5,-.52][part]
+		layer.z_index=-4 if part==0 else int((position.y+root_y)*2)+part
 		layer.material.set_shader_parameter("clock",clock)
 		layer.material.set_shader_parameter("formation",clampf(phase,0,1))
 		layer.material.set_shader_parameter("pose",clampf(phase-1,0,3))

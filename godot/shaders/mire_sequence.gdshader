@@ -3,6 +3,7 @@ uniform float formation=0.0;
 uniform float pose=0.0;
 uniform float clock=0.0;
 uniform int part=0;
+uniform float seed=13.0;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
 void fragment(){
@@ -16,13 +17,23 @@ void fragment(){
   reveal=smoothstep(field-.12,field+.12,floor(formation*32.0)/32.0*1.24-.12);
  }else{
   row=0.0;
-  float x=.05;float y=.19;float w=.32;float h=.61;
-  if(part==2){x=.25;y=.02;w=.34;h=.74;}
-  if(part==3){x=.44;y=.18;w=.34;h=.66;}
-  if(part==4){x=.65;y=.14;w=.32;h=.67;}
-  local=(UV-vec2(x,y))/vec2(w,h);
-  if(part==1||part==4)local.x=1.0-local.x;
+  float r=hash(vec2(float(part)*7.13,seed));
+  float r2=hash(vec2(seed,float(part)*19.71));
+  vec2 root=vec2(.24,.755);
+  if(part==2)root=vec2(.42,.71);
+  if(part==3)root=vec2(.59,.80);
+  if(part==4)root=vec2(.77,.755);
+  root.x+=(r-.5)*.035;
+  vec2 size=vec2(.27+r*.07,.53+r2*.19);
+  // Rotate around the buried wrist, never around the sprite center.
+  vec2 d=UV-root;
+  float angle=(r2-.5)*.42;
+  d=vec2(cos(angle)*d.x+sin(angle)*d.y*.5,-sin(angle)*d.x*2.0+cos(angle)*d.y);
+  local=d/size+vec2(.5,.94);
+  if(r>.5)local.x=1.0-local.x;
   frame=floor(clamp(pose,0.0,3.0)+.5);
+  // Different grip phases and rates, driven by the reversible pose timeline.
+  if(pose>=2.0)frame=2.0+step(.5,fract((pose-2.0)*(.7+r*.7)+r2));
   reveal=smoothstep(1.0-clamp(pose,0.0,1.0)-.06,1.0-clamp(pose,0.0,1.0)+.06,local.y);
   reveal*=step(.01,pose);
  }
