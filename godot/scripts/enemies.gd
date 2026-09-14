@@ -17,8 +17,10 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 var unlock_order: Array=[]
 var variant_order: Array=[]
 var wave_variants: Array=[]
+var used_variants: Array=[]
 
 func plan(episode: int=1) -> Array:
+	used_variants.clear()
 	unlock_order=["shield","archer","marauder"]
 	unlock_order.shuffle()
 	variant_order=["brute","swift"]
@@ -76,7 +78,9 @@ func variant(e: Dictionary, allowed: Array=[]):
 	if e.boss:
 		e.speedFactor=.75
 		return
-	e.variant=allowed.pick_random() if not allowed.is_empty() and randf()<.25 else "regular"
+	var available=allowed.filter(func(kind):return kind not in used_variants)
+	e.variant=available.pick_random() if not available.is_empty() and randf()<.25 else "regular"
+	if e.variant!="regular":used_variants.append(e.variant)
 	e.size=1.18 if e.variant=="brute" else (.702 if e.variant=="swift" else 1.0)
 	e.speedFactor=2.5625 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))

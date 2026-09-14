@@ -12,6 +12,15 @@ func check():
    swift_found=true
    assert(is_equal_approx(candidate.size,.54*1.3) and is_equal_approx(candidate.speedFactor,2.05*1.25))
  assert(swift_found)
+ for run in 3:
+  ai.plan()
+  var counts={"brute":0,"swift":0}
+  for i in 500:
+   var candidate=m.make(1000+i,720,660,20)
+   ai.variant(candidate,["brute","swift"])
+   if candidate.variant in counts:counts[candidate.variant]+=1
+   candidate.hp=0
+  assert(counts.brute==1 and counts.swift==1,"Each variant can spawn only once per run, even after death; a new run resets the cap")
  var hero=m.make(1,720,660,100,true)
  var small=m.make(2,580,660,16)
  small.variant="swift"
