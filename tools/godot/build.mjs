@@ -43,6 +43,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
  run(binary,['--headless','--path','godot','--script','tests/mire.gd']);
  run(binary,['--headless','--path','godot','--script','tests/mire_audio.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/swamp_fog.gd']);
  run(binary,['--headless','--path','godot','--script','tests/combo.gd']);
  run(binary,['--headless','--path','godot','--script','tests/eggs.gd']);
  run(binary,['--headless','--path','godot','--script','tests/wave_audio.gd']);

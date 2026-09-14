@@ -64,6 +64,20 @@ func setup(source: CairnArt,name: String):
 					decoration.z_index=1805
 				add_child(decoration)
 				decorations.append(decoration)
+		if chapter=="swamp":
+			var fog=ColorRect.new()
+			fog.name="DriftingFog"
+			fog.size=Vector2(1440,810)
+			fog.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			fog.z_as_relative=false
+			fog.z_index=1810
+			var fog_material=ShaderMaterial.new()
+			fog_material.set_meta("continuous_clock",true)
+			fog_material.shader=preload("res://shaders/swamp_fog.gdshader")
+			fog_material.set_shader_parameter("area",float(name.get_slice("-",1)))
+			fog.material=fog_material
+			add_child(fog)
+			layers.append(fog_material)
 		z_index=-100
 		return
 	var base=Sprite2D.new()
@@ -99,7 +113,7 @@ func setup(source: CairnArt,name: String):
 
 func advance(t: float):
 	clock=t
-	for mat in layers: mat.set_shader_parameter("clock",fmod(t,24))
+	for mat in layers: mat.set_shader_parameter("clock",t if mat.get_meta("continuous_clock",false) else fmod(t,24))
 	for decoration in decorations:
 		decoration.clock=fmod(t,24)
 		decoration.queue_redraw()
