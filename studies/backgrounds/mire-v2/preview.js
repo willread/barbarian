@@ -14,6 +14,17 @@ try{
  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
  const image=new Image();image.src='/godot/assets/mire-oil-v2.png';await image.decode();const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.uniform2f(gl.getUniformLocation(program,'TEXTURE_PIXEL_SIZE'),1/image.width,1/image.height);
  const formation=gl.getUniformLocation(program,'formation'),pose=gl.getUniformLocation(program,'pose');
+ let spots=[];
+ function shuffle(){
+  const count=Math.random()<.5?3:4,rotation=Math.random()*Math.PI*2,spread=count===3?1.8+Math.random()*.7:Math.PI*2/3;
+  spots=[{x:0,y:0,seed:Math.random()*1000}];
+  for(let i=0;i<count-1;i++){
+   const angle=rotation+i*spread+(Math.random()-.5)*.32,distance=1.72+Math.random()*.18;
+   spots.push({x:Math.cos(angle)*68*distance,y:Math.sin(angle)*14*distance,seed:Math.random()*1000});
+  }
+  spots.sort((a,b)=>a.y-b.y);
+ }
+ shuffle();$('clump').onclick=()=>{shuffle();render()};
  function render(){
   let phase,label;
   if(t<1.4){phase=t/1.4;label='Buildup';}
@@ -23,8 +34,6 @@ try{
   else if(t<6.1){phase=1-(t-4.7)/1.4;label='Reverse · mire recedes';}
   else{phase=0;label='Gone';}
   gl.uniform1f(formation,Math.max(0,Math.min(1,phase)));gl.uniform1f(pose,Math.max(0,Math.min(3,phase-1)));
-  const layout=$('clump').value, count=Number(layout.slice(-1)),vertical=layout.startsWith('v');
-  const spots=Array.from({length:count},(_,i)=>({x:vertical?Math.sin(i*7)*8:(i-(count-1)/2)*120,y:vertical?(i-(count-1)/2)*24:Math.sin(i*7)*3,seed:13+i*27})).sort((a,b)=>a.y-b.y);
   gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   for(const part of [0,1]){
    for(const spot of spots){

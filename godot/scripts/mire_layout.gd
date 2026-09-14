@@ -4,11 +4,14 @@ static func spots(point: Vector2) -> Array:
  var rng=RandomNumberGenerator.new()
  rng.seed=absi(int(point.x*31+point.y*71))
  var count=rng.randi_range(3,4)
- var vertical=rng.randf()<.5
- var result=[]
- for i in count:
-  var along=i-(count-1)*.5
-  var offset=Vector2(rng.randf_range(-9,9),along*24) if vertical else Vector2(along*120,rng.randf_range(-3,3))
+ var result=[{"offset":Vector2.ZERO,"seed":rng.randf()*1000}]
+ var rotation=rng.randf()*TAU
+ var spread=rng.randf_range(1.8,2.5) if count==3 else TAU/3.0
+ for i in range(count-1):
+  var angle=rotation+i*spread+rng.randf_range(-.16,.16)
+  # Touch a central puddle by 5-14% of the diameter, in random directions.
+  var distance=rng.randf_range(1.72,1.90)
+  var offset=Vector2(cos(angle),sin(angle))*RADIUS*distance
   result.append({"offset":offset,"seed":rng.randf()*1000})
  return result
 static func contains(point: Vector2,target: Vector2) -> bool:
