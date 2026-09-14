@@ -19,6 +19,7 @@ func _ready():
 	# Narrow high-volume deposits form fine rivulets among the broader splashes.
 	for n in 65:
 		deposits.append({"x":randf()*W,"y":randf()*H,"rx":.65+pow(randf(),1.6)*4.2,"ry":1.5+randf()*5,"angle":randf()*.35,"phase":randf()*TAU,"lobes":2,"roughness":randf()*.35,"amount":1.8+randf()*2.4,"at":.04+randf()*.61})
+	if letter_mask:build_letter_splats()
 	deposits.sort_custom(func(a,b):return a.at<b.at)
 	viewport=SubViewport.new()
 	viewport.size=Vector2i(W,H)
@@ -43,9 +44,6 @@ func _ready():
 	surface.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
 	var shade=ShaderMaterial.new()
 	shade.shader=load("res://shaders/blood_surface.gdshader")
-	if letter_mask:
-		shade.set_shader_parameter("use_mask",true)
-		shade.set_shader_parameter("letter_mask",letter_mask)
 	surface.material=shade
 	add_child(surface)
 	surface.visible=false
@@ -54,7 +52,6 @@ func advance(dt: float):
 	age=min(3.8,age+dt)
 	if age<0: return
 	surface.visible=true
-	if letter_mask:surface.material.set_shader_parameter("letter_fill",smoothstep(.25,1.0,age)*.3)
 	var positions=PackedVector4Array()
 	var shapes=PackedVector4Array()
 	var amounts=PackedFloat32Array()
@@ -74,7 +71,7 @@ func advance(dt: float):
 	fluid.set_shader_parameter("count",count)
 	fluid.set_shader_parameter("clear",not started)
 	fluid.set_shader_parameter("age",age)
-	fluid.set_shader_parameter("ticks",min(3.0,dt*60))
+	fluid.set_shader_parameter("ticks",min(3.0,dt*60)*(.12 if letter_mask else 1.0))
 	if old<3.8: viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	started=true
 	queue_redraw()
@@ -85,3 +82,18 @@ func _draw():
 		return
 	var fade=clamp((age-.25)/1.3,0,1)
 	draw_rect(Rect2(0,0,1440,1062),Color(.439,.035,.063,fade*fade*(3-2*fade)))
+
+# The font is only a placement guide. Every visible edge comes from a fluid splat.
+func build_letter_splats():
+	deposits.clear()
+	var guide=letter_mask.get_image()
+	guide.resize(W,H,Image.INTERPOLATE_LANCZOS)
+	for y in range(0,H,2):
+		for x in range(0,W,2):
+			if guide.get_pixel(x,y).a<.6:continue
+			var px=x+randf_range(-.7,.7)
+			var py=y+randf_range(-.7,.7)
+			var arrival=.05+float(x)/W*.8+randf()*.28
+			deposits.append({"x":px,"y":py,"rx":randf_range(1.3,2.5),"ry":randf_range(1.1,2.2),"angle":randf()*TAU,"phase":randf()*TAU,"lobes":3+randi()%4,"roughness":.8,"amount":randf_range(.3,.65),"at":arrival})
+			if randf()<.13:
+				deposits.append({"x":px+randf_range(-4,4),"y":py+randf_range(-4,5),"rx":randf_range(.35,.8),"ry":randf_range(.4,1.1),"angle":randf()*TAU,"phase":randf()*TAU,"lobes":3,"roughness":.7,"amount":.4,"at":arrival+.03})

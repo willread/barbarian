@@ -58,6 +58,21 @@ func check():
  game.m.begin(game.hero,"spin")
  game.damage(brute,game.hero.attack,game.hero)
  assert(brute.hp==100 and game.hero.attack.is_empty() and game.hero.chargeRebound!=0,"Spin rebounds off brutes without damage")
+ var boss=game.enemies[0]
+ boss.x=900
+ var offscreen=game.m.make(901,-300,660,100)
+ game.enemies.append(offscreen)
+ var before_kills=game.kills
+ var before_hp=game.hero.hp
+ game.damage_multiplier=0
+ console.toggle()
+ console.execute("TNT")
+ assert(boss.hp==0 and not boss.down.is_empty(),"TNT kills bosses through defenses")
+ assert(offscreen.hp==100 and game.hero.hp==before_hp,"TNT spares offscreen enemies and player")
+ assert(game.kills==before_kills+1 and not paused)
+ console.toggle()
+ console.execute("TNT")
+ assert(game.kills==before_kills+1,"TNT cannot kill a corpse twice")
  game.queue_free()
  await process_frame
  print("CAIRN_CONSOLE_OK: three letter drops, automatic commands, freeze/resume, boss, cancel and unknown codes")

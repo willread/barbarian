@@ -93,6 +93,7 @@ func landed():
 func execute(text: String):
  if game.phase in ["playing","paused"]:
   match text.to_upper():
+   "TNT":game.kill_visible_enemies()
    "HOH":game.unlock_candy_session()
    "EMT":
     game.hero.hp=game.hero.max

@@ -660,6 +660,11 @@ func begin_walk(kind: String):
 func can_cast() -> bool:
 	return phase=="playing" and magic>=100 and spell<0 and hero.air.is_empty() and hero.attack.is_empty() and hero.down.is_empty() and hero.pickup.is_empty()
 
+func kill_visible_enemies():
+	for enemy in enemies:
+		if enemy.hp>0 and enemy.x>=0 and enemy.x<=1440:
+			damage(enemy,{"type":"cheat","damage":enemy.hp,"direction":1 if enemy.x>=hero.x else -1,"knock":true,"magic":true,"instant_kill":true},hero)
+
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
 	if f.player and not f.pickup.is_empty():return
@@ -671,7 +676,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		hit_stop=.055
 		shake=4
 		return
-	if not f.player and e_ai.block(f,a,attacker):
+	if not f.player and not a.get("instant_kill",false) and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
 		audio.play("resist",-4)
@@ -692,7 +697,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		a=a.duplicate()
 		a.damage*=.65 if f.kind=="king" else .2
 	var previous_hp=f.hp
-	f.hp=max(0,f.hp-a.damage*damage_multiplier*difficulty_damage(f.player)*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
+	f.hp=0 if a.get("instant_kill",false) and not f.player else max(0,f.hp-a.damage*damage_multiplier*difficulty_damage(f.player)*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.0))
 	if f.hp<previous_hp:
 		if f.player:
 			if not run_stats.is_empty():run_stats.damage_taken+=previous_hp-f.hp
