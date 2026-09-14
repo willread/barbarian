@@ -9,7 +9,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster["archer"]={"hp":6,"speed":1.05}
 	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":105,"speed":.8},"saint":{"hp":120,"speed":.8}})
 	for attack in [
-		["mireCast",96,52,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
+		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
 		["rootSlam",108,56,62,9,64],["kingSweep",82,38,45,8,72],
 		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}

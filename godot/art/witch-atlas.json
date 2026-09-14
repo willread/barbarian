@@ -5,59 +5,59 @@
   "cels": [
     {
       "file": "enemy-witch-0.png",
-      "left": 1,
-      "top": 34,
-      "width": 342,
-      "height": 478
+      "left": 0,
+      "top": 32,
+      "width": 347,
+      "height": 487
     },
     {
       "file": "enemy-witch-1.png",
-      "left": 44,
+      "left": 42,
       "top": 91,
-      "width": 312,
-      "height": 421
+      "width": 316,
+      "height": 430
     },
     {
       "file": "enemy-witch-2.png",
-      "left": 10,
-      "top": 76,
-      "width": 374,
-      "height": 436
+      "left": 8,
+      "top": 74,
+      "width": 311,
+      "height": 445
     },
     {
       "file": "enemy-witch-3.png",
-      "left": 0,
-      "top": 9,
-      "width": 360,
-      "height": 503
+      "left": -17,
+      "top": 5,
+      "width": 384,
+      "height": 517
     },
     {
       "file": "enemy-witch-4.png",
-      "left": 28,
-      "top": 0,
-      "width": 356,
-      "height": 451
+      "left": 27,
+      "top": 19,
+      "width": 443,
+      "height": 435
     },
     {
       "file": "enemy-witch-5.png",
-      "left": 0,
-      "top": 0,
-      "width": 356,
-      "height": 451
+      "left": 96,
+      "top": 54,
+      "width": 261,
+      "height": 400
     },
     {
       "file": "enemy-witch-6.png",
-      "left": 41,
-      "top": 0,
-      "width": 343,
-      "height": 465
+      "left": 65,
+      "top": 46,
+      "width": 276,
+      "height": 407
     },
     {
       "file": "enemy-witch-7.png",
-      "left": 0,
-      "top": 0,
-      "width": 370,
-      "height": 498
+      "left": -50,
+      "top": 308,
+      "width": 424,
+      "height": 192
     }
   ]
 }

@@ -25,6 +25,7 @@ if(!fs.existsSync('godot/art/controls/hall-of-legends.png'))run(process.execPath
 if(!menuManifest.menu['HUD 10X']||menuManifest.hudSmallLabelVersion!==1)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
 run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
+ run(process.execPath,['tools/godot/check-episode-sprites.mjs']);
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
  run(binary,['--headless','--path','godot','--script','tests/run_records.gd']);
  run(binary,['--headless','--path','godot','--script','tests/results_ui.gd']);

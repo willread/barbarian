@@ -6,58 +6,58 @@
     {
       "file": "enemy-bearer-0.png",
       "left": 31,
-      "top": 59,
-      "width": 315,
-      "height": 406
+      "top": 54,
+      "width": 319,
+      "height": 416
     },
     {
       "file": "enemy-bearer-1.png",
-      "left": 28,
-      "top": 58,
-      "width": 328,
-      "height": 406
+      "left": 25,
+      "top": 56,
+      "width": 334,
+      "height": 411
     },
     {
       "file": "enemy-bearer-2.png",
-      "left": 28,
-      "top": 64,
-      "width": 324,
-      "height": 399
+      "left": 24,
+      "top": 63,
+      "width": 330,
+      "height": 401
     },
     {
       "file": "enemy-bearer-3.png",
-      "left": 37,
-      "top": 57,
-      "width": 363,
-      "height": 406
+      "left": 35,
+      "top": 53,
+      "width": 366,
+      "height": 413
     },
     {
       "file": "enemy-bearer-4.png",
-      "left": 17,
-      "top": 62,
-      "width": 401,
-      "height": 362
+      "left": 16,
+      "top": 60,
+      "width": 496,
+      "height": 364
     },
     {
       "file": "enemy-bearer-5.png",
-      "left": 0,
-      "top": 65,
-      "width": 383,
-      "height": 358
+      "left": 43,
+      "top": 63,
+      "width": 342,
+      "height": 360
     },
     {
       "file": "enemy-bearer-6.png",
-      "left": 29,
-      "top": 70,
-      "width": 389,
-      "height": 356
+      "left": 26,
+      "top": 67,
+      "width": 384,
+      "height": 360
     },
     {
       "file": "enemy-bearer-7.png",
-      "left": 0,
-      "top": 250,
-      "width": 400,
-      "height": 196
+      "left": -54,
+      "top": 246,
+      "width": 456,
+      "height": 200
     }
   ]
 }

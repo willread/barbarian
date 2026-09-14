@@ -1,15 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
+import {splitEpisodeSheet} from './split-episode-sheet.mjs';
 import {screens,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground} from '../../studies/backgrounds/swamp-v2/scene.js';
 const out='godot/assets/',source='asset-sources/art/episodes/';
 const stamp=out+'episodes-bake.json';
-const inputs=[import.meta.filename,...fs.readdirSync(source).map(f=>source+f),...fs.readdirSync('studies/backgrounds/ashen-v1').map(f=>'studies/backgrounds/ashen-v1/'+f),'studies/backgrounds/swamp-v2/scene.js'];
+const inputs=[import.meta.filename,'tools/godot/split-episode-sheet.mjs',...fs.readdirSync(source).map(f=>source+f),...fs.readdirSync('studies/backgrounds/ashen-v1').map(f=>'studies/backgrounds/ashen-v1/'+f),'studies/backgrounds/swamp-v2/scene.js'];
 const version=inputs.map(f=>[f,fs.statSync(f).mtimeMs]);
 if(fs.existsSync(stamp)&&fs.readFileSync(stamp,'utf8')===JSON.stringify(version)&&fs.existsSync(out+'ashen-4-base.png'))process.exit(0);
 fs.copyFileSync(source+'mire-effect-v1.png',out+'mire-effect-v1.png');
 for(const kind of ['witch','bearer','king','saint']){
  const sheet=await loadImage(source+kind+'.png'),cw=Math.floor(sheet.width/4),ch=Math.floor(sheet.height/2),cels=[];
+ if(kind==='witch'||kind==='bearer'){
+  for(const [i,frame] of splitEpisodeSheet(sheet,kind).entries()){
+   const file=`enemy-${kind}-${i}.png`;fs.writeFileSync(out+file,frame.image.toBuffer('image/png'));
+   cels.push({file,left:frame.left,top:frame.top,width:frame.width,height:frame.height});
+  }
+  fs.writeFileSync(`godot/art/${kind}-atlas.json`,JSON.stringify({cellWidth:cw,cellHeight:ch,facing:1,cels},null,2)+'\n');
+  continue;
+ }
  for(let i=0;i<8;i++){
   const c=createCanvas(cw,ch),g=c.getContext('2d');
   if(kind==='witch'&&i<2){g.translate(cw,0);g.scale(-1,1)}

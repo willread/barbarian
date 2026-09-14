@@ -43,7 +43,14 @@ func check():
 	combat.sync_views(game)
 	assert(combat.mire_views.size()==1)
 	var view=combat.mire_views[combat.mire_id(patch)]
-	assert(view.z_index==1361 and view.mode==1,"Hands must sort above feet at the pool center")
+	assert(view.layers.size()==5 and view.mode==1)
+	assert(view.DRAW_RECT.size==Vector2(240,120))
+	assert(view.layers[0].z_index==-4,"Mud remains behind fighters")
+	var depths=[]
+	for hand in view.layers.slice(1):
+		assert(not hand.z_as_relative and hand.z_index not in depths)
+		depths.append(hand.z_index)
+	assert(depths.min()<1360 and depths.max()>1360,"Hands straddle the player at the pool center")
 	var pixels=view.texture.get_image()
 	assert(pixels.get_pixel(0,0).a<.01,"Effect must have real alpha, not a checkerboard")
 	game.hero.x=720;game.hero.y=680;game.hero.hp=100

@@ -1,11 +1,12 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
-const MIRE_RADIUS=Vector2(190,58)
+const MIRE_RADIUS=Vector2(95,29)
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
 const MIRE_DRAIN=2.2 # About 3 player HP/s at the game's default damage tuning.
 var mire_views: Dictionary={}
+var retiring_mire: Array=[]
 var next_mire_id=0
 
 func mire_id(h: Dictionary) -> String:
@@ -28,8 +29,11 @@ func clear():
 	for view in mire_views.values():
 		if is_instance_valid(view):view.queue_free()
 	mire_views.clear()
+	for view in retiring_mire:
+		if is_instance_valid(view):view.queue_free()
+	retiring_mire.clear()
 
-func sync_views(game):
+func sync_views(game,dt: float=0.0):
 	var visible_ids=[]
 	for enemy in game.enemies:
 		var a=enemy.attack
@@ -40,12 +44,23 @@ func sync_views(game):
 	for h in hazards:
 		if h.kind!="mire":continue
 		if h.owner.hp<=0:continue
+		var warning="warning-%d"%h.owner.id
+		if not mire_views.has(mire_id(h)) and mire_views.has(warning):
+			mire_views[mire_id(h)]=mire_views[warning]
+			mire_views.erase(warning)
 		show_mire(game,mire_id(h),h.p,1,h.life-h.age,h.age)
 		visible_ids.append(mire_id(h))
 	for id in mire_views.keys():
 		if id not in visible_ids:
-			mire_views[id].queue_free()
+			mire_views[id].retire()
+			retiring_mire.append(mire_views[id])
 			mire_views.erase(id)
+	for view in mire_views.values():view.advance(dt)
+	for view in retiring_mire:view.advance(dt)
+	for i in range(retiring_mire.size()-1,-1,-1):
+		if retiring_mire[i].finished:
+			retiring_mire[i].queue_free()
+			retiring_mire.remove_at(i)
 
 func show_mire(game,id: String,p: Vector2,mode: int,progress: float,time: float):
 	if not mire_views.has(id):
@@ -55,11 +70,8 @@ func show_mire(game,id: String,p: Vector2,mode: int,progress: float,time: float)
 		mire_views[id]=view
 	var view=mire_views[id]
 	view.position=p
-	view.z_index=-4 if mode==0 else int(p.y)*2+1
-	view.mode=mode
-	view.progress=progress
-	view.clock=time
-	view.queue_redraw()
+	view.z_index=0
+	view.configure(mode,progress,time)
 
 func step(game,dt: float):
 	# Every patch is owned by its caster; none survive that caster's death.
