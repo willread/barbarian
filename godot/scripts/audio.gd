@@ -26,6 +26,7 @@ func setup(source: Node2D):
 	mire_loop.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 	mire_loop.stream=preload("res://audio/mire_loop.ogg")
 	mire_loop.stream.loop=true
+	mire_loop.pitch_scale=.7
 	mire_loop.volume_db=-60
 	add_child(mire_loop)
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
@@ -143,7 +144,7 @@ func _process(dt: float):
 	var bubbling=audible and game.phase=="playing" and hands
 	# One shared bed avoids multiplying volume with each hand or clump.
 	if bubbling and not mire_loop.playing:mire_loop.play()
-	if game.phase!="paused" and not get_tree().paused:mire_loop.volume_db=move_toward(mire_loop.volume_db,-12.0 if bubbling else -60.0,dt*(90 if bubbling else 180))
+	if game.phase!="paused" and not get_tree().paused:mire_loop.volume_db=move_toward(mire_loop.volume_db,linear_to_db(.3) if bubbling else -60.0,dt*(90 if bubbling else 180))
 	mire_loop.stream_paused=game.phase=="paused" or get_tree().paused
 	if game.muted or (not bubbling and not mire_loop.stream_paused and mire_loop.volume_db<=-59):mire_loop.stop()
 	for i in tracks.size():

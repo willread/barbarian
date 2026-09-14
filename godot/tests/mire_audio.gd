@@ -14,7 +14,9 @@ func check():
  game.enemies=[hag]
  game.episode_combat.hazards=[{"kind":"mire","owner":hag,"p":Vector2(720,680),"age":.5,"life":8.}]
  game.episode_combat.sync_views(game)
- game.audio._process(.2)
+ game.audio._process(1.0)
+ assert(is_equal_approx(game.audio.mire_loop.pitch_scale,.7))
+ assert(is_equal_approx(db_to_linear(game.audio.mire_loop.volume_db),.3))
  assert(game.audio.mire_loop.playing and game.audio.mire_loop.stream.loop)
  game.phase="paused"
  game.audio._process(.1)
