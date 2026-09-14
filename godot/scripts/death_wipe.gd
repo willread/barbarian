@@ -71,7 +71,7 @@ func advance(dt: float):
 	fluid.set_shader_parameter("count",count)
 	fluid.set_shader_parameter("clear",not started)
 	fluid.set_shader_parameter("age",age)
-	fluid.set_shader_parameter("ticks",min(3.0,dt*60)*(.12 if letter_mask else 1.0))
+	fluid.set_shader_parameter("ticks",min(3.0,dt*60)*(.06 if letter_mask else 1.0))
 	if old<3.8: viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	started=true
 	queue_redraw()
@@ -88,12 +88,32 @@ func build_letter_splats():
 	deposits.clear()
 	var guide=letter_mask.get_image()
 	guide.resize(W,H,Image.INTERPOLATE_LANCZOS)
-	for y in range(0,H,2):
-		for x in range(0,W,2):
-			if guide.get_pixel(x,y).a<.6:continue
-			var px=x+randf_range(-.7,.7)
-			var py=y+randf_range(-.7,.7)
-			var arrival=.05+float(x)/W*.8+randf()*.28
-			deposits.append({"x":px,"y":py,"rx":randf_range(1.3,2.5),"ry":randf_range(1.1,2.2),"angle":randf()*TAU,"phase":randf()*TAU,"lobes":3+randi()%4,"roughness":.8,"amount":randf_range(.3,.65),"at":arrival})
-			if randf()<.13:
-				deposits.append({"x":px+randf_range(-4,4),"y":py+randf_range(-4,5),"rx":randf_range(.35,.8),"ry":randf_range(.4,1.1),"angle":randf()*TAU,"phase":randf()*TAU,"lobes":3,"roughness":.7,"amount":.4,"at":arrival+.03})
+	var candidates: Array=[]
+	# Measure clearance from the font edge, then place the largest interior
+	# splashes first. This preserves counters and letter gaps without clipping.
+	for y in range(1,H-1,2):
+		for x in range(1,W-1,2):
+			if guide.get_pixel(x,y).a<.7:continue
+			var clearance=8.0
+			for dy in range(-8,9):
+				for dx in range(-8,9):
+					var distance=Vector2(dx,dy).length()
+					if distance>=clearance:continue
+					if x+dx<0 or x+dx>=W or y+dy<0 or y+dy>=H or guide.get_pixel(x+dx,y+dy).a<.7:
+						clearance=distance
+			if clearance<2.5:continue
+			candidates.append({"point":Vector2(x,y),"radius":minf(6.,clearance*.88)})
+	candidates.shuffle()
+	candidates.sort_custom(func(a,b):return a.radius>b.radius)
+	var placed: Array=[]
+	for candidate in candidates:
+		var covered=false
+		for previous in placed:
+			if candidate.point.distance_to(previous.point)<(candidate.radius+previous.radius)*.64:
+				covered=true
+				break
+		if covered:continue
+		placed.append(candidate)
+		var point=candidate.point
+		var radius=candidate.radius
+		deposits.append({"x":point.x,"y":point.y,"rx":radius,"ry":radius*randf_range(.88,1.),"angle":randf()*TAU,"phase":randf()*TAU,"lobes":3+randi()%3,"roughness":.35,"amount":randf_range(.4,.6),"at":.05+point.x/W*.8+randf()*.2})
