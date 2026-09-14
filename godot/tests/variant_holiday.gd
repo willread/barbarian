@@ -4,6 +4,14 @@ func check():
  var art=CairnArt.new()
  var m=CairnMechanics.new(art.data.attacks)
  var ai=CairnEnemies.new(m,art.data.roster)
+ var swift_found=false
+ for i in 100:
+  var candidate=m.make(500+i,720,660,20)
+  ai.variant(candidate,["swift"])
+  if candidate.variant=="swift":
+   swift_found=true
+   assert(is_equal_approx(candidate.size,.72*.75) and is_equal_approx(candidate.speedFactor,2.05*1.25))
+ assert(swift_found)
  var hero=m.make(1,720,660,100,true)
  var small=m.make(2,580,660,16)
  small.variant="swift"

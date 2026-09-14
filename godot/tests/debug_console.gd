@@ -5,35 +5,57 @@ func check():
  root.add_child(game)
  game.start_game()
  var console=game.debug_console
- assert(not console.visible)
  console.toggle()
- assert(paused and console.visible)
  var clock=game.clock
  await create_timer(.1).timeout
- assert(game.clock==clock,"Console freezes gameplay")
+ assert(paused and game.clock==clock)
  game.hero.hp=12
- console.execute(" healme ")
- assert(game.hero.hp==game.hero.max)
- console.execute("kfc")
- assert(not game.chicken.is_empty() and not game.chicken.roast and paused)
- var chicken_node=game.chicken_node
- console.execute("KFC")
- assert(game.chicken_node==chicken_node,"Repeated summons preserve the existing chicken")
- for area in range(2,5):
-  console.execute("FASTTRAVEL")
-  assert(game.screen_for_wave(game.wave)==area)
-  assert(game.background.key=="citadel-%d"%area)
-  assert(paused,"Commands must not unfreeze the game")
- console.execute("FASTTRAVEL")
- assert(game.wave==10)
- console.execute("bogus")
- assert(console.output.text.begins_with("Unknown"))
+ console.accept_letter("E")
+ console.accept_letter("M")
+ assert(console.code=="EM" and paused and game.hero.hp==12)
+ console.accept_letter("1")
+ assert(console.code=="EM")
  if "--console-capture" in OS.get_cmdline_user_args():
+  await create_timer(.8).timeout
   await RenderingServer.frame_post_draw
   root.get_texture().get_image().save_png("E:/Cairn-build-tools/debug-console.png")
+ console.accept_letter("T")
+ console.accept_letter("X")
+ assert(console.code=="EMT")
+ await create_timer(1.2).timeout
+ assert(game.hero.hp==game.hero.max and not paused and not console.visible)
  console.toggle()
+ console.execute("KFC")
+ assert(not game.chicken.is_empty() and not paused)
+ for area in range(2,5):
+  console.toggle()
+  console.execute("FWD")
+  assert(game.screen_for_wave(game.wave)==area and not paused)
+ console.toggle()
+ console.execute("FWD")
+ assert(game.wave==10)
+ console.toggle()
+ console.execute("CEO")
+ assert(game.wave==game.encounters.size() and game.enemies[0].boss)
+ console.toggle()
+ console.accept_letter("Z")
+ console.accept_letter("Z")
+ console.accept_letter("Z")
+ await create_timer(1.2).timeout
  assert(not paused and not console.visible)
+ console.toggle()
+ console.accept_letter("E")
+ console.close()
+ await create_timer(.7).timeout
+ assert(not paused and not console.visible)
+ var brute=game.m.make(900,820,660,100)
+ brute.variant="brute"
+ brute.size=1.18
+ game.hero.attack={}
+ game.m.begin(game.hero,"spin")
+ game.damage(brute,game.hero.attack,game.hero)
+ assert(brute.hp==100 and game.hero.attack.is_empty() and game.hero.chargeRebound!=0,"Spin rebounds off brutes without damage")
  game.queue_free()
  await process_frame
- print("CAIRN_CONSOLE_OK: freeze, heal, area skipping, final-area guard and resume")
+ print("CAIRN_CONSOLE_OK: three letter drops, automatic commands, freeze/resume, boss, cancel and unknown codes")
  quit()

@@ -1,80 +1,98 @@
 extends CanvasLayer
 var game: Node2D
-var input: LineEdit
-var output: Label
-var panel: PanelContainer
 var previous_pause=false
+var code=""
+var letters: Array=[]
+var tweens: Array=[]
+var landing_count=0
+var generation=0
+var glyphs: Dictionary
 func _ready():
  process_mode=Node.PROCESS_MODE_ALWAYS
  layer=3000
- panel=PanelContainer.new()
- panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
- panel.offset_bottom=180
- var style=StyleBoxFlat.new()
- style.bg_color=Color(.025,.03,.025,.96)
- style.content_margin_left=24;style.content_margin_right=24
- style.content_margin_top=18;style.content_margin_bottom=18
- panel.add_theme_stylebox_override("panel",style)
- add_child(panel)
- var box=VBoxContainer.new()
- panel.add_child(box)
- var title=Label.new()
- title.text="DEBUG CONSOLE  |  ~ or Esc to close"
- box.add_child(title)
- output=Label.new()
- output.text="HEALME - restore health    FASTTRAVEL - next area    KFC - summon chicken"
- box.add_child(output)
- input=LineEdit.new()
- input.placeholder_text="Enter cheat code..."
- input.add_theme_font_size_override("font_size",22)
- box.add_child(input)
- input.text_submitted.connect(execute)
+ glyphs=JSON.parse_string(FileAccess.get_file_as_string("res://assets/cheat-letters.json")).menu
  hide()
 func toggle():
  if visible:
-  hide()
-  get_tree().paused=previous_pause
-  input.release_focus()
- else:
+  close()
+ elif game.phase in ["playing","paused"]:
   previous_pause=get_tree().paused
   get_tree().paused=true
+  code=""
+  landing_count=0
   show()
-  input.clear()
-  input.grab_focus()
+ game.bindings.clear();game.keys.clear();game.pressed.clear()
+func close():
+ generation+=1
+ for tween in tweens:
+  if tween.is_valid():tween.kill()
+ tweens.clear()
+ for letter in letters:letter.queue_free()
+ letters.clear()
+ code=""
+ hide()
+ get_tree().paused=previous_pause
  game.bindings.clear();game.keys.clear();game.pressed.clear()
 func _input(event: InputEvent):
  if event is InputEventKey and event.pressed and not event.echo:
   if event.physical_keycode==KEY_QUOTELEFT or event.keycode==KEY_QUOTELEFT or event.unicode==126:
    toggle()
    get_viewport().set_input_as_handled()
-  elif visible and event.keycode==KEY_ESCAPE:
-   toggle()
+  elif visible:
+   if event.keycode==KEY_ESCAPE:close()
+   elif event.unicode>0:accept_letter(String.chr(event.unicode).to_upper())
    get_viewport().set_input_as_handled()
+func accept_letter(ch: String):
+ if not visible or code.length()>=3 or ch.length()!=1 or not glyphs.has(ch):return
+ code+=ch
+ var meta=glyphs[ch]
+ var face=Sprite2D.new()
+ face.texture=game.art.texture("menu-"+meta.id+".png")
+ face.scale=Vector2(meta.width,meta.height)/face.texture.get_size()
+ add_child(face)
+ letters.append(face)
+ var center=get_viewport().get_visible_rect().size*.5
+ var width=0.0
+ for letter in letters:width+=letter.texture.get_width()*letter.scale.x
+ var x=center.x-width*.5
+ for letter in letters:
+  var w=letter.texture.get_width()*letter.scale.x
+  letter.position.x=x+w*.5
+  x+=w
+ face.position.y=-200
+ var tween=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+ tweens.append(tween)
+ tween.tween_interval((letters.size()-1)*.12)
+ tween.tween_property(face,"position:y",center.y,.3264).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+ tween.tween_callback(func():game.audio.play("menu_land"))
+ tween.tween_property(face,"position:y",center.y+2.6,.024)
+ tween.tween_property(face,"position:y",center.y-4.9,.048)
+ tween.tween_property(face,"position:y",center.y,.0816)
+ tween.tween_callback(landed)
+func landed():
+ landing_count+=1
+ if code.length()==3 and landing_count==3:
+  var token=generation
+  await get_tree().create_timer(.18,true).timeout
+  if visible and token==generation:execute(code)
 func execute(text: String):
- var code=text.strip_edges().to_upper()
- input.clear()
- if game.phase not in ["playing","paused"]:
-  output.text="Start or resume a run to use cheats."
-  return
- match code:
-  "HEALME":
-   game.hero.hp=game.hero.max
-   game.displayed_health=game.hero.max
-   output.text="Health restored."
-  "KFC":
-   var point=Vector2(clampf(game.hero.x+120,90,1300),game.hero.y)
-   output.text="Chicken summoned." if game.summon_chicken(point) else "There is already a chicken in this area."
-  "FASTTRAVEL":
-   var area=game.screen_for_wave(game.wave)
-   if area>=4:
-    output.text="Already in the final area."
-    return
-   game.wave=area*3+1
-   game.spawn_wave()
-   game.begin_walk("enter")
-   game.transition=game.CLOSE+game.HOLD
-   game.swapped=true
-   output.text="Travelled to area %d. Close the console to continue."%(area+1)
-  _:output.text="Unknown code: "+code
+ if game.phase in ["playing","paused"]:
+  match text.to_upper():
+   "EMT":
+    game.hero.hp=game.hero.max
+    game.displayed_health=game.hero.max
+   "KFC":game.summon_chicken(Vector2(clampf(game.hero.x+120,90,1300),game.hero.y))
+   "CEO":travel(game.encounters.size())
+   "FWD":
+    var area=game.screen_for_wave(game.wave)
+    if area<4:travel(area*3+1)
+  if game.phase=="paused":game.change_phase("playing")
+ close()
+func travel(wave: int):
+ game.wave=wave
+ game.spawn_wave()
+ game.begin_walk("enter")
+ game.transition=game.CLOSE+game.HOLD
+ game.swapped=true
 func _exit_tree():
  if visible:get_tree().paused=previous_pause

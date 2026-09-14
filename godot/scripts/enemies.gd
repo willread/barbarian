@@ -77,8 +77,8 @@ func variant(e: Dictionary, allowed: Array=[]):
 		e.speedFactor=.75
 		return
 	e.variant=allowed.pick_random() if not allowed.is_empty() and randf()<.25 else "regular"
-	e.size=1.18 if e.variant=="brute" else (.72 if e.variant=="swift" else 1.0)
-	e.speedFactor=2.05 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
+	e.size=1.18 if e.variant=="brute" else (.54 if e.variant=="swift" else 1.0)
+	e.speedFactor=2.5625 if e.variant=="swift" else (.68 if e.variant=="brute" else 1.0)
 	e.hp=round(e.hp*(1.45 if e.variant=="brute" else (.85 if e.variant=="swift" else 1.0)))
 	# Apply after variant rounding so every size receives exactly the same reduction.
 	e.hp*=HEALTH_SCALE.get(e.kind,1.0)

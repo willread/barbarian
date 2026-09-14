@@ -620,7 +620,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
 	if f.player and not f.pickup.is_empty():return
 	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
-	if attacker.player and not f.player and a.get("type","")=="charge" and e_ai.heavy(f):
+	if attacker.player and not f.player and (a.get("type","")=="charge" and e_ai.heavy(f) or a.get("spin",false) and f.get("variant","")=="brute"):
 		m.rebound_charge(attacker,int(a.direction))
 		audio.play("resist",-4)
 		burst((f.x+attacker.x)*.5,f.y-105,7,Color("b7a58c"))
