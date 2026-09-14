@@ -1,4 +1,5 @@
 extends CanvasLayer
+const LETTER_OVERLAP=24.0 # Remove excess transparent padding between baked glyphs.
 var game: Node2D
 var previous_pause=false
 var code=""
@@ -60,6 +61,7 @@ func accept_letter(ch: String):
  var center=get_viewport().get_visible_rect().size*.5
  var width=0.0
  for letter in letters:width+=letter.texture.get_width()*letter.scale.x
+ width-=LETTER_OVERLAP*maxi(0,letters.size()-1)
  var x=center.x-width*.5
  for letter in letters:
   var w=letter.texture.get_width()*letter.scale.x
@@ -72,7 +74,7 @@ func accept_letter(ch: String):
    var shift=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
    shifts[id]=shift
    shift.tween_property(letter,"position:x",target,.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-  x+=w
+  x+=w-LETTER_OVERLAP
  face.position.y=0
  var tween=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
  tweens.append(tween)
