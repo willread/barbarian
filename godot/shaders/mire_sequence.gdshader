@@ -5,7 +5,6 @@ uniform float clock=0.0;
 uniform int part=0;
 uniform float seed=13.0;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
 void fragment(){
  vec2 local=UV;
  float frame=mod(floor(clock*5.0),4.0);
@@ -13,8 +12,9 @@ void fragment(){
  float reveal=1.0;
  if(part==0){
   local=(UV-vec2(0,.46))/vec2(1,.60);
-  float field=noise(UV*vec2(18,12));
-  reveal=smoothstep(field-.12,field+.12,floor(formation*32.0)/32.0*1.24-.12);
+  float growth=smoothstep(0.0,1.0,formation);
+  local=(local-vec2(.5))/max(.001,growth)+vec2(.5);
+  reveal=step(.001,growth);
  }else{
   row=0.0;
   float r=hash(vec2(float(part)*7.13,seed));

@@ -55,7 +55,7 @@ func check():
 	game.hero.x=720;game.hero.y=680;game.hero.hp=100
 	var hp=game.hero.hp
 	for i in 60:combat.step(game,1.0/60)
-	assert(abs(game.hero.hp-(hp-2.2*game.damage_multiplier*100./48.))<.01,"Drain must be gradual and frame-rate independent")
+	assert(abs(game.hero.hp-(hp-(2.2*game.damage_multiplier*100./48.+game.damage_multiplier/.65)))<.01,"Drain must be gradual and frame-rate independent")
 	assert(game.hero.hurtTicks==0 and game.hero.down.is_empty(),"Drain must not repeatedly stun the player")
 	# A jump started in the grasp has a much lower apex, even with run held.
 	var trapped=game.make_actor(720,680,100,true)

@@ -1,5 +1,6 @@
 extends CanvasLayer
 const TIPS=[
+	"Dash to escape sticky situations",
 	"Hold attack to spin and get yourself out of tight situations",
 	"double tap a direction to dash, follow with an attack to charge",
 	"remember to unleash your magic when the gauge is full",
