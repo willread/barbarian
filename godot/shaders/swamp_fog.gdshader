@@ -11,12 +11,13 @@ void fragment(){
  float coverage=0.0;
  for(int i=0;i<5;i++){
   float n=float(i);
-  // Patches wrap beyond the visible edges, moving only a few pixels per second.
-  float x=mod(n*.59+area*.31+clock*(.0025+n*.00045),2.6)-.8;
-  float y=.24+fract(n*.371+area*.17)*.70;
+  // Layered banks travel across the arena and curl gently as they pass.
+  float x=mod(n*.59+area*.31+clock*(.008+n*.0015),2.6)-.8;
+  float y=.24+fract(n*.371+area*.17)*.70+sin(clock*.12+n*2.1)*.045;
   vec2 size=vec2(.24+fract(n*.43)*.18,.09+fract(n*.61)*.09);
   vec2 p=(UV-vec2(x,y))/size;
-  float billow=mist(p*2.3+vec2(-clock*.018,n*19.0+area));
+  p+=vec2(sin(p.y*2.0+clock*.16+n)*.12,cos(p.x*2.3-clock*.13+n)*.10);
+  float billow=mist(p*2.3+vec2(-clock*.055,n*19.0+area+clock*.025));
   float edge=1.0-smoothstep(.25,1.2,length(p)+(.5-billow)*.42);
   coverage+=edge*smoothstep(.20,.82,billow)*.36;
  }

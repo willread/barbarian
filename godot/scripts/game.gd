@@ -1858,10 +1858,19 @@ func archer_test():
 	assert(e_ai.archer_intent(archer,hero).x<0,"Archer must retreat when crowded")
 	archer.x=-100
 	hero.x=400
-	assert(e_ai.archer_intent(archer,hero).is_zero_approx() and archer.attack.type=="archerShot","Archers can fire from offscreen")
+	assert(e_ai.archer_intent(archer,hero).x>0 and archer.attack.is_empty(),"Offscreen archers must enter before firing or retreating")
+	for side in [-1,1]:
+		archer.attack={}
+		archer.x=CairnEnemies.arena_margin(archer) if side==-1 else 1440.-CairnEnemies.arena_margin(archer)
+		hero.x=archer.x-side*100
+		assert(e_ai.archer_intent(archer,hero).x*side<=0,"Crowded archers cannot retreat past either visible edge")
+		archer.x+=side*20
+		CairnEnemies.keep_in_arena(archer)
+		assert(archer.x>=CairnEnemies.arena_margin(archer) and archer.x<=1440.-CairnEnemies.arena_margin(archer))
 	archer.attack={}
 	hero.x=720
 	archer.x=350
+	archer.dir=1
 	var arrow=load("res://scripts/arrow.gd").new()
 	arena_clip.add_child(arrow)
 	arrow.setup(self,archer)

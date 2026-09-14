@@ -48,26 +48,27 @@ func _init():
 	assert(m.begin(spinner,"spin"))
 	var art=CairnArt.new()
 	# Real weapon poses must cover both edges of the melee lane symmetrically.
-	for weapon in ["axe","sword"]:
-		for facing in [-1,1]:
-			for depth in [-36,-35,0,35,36]:
-				var player=m.make(100,720,660,100,true)
-				player.weapon=weapon
-				player.dir=facing
-				var foe=m.make(101,720+100*facing,660+depth,100)
-				foe.dir=-facing
-				m.begin(player,"slash")
-				var connected=false
-				for age in range(int(player.attack.from),int(player.attack.to)+1):
-					player.attack.age=age
-					player.attack.box=art.hit_box(player,art.pose(player))
-					connected=connected or m.can_hit(player,foe,player.attack)
-				assert(connected==(abs(depth)<36),"Player swing must reach either lane edge, never outside")
-				for move in data.attacks:
-					if move in ["whiff","slash","pommel","kick","air","back","charge"]:continue
-					foe.attack={}
-					m.begin(foe,move)
-					assert(not m.can_hit(foe,player,foe.attack) or connected,"Enemy melee cannot reach a lane the player cannot hit: "+move)
+	for player_move in ["slash","spin"]:
+		for weapon in ["axe","sword"]:
+			for facing in [-1,1]:
+				for depth in [-36,-35,0,35,36]:
+					var player=m.make(100,720,660,100,true)
+					player.weapon=weapon
+					player.dir=facing
+					var foe=m.make(101,720+100*facing,660+depth,100)
+					foe.dir=-facing
+					m.begin(player,player_move)
+					var connected=false
+					for age in range(int(player.attack.from),int(player.attack.to)+1):
+						player.attack.age=age
+						player.attack.box=art.hit_box(player,art.pose(player))
+						connected=connected or m.can_hit(player,foe,player.attack)
+					assert(connected==(abs(depth)<36),"Player swing must reach either lane edge, never outside")
+					for move in data.attacks:
+						if move in ["whiff","slash","pommel","kick","air","back","charge"]:continue
+						foe.attack={}
+						m.begin(foe,move)
+						assert(not m.can_hit(foe,player,foe.attack) or connected,"Enemy melee cannot reach a lane the player cannot hit: "+move)
 	var jumper=m.make(102,720,660,100,true)
 	var grounded=m.make(103,820,660,100)
 	grounded.dir=-1

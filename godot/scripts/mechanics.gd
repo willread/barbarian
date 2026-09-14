@@ -177,7 +177,7 @@ func begin(f: Dictionary, type: String) -> bool:
 		a.dive=true
 		a.lane=30
 		a.box=[-6,42 if f.weapon=="axe" else 58,-36,90]
-	if type=="spin":a.lane=27
+	if type=="spin":a.lane=MELEE_LANE
 	if type not in ["air","charge"]:
 		f.velocityX=0.0
 		f.velocityY=0.0

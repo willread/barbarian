@@ -247,8 +247,12 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	var dy=h.y-e.y
 	e.dir=1 if dx>=0 else -1
 	if h.hp<=0:return Vector2.ZERO
+	var margin=arena_margin(e)
+	# Walk fully into view before choosing a firing or retreat position.
+	if e.x<margin:return Vector2(1,0)
+	if e.x>1440.-margin:return Vector2(-1,0)
+	e["entered_arena"]=true
 	if abs(dx)<310:
-		var margin=arena_margin(e) if e.get("entered_arena",false) else -120.0
 		if (e.dir==1 and e.x>margin+2) or (e.dir==-1 and e.x<1440.-margin-2):return Vector2(-e.dir,sign(dy)*.3)
 	if abs(dx)>650:return Vector2(e.dir,sign(dy)*.5)
 	if abs(dy)>28:return Vector2(0,sign(dy))
