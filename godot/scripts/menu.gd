@@ -66,7 +66,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 			tween.tween_property(group,"position:y",y+2.6,.024)
 			tween.tween_property(group,"position:y",y-4.9,.048).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 			tween.tween_property(group,"position:y",y,.0816).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	select(0,false)
+	select(labels.find("NORMAL") if labels.has("NORMAL") else 0,false)
 	layout_screen(screen_size,is_title)
 
 func switch_items(labels: Array,is_title: bool=true):
