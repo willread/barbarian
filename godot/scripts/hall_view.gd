@@ -140,7 +140,7 @@ func draw_table():
 
 		elif i%2==0:content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.65,.48,.025))
 		content.draw_line(Vector2(0,y),Vector2(w,y),Color(.40,.34,.24,.45))
-		var reached="EP %d · AREA %d/4"%[run.get("episode",1),run.get("area",1)]
+		var reached="EP %d - BEAT"%run.get("episode",1) if run.get("outcome","")=="won" else "EP %d · AREA %d/4"%[run.get("episode",1),run.get("area",1)]
 		var time=CairnRunRecords.duration(run.get("time",0))
 		var date=display_date(str(run.get("date","")))
 		if compact:
