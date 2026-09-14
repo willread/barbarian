@@ -27,9 +27,11 @@ void fragment(){
  float ridge=exp(-pow((distance_to_opening-bevel_width)/(1.1*unit),2.));
  float facing_light=max(dot(-direction,normalize(vec2(-.65,-.8))),0.);
  float recess=smoothstep(0.,5.*unit,distance_to_opening);
- float illumination=mix(.88,.16+1.65*pow(diffuse,1.4),face);
+ // Lift only unlit faces; retain the existing light-facing bevel and ridge.
+ float shadow_lift=1.-smoothstep(.25,.7,diffuse);
+ float illumination=mix(.88,.16+1.65*pow(diffuse,1.4)+.30*shadow_lift,face);
  vec3 color=rock*vec3(.72,.75,.79)*illumination;
  color+=rock*ridge*(.16+.95*facing_light);
- color*=mix(.08,1.,recess);
+ color*=mix(.08+.22*shadow_lift,1.,recess);
  COLOR=vec4(color,1.);
 }
