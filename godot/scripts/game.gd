@@ -1311,7 +1311,7 @@ func step_chicken(dt: float):
 		c["egg_check"]=c.get("egg_check",2.)-dt
 		if c.get("lay",-1.)<0 and c.egg_check<=0 and c.age<9 and c.height<=0:
 			c.egg_check=2.
-			if c.get("egg_count",0)<2 and randf()<.35:
+			if c.get("egg_count",0)<2 and randf()<.21:
 				c["lay"]=0.
 				c["laid"]=false
 				c.hop=0.
