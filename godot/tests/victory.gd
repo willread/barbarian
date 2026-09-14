@@ -33,6 +33,7 @@ func check():
   game._process(1.0/60)
   await process_frame
  assert(game.phase=="won" and game.results_view!=null and game.finished_run.outcome=="won")
+ assert(not is_instance_valid(game.wipe),"Winning scores overlay the arena without a full-screen blood wipe")
  assert(game.records.board().runs.size()==1 and 1 in game.unlocked_episodes)
  game.queue_free()
  await process_frame

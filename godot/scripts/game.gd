@@ -485,11 +485,6 @@ func finish_run(outcome: String):
 	results_view.save_failed=records.save_error!=OK
 	add_child(results_view)
 	results_view.activated.connect(menu_action)
-	if outcome=="won" and not is_instance_valid(wipe):
-		wipe=DeathWipe.new()
-		add_child(wipe)
-		# Seed the same blood surface used by defeat; continue its settling below.
-		wipe.advance(.8)
 
 func refresh_settings(index: int):
 	menu.show_items(option_labels(),true,false)
