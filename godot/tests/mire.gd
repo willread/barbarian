@@ -106,6 +106,17 @@ func check():
 	combat.hazards=[patch]
 	var fresh=combat.place_clump(game,hag,patch.p)
 	assert(fresh==null or not combat.MireLayout.overlaps(fresh,patch.p))
+	for move in ["mireCast","hagClaw"]:
+		game.e_ai.finish(hag,{"type":move},game.hero)
+		var duration=game.m.attacks[move].ticks
+		assert(absf(float(duration+85)/float(duration+hag.aiRest)-1.3)<.01,"Hag attack cycle should be about 30% more frequent")
+	hag.attack={};hag.aiRest=0;hag.mire_count=3;hag.hag_move_ticks=20
+	game.hero.x=hag.x-400;game.hero.y=hag.y
+	game.e_ai.hag_intent(hag,game.hero)
+	assert(hag.attack.get("type")=="mireCast","Ready hag casts a fourth clump before strolling")
+	hag.attack={};hag.mire_count=4
+	game.e_ai.hag_intent(hag,game.hero)
+	assert(hag.attack.is_empty(),"Keep the four-clump cap")
 	print("CAIRN_MIRE_OK: heavy slow, health drain, limited jump, independent patches, owner death and defensive claw")
 	game.queue_free()
 	await process_frame
