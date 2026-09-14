@@ -4,6 +4,8 @@ var previous_pause=false
 var code=""
 var letters: Array=[]
 var tweens: Array=[]
+var shifts: Dictionary={}
+var textures: Dictionary={}
 var landing_count=0
 var generation=0
 var glyphs: Dictionary
@@ -11,6 +13,7 @@ func _ready():
  process_mode=Node.PROCESS_MODE_ALWAYS
  layer=3000
  glyphs=JSON.parse_string(FileAccess.get_file_as_string("res://assets/cheat-letters.json")).menu
+ for ch in glyphs:textures[ch]=game.art.texture("menu-"+glyphs[ch].id+".png")
  hide()
 func toggle():
  if visible:
@@ -27,6 +30,9 @@ func close():
  for tween in tweens:
   if tween.is_valid():tween.kill()
  tweens.clear()
+ for shift in shifts.values():
+  if shift.is_valid():shift.kill()
+ shifts.clear()
  for letter in letters:letter.queue_free()
  letters.clear()
  code=""
@@ -47,7 +53,7 @@ func accept_letter(ch: String):
  code+=ch
  var meta=glyphs[ch]
  var face=Sprite2D.new()
- face.texture=game.art.texture("menu-"+meta.id+".png")
+ face.texture=textures[ch]
  face.scale=Vector2(meta.width,meta.height)/face.texture.get_size()
  add_child(face)
  letters.append(face)
@@ -57,13 +63,20 @@ func accept_letter(ch: String):
  var x=center.x-width*.5
  for letter in letters:
   var w=letter.texture.get_width()*letter.scale.x
-  letter.position.x=x+w*.5
+  var target=x+w*.5
+  if letter==face:
+   letter.position.x=target
+  else:
+   var id=letter.get_instance_id()
+   if shifts.has(id) and shifts[id].is_valid():shifts[id].kill()
+   var shift=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+   shifts[id]=shift
+   shift.tween_property(letter,"position:x",target,.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
   x+=w
- face.position.y=-200
+ face.position.y=0
  var tween=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
  tweens.append(tween)
- tween.tween_interval((letters.size()-1)*.12)
- tween.tween_property(face,"position:y",center.y,.3264).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+ tween.tween_property(face,"position:y",center.y,.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
  tween.tween_callback(func():game.audio.play("menu_land"))
  tween.tween_property(face,"position:y",center.y+2.6,.024)
  tween.tween_property(face,"position:y",center.y-4.9,.048)
@@ -73,7 +86,7 @@ func landed():
  landing_count+=1
  if code.length()==3 and landing_count==3:
   var token=generation
-  await get_tree().create_timer(.18,true).timeout
+  await get_tree().create_timer(.08,true).timeout
   if visible and token==generation:execute(code)
 func execute(text: String):
  if game.phase in ["playing","paused"]:
