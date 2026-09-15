@@ -28,7 +28,7 @@ run(process.execPath,['tools/godot/bake-king.mjs']);
 run(process.execPath,['tools/godot/bake-mire-oil.mjs']);
 if(!fs.existsSync('godot/assets/cheat-letters.json'))run(process.execPath,['tools/godot/bake-cheats.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
-if(!menuManifest.menu['NEW JOURNEY']||!menuManifest.menu['EASY']||!menuManifest.menu['NORMAL']||!menuManifest.menu['HARD']||!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
+if(!menuManifest.menu['MUSIC PLAYER']||!menuManifest.menu['NEW JOURNEY']||!menuManifest.menu['EASY']||!menuManifest.menu['NORMAL']||!menuManifest.menu['HARD']||!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['tools/godot/bake-results.mjs']);
 if(!fs.existsSync('godot/art/controls/hall-of-legends.png'))run(process.execPath,['tools/godot/bake-controls.mjs','--hall']);
 if(!menuManifest.menu['HUD x10']||menuManifest.hudSmallLabelVersion!==1||menuManifest.hudMultiplierWeightVersion!==2)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
@@ -50,6 +50,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/audio_mix.gd']);
  run(binary,['--headless','--path','godot','--script','tests/creature_art.gd']);
  run(binary,['--headless','--path','godot','--script','tests/settings_menu.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/music_player.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);

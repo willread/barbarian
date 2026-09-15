@@ -54,6 +54,7 @@ var voice_enabled=true
 var master_volume=100
 var loading_menu=false
 var bindings=CairnBindings.new()
+var music_player_view: CanvasLayer
 var controls_view: CanvasLayer
 var results_view: CanvasLayer
 var hall_view: CanvasLayer
@@ -357,6 +358,22 @@ func change_phase(next: String):
 	responsive_layout()
 
 func menu_action(label: String):
+	if label=="MUSIC PLAYER":
+		if is_instance_valid(music_player_view):return
+		settings_page="music_player"
+		menu.visible=false
+		music_player_view=preload("res://scripts/music_player.gd").new()
+		music_player_view.game=self
+		add_child(music_player_view)
+		music_player_view.closed.connect(func():menu_action("BACK"))
+		return
+	if label=="BACK" and settings_page=="music_player":
+		music_player_view.queue_free()
+		music_player_view=null
+		settings_page="sound"
+		menu.visible=true
+		refresh_settings(4)
+		return
 	if label=="HALL OF LEGENDS":
 		if is_instance_valid(hall_view):return
 		# Keep the previous screen visible beneath the hall overlay.
@@ -455,7 +472,7 @@ func menu_action(label: String):
 
 func option_labels() -> Array:
 	refresh_weapon_day()
-	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"BACK"]
+	if settings_page=="sound":return ["SOUND: OFF" if muted else "SOUND: ON","MUSIC: ON" if music_enabled else "MUSIC: OFF","VOICE: ON" if voice_enabled else "VOICE: OFF","VOLUME: %d"%master_volume,"MUSIC PLAYER","BACK"]
 	if settings_page=="display":return ["FULLSCREEN: ON" if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN else "FULLSCREEN: OFF","BACK"]
 	if settings_page=="game":return (["WEAPON: "+weapon_skin.replace("_"," ").to_upper()] if available_weapons().size()>1 else [])+["CONTROLS","BACK"]
 	return ["GAME","SOUND","DISPLAY","BACK"]
@@ -1085,7 +1102,7 @@ func _process(raw: float):
 	pause_skull.scale=screen_size/512.0
 	pause_skull.material.set_shader_parameter("progress",absf(2.0*pause_cover-1.0))
 	if phase in ["paused","playing"]:
-		menu.visible=pause_cover>=.5
+		menu.visible=pause_cover>=.5 and not is_instance_valid(music_player_view)
 		menu.modulate.a=1.0
 	else: menu.modulate.a=1.0
 	transition_tips.update(transition if phase=="playing" else -1.0,CLOSE,HOLD,screen_size)
@@ -1145,6 +1162,10 @@ func _input(event: InputEvent):
 		if event.keycode in [KEY_W,KEY_A,KEY_S,KEY_D]:
 			event=event.duplicate()
 			event.keycode={KEY_W:KEY_UP,KEY_A:KEY_LEFT,KEY_S:KEY_DOWN,KEY_D:KEY_RIGHT}[event.keycode]
+	if is_instance_valid(music_player_view):
+		music_player_view.handle(event)
+		get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(controls_view):
 		controls_view.handle(event)
 		if event is InputEventKey:get_viewport().set_input_as_handled()
