@@ -39,7 +39,20 @@ void fragment(){
  float hot=smoothstep(.12,.42,paint.r-paint.b)*smoothstep(.25,.6,paint.r);
  float fire=noise(vec2(uv.x*160.0,uv.y*85.0+clock*4.4));
  float flicker=.35+.4*fire+.25*sin(clock*2.7+uv.x*39.0);
- paint.rgb+=vec3(.16,.052,.006)*hot*lane*flicker;
+ if(area>1.5 && area<2.5){
+  // Spatially offset noise gives each window and torch its own irregular
+  // burn. Slow fuel variation and faster flutter avoid a synchronized pulse.
+  float fuel=noise(vec2(uv.x*23.0+uv.y*11.0,clock*2.5));
+  float flutter=noise(vec2(uv.x*41.0-uv.y*9.0+17.0,clock*6.0));
+  float tips=noise(vec2(uv.x*67.0+uv.y*31.0+5.0,clock*10.5));
+  float burn=fuel*.60+flutter*.30+tips*.10;
+  // Modulate down as well as up so bright painted flame cores visibly
+  // flicker instead of disappearing into an already saturated highlight.
+  paint.rgb*=1.0+hot*lane*(burn-.5)*.85;
+  paint.rgb+=vec3(.045,.018,.002)*hot*lane*burn;
+ }else{
+  paint.rgb+=vec3(.16,.052,.006)*hot*lane*flicker;
+ }
  // Painted smoke moves without displacing the furnace architecture.
  float gray=1.0-smoothstep(.03,.16,abs(paint.r-paint.b));
  float smoke=gray*smoothstep(.17,.34,paint.r)*(1.0-smoothstep(.55,.72,paint.r))*lane;
