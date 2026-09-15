@@ -1,58 +1,89 @@
 extends Node2D
+# Source positions are registered to the four 1440 x 810 paintings.
 var area=1
 var foreground=false
 var clock=0.0
+var smoke_texture: GradientTexture2D
 
-func chain(origin: Vector2,length: int,lean: float):
-	for i in length:
-		var p=origin+Vector2(lean*i+sin(clock*TAU/8+i*.12)*i*.12,i*16)
-		draw_set_transform(p,lean*.04,Vector2(.65 if i%2 else 1,1))
-		draw_arc(Vector2.ZERO,11,0,TAU,16,Color("080a0b"),8,true)
-		draw_arc(Vector2(-1,-1),9,.5,3.8,12,Color("34312d"),2,true)
-	draw_set_transform(Vector2.ZERO)
+func _ready():
+	var gradient=Gradient.new()
+	gradient.set_color(0,Color(1,1,1,.23))
+	gradient.add_point(.35,Color(1,1,1,.13))
+	gradient.set_color(gradient.get_point_count()-1,Color(1,1,1,0))
+	smoke_texture=GradientTexture2D.new()
+	smoke_texture.gradient=gradient
+	smoke_texture.width=64
+	smoke_texture.height=64
+	smoke_texture.fill=GradientTexture2D.FILL_RADIAL
+	smoke_texture.fill_from=Vector2(.5,.5)
+	smoke_texture.fill_to=Vector2(1,.5)
+
+func exhaust(origin: Vector2,spread: float,rise: float,seed_value: float,tint: Color):
+	if not smoke_texture:return
+	for i in 18:
+		var age=fposmod(clock/(7.3+seed_value*.13)+i/18.0,1.0)
+		var drift=sin(age*5.0+seed_value+clock*.17)*spread*age
+		var p=origin+Vector2(drift+age*spread*.45,-age*rise)
+		var size=Vector2(28+age*spread,18+age*spread*.65)
+		var color=tint
+		color.a*=pow(sin(age*PI),1.5)
+		draw_texture_rect(smoke_texture,Rect2(p-size,size*2),false,color)
+
+func embers(origin: Vector2,count: int,spread: float,rise: float,seed_value: float):
+	for i in count:
+		var age=fposmod(clock/(2.7+fmod(i*.37,2.1))+i/float(count),1.0)
+		var p=origin+Vector2(sin(i*17.3+seed_value)*spread*age+sin(age*7+i)*9,-rise*age)
+		var alpha=pow(sin(age*PI),2)*(.23+.17*sin(i*9.1+clock*3))
+		draw_line(p,p+Vector2(-1,2+i%3),Color(1,.44+.1*sin(i),.10,alpha),.7+(i%3)*.25,true)
+
+func ash(count: int,front: bool):
+	for i in count:
+		var age=fposmod(clock/(13.1+i%7)+i/float(count),1.0)
+		var x=fposmod(i*137.71+clock*(8.0 if area==1 else 2.3)+sin(age*7+i)*20,1500)-30
+		var y=age*(850 if front else 555)-20
+		var alpha=sin(age*PI)*(.15 if front else .25)
+		var p=Vector2(x,y)
+		var r=(1.1 if front else .55)+i%3*.23
+		draw_line(p,p+Vector2(r*cos(clock+i),r*1.4),Color(.66,.62,.56,alpha),r,true)
 
 func _draw():
 	if foreground:
-		match area:
-			1:
-				chain(Vector2(1380,105),14,2.4)
-				for i in 5:
-					var p=Vector2(0,800-i*10)
-					draw_line(p,Vector2(115+i*13,790-i*18),Color("101215"),13-i*2,true)
-			2:
-				chain(Vector2(30,90),25,.45)
-				draw_colored_polygon(PackedVector2Array([Vector2(1390,810),Vector2(1440,810),Vector2(1440,300),Vector2(1410,300)]),Color("111315"))
-				for i in 8:draw_circle(Vector2(1420,360+i*52),5,Color("393732"))
-			3:
-				draw_arc(Vector2(-60,820),170,0,TAU,48,Color("0c1012"),24,true)
-				for i in 8:
-					var a=i*TAU/8+clock*TAU/24
-					draw_line(Vector2(-60,820),Vector2(-60,820)+Vector2(cos(a),sin(a))*165,Color("15191b"),9,true)
-				chain(Vector2(1420,60),22,-.65)
-			4:
-				chain(Vector2(-12,650),13,4.8)
-				chain(Vector2(1440,650),13,-4.8)
+		ash(16 if area==1 else 9,true)
+		# Sparse soft cinders skirt the corners; no solid objects cover fighters.
+		if area>1:
+			embers(Vector2(18,825),7,65,155,area)
+			embers(Vector2(1412,830),6,52,130,area+3)
 		return
-	# All environmental particles stay behind the combat lane. Periods divide 24s.
-	if area==1:
-		for i in 90:
-			var t=fposmod(clock/12+float(i)/90,1)
-			var x=fposmod(i*133.7+t*95,1440)
-			draw_circle(Vector2(x,60+t*490),.8+i%3*.35,Color(.7,.7,.68,sin(t*PI)*.45))
-	elif area==2:
-		for side in [0,1]:
+	ash(72 if area==1 else 26,false)
+	match area:
+		1:
+			exhaust(Vector2(1010,239),62,210,1,Color(.25,.24,.23,.6))
+			exhaust(Vector2(1140,178),48,155,5,Color(.23,.22,.21,.55))
+			exhaust(Vector2(795,300),38,145,8,Color(.30,.28,.26,.3))
+			embers(Vector2(1123,201),12,28,76,2)
+		2:
+			# Exhaust follows the two enormous angled ducts, fire vents and gate.
+			exhaust(Vector2(449,369),95,173,2,Color(.55,.51,.46,.68))
+			exhaust(Vector2(1023,425),85,177,7,Color(.47,.43,.38,.60))
+			exhaust(Vector2(705,520),100,225,4,Color(.35,.30,.25,.38))
+			embers(Vector2(727,520),30,85,235,4)
+			embers(Vector2(253,387),14,38,113,8)
+			embers(Vector2(1217,442),14,32,135,2)
+		3:
+			# Short ballistic spatters strike the receiving trough beneath the pour.
 			for i in 28:
-				var t=fposmod(clock/6+i/28.0+side*.5,1)
-				var p=Vector2(475 if side==0 else 1010,330)+Vector2((-1 if side==0 else 1)*t*105+sin(i*9.)*t*25,-t*65)
-				draw_circle(p,5+t*17,Color(.48,.47,.43,pow(sin(t*PI),2)*.022))
-	elif area==3:
-		for i in 45:
-			var t=fposmod(clock/3+i/45.0,1)
-			var p=Vector2(580+sin(i*3.4)*t*20,220+t*225)
-			draw_line(p,p+Vector2(2,7),Color(1,.5,.1,sin(t*PI)*.6),1.3,true)
-	else:
-		var pulse=(1-cos(clock*TAU/8))*.5
-		for i in 35:
-			var t=fposmod(clock/8+i/35.0,1)
-			var p=Vector2(720+sin(i*6.3)*145,520-t*220)
-			draw_circle(p,1.2,Color(1,.49,.16,sin(t*PI)*pulse*.6))
+				var age=fposmod(clock/(1.1+i%3*.23)+i/28.0,1)
+				var p=Vector2(584,423)+Vector2(sin(i*7.13)*78*age,-90*age+132*age*age)
+				draw_line(p,p+Vector2(sin(i*7.13)*2,2+age*3),Color(1,.57,.17,sin(age*PI)*.58),1,true)
+			exhaust(Vector2(601,453),95,247,3,Color(.42,.35,.28,.60))
+			exhaust(Vector2(919,489),73,195,8,Color(.38,.33,.28,.48))
+			embers(Vector2(558,150),22,42,124,5)
+			embers(Vector2(1181,467),21,64,226,3)
+		4:
+			# The sealed sanctuary breathes slowly; side fires remain independent.
+			var breath=.65+.2*sin(clock*.43)
+			exhaust(Vector2(295,533),65,234,2,Color(.43,.39,.34,.52*breath))
+			exhaust(Vector2(1137,536),68,218,9,Color(.43,.39,.34,.48*breath))
+			embers(Vector2(284,510),20,42,210,1)
+			embers(Vector2(1159,514),20,46,225,7)
+			exhaust(Vector2(714,557),150,65,6,Color(.40,.35,.29,.22))

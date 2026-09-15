@@ -11,7 +11,9 @@ var decorations: Array=[]
 func setup(source: CairnArt,name: String):
 	art=source
 	key=name
-	for child in get_children(): child.queue_free()
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
 	layers.clear()
 	decorations.clear()
 	position=Vector2.ZERO
@@ -28,6 +30,7 @@ func setup(source: CairnArt,name: String):
 		if chapter=="ashen":
 			var heat=ShaderMaterial.new()
 			heat.shader=preload("res://shaders/ashen_heat.gdshader")
+			heat.set_meta("continuous_clock",true)
 			heat.set_shader_parameter("area",float(name.get_slice("-",1)))
 			painting.material=heat
 			layers.append(heat)
@@ -64,11 +67,26 @@ func setup(source: CairnArt,name: String):
 				var decoration=preload("res://scripts/ashen_scenery.gd").new()
 				decoration.area=int(name.get_slice("-",1))
 				decoration.foreground=front
+				decoration.set_meta("continuous_clock",true)
 				if front:
 					decoration.z_as_relative=false
 					decoration.z_index=1805
 				add_child(decoration)
 				decorations.append(decoration)
+		if chapter=="ashen":
+			var veil=ColorRect.new()
+			veil.name="AshenVeil"
+			veil.size=Vector2(1440,810)
+			veil.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			veil.z_as_relative=false
+			veil.z_index=1810
+			var veil_material=ShaderMaterial.new()
+			veil_material.shader=preload("res://shaders/ashen_veil.gdshader")
+			veil_material.set_meta("continuous_clock",true)
+			veil_material.set_shader_parameter("area",float(name.get_slice("-",1)))
+			veil.material=veil_material
+			add_child(veil)
+			layers.append(veil_material)
 		if chapter=="swamp":
 			var foreground_layer=Node2D.new()
 			foreground_layer.z_as_relative=false
