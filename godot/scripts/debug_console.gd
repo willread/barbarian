@@ -6,6 +6,7 @@ var code=""
 var letters: Array=[]
 var tweens: Array=[]
 var shifts: Dictionary={}
+var falls: Dictionary={}
 var textures: Dictionary={}
 var landing_count=0
 var generation=0
@@ -19,18 +20,26 @@ func _ready():
 func toggle():
  if visible:
   close()
- elif game.phase in ["playing","paused"]:
+ elif game.phase=="playing":
   previous_pause=get_tree().paused
   get_tree().paused=true
   code=""
   landing_count=0
   show()
+  for i in 3:
+   var face=Sprite2D.new()
+   face.texture=textures["?"]
+   face.scale=Vector2(glyphs["?"].width,glyphs["?"].height)/face.texture.get_size()
+   add_child(face);letters.append(face)
+  arrange(false)
+  for face in letters:drop(face,false)
  game.bindings.clear();game.keys.clear();game.pressed.clear()
 func close():
  generation+=1
  for tween in tweens:
   if tween.is_valid():tween.kill()
  tweens.clear()
+ falls.clear()
  for shift in shifts.values():
   if shift.is_valid():shift.kill()
  shifts.clear()
@@ -51,13 +60,15 @@ func _input(event: InputEvent):
    get_viewport().set_input_as_handled()
 func accept_letter(ch: String):
  if not visible or code.length()>=3 or ch.length()!=1 or not glyphs.has(ch):return
+ if ch=="?":return
+ var face=letters[code.length()]
  code+=ch
  var meta=glyphs[ch]
- var face=Sprite2D.new()
  face.texture=textures[ch]
  face.scale=Vector2(meta.width,meta.height)/face.texture.get_size()
- add_child(face)
- letters.append(face)
+ arrange(true)
+ drop(face,true)
+func arrange(animate: bool):
  var center=get_viewport().get_visible_rect().size*.5
  var width=0.0
  for letter in letters:width+=letter.texture.get_width()*letter.scale.x
@@ -66,7 +77,7 @@ func accept_letter(ch: String):
  for letter in letters:
   var w=letter.texture.get_width()*letter.scale.x
   var target=x+w*.5
-  if letter==face:
+  if not animate:
    letter.position.x=target
   else:
    var id=letter.get_instance_id()
@@ -75,15 +86,20 @@ func accept_letter(ch: String):
    shifts[id]=shift
    shift.tween_property(letter,"position:x",target,.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
   x+=w-LETTER_OVERLAP
+func drop(face: Sprite2D,count_landing: bool):
+ var id=face.get_instance_id()
+ if falls.has(id) and falls[id].is_valid():falls[id].kill()
+ var center=get_viewport().get_visible_rect().size*.5
  face.position.y=0
  var tween=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
  tweens.append(tween)
+ falls[id]=tween
  tween.tween_property(face,"position:y",center.y,.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
  tween.tween_callback(func():game.audio.play("menu_land"))
  tween.tween_property(face,"position:y",center.y+2.6,.024)
  tween.tween_property(face,"position:y",center.y-4.9,.048)
  tween.tween_property(face,"position:y",center.y,.0816)
- tween.tween_callback(landed)
+ if count_landing:tween.tween_callback(landed)
 func landed():
  landing_count+=1
  if code.length()==3 and landing_count==3:
@@ -91,7 +107,7 @@ func landed():
   await get_tree().create_timer(.08,true).timeout
   if visible and token==generation:execute(code)
 func execute(text: String):
- if game.phase in ["playing","paused"]:
+ if game.phase=="playing":
   match text.to_upper():
    "TNT":game.kill_visible_enemies()
    "HOH":game.unlock_candy_session()
@@ -103,7 +119,6 @@ func execute(text: String):
    "FWD":
     var area=game.screen_for_wave(game.wave)
     if area<4:travel(area*3+1)
-  if game.phase=="paused":game.change_phase("playing")
  close()
 func travel(wave: int):
  game.wave=wave

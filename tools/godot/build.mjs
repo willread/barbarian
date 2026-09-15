@@ -26,7 +26,7 @@ run(process.execPath,['tools/godot/bake-world.mjs']);
 run(process.execPath,['tools/godot/bake-episodes.mjs']);
 run(process.execPath,['tools/godot/bake-king.mjs']);
 run(process.execPath,['tools/godot/bake-mire-oil.mjs']);
-if(!fs.existsSync('godot/assets/cheat-letters.json'))run(process.execPath,['tools/godot/bake-cheats.mjs']);
+if(!fs.existsSync('godot/assets/cheat-letters.json')||!JSON.parse(fs.readFileSync('godot/assets/cheat-letters.json','utf8')).menu['?'])run(process.execPath,['tools/godot/bake-cheats.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
 if(!menuManifest.menu['MUSIC PLAYER']||!menuManifest.menu['NEW JOURNEY']||!menuManifest.menu['EASY']||!menuManifest.menu['NORMAL']||!menuManifest.menu['HARD']||!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['tools/godot/bake-results.mjs']);

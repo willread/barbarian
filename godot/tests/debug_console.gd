@@ -5,7 +5,16 @@ func check():
  root.add_child(game)
  game.start_game()
  var console=game.debug_console
+ game.change_phase("paused")
  console.toggle()
+ assert(not console.visible and not paused,"Cheats must not open on pause menus")
+ game.change_phase("title")
+ console.toggle()
+ assert(not console.visible,"Cheats must not open on title menus")
+ game.start_game()
+ console.toggle()
+ assert(console.letters.size()==3 and console.code.is_empty())
+ for letter in console.letters:assert(letter.texture==console.textures["?"],"Opening shows three question marks")
  var clock=game.clock
  await create_timer(.1).timeout
  assert(paused and game.clock==clock)
@@ -13,6 +22,7 @@ func check():
  console.accept_letter("E")
  console.accept_letter("M")
  assert(console.code=="EM" and paused and game.hero.hp==12)
+ assert(console.letters.size()==3 and console.letters[0].texture==console.textures["E"] and console.letters[1].texture==console.textures["M"] and console.letters[2].texture==console.textures["?"],"Typed letters replace existing slots")
  console.accept_letter("1")
  assert(console.code=="EM")
  if "--console-capture" in OS.get_cmdline_user_args():
