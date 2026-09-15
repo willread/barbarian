@@ -2,6 +2,14 @@ extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
 const BOMB_RADIUS=Vector2(220,85)
+const BOMB_GRAVITY=900.0
+
+static func bomb_height(h: Dictionary) -> float:
+	if h.reflected:
+		var t=h.get("flight_age",0.0)
+		return maxf(0,h.get("launch_height",0.0)+h.get("launch_speed",430.0)*t-.5*BOMB_GRAVITY*t*t)
+	return sin(minf(h.age/.65,1)*PI)*160.0
+
 var bomb_views: Array=[]
 var explosions: Array=[]
 var root_views: Array=[]
@@ -239,24 +247,36 @@ func step(game,dt: float):
 		if h.kind!="clinker":continue
 		if h.reflected:
 			var before=h.p
-			h.p+=h.velocity*dt
+			var old_height=bomb_height(h)
+			var landing=bomb_landing(h)
+			h.flight_age=h.get("flight_age",0.0)+dt
+			if old_height>0 or h.flight_age<=dt:
+				h.p+=h.velocity*dt
+				h.p.x=clampf(h.p.x,35,1405)
+			if bomb_height(h)<=0:
+				h.p=landing
+				h.velocity=Vector2.ZERO
 			for enemy in game.enemies:
 				var point=Vector2(enemy.x,enemy.y)/Vector2(65,35)
 				var nearest=Geometry2D.get_closest_point_to_segment(point,before/Vector2(65,35),h.p/Vector2(65,35))
-				if enemy.hp>0 and point.distance_to(nearest)<1:
+				if enemy.hp>0 and point.distance_to(nearest)<1 and minf(old_height,bomb_height(h))<95*enemy.size:
 					h.p=nearest*Vector2(65,35)
 					h.life=h.age
 					break
 		else:h.p=h.start.lerp(h.target,minf(1,h.age/.65))
 		var hero=game.hero
 		var a=hero.attack
-		if h.age<h.life and not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.3:
+		if h.age<h.life and not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.3 and bomb_height(h)<100+hero.height*4.5:
 			var dx=(h.p.x-hero.x)*a.direction
 			if dx>=-35 and dx<max(100,a.reach*game.m.SCALE) and abs(hero.y-h.p.y)<42:
+				var launch_height=bomb_height(h)
 				h.reflected=true
+				h.flight_age=0.0
+				h.launch_height=launch_height
+				h.launch_speed=520.0 if a.type=="charge" else 430.0
 				h.strikes.append(a)
 				h.velocity=Vector2(a.direction*(1050 if a.type=="charge" else 650),0)
-				h.life=max(h.life,h.age+.75)
+				h.life=max(h.life,h.age+1.35)
 				game.burst(h.p.x,h.p.y-25,10,Color("ffbd69"))
 		if h.life-h.age<.45 and not h.get("warned",false):
 			h.warned=true
@@ -267,6 +287,53 @@ func step(game,dt: float):
 	var mire=mire_at(game.hero)
 	if not mire.is_empty() and game.hero.hp>0:
 		game.damage(game.hero,{"type":"mireDrain","damage":MIRE_DRAIN*dt,"direction":1 if game.hero.x>=mire.owner.x else -1,"continuous":true,"no_stun":true,"knock":false},mire.owner)
+
+
+func bomb_landing(h: Dictionary) -> Vector2:
+	if not h.reflected:return h.target
+	var height=bomb_height(h)
+	var vertical=h.get("launch_speed",430.0)-BOMB_GRAVITY*h.get("flight_age",0.0)
+	var remaining=maxf(0,(vertical+sqrt(vertical*vertical+2*BOMB_GRAVITY*height))/BOMB_GRAVITY)
+	return Vector2(clampf(h.p.x+h.velocity.x*remaining,35,1405),h.p.y)
+
+func avoid_bombs(game,enemy: Dictionary) -> Variant:
+	# React to visible throws, with a short delay; committed strikes still finish.
+	if enemy.hp<=0 or enemy.hurtTicks or enemy.recovering or not enemy.down.is_empty():return null
+	var threats=[]
+	for h in hazards:
+		if h.kind=="clinker" and h.age>=.18 and h.age<h.life:threats.append(bomb_landing(h))
+	var point=Vector2(enemy.x,enemy.y)
+	var footprint=BOMB_RADIUS+Vector2(40,25)
+	var danger=Vector2.ZERO
+	var nearest=INF
+	for target in threats:
+		var distance=((point-target)/footprint).length()
+		if distance<1.0 and distance<nearest:
+			nearest=distance
+			danger=target
+	if nearest==INF:return null
+	if not enemy.attack.is_empty():
+		if enemy.boss or enemy.attack.age>=enemy.attack.from-6:return null
+		game.m.interrupt_attack(enemy)
+	var best=point
+	var cost=INF
+	for i in 16:
+		var angle=TAU*i/16.0
+		var candidate=danger+Vector2(cos(angle),sin(angle))*footprint*1.12
+		var probe={"x":clampf(candidate.x,game.e_ai.arena_margin(enemy),1440-game.e_ai.arena_margin(enemy)),"y":clampf(candidate.y,560,755)}
+		game.background.constrain(probe)
+		candidate=Vector2(probe.x,probe.y)
+		var penalty=0.0
+		for target in threats:
+			penalty+=maxf(0,1.08-((candidate-target)/footprint).length())*3000
+		var score=point.distance_to(candidate)+penalty
+		if score<cost:
+			cost=score
+			best=candidate
+	var direction=point.direction_to(best)
+	if absf(direction.x)>.2:enemy.dir=1 if direction.x>0 else -1
+	enemy.brace=0
+	return direction
 
 func movement(actor: Dictionary,before: Vector2):
 	actor["mired"]=false
@@ -301,7 +368,7 @@ func draw_ground(game,node: Node2D):
 			"clinker":
 				var remaining=maxf(0,h.life-h.age)
 				var pulse=.55+.3*sin(h.age*12+pow(h.age,3)*2)
-				var point=h.p if h.reflected else h.target
+				var point=bomb_landing(h)
 				var color=Color(.3,.85,1,pulse) if h.reflected else Color(1,.25,.035,pulse)
 				ellipse(node,point,BOMB_RADIUS,Color(color,.09),true)
 				ellipse(node,point,BOMB_RADIUS,color)

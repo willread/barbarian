@@ -992,7 +992,8 @@ func tick(dt: float):
 	for f in enemies:
 		if f.hp<=0: continue
 		var enemy_before=Vector2(f.x,f.y)
-		var intent=e_ai.intent(f,hero,f.id in engaged)
+		var escape=episode_combat.avoid_bombs(self,f)
+		var intent=e_ai.intent(f,hero,f.id in engaged) if escape==null else escape
 		if not f.attack.is_empty(): e_ai.motion(f)
 		elif not f.hurtTicks and f.down.is_empty() and not f.recovering:
 			var speed=e_ai.roster[f.kind].speed*f.speedFactor

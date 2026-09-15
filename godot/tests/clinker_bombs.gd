@@ -53,6 +53,43 @@ func check():
 	assert(owner.hp<30 and owner.slamPush.x>0 and hero.hp==100,"Reflected blast hits enemies only")
 	combat.clear()
 	assert(combat.explosions.is_empty() and combat.bomb_views.is_empty())
+	# Reflected projectiles rise, descend and settle; their landing tell stays fixed.
+	var arc={"kind":"clinker","owner":owner,"p":Vector2(400,670),"target":Vector2(400,670),"age":.8,"life":3.0,"reflected":true,"velocity":Vector2(650,0),"strikes":[],"flight_age":0.0,"launch_height":0.0,"launch_speed":430.0}
+	combat.hazards=[arc]
+	owner.x=1300;owner.hp=30;owner.invTicks=0;owner.down={};owner.attack={}
+	hero.attack={}
+	var landing=combat.bomb_landing(arc)
+	combat.step(game,.2)
+	var rise=combat.bomb_height(arc)
+	assert(rise>60)
+	combat.step(game,.2)
+	assert(combat.bomb_height(arc)>rise,"Bomb rises after reflection")
+	assert(combat.bomb_landing(arc).distance_to(landing)<.01,"Landing warning tracks the ballistic endpoint")
+	var peak=combat.bomb_height(arc)
+	combat.step(game,.35)
+	assert(combat.bomb_height(arc)<peak,"Bomb falls after its apex")
+	combat.step(game,.25)
+	assert(arc.p.distance_to(landing)<.01)
+	assert(combat.bomb_height(arc)==0 and arc.velocity==Vector2.ZERO,"Bomb settles on the floor")
+	# Other enemies avoid a bearer's throw, even before it lands.
+	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.3,"life":2.25,"reflected":false}
+	combat.hazards=[thrown]
+	var dodger=game.make_actor(720,670,100)
+	dodger.kind="bone";dodger.attack={};dodger.down={};dodger.hurtTicks=0;dodger.recovering=false
+	var escape=combat.avoid_bombs(game,dodger)
+	assert(escape is Vector2 and escape.length()>.9,"Nearby enemy must seek an escape")
+	for tick in 100:
+		escape=combat.avoid_bombs(game,dodger)
+		if escape==null:break
+		dodger.x+=escape.x*3;dodger.y+=escape.y*3
+	assert(((Vector2(dodger.x,dodger.y)-thrown.target)/combat.BOMB_RADIUS).length()>1,"Escape actually clears the blast")
+	assert(dodger.y>=560 and dodger.y<=755)
+	dodger.x=720;dodger.y=560;thrown.target=Vector2(720,560)
+	escape=combat.avoid_bombs(game,dodger)
+	assert(escape.y>=0,"Do not evade into the upper wall")
+	dodger.hurtTicks=10
+	assert(combat.avoid_bombs(game,dodger)==null,"Stunned enemies cannot evade")
+	combat.clear()
 	game.queue_free()
 	await process_frame
 	print("CAIRN_BOMBS_OK: fuse, damage, radial knockdown, ellipse, invulnerability, reflection, pause and cleanup")
