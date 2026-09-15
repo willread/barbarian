@@ -114,7 +114,7 @@ const OPEN=.45/.49
 const HOLD=3.0
 
 func _ready():
-	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN if get_window().has_focus() else Input.MOUSE_MODE_VISIBLE
+	update_mouse_cursor()
 	# Command-line test/capture runs never touch the player's records.
 	if DisplayServer.get_name()!="headless" and OS.get_cmdline_user_args().is_empty():records=CairnRunRecords.new()
 	Input.joy_connection_changed.connect(func(_device,connected):
@@ -334,6 +334,7 @@ func change_phase(next: String):
 		pause_cover=0.0
 		title_intro=0.0
 	phase=next
+	update_mouse_cursor()
 	overlay.z_index=2090 if next in ["lost","won","paused"] or pause_cover>0 else 2000
 	bindings.clear()
 	keys.clear()
@@ -1253,8 +1254,11 @@ func cycle_weapon(direction: int):
 func toggle_weapon():
 	cycle_weapon(1)
 
+func update_mouse_cursor():
+	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN if phase in ["playing","dying","victory"] and get_window().has_focus() else Input.MOUSE_MODE_VISIBLE
+
 func _notification(what: int):
-	if what==NOTIFICATION_APPLICATION_FOCUS_IN:Input.mouse_mode=Input.MOUSE_MODE_HIDDEN
+	if what==NOTIFICATION_APPLICATION_FOCUS_IN:update_mouse_cursor()
 	elif what==NOTIFICATION_APPLICATION_FOCUS_OUT:Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT and phase=="playing" and is_instance_valid(menu): change_phase("paused")
 
