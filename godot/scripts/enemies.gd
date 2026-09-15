@@ -4,7 +4,7 @@ var m: CairnMechanics
 var roster: Dictionary
 # Tiny variants are temporarily disabled; retain their behavior for later re-enabling.
 const ENABLED_VARIANTS=["brute"]
-const HEALTH_SCALE={"legion":0.525,"shield":0.70}
+const HEALTH_SCALE={"legion":0.70,"shield":0.70,"marauder":0.75}
 func _init(mechanics: CairnMechanics, data: Dictionary):
 	m=mechanics
 	roster=data.duplicate(true)
