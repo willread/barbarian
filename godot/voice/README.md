@@ -8,3 +8,5 @@ The first visible living heavy enemy and the first full mana bar each queue a li
 
 The tiny_enemy cue uses the new user-provided Cairn recording and fires once per run when a living swift variant enters the visible play area. It shares the existing voice settings, queue and milestone reset rules.
 
+
+Each episode boss now queues its own user-supplied Cairn line: champion, king, and saint. These take priority over ordinary quips and trigger once per run when that boss becomes visible. Bosses do not trigger the generic big-enemy line; ordinary heavy enemies retain it. The September 15 recordings use the same loudness and 30 Hz portrait-envelope processing as existing clips.

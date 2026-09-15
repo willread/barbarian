@@ -49,6 +49,17 @@ func check():
 	voice.reset()
 	voice.observe_milestones()
 	assert(voice.pending.is_empty())
+	# Boss cues remain eligible after both ordinary enemy milestones have fired.
+	for kind in ["champion","king","saint"]:
+		voice.reset()
+		foe.boss=true;foe.kind=kind;foe.size=1.8;foe.variant="regular"
+		foe.x=-100
+		voice.observe_milestones()
+		assert(voice.pending.is_empty())
+		foe.x=300
+		voice.observe_milestones()
+		voice.observe_milestones()
+		assert(voice.pending.size()==1 and voice.pending[0].id=="boss_"+kind)
 	game.start_game()
 	assert(voice.milestones.is_empty())
 	game.voice_enabled=false
