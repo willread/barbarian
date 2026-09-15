@@ -114,6 +114,7 @@ const OPEN=.45/.49
 const HOLD=3.0
 
 func _ready():
+	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN if get_window().has_focus() else Input.MOUSE_MODE_VISIBLE
 	# Command-line test/capture runs never touch the player's records.
 	if DisplayServer.get_name()!="headless" and OS.get_cmdline_user_args().is_empty():records=CairnRunRecords.new()
 	Input.joy_connection_changed.connect(func(_device,connected):
@@ -1253,6 +1254,8 @@ func toggle_weapon():
 	cycle_weapon(1)
 
 func _notification(what: int):
+	if what==NOTIFICATION_APPLICATION_FOCUS_IN:Input.mouse_mode=Input.MOUSE_MODE_HIDDEN
+	elif what==NOTIFICATION_APPLICATION_FOCUS_OUT:Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
 	if what==NOTIFICATION_APPLICATION_FOCUS_OUT and phase=="playing" and is_instance_valid(menu): change_phase("paused")
 
 func drop_gear(f: Dictionary):
