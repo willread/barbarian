@@ -26,6 +26,8 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 	if not f.player and f.kind=="king" and f.hp>0 and f.down.is_empty() and not f.hurtTicks and not f.recovering:
 		if not f.attack.is_empty():
 			var a=f.attack
+			if a.type=="kingCharge":
+				return ["king-attacks",0 if a.age<a.from-16 else 1] if a.age<a.from else ["king-walk",int((a.age-a.from)*.6)%8] if not a.get("arrived",false) else ["king-attacks",3]
 			var frame=0 if a.age<a.from-14 else 1 if a.age<a.from else 2 if a.age<a.from+10 else 3
 			return ["king-attacks",frame+(4 if a.type=="rootSlam" else 0)]
 		if f.moving:return ["king-walk",int(f.stride*8)%8]

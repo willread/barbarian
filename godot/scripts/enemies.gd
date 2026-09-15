@@ -12,7 +12,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":65,"speed":.8},"saint":{"hp":120,"speed":.8}})
 	for attack in [
 		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
-		["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
+		["kingCharge",138,48,-1,0,0],["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
 		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
 
@@ -304,11 +304,24 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
 
 func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	e["escape_cooldown"]=maxi(0,e.get("escape_cooldown",0)-1)
+	var cornered=(e.x<245 or e.x>1195) and absf(h.x-e.x)<340 and absf(h.y-e.y)<85
+	e["corner_ticks"]=mini(240,e.get("corner_ticks",0)+1) if cornered else maxi(0,e.get("corner_ticks",0)-3)
 	if e.hp<=e.max*.5:e.phaseTwo=true
 	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
 	var dx=h.x-e.x
 	var dy=h.y-e.y
 	e.dir=facing_target(e,h.x)
+	if e.corner_ticks>=180 and e.escape_cooldown==0:
+		e.dir=1 if e.x<720 else -1
+		if m.begin(e,"kingCharge"):
+			e.attack.target=Vector2(1160 if e.dir>0 else 280,e.y)
+			e.attack["charge_hit"]=false
+			e.attack["arrived"]=false
+			e.corner_ticks=0
+			e.escape_cooldown=720
+			e["open_ticks"]=0
+		return Vector2.ZERO
 	if e.aiRest:return Vector2.ZERO
 	# Alternate a committed close sweep with a ranged, position-locked root eruption.
 	# Long recovery rewards going around the attack instead of trading damage.
@@ -355,6 +368,7 @@ func hag_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	return Vector2.ZERO
 
 static func boss_open(e: Dictionary) -> bool:
+	if e.attack.get("type","")=="kingCharge":return e.attack.get("arrived",false)
 	return e.phaseTwo or (not e.attack.is_empty() and e.attack.age>max(e.attack.to,e.attack.from+7)) or e.get("open_ticks",0)>0
 
 func separate(actors: Array):

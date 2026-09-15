@@ -150,6 +150,7 @@ func step(game,dt: float):
 		enemy["hazard_live"]=hazards.any(func(h):return h.owner.id==enemy.id)
 		enemy["mire_count"]=hazards.filter(func(h):return h.kind=="mire" and h.owner.id==enemy.id).size()
 		var a=enemy.attack
+		if enemy.hp>0 and a.get("type","")=="kingCharge":step_king_charge(game,enemy,a,dt)
 		if a.get("type","")=="mireCast" and not a.get("placed",false):
 			var placement=place_clump(game,enemy,a.target)
 			if placement==null:
@@ -298,3 +299,36 @@ func spawn_root(owner: Dictionary,target: Vector2,age: float,previous: int=-1):
 	var height=heights[variant]*randf_range(.94,1.08)
 	var size=Vector2(height*texture.get_width()/texture.get_height(),height)
 	hazards.append({"kind":"root","owner":owner,"p":target,"age":age,"life":1.75,"struck":false,"variant":variant,"flip":-1 if randf()<.5 else 1,"size":size})
+
+func step_king_charge(game,king: Dictionary,a: Dictionary,dt: float):
+	if a.age<a.from:
+		if not a.get("warned",false):
+			a.warned=true
+			game.audio.play("roar",-4,.7)
+		if a.age%12==0:
+			game.burst(king.x+king.dir*32,king.y-5,5,Color("827865"))
+			game.audio.play("heavy_hit",-15,.6)
+		return
+	if a.get("arrived",false):return
+	if not a.get("launched",false):
+		a.launched=true
+		game.audio.play("axe",-2,.55)
+		game.shake=maxf(game.shake,5)
+	var before=float(king.x)
+	king.x=move_toward(king.x,a.target.x,1350*dt)
+	king.dir=a.direction
+	if a.age%4==0:
+		game.burst(king.x-king.dir*45,king.y-5,6,Color("827865"))
+		game.shake=maxf(game.shake,2)
+	var hero=game.hero
+	# Swept contact avoids skipping the player at charge speed; one hit per escape.
+	if not a.charge_hit and hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<48 and absf(hero.y-king.y)<43 and hero.x>=minf(before,king.x)-95 and hero.x<=maxf(before,king.x)+95:
+		a.charge_hit=true
+		game.damage(hero,{"type":"kingCharge","damage":14,"direction":a.direction,"knock":true,"push":7.0},king)
+		hero.invTicks=maxi(hero.invTicks,60)
+		game.audio.play("heavy_hit",-2,.7)
+		game.shake=maxf(game.shake,9)
+	if absf(king.x-a.target.x)<1:
+		a.arrived=true
+		king["open_ticks"]=90
+		game.burst(king.x+king.dir*45,king.y-5,14,Color("827865"))
