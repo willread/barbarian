@@ -230,7 +230,7 @@ func motion(e: Dictionary):
 
 func finish(e: Dictionary,a: Dictionary,h: Dictionary):
 	if e.kind=="king":
-		e.aiRest=28 if e.phaseTwo else 42
+		e.aiRest=randi_range(54,144) if e.phaseTwo else randi_range(66,168)
 		e["open_ticks"]=e.aiRest
 		return
 	if e.kind=="witch":
