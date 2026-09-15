@@ -76,6 +76,13 @@ func check():
   game.episode_combat.spawn_root(king,Vector2(700,670),.5)
   game.episode_combat.step(game,.01)
   assert((game.hero.hp<100)==(abs(depth)<52),"Root depth includes nearby feet but preserves a dodge outside its footprint")
+ # Phase two advances both charge timers twice as fast, including an existing wait.
+ king.attack={"type":"rootSlam"};king.roam_charge_wait=400;king.escape_cooldown=300;king.phaseTwo=false;king.hp=king.max
+ game.e_ai.king_intent(king,game.hero)
+ assert(king.roam_charge_wait==399 and king.escape_cooldown==299)
+ king.hp=king.max*.5
+ game.e_ai.king_intent(king,game.hero)
+ assert(king.phaseTwo and king.roam_charge_wait==397 and king.escape_cooldown==297,"Phase two doubles charge timer speed immediately")
  # The large boss receives attacks across a broader floor footprint.
  king.attack={};king.hurtTicks=0;king.down={};king.invTicks=0;king.hp=65;king.x=760;king.y=670
  game.hero.x=700;game.hero.height=0;game.hero.dir=1

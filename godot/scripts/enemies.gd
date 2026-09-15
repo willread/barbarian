@@ -307,12 +307,13 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
 
 func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.hp<=e.max*.5:e.phaseTwo=true
+	var charge_clock=2 if e.phaseTwo else 1
 	if not e.has("roam_charge_wait"):e.roam_charge_wait=randi_range(300,480)
-	e.roam_charge_wait=maxi(0,e.roam_charge_wait-1)
-	e["escape_cooldown"]=maxi(0,e.get("escape_cooldown",0)-1)
+	e.roam_charge_wait=maxi(0,e.roam_charge_wait-charge_clock)
+	e["escape_cooldown"]=maxi(0,e.get("escape_cooldown",0)-charge_clock)
 	var cornered=(e.x<390 or e.x>1050) and absf(h.x-e.x)<600 and absf(h.y-e.y)<130
 	e["corner_ticks"]=mini(240,e.get("corner_ticks",0)+1) if cornered else maxi(0,e.get("corner_ticks",0)-1)
-	if e.hp<=e.max*.5:e.phaseTwo=true
 	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or not e.attack.is_empty():return Vector2.ZERO
 	var dx=h.x-e.x
 	var dy=h.y-e.y
