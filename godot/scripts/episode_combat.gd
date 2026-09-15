@@ -206,7 +206,7 @@ func step(game,dt: float):
 			var growth=minf(clampf(h.age/.20,0,1),clampf((h.life-h.age)/.30,0,1))
 			var rise=1.0-pow(1.0-growth,3)
 			# Keep contact live after eruption; regular invulnerability and a local cooldown prevent rapid repeated hits.
-			if h.age>=.18 and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<29:
+			if h.age>=.18 and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<52:
 				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false,"no_stun":true},h.owner)
 				# One escape window shared across every root, including later eruptions.
 				if victim.hp>0:victim.invTicks=maxi(victim.invTicks,45)
@@ -322,7 +322,7 @@ func step_king_charge(game,king: Dictionary,a: Dictionary,dt: float):
 		game.shake=maxf(game.shake,2)
 	var hero=game.hero
 	# Swept contact avoids skipping the player at charge speed; one hit per escape.
-	if not a.charge_hit and hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<48 and absf(hero.y-king.y)<43 and hero.x>=minf(before,king.x)-95 and hero.x<=maxf(before,king.x)+95:
+	if not a.charge_hit and hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<48 and absf(hero.y-king.y)<55 and hero.x>=minf(before,king.x)-95 and hero.x<=maxf(before,king.x)+95:
 		a.charge_hit=true
 		game.damage(hero,{"type":"kingCharge","damage":14,"direction":a.direction,"knock":true,"push":7.0},king)
 		hero.invTicks=maxi(hero.invTicks,60)

@@ -5,7 +5,7 @@ extends RefCounted
 const HZ = 59.92274340431231
 const STEP = 1.0 / HZ
 const SCALE = 4.5
-const MELEE_LANE = 8 * SCALE
+const MELEE_LANE = 48.0
 const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":48}}
 var combat_extensions=false
 var attacks: Dictionary
@@ -175,7 +175,7 @@ func begin(f: Dictionary, type: String) -> bool:
 		a.damage=4.5 if f.weapon=="axe" else 3.2
 		a.knock=f.weapon=="axe"
 		a.dive=true
-		a.lane=30
+		a.lane=42
 		a.box=[-6,42 if f.weapon=="axe" else 58,-36,90]
 	if type=="spin":a.lane=MELEE_LANE
 	if type not in ["air","charge"]:

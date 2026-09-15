@@ -305,15 +305,17 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 
 func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	e["escape_cooldown"]=maxi(0,e.get("escape_cooldown",0)-1)
-	var cornered=(e.x<245 or e.x>1195) and absf(h.x-e.x)<340 and absf(h.y-e.y)<85
-	e["corner_ticks"]=mini(240,e.get("corner_ticks",0)+1) if cornered else maxi(0,e.get("corner_ticks",0)-3)
+	var cornered=(e.x<390 or e.x>1050) and absf(h.x-e.x)<600 and absf(h.y-e.y)<130
+	e["corner_ticks"]=mini(240,e.get("corner_ticks",0)+1) if cornered else maxi(0,e.get("corner_ticks",0)-1)
 	if e.hp<=e.max*.5:e.phaseTwo=true
-	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
+	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or not e.attack.is_empty():return Vector2.ZERO
 	var dx=h.x-e.x
 	var dy=h.y-e.y
 	e.dir=facing_target(e,h.x)
-	if e.corner_ticks>=180 and e.escape_cooldown==0:
+	if e.corner_ticks>=150 and e.escape_cooldown==0:
 		e.dir=1 if e.x<720 else -1
+		# Break a sustained corner stun-lock, then give the full charge warning.
+		e.hurtTicks=0;e.recovering=0;e.recoil=0;e.stagger=0
 		if m.begin(e,"kingCharge"):
 			e.attack.target=Vector2(1160 if e.dir>0 else 280,e.y)
 			e.attack["charge_hit"]=false
@@ -322,7 +324,7 @@ func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 			e.escape_cooldown=720
 			e["open_ticks"]=0
 		return Vector2.ZERO
-	if e.aiRest:return Vector2.ZERO
+	if e.aiRest or e.hurtTicks or e.recovering:return Vector2.ZERO
 	# Alternate a committed close sweep with a ranged, position-locked root eruption.
 	# Long recovery rewards going around the attack instead of trading damage.
 	if abs(dx)<560 and abs(dy)<90:
