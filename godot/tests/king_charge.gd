@@ -61,11 +61,14 @@ func check():
  game.hero.x=520;game.hero.y=670;game.hero.hp=100;game.hero.invTicks=9999;game.hero.down={};game.hero.height=0
  game.stage_walk="";game.transition=-1;game.phase="playing"
  var charged=false
+ var completed=false
  for tick in 600:
   game.tick(1.0/60)
   if king.attack.get("type","")=="kingCharge":charged=true
-  if charged and king.x>1100:break
- assert(charged and king.x>1100,"Normal combat loop must trigger and complete a corner escape")
+  if charged and king.attack.get("arrived",false):
+   completed=true
+   break
+ assert(charged and completed,"Normal combat loop must trigger and complete a corner escape")
  for depth in [-60,-45,45,60]:
   game.episode_combat.clear()
   game.hero.x=700;game.hero.y=670+depth;game.hero.height=0;game.hero.hp=100;game.hero.invTicks=0;game.hero.down={}
@@ -73,6 +76,16 @@ func check():
   game.episode_combat.spawn_root(king,Vector2(700,670),.5)
   game.episode_combat.step(game,.01)
   assert((game.hero.hp<100)==(abs(depth)<52),"Root depth includes nearby feet but preserves a dodge outside its footprint")
+ # The large boss receives attacks across a broader floor footprint.
+ king.attack={};king.hurtTicks=0;king.down={};king.invTicks=0;king.hp=65;king.x=760;king.y=670
+ game.hero.x=700;game.hero.height=0;game.hero.dir=1
+ var strike={"type":"light","reach":40,"direction":1}
+ for depth in [-81,-65,65,81]:
+  game.hero.y=670+depth
+  assert(game.m.can_hit(game.hero,king,strike)==(abs(depth)<80),"King receives blows above and below his broad stance")
+ game.hero.y=735;game.hero.hp=100;game.hero.invTicks=0;game.hero.down={}
+ strike.direction=-1
+ assert(not game.m.can_hit(king,game.hero,strike),"Larger receiving footprint must not extend boss attacks")
  game.queue_free();await process_frame;await create_timer(.15).timeout
  print("CAIRN_KING_CHARGE_OK: sustained pressure, warning, both directions, swept hit, knockdown, recovery and cooldown")
  quit()
