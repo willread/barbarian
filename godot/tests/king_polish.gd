@@ -49,7 +49,7 @@ func check():
  combat.step(game,.7)
  assert(game.hero.hp==hp,"Invulnerability protects against contact")
  combat.clear()
- # Both phases send exactly three separately targeted roots.
+ # Phase one sends two roots; phase two sends four with tighter spacing.
  for phase in [false,true]:
   king.phaseTwo=phase;king.moveIndex=0;king.aiRest=0
   game.hero.height=100;game.hero.x=620
@@ -59,14 +59,22 @@ func check():
   king.attack={}
   assert(combat.hazards.size()==1)
   game.hero.x=820
-  combat.step(game,.18)
+  var interval=.38 if phase else .48
+  combat.step(game,interval-.30)
   assert(combat.hazards.size()==2)
   var second=combat.hazards[1]
   assert(second.p.x==820 and second.age<0,"Second target warns before emerging")
   assert(second.variant!=combat.hazards[0].variant,"Consecutive silhouettes differ")
-  game.hero.x=1060
-  combat.step(game,.48)
-  assert(combat.hazards.size()==3 and combat.hazards[2].p.x==1060)
+  if phase:
+   game.hero.x=1060
+   combat.step(game,interval)
+   assert(combat.hazards.size()==3 and combat.hazards[2].p.x==1060)
+   game.hero.x=1200
+   combat.step(game,interval)
+   assert(combat.hazards.size()==4 and combat.hazards[3].p.x==1200)
+  else:
+   combat.step(game,interval)
+   assert(combat.hazards.size()==2,"Phase one stops after two eruptions")
   assert(second.p.x==820,"Warnings lock instead of following the player")
   assert(combat.root_sequences.is_empty())
   combat.step(game,.3)

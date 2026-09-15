@@ -4,6 +4,7 @@ var hazards: Array=[]
 var root_views: Array=[]
 var root_sequences: Array=[]
 const ROOT_INTERVAL=.48
+const ROOT_PHASE_TWO_INTERVAL=.38
 const ROOT_WARNING=.30
 const MireLayout=preload("res://scripts/mire_layout.gd")
 const MIRE_SPEED=.10
@@ -149,7 +150,8 @@ func step(game,dt: float):
 				game.audio.play("heavy_hit",-5,.7)
 				game.shake=maxf(game.shake,4)
 				spawn_root(enemy,target,0.0)
-				root_sequences.append({"owner":enemy,"wait":ROOT_INTERVAL-ROOT_WARNING,"remaining":2,"variant":hazards.back().variant})
+				var interval=ROOT_PHASE_TWO_INTERVAL if enemy.phaseTwo else ROOT_INTERVAL
+				root_sequences.append({"owner":enemy,"wait":interval-ROOT_WARNING,"interval":interval,"remaining":3 if enemy.phaseTwo else 1,"variant":hazards.back().variant})
 			"furnaceBlast":
 				# The Saint ejects slag so reflection also works in the solo boss encounter.
 				if not hazards.any(func(h):return h.kind=="clinker" and h.owner.id==enemy.id):
@@ -167,7 +169,7 @@ func step(game,dt: float):
 			spawn_root(sequence.owner,target,-ROOT_WARNING,sequence.variant)
 			sequence.variant=hazards.back().variant
 			sequence.remaining-=1
-			sequence.wait+=ROOT_INTERVAL
+			sequence.wait+=sequence.interval
 	root_sequences=root_sequences.filter(func(s):return s.owner.hp>0 and s.remaining>0)
 	for h in hazards:
 		h.age+=dt
