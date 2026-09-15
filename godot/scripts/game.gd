@@ -676,6 +676,14 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
 	if f.player and not f.pickup.is_empty():return
 	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
+	if attacker.player and not f.player and f.kind=="shield" and a.get("spin",false) and not e_ai.guard_open(f):
+		var push_direction=1 if f.x>=attacker.x else -1
+		f.x=clampf(f.x+push_direction*42,70,1370)
+		f.brace=14
+		f.aiRest=max(f.aiRest,12)
+		audio.play("shield",-5)
+		burst(f.x-push_direction*35,f.y-110,6,Color("b9a077"))
+		return
 	if attacker.player and not f.player and (a.get("type","")=="charge" and e_ai.heavy(f) or a.get("spin",false) and f.get("variant","")=="brute"):
 		m.rebound_charge(attacker,int(a.direction))
 		audio.play("resist",-4)
@@ -786,7 +794,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		else:
 			kills+=1
 	if not f.player and attacker.player and not a.get("magic",false):
-		magic=min(100,magic+(6+(8 if f.hp<=0 else 0))*combo.mana_multiplier())
+		magic=min(100,magic+(6+(8 if f.hp<=0 else 0))*combo.mana_multiplier()*.6)
 		if magic>=100:hero_voice.request_once("mana_full")
 
 func burst(x: float,y: float,count: int,color: Color):

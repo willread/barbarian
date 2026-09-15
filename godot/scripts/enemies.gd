@@ -99,6 +99,11 @@ static func heavy(e: Dictionary) -> bool:
 static func guard_open(e: Dictionary) -> bool:
 	return e.kind=="shield" and not e.attack.is_empty() and e.attack.age>=e.attack.from-12
 
+static func facing_target(e: Dictionary,target_x: float) -> int:
+	# A small overlap/separation correction must not flip an actor's entire silhouette.
+	if absf(target_x-e.x)<36:return e.dir
+	return 1 if target_x>e.x else -1
+
 func frame(e: Dictionary) -> int:
 	if not e.down.is_empty(): return (14 if e.hp>0 and e.down.ground<=20 else 13) if e.down.ground else 12
 	if e.hp<=0: return 13
@@ -141,8 +146,11 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 		h.x=e.noticedPosition.x
 		h.y=e.noticedPosition.y
 	if e.kind=="legion":
+		if absf(h.x-e.x)<36:
+			h=h.duplicate()
+			h.x=e.x+e.dir*maxf(.01,absf(h.x-e.x))
 		if heavy(e) and e.attack.is_empty() and not e.hurtTicks and e.down.is_empty():
-			var face=1 if h.x>=e.x else -1
+			var face=facing_target(e,h.x)
 			if face!=e.dir:
 				e.turnTicks+=1
 				if e.turnTicks<24:return Vector2.ZERO
@@ -164,7 +172,7 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 	if e.kind=="champion" and e.hp<=e.max*.5: e.phaseTwo=true
 	var x=(h.x-e.x)/m.SCALE
 	var y=(h.y-e.y)/m.SCALE
-	var face=-1 if x<0 else 1
+	var face=facing_target(e,h.x)
 	if not e.attack.is_empty():
 		if e.kind=="marauder" and not heavy(e) and not e.attack.get("rush",false) and not e.rushCombo and e.attack.age<e.attack.from-6:
 			e.dir=face
@@ -259,7 +267,7 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
 	var dx=h.x-e.x
 	var dy=h.y-e.y
-	e.dir=1 if dx>=0 else -1
+	e.dir=facing_target(e,h.x)
 	if h.hp<=0:return Vector2.ZERO
 	var margin=arena_margin(e)
 	# Walk fully into view before choosing a firing or retreat position.
@@ -281,7 +289,7 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty() or h.hp<=0:return Vector2.ZERO
 	var dx=h.x-e.x
 	var dy=h.y-e.y
-	e.dir=1 if dx>=0 else -1
+	e.dir=facing_target(e,h.x)
 	var ranged=e.kind in ["witch","bearer"]
 	var reach=530.0 if ranged else 270.0
 	if not e.aiRest and abs(dx)<reach and abs(dy)<(130 if e.kind=="witch" else 26):
@@ -300,7 +308,7 @@ func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
 	var dx=h.x-e.x
 	var dy=h.y-e.y
-	e.dir=1 if dx>=0 else -1
+	e.dir=facing_target(e,h.x)
 	if e.aiRest:return Vector2.ZERO
 	# Alternate a committed close sweep with a ranged, position-locked root eruption.
 	# Long recovery rewards going around the attack instead of trading damage.
@@ -320,7 +328,7 @@ func hag_intent(e: Dictionary,h: Dictionary) -> Vector2:
 		if e.x>1270:return Vector2(-1,0)
 	var dx=h.x-e.x
 	var dy=h.y-e.y
-	e.dir=1 if dx>=0 else -1
+	e.dir=facing_target(e,h.x)
 	e["hag_move_cooldown"]=max(0,e.get("hag_move_cooldown",120)-1)
 	if not e.aiRest and abs(dx)<175 and abs(dy)<36:
 		m.begin(e,"hagClaw")

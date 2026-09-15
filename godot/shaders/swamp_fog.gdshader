@@ -21,6 +21,6 @@ void fragment(){
   float edge=1.0-smoothstep(.25,1.2,length(p)+(.5-billow)*.42);
   coverage+=edge*smoothstep(.20,.82,billow)*.52;
  }
- float alpha=min(.43,coverage)*(1.0-smoothstep(.94,1.0,UV.y));
+ float alpha=min(.645,coverage*1.5)*(1.0-smoothstep(.94,1.0,UV.y));
  COLOR=vec4(.65,.70,.67,alpha);
 }
