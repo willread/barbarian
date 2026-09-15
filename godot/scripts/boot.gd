@@ -2,7 +2,7 @@ extends Node2D
 var picture: AtlasTexture
 var flat: Texture2D
 var backdrop=preload("res://art/studio-background.png")
-var stones=preload("res://art/branding/cairn-icon-256.png")
+var stones=preload("res://art/branding/loading-stones-v2.png")
 var elapsed=0.0
 var white_layer: Node2D
 func _ready():
@@ -52,7 +52,9 @@ func _draw():
 	var edge=clampf(min(screen.x,screen.y)*.09,60.,96.)
 	var origin=screen-Vector2.ONE*(edge+24.)
 	var cycle=fmod(elapsed,2.8)/2.8
-	var regions=[Rect2(0,158,256,98),Rect2(0,102,256,56),Rect2(0,0,256,102)]
+	# Complete separate rocks include the top faces hidden in the stacked icon.
+	var regions=[Rect2(25,211,677,326),Rect2(787,215,613,300),Rect2(1545,246,564,269)]
+	var placements=[Rect2(26,127,204,98),Rect2(36,75,184,90),Rect2(43,31,170,81)]
 	for i in 3:
 		var t=cycle-i*.16
 		if t<0 or cycle>.99:continue
@@ -62,11 +64,13 @@ func _draw():
 		elif t<.21:drop=-1.5*sin((t-.17)/.04*PI)
 		if cycle>.82:drop=270.*pow((cycle-.82)/.17,2.)
 		var region=regions[i]
-		var target=Rect2(origin+(region.position+Vector2(0,drop))*edge/256.,region.size*edge/256.)
+		var placement=placements[i]
+		var target=Rect2(origin+(placement.position+Vector2(0,drop))*edge/256.,placement.size*edge/256.)
 		# Clip motion to the loader square, just like the browser SVG viewport.
 		var clipped=target.intersection(Rect2(origin,Vector2.ONE*edge))
 		if clipped.has_area():
-			var source=Rect2(region.position+(clipped.position-target.position)*256./edge,clipped.size*256./edge)
+			var source_scale=region.size/target.size
+			var source=Rect2(region.position+(clipped.position-target.position)*source_scale,clipped.size*source_scale)
 			draw_texture_rect_region(stones,clipped,source)
 
 func draw_white_logo():
