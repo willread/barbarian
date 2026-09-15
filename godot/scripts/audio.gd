@@ -55,7 +55,7 @@ func setup(source: Node2D):
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
 		voices.append(player)
-	for id in ["music_menu","music_game","music_game-3","music_game-4"]:
+	for id in ["music_menu","music_game","roots-below","music_game-4"]:
 		var player=AudioStreamPlayer.new()
 		player.bus=Mix.bus_for(id)
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM

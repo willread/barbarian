@@ -11,7 +11,7 @@ func check():
  var audio=game.audio
  audio.set_process(false)
  audio.unlocked=true
- assert(audio.tracks[2].stream.resource_path.ends_with("music_game-3.ogg"))
+ assert(audio.tracks[2].stream.resource_path.ends_with("roots-below.ogg"))
  assert(audio.tracks[3].stream.resource_path.ends_with("music_game-4.ogg"))
  for episode in [1,2,3]:
   game.current_episode=episode
