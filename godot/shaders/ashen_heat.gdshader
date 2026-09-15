@@ -17,6 +17,15 @@ vec2 banner(vec2 uv,vec4 rect,float phase){
  mask*=step(0.0,p.x)*step(p.x,1.0)*step(0.0,p.y)*step(p.y,1.0);
  return vec2(sin(p.y*5.0-clock*1.9+phase)*.0015*p.y*mask,0.0);
 }
+// Each post flame stays rooted at its grate; only the rising tongue deforms.
+vec3 post_fire(vec2 uv,vec2 base,vec2 extent,float seed){
+ vec2 p=(uv*vec2(1672.0,941.0)-base)/extent;
+ float rise=clamp(-p.y,0.0,1.0);
+ float mask=(1.0-smoothstep(.55,1.0,abs(p.x)))*smoothstep(0.0,.16,rise)*(1.0-smoothstep(.82,1.0,rise));
+ float flutter=noise(vec2(seed+rise*5.0,clock*3.7));
+ float curl=sin(rise*8.0-clock*(5.0+seed*.07)+seed);
+ return vec3(vec2((curl*2.1+(flutter-.5)*3.0)*rise,(flutter-.5)*5.0*rise)*mask/vec2(1672.0,941.0),mask);
+}
 void fragment(){
  vec2 uv=UV;
  if(area<1.5){uv+=banner(UV,vec4(.041,.288,.028,.183),0.0)+banner(UV,vec4(.917,.342,.035,.166),1.7);}
@@ -45,6 +54,22 @@ void fragment(){
   lava=max(lava,(1.0-smoothstep(.009,.020,abs(uv.x-.416)))*smoothstep(.508,.525,uv.y)*(1.0-smoothstep(.57,.592,uv.y)));
   uv.x+=sin(uv.y*57.0-clock*4.0)*.00065*lava;
  }
+ float post_mask=0.0;
+ if(area>2.5 && area<3.5){
+  vec3 posts=post_fire(uv,vec2(242,137),vec2(30,74),1.0);
+  posts+=post_fire(uv,vec2(346,124),vec2(17,59),4.0);
+  posts+=post_fire(uv,vec2(293,387),vec2(36,58),7.0);
+  posts+=post_fire(uv,vec2(397,311),vec2(17,44),10.0);
+  posts+=post_fire(uv,vec2(514,380),vec2(23,44),13.0);
+  posts+=post_fire(uv,vec2(883,187),vec2(18,51),16.0);
+  posts+=post_fire(uv,vec2(1285,302),vec2(23,40),19.0);
+  posts+=post_fire(uv,vec2(1552,429),vec2(27,56),22.0);
+  posts+=post_fire(uv,vec2(1220,510),vec2(25,38),25.0);
+  posts+=post_fire(uv,vec2(1450,537),vec2(20,31),28.0);
+  posts+=post_fire(uv,vec2(337,524),vec2(16,28),31.0);
+  uv+=posts.xy;
+  post_mask=clamp(posts.z,0.0,1.0);
+ }
  vec4 paint=texture(TEXTURE,clamp(uv,vec2(.001),vec2(.999)));
  if(area<1.5){paint=road_scene(clamp(uv,vec2(.001),vec2(.999)));}
  if(area>3.5){
@@ -70,6 +95,12 @@ void fragment(){
   paint.rgb+=vec3(.045,.018,.002)*hot*lane*burn;
  }else{
   paint.rgb+=vec3(.16,.052,.006)*hot*lane*flicker;
+ }
+ if(post_mask>0.0){
+  float fuel=noise(vec2(uv.x*91.0+uv.y*37.0,clock*3.0));
+  float flutter=noise(vec2(uv.x*143.0-uv.y*53.0,clock*8.5));
+  paint.rgb*=1.0+post_mask*hot*((fuel*.65+flutter*.35)-.5)*1.15;
+  paint.rgb+=vec3(.055,.023,.003)*post_mask*hot*flutter;
  }
  // Bright streaks advect downward, with independently changing hot rivulets.
  if(lava>0.0){
