@@ -76,6 +76,18 @@ func check():
   game.episode_combat.spawn_root(king,Vector2(700,670),.5)
   game.episode_combat.step(game,.01)
   assert((game.hero.hp<100)==(abs(depth)<52),"Root depth includes nearby feet but preserves a dodge outside its footprint")
+ # A target beyond the actor margin must stop the run on the first edge contact.
+ for direction in [-1,1]:
+  var margin=game.e_ai.arena_margin(king)
+  king.x=margin+5 if direction<0 else 1440-margin-5;king.y=670;king.entered_arena=true
+  var a={"type":"kingCharge","age":48,"from":48,"direction":direction,"target":Vector2(0 if direction<0 else 1440,670),"charge_hit":false,"arrived":false}
+  king.attack=a;game.hero.invTicks=999
+  game.episode_combat.step_king_charge(game,king,a,1.0/60)
+  assert(a.arrived,"Charge immediately ends when its movement hits the screen margin")
+  assert(game.art.pose(king)[0]!="king-walk","Edge contact leaves the running animation")
+  var stopped=Vector2(king.x,king.y)
+  game.episode_combat.step_king_charge(game,king,a,1.0/60)
+  assert(Vector2(king.x,king.y)==stopped,"Stopped charge cannot push against the edge again")
  # Phase two advances both charge timers twice as fast, including an existing wait.
  king.attack={"type":"rootSlam"};king.roam_charge_wait=400;king.escape_cooldown=300;king.phaseTwo=false;king.hp=king.max
  game.e_ai.king_intent(king,game.hero)

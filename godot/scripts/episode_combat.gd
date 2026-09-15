@@ -317,6 +317,8 @@ func step_king_charge(game,king: Dictionary,a: Dictionary,dt: float):
 	var before=Vector2(king.x,king.y)
 	var next=before.move_toward(a.target,1350*dt)
 	king.x=next.x;king.y=next.y
+	# Apply the same screen margin as the main loop before checking arrival.
+	game.e_ai.keep_in_arena(king)
 	game.background.constrain(king)
 	var after=Vector2(king.x,king.y)
 	king.dir=a.direction
