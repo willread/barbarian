@@ -114,6 +114,27 @@ func setup(source: CairnArt,name: String):
 			veil.material=veil_material
 			add_child(veil)
 			layers.append(veil_material)
+			# Explicitly recapture after fighters, projectiles and foreground effects.
+			# Earlier screen-reading effects may already have populated the back buffer.
+			var capture=BackBufferCopy.new()
+			capture.name="AshenSceneCapture"
+			capture.copy_mode=BackBufferCopy.COPY_MODE_VIEWPORT
+			capture.z_as_relative=false
+			capture.z_index=1811
+			add_child(capture)
+			var scene_heat=ColorRect.new()
+			scene_heat.name="AshenSceneHeat"
+			scene_heat.size=Vector2(1440,810)
+			scene_heat.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			scene_heat.z_as_relative=false
+			scene_heat.z_index=1812
+			var scene_material=ShaderMaterial.new()
+			scene_material.shader=preload("res://shaders/ashen_scene_heat.gdshader")
+			scene_material.set_meta("continuous_clock",true)
+			scene_material.set_shader_parameter("area",float(name.get_slice("-",1)))
+			scene_heat.material=scene_material
+			add_child(scene_heat)
+			layers.append(scene_material)
 		if chapter=="swamp":
 			var foreground_layer=Node2D.new()
 			foreground_layer.z_as_relative=false

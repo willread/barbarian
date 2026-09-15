@@ -12,6 +12,11 @@ func check():
 		game.background.setup(game.art,"ashen-%d"%area)
 		await process_frame
 		assert(game.background.has_node("AshenVeil"))
+		var heat=game.background.get_node("AshenSceneHeat")
+		var capture=game.background.get_node("AshenSceneCapture")
+		assert(capture.copy_mode==BackBufferCopy.COPY_MODE_VIEWPORT)
+		assert(capture.z_index>1805 and heat.z_index>capture.z_index and heat.z_index<game.hud.z_index)
+		assert(not heat.z_as_relative and heat.mouse_filter==Control.MOUSE_FILTER_IGNORE)
 		assert(game.background.has_node("FurnaceExhaust")== (area==2),"Dedicated exhaust belongs only to the furnace")
 		assert(game.background.has_node("HangingBrazier")== (area==3))
 		var veil=game.background.get_node("AshenVeil")
@@ -29,6 +34,7 @@ func check():
 				root.get_texture().get_image().save_png("E:/Cairn-build-tools/ashen-motion-%d-%.2f.png"%[area,time])
 	game.background.setup(game.art,"citadel-1")
 	await process_frame
+	assert(not game.background.has_node("AshenSceneHeat") and not game.background.has_node("AshenSceneCapture"))
 	assert(not game.background.has_node("AshenVeil"),"Episode transition must remove soot overlays")
 	assert(game.background.decorations.is_empty())
 	game.queue_free()

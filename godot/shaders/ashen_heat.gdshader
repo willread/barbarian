@@ -27,17 +27,6 @@ void fragment(){
  else if(area<2.5){sources=plume(uv,vec2(.50,.67),vec2(.25,.53))+plume(uv,vec2(.30,.50),vec2(.14,.25))+plume(uv,vec2(.73,.55),vec2(.15,.28));}
  else if(area<3.5){sources=plume(uv,vec2(.405,.60),vec2(.13,.49))+plume(uv,vec2(.64,.62),vec2(.12,.38))+plume(uv,vec2(.84,.61),vec2(.12,.39));}
  else{sources=plume(uv,vec2(.20,.70),vec2(.15,.43))+plume(uv,vec2(.80,.70),vec2(.15,.43))+plume(uv,vec2(.50,.70),vec2(.20,.35));}
- // Tall rising cells and broad heat sheets refract almost the entire scene.
- // Source plumes stay stronger, while the nearest paving and frame edges ease out.
- vec2 flow=vec2(uv.x*58.0+clock*.12,uv.y*18.0+clock*1.45);
- vec2 turbulence=vec2(noise(flow),noise(flow+vec2(17.2,4.8)))-.5;
- turbulence+=(vec2(noise(flow*2.13+clock*.31),noise(flow*2.13+23.1))-.5)*.36;
- turbulence+=(vec2(noise(uv*vec2(21.0,10.0)+vec2(0.0,clock*.4)),noise(uv*vec2(18.0,8.0)+vec2(19.0,clock*.33)))-.5)*.30;
- float edges=smoothstep(0.0,.035,uv.x)*(1.0-smoothstep(.965,1.0,uv.x));
- float ground=smoothstep(.62,.78,uv.y)*(1.0-smoothstep(.91,1.0,uv.y));
- float atmosphere=(.35+.65*smoothstep(.02,.28,uv.y))*(1.0-smoothstep(.93,1.0,uv.y));
- float strength=(.0032*atmosphere+min(sources,1.4)*.0048+ground*.0022)*edges;
- uv+=turbulence*vec2(1.0,.30)*strength;
  // The narrow pour stays attached to the left lip and receiving trough.
  float lava=0.0;
  // Distant molten cascade: fixed cliff boundaries, falling internal channels.
