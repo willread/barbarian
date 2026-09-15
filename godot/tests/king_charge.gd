@@ -31,8 +31,17 @@ func check():
   king.attack={};king.corner_ticks=240;king.x=180;game.hero.x=300;king.aiRest=999
   game.e_ai.king_intent(king,game.hero)
   assert(king.attack.is_empty(),"Escape cooldown prevents spam")
+ # Repositioning is also available in open ground, without corner pressure.
+ king.x=800;king.y=670;king.attack={};king.aiRest=0;king.corner_ticks=0;king.escape_cooldown=0;king.roam_charge_wait=1
+ game.hero.x=650;game.hero.y=670
+ game.e_ai.king_intent(king,game.hero)
+ assert(king.attack.type=="kingCharge","Periodic charge must also trigger away from corners")
+ king.attack={}
+ game.e_ai.finish(king,{},game.hero)
+ var intent=game.e_ai.king_intent(king,game.hero)
+ assert(intent.length()>0,"King steps to a new position during attack recovery")
  # Exercise real AI, attack completion and recovery scheduling, not just direct intent calls.
- king.x=350;king.y=670;king.hp=65;king.attack={};king.aiRest=0;king.hurtTicks=0;king.recovering=0;king.escape_cooldown=0;king.corner_ticks=0
+ king.x=350;king.y=670;king.hp=65;king.attack={};king.aiRest=0;king.hurtTicks=0;king.recovering=0;king.escape_cooldown=0;king.corner_ticks=0;king.roam_charge_wait=300
  game.hero.x=520;game.hero.y=670;game.hero.hp=100;game.hero.invTicks=9999;game.hero.down={};game.hero.height=0
  game.stage_walk="";game.transition=-1;game.phase="playing"
  var charged=false

@@ -232,6 +232,9 @@ func finish(e: Dictionary,a: Dictionary,h: Dictionary):
 	if e.kind=="king":
 		e.aiRest=randi_range(54,144) if e.phaseTwo else randi_range(66,168)
 		e["open_ticks"]=e.aiRest
+		var direction=signf(e.x-h.x) if absf(e.x-h.x)<280 else signf(h.x-e.x)
+		if direction==0:direction=1 if e.x<720 else -1
+		e["reposition_target"]=Vector2(clampf(e.x+direction*randf_range(90,155),300,1140),clampf(e.y+(-1 if randf()<.5 else 1)*randf_range(22,40),610,735))
 		return
 	if e.kind=="witch":
 		# Keep readable windups; shorten the full attack/rest cycle by 1 / 1.3.
@@ -304,6 +307,8 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
 
 func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if not e.has("roam_charge_wait"):e.roam_charge_wait=randi_range(300,480)
+	e.roam_charge_wait=maxi(0,e.roam_charge_wait-1)
 	e["escape_cooldown"]=maxi(0,e.get("escape_cooldown",0)-1)
 	var cornered=(e.x<390 or e.x>1050) and absf(h.x-e.x)<600 and absf(h.y-e.y)<130
 	e["corner_ticks"]=mini(240,e.get("corner_ticks",0)+1) if cornered else maxi(0,e.get("corner_ticks",0)-1)
@@ -312,7 +317,7 @@ func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	var dx=h.x-e.x
 	var dy=h.y-e.y
 	e.dir=facing_target(e,h.x)
-	if e.corner_ticks>=150 and e.escape_cooldown==0:
+	if (e.corner_ticks>=150 or e.roam_charge_wait==0) and e.escape_cooldown==0:
 		e.dir=1 if e.x<720 else -1
 		# Break a sustained corner stun-lock, then give the full charge warning.
 		e.hurtTicks=0;e.recovering=0;e.recoil=0;e.stagger=0
@@ -321,10 +326,14 @@ func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 			e.attack["charge_hit"]=false
 			e.attack["arrived"]=false
 			e.corner_ticks=0
-			e.escape_cooldown=720
+			e.escape_cooldown=360
+			e.roam_charge_wait=randi_range(420,660)
 			e["open_ticks"]=0
 		return Vector2.ZERO
-	if e.aiRest or e.hurtTicks or e.recovering:return Vector2.ZERO
+	if e.hurtTicks or e.recovering:return Vector2.ZERO
+	if e.aiRest:
+		var target=e.get("reposition_target",Vector2(e.x,e.y))
+		return Vector2(signf(target.x-e.x) if absf(target.x-e.x)>12 else 0,signf(target.y-e.y) if absf(target.y-e.y)>5 else 0)*.8
 	# Alternate a committed close sweep with a ranged, position-locked root eruption.
 	# Long recovery rewards going around the attack instead of trading damage.
 	if abs(dx)<560 and abs(dy)<90:
