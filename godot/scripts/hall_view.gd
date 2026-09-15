@@ -116,6 +116,11 @@ func draw_backdrop():
 	else:
 		backdrop.draw_texture_rect(title_texture,Rect2(Vector2(viewport_size.x*.5,scroll.position.y*.40)-size*.5,size),false,Color(1.3,1.3,1.3))
 
+	# The bottom rule belongs to the stationary table frame, not its rows.
+	if not runs.is_empty():
+		var bottom=scroll.position+Vector2(0,scroll.size.y)
+		backdrop.draw_line(bottom,bottom+Vector2(scroll.size.x,0),gold)
+
 func display_date(value: String) -> String:
 	var parts=value.left(10).split("-")
 	if parts.size()!=3:return value
@@ -154,7 +159,6 @@ func draw_table():
 		else:
 			var values=[str(run.table_rank),CairnRunRecords.number(run.score),reached,str(run.get("difficulty","normal")).capitalize(),time,date]
 			for j in values.size():text(content,values[j],Vector2(w*COLUMNS[j][2]+8,y+row_height*.5),text_size,ink,false,w*COLUMNS[j][3]-16)
-	content.draw_line(Vector2(0,runs.size()*row_height),Vector2(w,runs.size()*row_height),gold)
 
 func reveal_selected():
 	if runs.is_empty():return
