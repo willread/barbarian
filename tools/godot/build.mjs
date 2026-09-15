@@ -24,6 +24,7 @@ if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepar
 }
 run(process.execPath,['tools/godot/bake-world.mjs']);
 run(process.execPath,['tools/godot/bake-episodes.mjs']);
+run(process.execPath,['tools/godot/bake-furnace.mjs']);
 run(process.execPath,['tools/godot/bake-king.mjs']);
 run(process.execPath,['tools/godot/bake-mire-oil.mjs']);
 if(!fs.existsSync('godot/assets/cheat-letters.json')||!JSON.parse(fs.readFileSync('godot/assets/cheat-letters.json','utf8')).menu['?'])run(process.execPath,['tools/godot/bake-cheats.mjs']);

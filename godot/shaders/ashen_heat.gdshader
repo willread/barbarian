@@ -18,7 +18,6 @@ vec2 banner(vec2 uv,vec4 rect,float phase){
 void fragment(){
  vec2 uv=UV;
  if(area<1.5){uv+=banner(UV,vec4(.041,.288,.028,.183),0.0)+banner(UV,vec4(.917,.342,.035,.166),1.7);}
- else if(area<2.5){uv+=banner(UV,vec4(.082,.331,.031,.166),.5)+banner(UV,vec4(.911,.326,.031,.166),2.1);}
  else if(area>3.5){uv+=banner(UV,vec4(.31,.34,.035,.21),1.1)+banner(UV,vec4(.66,.34,.035,.21),2.8);}
  float lane=1.0-smoothstep(.65,.73,uv.y);
  float sources=0.0;

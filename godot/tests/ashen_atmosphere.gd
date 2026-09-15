@@ -12,6 +12,7 @@ func check():
 		game.background.setup(game.art,"ashen-%d"%area)
 		await process_frame
 		assert(game.background.has_node("AshenVeil"))
+		assert(game.background.has_node("FurnaceExhaust")== (area==2),"Dedicated exhaust belongs only to the furnace")
 		var veil=game.background.get_node("AshenVeil")
 		assert(veil.mouse_filter==Control.MOUSE_FILTER_IGNORE and veil.z_index==1810)
 		for time in [23.98,24.02,61.7]:

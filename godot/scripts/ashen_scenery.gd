@@ -62,9 +62,7 @@ func _draw():
 			exhaust(Vector2(795,300),38,145,8,Color(.30,.28,.26,.3))
 			embers(Vector2(1123,201),12,28,76,2)
 		2:
-			# Exhaust follows the two enormous angled ducts, fire vents and gate.
-			exhaust(Vector2(449,369),95,173,2,Color(.55,.51,.46,.68))
-			exhaust(Vector2(1023,425),85,177,7,Color(.47,.43,.38,.60))
+			# The two angled ducts have their own continuous turbulent exhaust shader.
 			exhaust(Vector2(705,520),100,225,4,Color(.35,.30,.25,.38))
 			embers(Vector2(727,520),30,85,235,4)
 			embers(Vector2(253,387),14,38,113,8)

@@ -62,6 +62,17 @@ func setup(source: CairnArt,name: String):
 			foreground.z_as_relative=false
 			foreground.z_index=1805
 			add_child(foreground)
+		if name=="ashen-2":
+			var exhaust=ColorRect.new()
+			exhaust.name="FurnaceExhaust"
+			exhaust.size=Vector2(1440,810)
+			exhaust.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			var exhaust_material=ShaderMaterial.new()
+			exhaust_material.shader=preload("res://shaders/furnace_exhaust.gdshader")
+			exhaust_material.set_meta("continuous_clock",true)
+			exhaust.material=exhaust_material
+			add_child(exhaust)
+			layers.append(exhaust_material)
 		if name=="ashen-1":
 			var trains=preload("res://scripts/ashen_trains.gd").new()
 			trains.name="OreTrains"
