@@ -11,9 +11,10 @@ float track_y(float x){
 }
 float cart_mask(vec2 local,float half_width){
  float down=local.y-local.x*.145+32.0;
- float body=(1.0-smoothstep(half_width-3.0-down*.13,half_width-2.0-down*.13,abs(local.x)))*smoothstep(-1.0,0.0,down)*(1.0-smoothstep(25.0,27.0,down));
- float lip=(1.0-smoothstep(half_width-1.0,half_width,abs(local.x)))*smoothstep(-3.0,-2.0,down)*(1.0-smoothstep(1.5,2.5,down));
- float wheels=max(1.0-smoothstep(4.0,5.4,length(local-vec2(-half_width*.60,-4.0))),1.0-smoothstep(4.0,5.4,length(local-vec2(half_width*.60,2.5))));
+ float aa=max(1.0,length(fwidth(local))*.7);
+ float body=(1.0-smoothstep(half_width-2.5-down*.13-aa,half_width-2.5-down*.13+aa,abs(local.x)))*smoothstep(-.5-aa,-.5+aa,down)*(1.0-smoothstep(26.0-aa,26.0+aa,down));
+ float lip=(1.0-smoothstep(half_width-.5-aa,half_width-.5+aa,abs(local.x)))*smoothstep(-2.5-aa,-2.5+aa,down)*(1.0-smoothstep(2.0-aa,2.0+aa,down));
+ float wheels=max(1.0-smoothstep(4.7-aa,4.7+aa,length(local-vec2(-half_width*.60,-4.0))),1.0-smoothstep(4.7-aa,4.7+aa,length(local-vec2(half_width*.60,2.5))));
  return max(body,max(lip,wheels));
 }
 float track_box(vec2 p,vec4 b){return step(b.x,p.x)*step(p.x,b.z)*step(b.y,p.y)*step(p.y,b.w);}
@@ -49,7 +50,9 @@ vec4 road_scene(vec2 uv){
   vec2 local=p-vec2(x,track_y(x));
   if(abs(local.x)<49.0 && local.y>-44.0 && local.y<12.0){
    float mask=cart_mask(local,i==0?41.0:47.0)*(1.0-occlusion);
-   vec4 cart=texture(road_original,(anchor+local)/vec2(1672.0,941.0));
+   vec2 source=(anchor+local)/vec2(1672.0,941.0);
+   vec2 footprint=max(fwidth(source)*.35,vec2(.25)/vec2(1672.0,941.0));
+   vec4 cart=(texture(road_original,source+footprint)+texture(road_original,source-footprint)+texture(road_original,source+vec2(footprint.x,-footprint.y))+texture(road_original,source+vec2(-footprint.x,footprint.y)))*.25;
    scene=mix(scene,cart,mask);
   }
  }

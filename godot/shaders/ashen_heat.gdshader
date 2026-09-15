@@ -40,6 +40,16 @@ void fragment(){
  uv+=turbulence*vec2(1.0,.30)*strength;
  // The narrow pour stays attached to the left lip and receiving trough.
  float lava=0.0;
+ // Distant molten cascade: fixed cliff boundaries, falling internal channels.
+ if(area<1.5){
+  float center=.700+(uv.y-.30)*.055;
+  lava=(1.0-smoothstep(.010,.033,abs(uv.x-center)))*smoothstep(.245,.265,uv.y)*(1.0-smoothstep(.425,.46,uv.y));
+  vec4 source=texture(road_original,uv);
+  float molten=smoothstep(.15,.4,source.r-source.b)*smoothstep(.3,.65,source.r);
+  lava*=molten;
+  uv.x+=sin(uv.y*130.0-clock*5.0)*.0012*lava;
+  uv.y+=sin(uv.y*95.0-clock*7.0)*.002*lava;
+ }
  if(area>2.5 && area<3.5){
   float center=.408-(uv.y-.20)*.012;
   lava=(1.0-smoothstep(.003,.008,abs(uv.x-center)))*smoothstep(.195,.225,uv.y)*(1.0-smoothstep(.49,.518,uv.y));
@@ -86,3 +96,4 @@ void fragment(){
  paint.rgb+=vec3(.035,.030,.025)*(billow-.5)*smoke*min(sources+float(area<1.5),1.0);
  COLOR=paint;
 }
+

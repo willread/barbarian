@@ -27,7 +27,7 @@ func begin_departure(t: float):
 	starts=PARKED
 	targets=PARKED+Vector2.ONE*(1120.0 if direction>0 else -1320.0)
 	delays=Vector2(4.0 if variant==0 else 8.0,0) if direction>0 else Vector2(0,4.0)
-	phase_duration=rng.randf_range(26.0,33.0)+(7.0 if variant==2 else 0.0)
+	phase_duration=(rng.randf_range(26.0,33.0)+(7.0 if variant==2 else 0.0))*.5
 
 func advance(t: float):
 	clock=t
@@ -48,7 +48,7 @@ func advance(t: float):
 	elif phase=="empty" and elapsed>=phase_duration:
 		phase="arrive"
 		phase_start=t
-		phase_duration=rng.randf_range(25.0,32.0)
+		phase_duration=rng.randf_range(12.5,16.0)
 		starts=Vector2(-360,-100) if direction>0 else Vector2(1772,2032)
 		targets=PARKED
 		delays=Vector2.ZERO
