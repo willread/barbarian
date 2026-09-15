@@ -109,14 +109,16 @@ func check():
 	for move in ["mireCast","hagClaw"]:
 		game.e_ai.finish(hag,{"type":move},game.hero)
 		var duration=game.m.attacks[move].ticks
-		assert(absf(float(duration+85)/float(duration+hag.aiRest)-1.3)<.01,"Hag attack cycle should be about 30% more frequent")
-	hag.attack={};hag.aiRest=0;hag.mire_count=3;hag.hag_move_ticks=20
+		var previous_rest=35 if move=="mireCast" else 53
+		var rate=1.25 if move=="mireCast" else 1.0
+		assert(absf(float(duration+previous_rest)/float(duration+hag.aiRest)-rate)<.01,"Oil casts increase 25% while claw timing stays unchanged")
+	hag.attack={};hag.aiRest=0;hag.mire_count=4;hag.hag_move_ticks=20
 	game.hero.x=hag.x-400;game.hero.y=hag.y
 	game.e_ai.hag_intent(hag,game.hero)
-	assert(hag.attack.get("type")=="mireCast","Ready hag casts a fourth clump before strolling")
-	hag.attack={};hag.mire_count=4
+	assert(hag.attack.get("type")=="mireCast","Ready hag casts a fifth clump before strolling")
+	hag.attack={};hag.mire_count=5
 	game.e_ai.hag_intent(hag,game.hero)
-	assert(hag.attack.is_empty(),"Keep the four-clump cap")
+	assert(hag.attack.is_empty(),"Keep the five-clump cap")
 	print("CAIRN_MIRE_OK: heavy slow, health drain, limited jump, independent patches, owner death and defensive claw")
 	game.queue_free()
 	await process_frame

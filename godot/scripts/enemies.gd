@@ -4,12 +4,12 @@ var m: CairnMechanics
 var roster: Dictionary
 # Tiny variants are temporarily disabled; retain their behavior for later re-enabling.
 const ENABLED_VARIANTS=["brute"]
-const HEALTH_SCALE={"legion":0.70,"shield":0.70}
+const HEALTH_SCALE={"legion":0.525,"shield":0.70}
 func _init(mechanics: CairnMechanics, data: Dictionary):
 	m=mechanics
 	roster=data.duplicate(true)
 	roster["archer"]={"hp":6,"speed":1.05}
-	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":65,"speed":.8},"saint":{"hp":120,"speed":.8}})
+	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":81.25,"speed":.8},"saint":{"hp":120,"speed":.8}})
 	for attack in [
 		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
 		["kingCharge",138,48,-1,0,0],["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
@@ -237,8 +237,8 @@ func finish(e: Dictionary,a: Dictionary,h: Dictionary):
 		e["reposition_target"]=Vector2(clampf(e.x+direction*randf_range(90,155),300,1140),clampf(e.y+(-1 if randf()<.5 else 1)*randf_range(22,40),610,735))
 		return
 	if e.kind=="witch":
-		# Keep readable windups; shorten the full attack/rest cycle by 1 / 1.3.
-		e.aiRest=35 if a.type=="mireCast" else 53
+		# Oil cycle: (132 + 35) / 1.25 ≈ 134 ticks; preserve the warning.
+		e.aiRest=2 if a.type=="mireCast" else 53
 		return
 	if e.kind in ["witch","bearer","king","saint"]:
 		e.aiRest=40 if e.boss and e.phaseTwo else 85
@@ -371,7 +371,7 @@ func hag_intent(e: Dictionary,h: Dictionary) -> Vector2:
 		if (away<0 and e.x<200) or (away>0 and e.x>1240):
 			return Vector2(0,1 if e.y<h.y else -1)*.7
 		return Vector2(away*.8,signf(e.y-h.y)*.25)
-	if not e.aiRest and abs(dx)<650 and abs(dy)<140 and e.get("mire_count",0)<4:
+	if not e.aiRest and abs(dx)<650 and abs(dy)<140 and e.get("mire_count",0)<5:
 		if m.begin(e,"mireCast"):e.attack["target"]=Vector2(h.x,h.y)
 		return Vector2.ZERO
 	if e.get("hag_move_ticks",0)>0:

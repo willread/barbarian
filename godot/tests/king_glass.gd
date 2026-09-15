@@ -17,7 +17,7 @@ func check():
  var king=game.enemies[0]
  king.x=900
  king.y=660
- assert(king.max==65)
+ assert(king.max==81.25)
  var hp=king.hp
  game.damage(king,{"damage":10,"direction":1},game.hero)
  assert(is_equal_approx(hp-king.hp,6.5*game.damage_multiplier))
