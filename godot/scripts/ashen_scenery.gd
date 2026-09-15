@@ -78,6 +78,14 @@ func _draw():
 			embers(Vector2(558,150),22,42,124,5)
 			embers(Vector2(1181,467),21,64,226,3)
 		4:
+			# Fine iron dust drops from the seal as its outer collar finishes indexing.
+			var lock_phase=fposmod(clock,14.0)
+			for i in 18:
+				var dust_age=(lock_phase-9.7-i*.045)/2.5
+				if dust_age>0 and dust_age<1:
+					var origin=Vector2(594 if i%2==0 else 846,350)
+					var p=origin+Vector2(sin(i*7.3)*dust_age*18,dust_age*dust_age*94)
+					draw_circle(p,.65+i%3*.15,Color(.49,.43,.35,sin(dust_age*PI)*.27))
 			# The sealed sanctuary breathes slowly; side fires remain independent.
 			var breath=.65+.2*sin(clock*.43)
 			exhaust(Vector2(295,533),65,234,2,Color(.43,.39,.34,.52*breath))

@@ -1,5 +1,6 @@
 shader_type canvas_item;
 #include "res://shaders/ashen_track.gdshaderinc"
+#include "res://shaders/reliquary_lock.gdshaderinc"
 uniform float clock=0.0;
 uniform float area=1.0;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -26,15 +27,17 @@ void fragment(){
  else if(area<2.5){sources=plume(uv,vec2(.50,.67),vec2(.25,.53))+plume(uv,vec2(.30,.50),vec2(.14,.25))+plume(uv,vec2(.73,.55),vec2(.15,.28));}
  else if(area<3.5){sources=plume(uv,vec2(.405,.60),vec2(.13,.49))+plume(uv,vec2(.64,.62),vec2(.12,.38))+plume(uv,vec2(.84,.61),vec2(.12,.39));}
  else{sources=plume(uv,vec2(.20,.70),vec2(.15,.43))+plume(uv,vec2(.80,.70),vec2(.15,.43))+plume(uv,vec2(.50,.70),vec2(.20,.35));}
- // Two advected turbulence scales bend the image like rising hot air,
- // with much less displacement on the playable paving and at screen edges.
- vec2 flow=vec2(uv.x*72.0,uv.y*39.0+clock*1.7);
+ // Tall rising cells and broad heat sheets refract almost the entire scene.
+ // Source plumes stay stronger, while the nearest paving and frame edges ease out.
+ vec2 flow=vec2(uv.x*58.0+clock*.12,uv.y*18.0+clock*1.45);
  vec2 turbulence=vec2(noise(flow),noise(flow+vec2(17.2,4.8)))-.5;
  turbulence+=(vec2(noise(flow*2.13+clock*.31),noise(flow*2.13+23.1))-.5)*.36;
+ turbulence+=(vec2(noise(uv*vec2(21.0,10.0)+vec2(0.0,clock*.4)),noise(uv*vec2(18.0,8.0)+vec2(19.0,clock*.33)))-.5)*.30;
  float edges=smoothstep(0.0,.035,uv.x)*(1.0-smoothstep(.965,1.0,uv.x));
- float ground=smoothstep(.72,.78,uv.y)*(1.0-smoothstep(.84,.98,uv.y));
- float strength=(.00055*lane+min(sources,1.4)*.0028*lane+ground*.00045)*edges;
- uv+=turbulence*vec2(1.0,.48)*strength;
+ float ground=smoothstep(.62,.78,uv.y)*(1.0-smoothstep(.91,1.0,uv.y));
+ float atmosphere=(.35+.65*smoothstep(.02,.28,uv.y))*(1.0-smoothstep(.93,1.0,uv.y));
+ float strength=(.0032*atmosphere+min(sources,1.4)*.0048+ground*.0022)*edges;
+ uv+=turbulence*vec2(1.0,.30)*strength;
  // The narrow pour stays attached to the left lip and receiving trough.
  float lava=0.0;
  if(area>2.5 && area<3.5){
@@ -45,6 +48,12 @@ void fragment(){
  }
  vec4 paint=texture(TEXTURE,clamp(uv,vec2(.001),vec2(.999)));
  if(area<1.5){paint=road_scene(clamp(uv,vec2(.001),vec2(.999)));}
+ if(area>3.5){
+  // Sample rigidly rotated metal only inside the collars. The central sigil,
+  // door frame and stairs stay fixed, with narrow feathered mechanical seams.
+  float collar=lock_band(uv);
+  if(collar>0.0){paint=mix(paint,texture(TEXTURE,lock_uv(uv,clock)),collar);}
+ }
  // Animate only painted fire/lava; iron and stone keep their original colour.
  float hot=smoothstep(.12,.42,paint.r-paint.b)*smoothstep(.25,.6,paint.r);
  float fire=noise(vec2(uv.x*160.0,uv.y*85.0+clock*4.4));
