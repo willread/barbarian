@@ -2,6 +2,9 @@ extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
 var root_views: Array=[]
+var root_sequences: Array=[]
+const ROOT_INTERVAL=.48
+const ROOT_WARNING=.30
 const MireLayout=preload("res://scripts/mire_layout.gd")
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
@@ -27,6 +30,7 @@ func prepare_actor(actor: Dictionary):
 
 func clear():
 	hazards.clear()
+	root_sequences.clear()
 	for view in root_views:
 		if is_instance_valid(view):view.queue_free()
 	root_views.clear()
@@ -46,7 +50,7 @@ func sync_views(game,dt: float=0.0):
 			root_views.append(h.view)
 		h.view.position=h.p
 		h.view.z_index=int(h.p.y)*2
-		h.view.configure(h.age,h.life,h.kind=="rootSweep",h.owner.dir)
+		h.view.configure(h.age,h.life,h.kind=="rootSweep",h.get("flip",h.owner.dir),h.get("variant",0),h.get("size",Vector2(140,210)))
 	for i in range(root_views.size()-1,-1,-1):
 		var view=root_views[i]
 		if not hazards.any(func(h):return h.get("view")==view):
@@ -144,9 +148,8 @@ func step(game,dt: float):
 				enemy["open_ticks"]=90
 				game.audio.play("heavy_hit",-5,.7)
 				game.shake=maxf(game.shake,4)
-				for i in range(3 if enemy.phaseTwo else 1):
-					var offset=0 if i==0 else -105 if i==1 else 105
-					hazards.append({"kind":"root","owner":enemy,"p":target+Vector2(offset,0),"age":-i*.16,"life":1.25,"struck":false})
+				spawn_root(enemy,target,0.0)
+				root_sequences.append({"owner":enemy,"wait":ROOT_INTERVAL-ROOT_WARNING,"remaining":2,"variant":hazards.back().variant})
 			"furnaceBlast":
 				# The Saint ejects slag so reflection also works in the solo boss encounter.
 				if not hazards.any(func(h):return h.kind=="clinker" and h.owner.id==enemy.id):
@@ -155,15 +158,32 @@ func step(game,dt: float):
 				if hero.invTicks==0 and hero.down.is_empty() and abs(hero.y-target.y)<26 and (hero.x-enemy.x)*a.direction>0:
 					game.damage(hero,{"type":"furnaceBlast","damage":10,"direction":a.direction,"knock":false},enemy)
 				hazards.append({"kind":"blast","owner":enemy,"p":Vector2(enemy.x,target.y),"dir":a.direction,"age":0.0,"life":.3})
+	# Each follow-up locks a fresh position, then gives a short ground tell.
+	for sequence in root_sequences:
+		if sequence.owner.hp<=0:continue
+		sequence.wait-=dt
+		if sequence.wait<=0 and sequence.remaining>0:
+			var target=Vector2(clampf(game.hero.x,90,1350),game.hero.y)
+			spawn_root(sequence.owner,target,-ROOT_WARNING,sequence.variant)
+			sequence.variant=hazards.back().variant
+			sequence.remaining-=1
+			sequence.wait+=ROOT_INTERVAL
+	root_sequences=root_sequences.filter(func(s):return s.owner.hp>0 and s.remaining>0)
 	for h in hazards:
 		h.age+=dt
-		if h.kind=="root" and h.age>=.18 and not h.get("struck",false) and h.owner.hp>0:
-			h.struck=true
-			game.burst(h.p.x,h.p.y-8,10,Color("716348"))
-			game.audio.play("bone",-12,.65)
+		if h.kind=="root" and h.owner.hp>0:
+			if h.age>=.18 and not h.get("struck",false):
+				h.struck=true
+				game.burst(h.p.x,h.p.y-8,10,Color("716348"))
+				game.audio.play("bone",-12,.65)
 			var victim=game.hero
-			if victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height<30 and absf(victim.x-h.p.x)<62 and absf(victim.y-h.p.y)<31:
+			var size=h.get("size",Vector2(140,210))
+			var growth=minf(clampf(h.age/.20,0,1),clampf((h.life-h.age)/.30,0,1))
+			var rise=1.0-pow(1.0-growth,3)
+			# Keep contact live after eruption; regular invulnerability and a local cooldown prevent rapid repeated hits.
+			if h.age>=.18 and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<29:
 				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false},h.owner)
+				h.next_hit=h.age+.65
 		if h.kind in ["mire","root","rootSweep"] and h.owner.hp<=0:h.life=h.age
 		if h.kind!="clinker":continue
 		if h.reflected:
@@ -222,13 +242,13 @@ func draw_ground(game,node: Node2D):
 		elif a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
 		elif a.type=="rootSlam":
-			for i in range(3 if e.phaseTwo else 1):
-				var offset=0 if i==0 else -105 if i==1 else 105
-				root_warning(node,a.target+Vector2(offset,0),float(a.age)/a.from)
+			root_warning(node,a.target,float(a.age)/a.from)
 
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
+			"root":
+				if h.age<0:root_warning(node,h.p,clampf(1+h.age/ROOT_WARNING,0,1))
 			"clinker":ellipse(node,h.p,Vector2(105,42),Color(1,.4,.07,(.25+.15*sin(h.age*15))*fade))
 			"blast":node.draw_rect(Rect2(h.p.x if h.dir>0 else 0,h.p.y-26,1440-h.p.x if h.dir>0 else h.p.x,52),Color(1,.55,.12,fade*.8))
 
@@ -249,3 +269,12 @@ func root_warning(node: Node2D,p: Vector2,progress: float):
 		var middle=p.lerp(end,.55)+Vector2(sin(i*3.1)*6,cos(i)*3)
 		node.draw_polyline(PackedVector2Array([p,middle,end]),Color(.12,.11,.07,.45+progress*.45),2+progress*3,true)
 		if progress>.5:node.draw_line(middle,end,Color(.7,.59,.32,(progress-.5)*1.3),1.5,true)
+
+func spawn_root(owner: Dictionary,target: Vector2,age: float,previous: int=-1):
+	var variant=randi_range(0,3)
+	if variant==previous:variant=(variant+randi_range(1,3))%4
+	var heights=[135.0,265.0,215.0,245.0]
+	var texture=preload("res://scripts/king_roots.gd").TEXTURES[variant]
+	var height=heights[variant]*randf_range(.94,1.08)
+	var size=Vector2(height*texture.get_width()/texture.get_height(),height)
+	hazards.append({"kind":"root","owner":owner,"p":target,"age":age,"life":1.75,"struck":false,"variant":variant,"flip":-1 if randf()<.5 else 1,"size":size})
