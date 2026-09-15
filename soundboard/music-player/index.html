@@ -1,0 +1,43 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cairn · Music</title>
+<style>
+:root{color-scheme:dark;font-family:Georgia,serif;background:#111714;color:#e2e3d6}*{box-sizing:border-box}body{max-width:1080px;margin:auto;padding:48px 28px}header{border-bottom:1px solid #58604a;padding-bottom:28px}small,.meta,label,button,a{font-family:system-ui,sans-serif}.eyebrow{letter-spacing:.25em;color:#b4b891;font-size:12px}h1{font-size:clamp(36px,5vw,58px);font-weight:normal;margin:16px 0}p{color:#b8c0b3;line-height:1.6}#controls{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:24px 0}button,a.download{border:1px solid #647056;background:#242e25;color:#e5e9dc;border-radius:5px;padding:10px 16px;cursor:pointer;font-size:14px;text-decoration:none}button:hover,a:hover{background:#3c4936}button:disabled{opacity:.4;cursor:wait}#cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}article{padding:26px;border:1px solid #374333;border-radius:8px;background:linear-gradient(140deg,#202a21,#151d18)}article.active{border-color:#d0bc79;box-shadow:inset 0 3px #d0bc79}h2{font-size:29px;font-weight:normal;margin:14px 0 8px}.meta{color:#adbb94;font-size:12px;letter-spacing:.07em}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}progress{width:100%;height:4px;accent-color:#d0bc79;margin:22px 0 8px}.time{font:12px system-ui;color:#b9c1b3}#status{min-height:24px;color:#e6dba9}.favorite{background:none}footer{margin-top:30px;font:13px/1.7 system-ui;color:#909c8c}input{accent-color:#cbbd85;vertical-align:middle} @media(max-width:650px){#cards{grid-template-columns:1fr}body{padding:28px 18px}}
+</style>
+<header><div class="eyebrow">CAIRN / SOUNDTRACKS</div><h1>Music library.</h1><p>All our tracks in one place. Each plays as a continuous loop.<br>New tracks appear here as they’re added.</p></header>
+<div id="controls"><button id="stop">Stop</button><label>Volume <input id="volume" type="range" min="0" max="100" value="30"> <span id="level">30%</span></label><button id="refresh">Refresh tracks</button></div>
+<div id="status" role="status">Choose a track to listen.</div><div id="cards"></div><footer>Instrumental · ElevenLabs · Retained source recordings.<br>“Check loop join” plays the last three seconds and continues into the beginning. Favorites are saved in this browser; choosing one does not change the game.</footer>
+<script type="module">
+let jobs=[],librarySignature="";
+let context,gain,source,active=null,startTime=0,offset=0,request=0;
+const buffers=new Map(),status=document.querySelector('#status');
+let favorite=localStorage.getItem('cairn-music-favorite');
+const stamp=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+function render(){
+document.querySelector('#cards').replaceChildren();
+for(const [i,j] of jobs.entries()){
+ const card=document.createElement('article');card.dataset.id=j.id;
+ card.innerHTML=`<div class="meta">${j.collection}${j.bpm?' · '+j.bpm+' BPM':''}${j.assignment?' · '+j.assignment:''}</div><h2>${j.name}</h2><p>${j.description}</p><div class="actions"><button data-play="${j.id}">Play</button><button data-join="${j.id}">Check loop join</button></div><progress max="1" value="0"></progress><div class="time">0:00 / ${j.duration?stamp(j.duration):'—'}</div><div class="actions"><button class="favorite" data-favorite="${j.id}">${favorite===j.id?'★ Favorite':'☆ Favorite'}</button><a class="download" href="${j.url}" download="${j.name}.${j.pathExtension}">Download loop</a></div>`;
+ document.querySelector('#cards').append(card);
+}
+}
+async function refresh(){const response=await fetch('/music/api/library');if(!response.ok)throw Error('Library unavailable');const next=(await response.json()).tracks;const signature=JSON.stringify(next);if(signature===librarySignature)return;librarySignature=signature;jobs=next;render();if(active)document.querySelector(`article[data-id="${active}"]`)?.classList.add('active')}
+await refresh();
+setInterval(()=>refresh().catch(()=>{}),15000);
+function stop(){request++;if(source){source.stop();source.disconnect();source=null}active=null;document.querySelectorAll('article').forEach(c=>c.classList.remove('active'))}
+async function play(id,join=false){
+ stop();const token=request;
+ context??=new AudioContext();gain??=context.createGain();gain.connect(context.destination);gain.gain.value=+volume.value/100;
+ await context.resume();status.textContent='Loading…';
+ try{
+  if(!buffers.has(id)){const file=jobs.find(j=>j.id===id).url;const r=await fetch(file);if(!r.ok)throw Error('Audio unavailable');buffers.set(id,await context.decodeAudioData(await r.arrayBuffer()))}
+  if(token!==request)return;
+  const buffer=buffers.get(id);source=context.createBufferSource();source.buffer=buffer;source.loop=true;source.connect(gain);
+  offset=join?Math.max(0,buffer.duration-3):0;startTime=context.currentTime;active=id;source.start(0,offset);
+  document.querySelector(`article[data-id="${id}"]`)?.classList.add('active');
+  status.textContent=jobs.find(j=>j.id===id).name+(join?' — loop boundary in 3 seconds':' — looping');
+ }catch(e){status.textContent='Could not load the audio. Refresh and try again.'}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.play)play(b.dataset.play);if(b.dataset.join)play(b.dataset.join);if(b.dataset.favorite){favorite=b.dataset.favorite;localStorage.setItem('cairn-music-favorite',favorite);document.querySelectorAll('[data-favorite]').forEach(x=>x.textContent=x.dataset.favorite===favorite?'★ Favorite':'☆ Favorite')}});
+const volume=document.querySelector('#volume');volume.oninput=()=>{document.querySelector('#level').textContent=volume.value+'%';if(gain)gain.gain.setTargetAtTime(+volume.value/100,context.currentTime,.025)};
+document.querySelector('#stop').onclick=()=>{stop();status.textContent='Stopped.'};document.querySelector('#refresh').onclick=()=>refresh().catch(()=>status.textContent='Could not refresh tracks.');
+function update(){if(active&&document.querySelector(`article[data-id="${active}"]`)){const b=buffers.get(active),t=(context.currentTime-startTime+offset)%b.duration,c=document.querySelector(`article[data-id="${active}"]`);c.querySelector('progress').value=t/b.duration;c.querySelector('.time').textContent=stamp(t)+' / '+stamp(b.duration)}requestAnimationFrame(update)}update();
+</script></html>
