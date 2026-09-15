@@ -32,6 +32,9 @@ func setup(source: CairnArt,name: String):
 			heat.shader=preload("res://shaders/ashen_heat.gdshader")
 			heat.set_meta("continuous_clock",true)
 			heat.set_shader_parameter("area",float(name.get_slice("-",1)))
+			if name=="ashen-1":
+				heat.set_shader_parameter("road_original",painting.texture)
+				heat.set_shader_parameter("road_clear",art.texture("ashen-track-clear.png"))
 			painting.material=heat
 			layers.append(heat)
 		add_child(painting)
@@ -62,6 +65,12 @@ func setup(source: CairnArt,name: String):
 			foreground.z_as_relative=false
 			foreground.z_index=1805
 			add_child(foreground)
+		if name=="ashen-3":
+			var brazier=preload("res://scripts/crucible_brazier.gd").new()
+			brazier.name="HangingBrazier"
+			brazier.set_meta("continuous_clock",true)
+			add_child(brazier)
+			decorations.append(brazier)
 		if name=="ashen-2":
 			var exhaust=ColorRect.new()
 			exhaust.name="FurnaceExhaust"
@@ -76,6 +85,7 @@ func setup(source: CairnArt,name: String):
 		if name=="ashen-1":
 			var trains=preload("res://scripts/ashen_trains.gd").new()
 			trains.name="OreTrains"
+			trains.track_material=painting.material
 			trains.set_meta("continuous_clock",true)
 			add_child(trains)
 			decorations.append(trains)

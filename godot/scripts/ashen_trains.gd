@@ -1,78 +1,67 @@
 extends Node2D
-# Small ore trains use the painting's own iron wagon texture, on the rear rail.
-# A private RNG keeps scenery scheduling independent of combat randomness.
+# The two original painted carts are composited inside the whole track region.
+# No new convoy, alternate track, added lights, or independent scenery sprites.
 var clock=0.0
+var track_material: ShaderMaterial
 var rng=RandomNumberGenerator.new()
 var initialized=false
-var next_departure=0.0
-var departure=0.0
-var speed=60.0
+var phase="parked"
+var phase_start=0.0
+var phase_duration=5.0
 var direction=1.0
-var wagon_count=4
-var active=false
+var variant=0
 var completed=0
-var painting: Texture2D
-const SPACING=59.0
-const WAGON_SCALE=.66
-const SOURCE_ANCHOR=Vector2(720,500)
-const WAGON= [Vector2(683,463),Vector2(716,468),Vector2(720,467),Vector2(727,470),Vector2(757,475),Vector2(760,479),Vector2(753,481),Vector2(750,495),Vector2(747,500),Vector2(744,504),Vector2(736,504),Vector2(731,500),Vector2(703,496),Vector2(699,500),Vector2(691,499),Vector2(687,494),Vector2(678,493),Vector2(677,489),Vector2(681,487),Vector2(685,468)]
+var positions=Vector2(720,1180)
+var starts=Vector2(720,1180)
+var targets=Vector2(720,1180)
+var delays=Vector2.ZERO
+const PARKED=Vector2(720,1180)
 
-func _ready():
-	rng.randomize()
-	painting=load("res://assets/ashen-1-base.png")
-	var depth=ShaderMaterial.new()
-	depth.shader=preload("res://shaders/ashen_train_depth.gdshader")
-	material=depth
+func _ready():rng.randomize()
+
+func begin_departure(t: float):
+	phase="depart"
+	phase_start=t
+	variant=rng.randi_range(0,2)
+	direction=-1.0 if variant==1 else 1.0
+	starts=PARKED
+	targets=PARKED+Vector2.ONE*(1120.0 if direction>0 else -1320.0)
+	delays=Vector2(4.0 if variant==0 else 8.0,0) if direction>0 else Vector2(0,4.0)
+	phase_duration=rng.randf_range(26.0,33.0)+(7.0 if variant==2 else 0.0)
 
 func advance(t: float):
 	clock=t
 	if not initialized:
 		initialized=true
-		next_departure=t+rng.randf_range(2.0,6.0)
-	if active and t>=departure+duration():
-		active=false
+		phase_start=t
+		phase_duration=rng.randf_range(4.0,9.0)
+	var elapsed=t-phase_start
+	if phase=="parked" and elapsed>=phase_duration:
+		begin_departure(t)
+		elapsed=0
+	elif phase=="depart" and elapsed>=phase_duration+maxf(delays.x,delays.y):
+		positions=targets
+		phase="empty"
+		phase_start=t
+		phase_duration=rng.randf_range(9.0,24.0)
 		completed+=1
-		next_departure=t+rng.randf_range(9.0,24.0)
-	if not active and t>=next_departure:
-		active=true
-		departure=t
-		speed=rng.randf_range(48.0,76.0)
-		direction=1.0 if rng.randf()>.5 else -1.0
-		wagon_count=rng.randi_range(3,6)
-	queue_redraw()
-
-func duration() -> float:
-	return (1600.0+(wagon_count-1)*SPACING)/speed
-
-func lead_x(t: float) -> float:
-	return -80+(t-departure)*speed if direction>0 else 1520-(t-departure)*speed
-
-func rail_y(x: float) -> float:
-	return 342.0+x*.130
-
-func _draw():
-	if not active or not painting:return
-	var head=lead_x(clock)
-	for i in wagon_count:
-		var x=head-direction*i*SPACING
-		if x < -100 or x > 1540:continue
-		var origin=Vector2(x,rail_y(x))
-		if i<wagon_count-1:
-			var end=Vector2(x-direction*SPACING,rail_y(x-direction*SPACING))
-			draw_line(origin+Vector2(0,-4),end+Vector2(0,-4),Color("332c26"),1.3,true)
-		var points=PackedVector2Array()
-		var uv=PackedVector2Array()
-		for p in WAGON:
-			points.append(origin+(p-SOURCE_ANCHOR)*WAGON_SCALE)
-			uv.append(p/painting.get_size())
-		draw_polygon(points,PackedColorArray([Color(.87,.87,.87,1)]),uv,painting)
-		# Turning wheel spokes stay barely visible at this distance.
-		for wheel in [Vector2(-16,-2),Vector2(13,2)]:
-			var center=origin+wheel
-			var spoke=Vector2.from_angle(clock*speed/3.0*direction)*1.7
-			draw_line(center-spoke,center+spoke,Color(.32,.30,.27,.6),.6,true)
-		if i==0:
-			# Small amber running lamp distinguishes the active haulage train.
-			var lamp=origin+Vector2(direction*21,-7)
-			draw_circle(lamp,2.8,Color(.95,.46,.12,.10))
-			draw_circle(lamp,1.0,Color(.98,.68,.29,.75))
+	elif phase=="empty" and elapsed>=phase_duration:
+		phase="arrive"
+		phase_start=t
+		phase_duration=rng.randf_range(25.0,32.0)
+		starts=Vector2(-360,-100) if direction>0 else Vector2(1772,2032)
+		targets=PARKED
+		delays=Vector2.ZERO
+		positions=starts
+		elapsed=0
+	elif phase=="arrive" and elapsed>=phase_duration:
+		phase="parked"
+		positions=PARKED
+		phase_start=t
+		phase_duration=rng.randf_range(10.0,27.0)
+	if phase in ["depart","arrive"]:
+		for i in 2:
+			var progress=clampf((elapsed-delays[i])/phase_duration,0,1)
+			# Smooth acceleration/braking, with the whole wheel contact following the rail.
+			positions[i]=lerpf(starts[i],targets[i],progress*progress*(3.0-2.0*progress))
+	if track_material:track_material.set_shader_parameter("cart_positions",positions)

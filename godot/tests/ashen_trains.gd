@@ -13,43 +13,41 @@ func check():
 	var trains=game.background.get_node("OreTrains")
 	trains.rng.seed=12345
 	trains.advance(100)
-	assert(not trains.active and trains.next_departure>=102 and trains.next_departure<=106)
-	var waits=[]
-	var directions=[]
+	assert(trains.phase=="parked" and trains.positions==trains.PARKED)
+	assert(trains.get_child_count()==0,"The track must be one shader region, with no extra convoy sprites")
+	var variants=[]
 	for i in 20:
-		var start=trains.next_departure
-		trains.advance(start)
-		assert(trains.active and trains.wagon_count>=3 and trains.wagon_count<=6)
-		assert(trains.speed>=48 and trains.speed<=76)
-		directions.append(trains.direction)
-		var x=trains.lead_x(start)
-		trains.advance(start+1)
-		assert(is_equal_approx(trains.lead_x(start+1)-x,trains.direction*trains.speed))
-		var end=start+trains.duration()+.01
-		trains.advance(end)
-		assert(not trains.active)
-		var wait=trains.next_departure-end
-		assert(wait>=9 and wait<=24)
-		waits.append(wait)
-	assert(1.0 in directions and -1.0 in directions)
-	assert(waits.max()-waits.min()>5,"Crossings must not run on a fixed loop")
+		trains.advance(trains.phase_start+trains.phase_duration+.01)
+		assert(trains.phase=="depart")
+		assert(trains.positions==trains.PARKED,"Departure must not snap carts out of their painted positions")
+		variants.append(trains.variant)
+		trains.advance(trains.phase_start+12)
+		assert(trains.positions.x<trains.positions.y,"Carts must never cross through one another")
+		var before=trains.positions
+		trains.advance(trains.clock+.01)
+		assert(trains.positions.distance_to(before)<2,"Motion must remain continuous")
+		trains.advance(trains.phase_start+trains.phase_duration+maxf(trains.delays.x,trains.delays.y)+.01)
+		assert(trains.phase=="empty")
+		assert(trains.phase_duration>=9 and trains.phase_duration<=24)
+		trains.advance(trains.phase_start+trains.phase_duration+.01)
+		assert(trains.phase=="arrive")
+		trains.advance(trains.phase_start+trains.phase_duration*.5)
+		assert(trains.positions.x<trains.positions.y)
+		trains.advance(trains.phase_start+trains.phase_duration+.01)
+		assert(trains.phase=="parked" and trains.positions==trains.PARKED)
+	assert(0 in variants and 1 in variants and 2 in variants)
 	assert(trains.completed==20)
 	if "--train-capture" in OS.get_cmdline_user_args():
-		trains.active=true
-		trains.departure=0
-		trains.direction=1
-		trains.speed=60
-		trains.wagon_count=5
-		for x in [340,690,890,1250]:
-			game.clock=(x+80)/60.0
-			game.background.advance(game.clock)
+		var samples=[Vector2(720,1180),Vector2(880,1340),Vector2(530,990),Vector2(170,630)]
+		for i in samples.size():
+			trains.track_material.set_shader_parameter("cart_positions",samples[i])
 			await process_frame
 			await RenderingServer.frame_post_draw
-			root.get_texture().get_image().save_png("E:/Cairn-build-tools/ashen-train-%d.png"%x)
+			root.get_texture().get_image().save_png("E:/Cairn-build-tools/ashen-track-region-%d.png"%i)
 	game.background.setup(game.art,"ashen-2")
 	await process_frame
 	assert(not game.background.has_node("OreTrains"))
 	game.queue_free()
 	await process_frame
-	print("CAIRN_ASHEN_TRAINS_OK: 20 varied crossings, continuous motion, random idle gaps, both directions, area cleanup")
+	print("CAIRN_ASHEN_TRAINS_OK: original carts, 20 regional sequences, three variants, no crossings or departure snaps, area cleanup")
 	quit()

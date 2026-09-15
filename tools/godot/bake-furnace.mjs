@@ -1,10 +1,18 @@
 import fs from 'node:fs';
-// Apply the revised still after the shared episode bake, including clean builds.
-// It has no dependency on the large, unchanged swamp animation atlases.
-const source='studies/backgrounds/ashen-v2/02-mouth.png';
-const target='godot/assets/ashen-2-base.png';
-const paint=fs.readFileSync(source);
-if(!fs.existsSync(target)||!paint.equals(fs.readFileSync(target))){
- fs.copyFileSync(source,target);
- console.log('Updated Furnace Mouth: banner-free painting prepared for animated exhaust.');
+// Revised stills and separate animation layers follow the shared episode bake.
+// They do not invalidate the large, unchanged swamp animation atlases.
+const sources={
+ '02-mouth.png':'ashen-2-base.png',
+ '03-crucible.png':'ashen-3-base.png',
+ '03-brazier.png':'crucible-brazier.png',
+ '01-track-clear.png':'ashen-track-clear.png',
+};
+for(const [file,asset] of Object.entries(sources)){
+ const source='studies/backgrounds/ashen-v2/'+file;
+ const target='godot/assets/'+asset;
+ const paint=fs.readFileSync(source);
+ if(!fs.existsSync(target)||!paint.equals(fs.readFileSync(target))){
+  fs.copyFileSync(source,target);
+  console.log('Updated Ashen animation asset: '+asset);
+ }
 }

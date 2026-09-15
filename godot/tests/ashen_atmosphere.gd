@@ -13,10 +13,12 @@ func check():
 		await process_frame
 		assert(game.background.has_node("AshenVeil"))
 		assert(game.background.has_node("FurnaceExhaust")== (area==2),"Dedicated exhaust belongs only to the furnace")
+		assert(game.background.has_node("HangingBrazier")== (area==3))
 		var veil=game.background.get_node("AshenVeil")
 		assert(veil.mouse_filter==Control.MOUSE_FILTER_IGNORE and veil.z_index==1810)
 		for time in [23.98,24.02,61.7]:
 			game.background.advance(time)
+			if area==3:assert(absf(game.background.get_node("HangingBrazier").rotation)<.029)
 			for material in game.background.layers:
 				assert(is_equal_approx(material.get_shader_parameter("clock"),time),"Atmosphere must not jump at the old 24-second loop boundary")
 			for decoration in game.background.decorations:

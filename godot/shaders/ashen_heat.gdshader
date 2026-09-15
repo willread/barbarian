@@ -1,4 +1,5 @@
 shader_type canvas_item;
+#include "res://shaders/ashen_track.gdshaderinc"
 uniform float clock=0.0;
 uniform float area=1.0;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -34,7 +35,16 @@ void fragment(){
  float ground=smoothstep(.72,.78,uv.y)*(1.0-smoothstep(.84,.98,uv.y));
  float strength=(.00055*lane+min(sources,1.4)*.0028*lane+ground*.00045)*edges;
  uv+=turbulence*vec2(1.0,.48)*strength;
+ // The narrow pour stays attached to the left lip and receiving trough.
+ float lava=0.0;
+ if(area>2.5 && area<3.5){
+  float center=.408-(uv.y-.20)*.012;
+  lava=(1.0-smoothstep(.003,.008,abs(uv.x-center)))*smoothstep(.195,.225,uv.y)*(1.0-smoothstep(.49,.518,uv.y));
+  lava=max(lava,(1.0-smoothstep(.009,.020,abs(uv.x-.416)))*smoothstep(.508,.525,uv.y)*(1.0-smoothstep(.57,.592,uv.y)));
+  uv.x+=sin(uv.y*57.0-clock*4.0)*.00065*lava;
+ }
  vec4 paint=texture(TEXTURE,clamp(uv,vec2(.001),vec2(.999)));
+ if(area<1.5){paint=road_scene(clamp(uv,vec2(.001),vec2(.999)));}
  // Animate only painted fire/lava; iron and stone keep their original colour.
  float hot=smoothstep(.12,.42,paint.r-paint.b)*smoothstep(.25,.6,paint.r);
  float fire=noise(vec2(uv.x*160.0,uv.y*85.0+clock*4.4));
@@ -52,6 +62,13 @@ void fragment(){
   paint.rgb+=vec3(.045,.018,.002)*hot*lane*burn;
  }else{
   paint.rgb+=vec3(.16,.052,.006)*hot*lane*flicker;
+ }
+ // Bright streaks advect downward, with independently changing hot rivulets.
+ if(lava>0.0){
+  float flow_lava=noise(vec2(uv.x*900.0,uv.y*170.0-clock*25.0));
+  float rivulet=noise(vec2(uv.x*1700.0+7.0,uv.y*73.0-clock*11.0));
+  paint.rgb*=1.0+lava*hot*((flow_lava*.7+rivulet*.3)-.5)*.95;
+  paint.rgb+=vec3(.11,.055,.006)*lava*hot*flow_lava;
  }
  // Painted smoke moves without displacing the furnace architecture.
  float gray=1.0-smoothstep(.03,.16,abs(paint.r-paint.b));
