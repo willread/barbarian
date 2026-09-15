@@ -314,21 +314,27 @@ func step_king_charge(game,king: Dictionary,a: Dictionary,dt: float):
 		a.launched=true
 		game.audio.play("axe",-2,.55)
 		game.shake=maxf(game.shake,5)
-	var before=float(king.x)
-	king.x=move_toward(king.x,a.target.x,1350*dt)
+	var before=Vector2(king.x,king.y)
+	var next=before.move_toward(a.target,1350*dt)
+	king.x=next.x;king.y=next.y
+	game.background.constrain(king)
+	var after=Vector2(king.x,king.y)
 	king.dir=a.direction
 	if a.age%4==0:
 		game.burst(king.x-king.dir*45,king.y-5,6,Color("827865"))
 		game.shake=maxf(game.shake,2)
 	var hero=game.hero
 	# Swept contact avoids skipping the player at charge speed; one hit per escape.
-	if not a.charge_hit and hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<48 and absf(hero.y-king.y)<55 and hero.x>=minf(before,king.x)-95 and hero.x<=maxf(before,king.x)+95:
+	var footprint=Vector2(95,55)
+	var feet=Vector2(hero.x,hero.y)/footprint
+	var nearest=Geometry2D.get_closest_point_to_segment(feet,before/footprint,after/footprint)
+	if not a.charge_hit and hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<48 and feet.distance_to(nearest)<1:
 		a.charge_hit=true
 		game.damage(hero,{"type":"kingCharge","damage":14,"direction":a.direction,"knock":true,"push":7.0},king)
 		hero.invTicks=maxi(hero.invTicks,60)
 		game.audio.play("heavy_hit",-2,.7)
 		game.shake=maxf(game.shake,9)
-	if absf(king.x-a.target.x)<1:
+	if after.distance_to(a.target)<1 or after.distance_to(before)<.1 or after.distance_to(next)>1:
 		a.arrived=true
 		king["open_ticks"]=90
 		game.burst(king.x+king.dir*45,king.y-5,14,Color("827865"))

@@ -1,11 +1,10 @@
 extends CanvasLayer
-const LETTER_OVERLAP=24.0 # Remove excess transparent padding between baked glyphs.
+const LETTER_SPACING=64.0 # Fixed centers, independent of glyph width.
 var game: Node2D
 var previous_pause=false
 var code=""
 var letters: Array=[]
 var tweens: Array=[]
-var shifts: Dictionary={}
 var falls: Dictionary={}
 var textures: Dictionary={}
 var landing_count=0
@@ -31,7 +30,7 @@ func toggle():
    face.texture=textures["?"]
    face.scale=Vector2(glyphs["?"].width,glyphs["?"].height)/face.texture.get_size()
    add_child(face);letters.append(face)
-  arrange(false)
+  arrange()
   for face in letters:drop(face,false)
  game.bindings.clear();game.keys.clear();game.pressed.clear()
 func close():
@@ -40,9 +39,6 @@ func close():
   if tween.is_valid():tween.kill()
  tweens.clear()
  falls.clear()
- for shift in shifts.values():
-  if shift.is_valid():shift.kill()
- shifts.clear()
  for letter in letters:letter.queue_free()
  letters.clear()
  code=""
@@ -66,26 +62,11 @@ func accept_letter(ch: String):
  var meta=glyphs[ch]
  face.texture=textures[ch]
  face.scale=Vector2(meta.width,meta.height)/face.texture.get_size()
- arrange(true)
  drop(face,true)
-func arrange(animate: bool):
+func arrange():
  var center=get_viewport().get_visible_rect().size*.5
- var width=0.0
- for letter in letters:width+=letter.texture.get_width()*letter.scale.x
- width-=LETTER_OVERLAP*maxi(0,letters.size()-1)
- var x=center.x-width*.5
- for letter in letters:
-  var w=letter.texture.get_width()*letter.scale.x
-  var target=x+w*.5
-  if not animate:
-   letter.position.x=target
-  else:
-   var id=letter.get_instance_id()
-   if shifts.has(id) and shifts[id].is_valid():shifts[id].kill()
-   var shift=create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-   shifts[id]=shift
-   shift.tween_property(letter,"position:x",target,.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-  x+=w-LETTER_OVERLAP
+ for i in letters.size():
+  letters[i].position.x=center.x+(i-1)*LETTER_SPACING
 func drop(face: Sprite2D,count_landing: bool):
  var id=face.get_instance_id()
  if falls.has(id) and falls[id].is_valid():falls[id].kill()

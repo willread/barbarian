@@ -20,7 +20,7 @@ func check():
   assert(king.x==origin and game.hero.hp==100,"Roar windup locks position and does not damage")
   for age in range(a.from,110):
    a.age=age;game.episode_combat.step(game,1.0/60)
-  assert(a.arrived and absf(king.x-a.target.x)<1,"Escape reaches the far side without leaving the arena")
+  assert(a.arrived and absf(king.x-origin)>600,"Escape reaches the far side without leaving the arena")
   assert(game.hero.hp<85 and not game.hero.down.is_empty(),"Charge causes heavy damage and knockdown")
   assert(absf(game.hero.down.vx)==7 and a.charge_hit)
   assert(game.e_ai.boss_open(king),"King is exposed after the escape")
@@ -31,6 +31,22 @@ func check():
   king.attack={};king.corner_ticks=240;king.x=180;game.hero.x=300;king.aiRest=999
   game.e_ai.king_intent(king,game.hero)
   assert(king.attack.is_empty(),"Escape cooldown prevents spam")
+ # Aim outward as well as inward, and above/below, locking before launch.
+ for offset in [Vector2(220,55),Vector2(-220,-55),Vector2(0,60)]:
+  king.x=800;king.y=670;king.attack={};king.aiRest=0;king.corner_ticks=0;king.escape_cooldown=0;king.roam_charge_wait=1;king.hurtTicks=0;king.recovering=0
+  game.hero.x=800+offset.x;game.hero.y=670+offset.y;game.hero.hp=100;game.hero.invTicks=0;game.hero.down={}
+  game.e_ai.king_intent(king,game.hero)
+  var a=king.attack
+  var aim=(a.target-Vector2(800,670)).normalized()
+  assert(aim.dot(offset.normalized())>.999,"Charge aims directly toward the player in both axes")
+  var locked=a.target
+  game.hero.x+=20
+  game.e_ai.king_intent(king,game.hero)
+  assert(a.target==locked,"Warning locks direction rather than homing")
+  game.hero.x-=20
+  for age in range(a.from,110):
+   a.age=age;game.episode_combat.step(game,1.0/60)
+  assert(a.arrived and game.hero.hp<100,"Diagonal and vertical charges make contact and finish")
  # Repositioning is also available in open ground, without corner pressure.
  king.x=800;king.y=670;king.attack={};king.aiRest=0;king.corner_ticks=0;king.escape_cooldown=0;king.roam_charge_wait=1
  game.hero.x=650;game.hero.y=670

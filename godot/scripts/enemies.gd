@@ -318,11 +318,18 @@ func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	var dy=h.y-e.y
 	e.dir=facing_target(e,h.x)
 	if (e.corner_ticks>=150 or e.roam_charge_wait==0) and e.escape_cooldown==0:
-		e.dir=1 if e.x<720 else -1
+		if absf(dx)>.01:e.dir=int(signf(dx))
 		# Break a sustained corner stun-lock, then give the full charge warning.
 		e.hurtTicks=0;e.recovering=0;e.recoil=0;e.stagger=0
 		if m.begin(e,"kingCharge"):
-			e.attack.target=Vector2(1160 if e.dir>0 else 280,e.y)
+			# Lock a straight path through the player's feet during the warning.
+			var origin=Vector2(e.x,e.y)
+			var aim=Vector2(dx,dy).normalized()
+			if aim==Vector2.ZERO:aim=Vector2(e.dir,0)
+			var distance=1000.0
+			if absf(aim.x)>.001:distance=minf(distance,absf(((1350.0 if aim.x>0 else 90.0)-origin.x)/aim.x))
+			if absf(aim.y)>.001:distance=minf(distance,absf(((750.0 if aim.y>0 else 570.0)-origin.y)/aim.y))
+			e.attack.target=origin+aim*distance
 			e.attack["charge_hit"]=false
 			e.attack["arrived"]=false
 			e.corner_ticks=0

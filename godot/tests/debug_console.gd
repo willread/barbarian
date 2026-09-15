@@ -15,6 +15,8 @@ func check():
  console.toggle()
  assert(console.letters.size()==3 and console.code.is_empty())
  for letter in console.letters:assert(letter.texture==console.textures["?"],"Opening shows three question marks")
+ var slots=console.letters.map(func(letter):return letter.position.x)
+ assert(is_equal_approx(slots[1]-slots[0],slots[2]-slots[1]))
  var clock=game.clock
  await create_timer(.1).timeout
  assert(paused and game.clock==clock)
@@ -32,6 +34,7 @@ func check():
  console.accept_letter("T")
  console.accept_letter("X")
  assert(console.code=="EMT")
+ assert(console.letters.map(func(letter):return letter.position.x)==slots,"Different glyph widths must never move any slot")
  await create_timer(1.2).timeout
  assert(game.hero.hp==game.hero.max and not paused and not console.visible)
  console.toggle()
