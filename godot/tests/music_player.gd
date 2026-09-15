@@ -29,7 +29,11 @@ func check():
   await create_timer(.3).timeout
   await RenderingServer.frame_post_draw
   root.get_texture().get_image().save_png("E:/Cairn-build-tools/music-player.png")
- game.menu_action("BACK")
+ var down=InputEventKey.new();down.keycode=KEY_DOWN;down.pressed=true
+ view.handle(down)
+ assert(view.selected==4,"Down from the last track selects the standard Back button")
+ var enter=InputEventKey.new();enter.keycode=KEY_ENTER;enter.pressed=true
+ view.handle(enter)
  await process_frame
  assert(not game.audio.music_preview and game.settings_page=="sound" and game.menu.visible)
  for track in game.audio.tracks:assert(not track.stream_paused)
