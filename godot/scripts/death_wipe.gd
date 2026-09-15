@@ -122,3 +122,24 @@ func build_letter_splats():
 		var aspect=randf_range(.72,1.0)
 		# Broad blobs, oblong splashes and irregular lobes share the inset budget.
 		deposits.append({"x":point.x,"y":point.y,"rx":radius,"ry":radius*aspect,"angle":randf()*TAU,"phase":randf()*TAU,"lobes":2+randi()%5,"roughness":randf_range(.25,.65),"amount":randf_range(.35,.7),"at":.05+point.x/W*.8+randf()*.2})
+
+	# Feed narrow rivulets from the lower silhouette over time. Low-volume
+	# letter splats alone do not have enough fluid mass to form visible drips.
+	for x in range(12,W-12,9):
+		var column=clampi(x+randi_range(-2,2),1,W-2)
+		var bottom=-1
+		for y in range(H-2,1,-1):
+			if guide.get_pixel(column,y).a>.8:
+				bottom=y
+				break
+		if bottom<H*.55 or randf()<.2:continue
+		var length=randf_range(5,14)
+		var width=randf_range(.6,1.05)
+		var start=randf_range(1.0,1.7)
+		var duration=randf_range(1.5,2.5)
+		for step in 33:
+			var t=step/32.0
+			var y=bottom-1+length*pow(t,1.35)
+			deposits.append({"x":column+sin(t*2.2)*.3,"y":y,"rx":width*(1.0-t*.25),"ry":.85,"angle":0.,"phase":0.,"lobes":2,"roughness":.08,"amount":.24,"at":start+duration*t})
+		# A heavier rounded bead gathers at the hanging tip.
+		deposits.append({"x":column+sin(2.2)*.3,"y":bottom-1+length,"rx":width*1.25,"ry":width*1.65,"angle":0.,"phase":0.,"lobes":2,"roughness":.05,"amount":.42,"at":start+duration})
