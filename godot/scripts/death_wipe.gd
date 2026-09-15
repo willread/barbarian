@@ -49,7 +49,8 @@ func _ready():
 	surface.visible=false
 func advance(dt: float):
 	var old=age
-	age=min(3.8,age+dt)
+	var settle_time=4.8 if letter_mask else 3.8
+	age=min(settle_time,age+dt)
 	if age<0: return
 	surface.visible=true
 	var positions=PackedVector4Array()
@@ -71,8 +72,10 @@ func advance(dt: float):
 	fluid.set_shader_parameter("count",count)
 	fluid.set_shader_parameter("clear",not started)
 	fluid.set_shader_parameter("age",age)
-	fluid.set_shader_parameter("ticks",min(3.0,dt*60)*(.06 if letter_mask else 1.0))
-	if old<3.8: viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
+	fluid.set_shader_parameter("settle_start",3.2 if letter_mask else 1.8)
+	fluid.set_shader_parameter("settle_end",settle_time)
+	fluid.set_shader_parameter("ticks",min(3.0,dt*60)*(.18 if letter_mask else 1.0))
+	if old<settle_time: viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	started=true
 	queue_redraw()
 func _draw():

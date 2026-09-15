@@ -8,6 +8,8 @@ uniform int count=0;
 uniform bool clear=true;
 uniform float age=0.;
 uniform float ticks=1.;
+uniform float settle_start=1.8;
+uniform float settle_end=3.8;
 float field(vec2 p){
  if(clear||p.x<0.||p.x>=320.||p.y<0.||p.y>=180.)return 0.;
  vec2 c=texture(history,(p+.5)/vec2(320.,180.)).rg;
@@ -17,7 +19,7 @@ float down(float v){float m=max(0.,v-.12);return min(m*.38,m*m*.075);}
 float flux(float a,float b){float f=clamp((a-b)*.025,-.08,.08);return f>0.?min(f,max(0.,a-.12)*.12):-min(-f,max(0.,b-.12)*.12);}
 void fragment(){
  vec2 p=floor(SCREEN_UV*vec2(320.,180.));
- float v=field(p),rate=1.-smoothstep(1.8,3.8,age);
+ float v=field(p),rate=1.-smoothstep(settle_start,settle_end,age);
  float change=down(field(p-vec2(0.,1.)))-down(v);
  if(p.x>0.)change+=flux(field(p-vec2(1.,0.)),v);
  if(p.x<319.)change-=flux(v,field(p+vec2(1.,0.)));
