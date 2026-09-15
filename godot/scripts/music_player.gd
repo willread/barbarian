@@ -7,15 +7,12 @@ var selected=0
 var current=-1
 var names: Array=[]
 var saved_pauses: Array=[]
-const STONE=preload("res://art/stone-border-v1.png")
 var font=preload("res://art/controls/cinzel.ttf")
 const PLACES=["MAIN MENU","EP I / THE FALLEN CITADEL","EP II / THE SUNKEN WILDS","EP III / THE ASHEN DEPTHS"]
-const PANEL=Rect2(300,230,840,530)
 const SEEK=Rect2(370,652,700,20)
 func _ready():
  layer=2200
  canvas=Node2D.new();add_child(canvas);canvas.draw.connect(paint)
- canvas.position=Vector2(43.2,45);canvas.scale=Vector2.ONE*.94
  player=AudioStreamPlayer.new();player.bus=&"Music";player.volume_db=-10;add_child(player)
  var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/manifest.json"))
  for track in game.audio.tracks:
@@ -63,44 +60,37 @@ func handle(event: InputEvent):
  elif event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
   var point=canvas.transform.affine_inverse()*(transform.affine_inverse()*event.position)
   for i in 4:
-   if Rect2(340,312+i*68,760,59).has_point(point):play_track(i);return
+   if Rect2(160,180+i*86,1120,86).has_point(point):play_track(i);return
   if Rect2(605,595,230,44).has_point(point):toggle()
   elif Rect2(410,595,125,44).has_point(point):play_track(selected-1)
   elif Rect2(905,595,125,44).has_point(point):play_track(selected+1)
   elif SEEK.has_point(point) and current>=0:seek_to((point.x-SEEK.position.x)/SEEK.size.x*player.stream.get_length())
   elif Rect2(620,710,200,42).has_point(point):closed.emit()
-func text(value: String,point: Vector2,size: int,color: Color=Color("d5c9aa"),center: bool=false):
+func text(value: String,point: Vector2,size: int,color: Color=Color("e4ddc9"),center: bool=false):
  if center:point.x-=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x*.5
  canvas.draw_string(font,point,value,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
-func plate(rect: Rect2,active: bool=false):
- canvas.draw_rect(rect,Color("1c211e"))
- canvas.draw_texture_rect_region(STONE,rect,Rect2(rect.position,rect.size),Color(1,1,1,.15))
- canvas.draw_rect(rect,Color("b6a06d") if active else Color("595643"),false,1.5)
- canvas.draw_line(rect.position+Vector2(2,2),Vector2(rect.end.x-2,rect.position.y+2),Color("706b55"),2)
- canvas.draw_line(Vector2(rect.position.x+2,rect.end.y-2),rect.end-Vector2(2,2),Color("090d0b"),3)
 func paint():
- canvas.draw_rect(Rect2(0,210,1440,600),Color(0,0,0,.3))
- plate(PANEL)
- canvas.draw_rect(PANEL.grow(-7),Color("756442"),false,1)
- for point in [PANEL.position+Vector2(15,15),Vector2(PANEL.end.x-15,PANEL.position.y+15),PANEL.end-Vector2(15,15),Vector2(PANEL.position.x+15,PANEL.end.y-15)]:
-  canvas.draw_circle(point,4,Color("a18a59"));canvas.draw_line(point-Vector2(2,0),point+Vector2(2,0),Color("302b20"),1)
- text("SONGS OF CAIRN",Vector2(720,279),31,Color("dec998"),true)
+ var corner=transform.affine_inverse()*Vector2.ZERO
+ canvas.draw_rect(Rect2(corner,get_viewport().get_visible_rect().size/transform.get_scale()),Color(0,0,0,.9))
+ text("MUSIC PLAYER",Vector2(720,87),40,Color("e4ddc9"),true)
+ text("TRACK",Vector2(178,151),16,Color("bdaa7d"))
+ text("USED IN",Vector2(720,151),16,Color("bdaa7d"))
  for i in 4:
-  plate(Rect2(340,312+i*68,760,59),selected==i)
-  text("%02d"%(i+1),Vector2(359,347+i*68),23,Color("a18f67"))
-  text(PLACES[i],Vector2(414,332+i*68),12,Color("a7ac98"))
-  text(names[i],Vector2(414,358+i*68),23)
-  if current==i and player.playing and not player.stream_paused:
-   for bar in 5:
-    var height=6+absf(sin(Time.get_ticks_msec()*.004+bar*1.7))*17
-    canvas.draw_rect(Rect2(1020+bar*8,355+i*68-height,4,height),Color("c9b078"))
+  var y=180+i*86
+  if selected==i:canvas.draw_rect(Rect2(160,y,1120,86),Color(.7,.48,.15,.12))
+  elif i%2==0:canvas.draw_rect(Rect2(160,y,1120,86),Color(.7,.65,.48,.025))
+  canvas.draw_line(Vector2(160,y),Vector2(1280,y),Color(.40,.34,.24,.45))
+  text(names[i],Vector2(178,y+50),27)
+  text(PLACES[i],Vector2(720,y+50),20)
+  if current==i:text("PAUSED" if player.stream_paused else "PLAYING",Vector2(1150,y+50),14,Color("bdaa7d"))
+ canvas.draw_line(Vector2(160,524),Vector2(1280,524),Color("bdaa7d"))
  for spec in [[Rect2(410,595,125,44),"PREV"],[Rect2(605,595,230,44),"PAUSE" if current==selected and player.playing and not player.stream_paused else "PLAY"],[Rect2(905,595,125,44),"NEXT"]]:
-  plate(spec[0]);text(spec[1],spec[0].get_center()+Vector2(0,7),20,Color("dec998"),true)
- canvas.draw_rect(Rect2(SEEK.position+Vector2(0,8),Vector2(SEEK.size.x,4)),Color("070b08"))
+  text(spec[1],spec[0].get_center()+Vector2(0,7),20,Color("e4ddc9"),true)
+ canvas.draw_rect(Rect2(SEEK.position+Vector2(0,8),Vector2(SEEK.size.x,4)),Color("39372d"))
  if current>=0:
   var position_seconds=player.get_playback_position();var length=player.stream.get_length()
   canvas.draw_rect(Rect2(SEEK.position+Vector2(0,8),Vector2(SEEK.size.x*position_seconds/length,4)),Color("c2a365"))
   text("%d:%02d / %d:%02d"%[int(position_seconds)/60,int(position_seconds)%60,int(length)/60,int(length)%60],Vector2(720,695),14,Color("adae99"),true)
  else:text("SELECT A TRACK",Vector2(720,695),14,Color("adae99"),true)
- text("BACK",Vector2(720,740),25,Color("dec998"),true)
+ text("BACK",Vector2(720,740),25,Color("e4ddc9"),true)
  text("SOUND MUTED" if game.muted else "LOOPING / ENTER TO PLAY / ARROWS TO SELECT & SEEK",Vector2(720,789),12,Color("b6baa4"),true)
