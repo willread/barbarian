@@ -27,7 +27,13 @@ func check():
  assert(game.hero.hp==hp,"Roots must not damage during emergence")
  combat.step(game,.09)
  assert(game.hero.hp<hp,"Visible eruption must damage a grounded player")
+ assert(game.hero.hurtTicks==0 and game.hero.recovering==0 and game.hero.recoil==0,"Roots must leave movement and dash available")
+ assert(game.hero.invTicks>=45,"Root hits grant a shared escape window")
  hp=game.hero.hp
+ combat.spawn_root(king,Vector2(game.hero.x,game.hero.y),.3)
+ combat.step(game,.01)
+ assert(game.hero.hp==hp,"Overlapping roots cannot bypass escape protection")
+ combat.hazards.pop_back()
  game.hero.invTicks=0
  combat.step(game,.1)
  assert(game.hero.hp==hp,"Contact cooldown prevents rapid repeat hits")

@@ -182,7 +182,9 @@ func step(game,dt: float):
 			var rise=1.0-pow(1.0-growth,3)
 			# Keep contact live after eruption; regular invulnerability and a local cooldown prevent rapid repeated hits.
 			if h.age>=.18 and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<29:
-				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false},h.owner)
+				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false,"no_stun":true},h.owner)
+				# One escape window shared across every root, including later eruptions.
+				if victim.hp>0:victim.invTicks=maxi(victim.invTicks,45)
 				h.next_hit=h.age+.65
 		if h.kind in ["mire","root","rootSweep"] and h.owner.hp<=0:h.life=h.age
 		if h.kind!="clinker":continue
