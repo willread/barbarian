@@ -11,7 +11,19 @@ const TAU=Math.PI*2;
 const sine=(t,period,offset=0)=>Math.sin(TAU*(t/period+offset));
 const random=i=>{const a=Math.sin(i*127.1+311.7)*43758.5453;return a-Math.floor(a)};
 const gust=(t,p=0)=>.62*sine(t,8,p)+.25*sine(t,6,p*.7)+.13*sine(t,3,p*1.3);
-export function prepareAssets(images,art){return art}
+export function prepareAssets(images,art,create){
+ const painting=create(1280,720),pg=painting.getContext('2d');pg.drawImage(images[0],0,0,1280,720);
+ const pixels=pg.getImageData(0,0,1280,720),d=pixels.data;
+ // Actual painted tree silhouettes occlude the distant flight plane, pixel for pixel.
+ for(let y=0;y<720;y++)for(let x=0;x<1280;x++){
+  const i=(y*1280+x)*4,luma=(d[i]*.2126+d[i+1]*.7152+d[i+2]*.0722)/255;
+  const edge=Math.max(0,Math.min(1,(x-455)/75,(1070-x)/80));
+  const visibility=Math.max(0,Math.min(1,(luma-.20)/.22));
+  d[i]=d[i+1]=d[i+2]=255;d[i+3]=Math.round(255*visibility*edge);
+ }
+ pg.putImageData(pixels,0,0);art.birdMask=painting;art.birdLayer=create(1280,720);
+ return art;
+}
 function sprite(g,image,x,y,w,h,angle=0,pivot=.5,tint=1){
  const fit=Math.min(w/image.width,h/image.height);w=image.width*fit;h=image.height*fit;
  g.save();g.translate(x,y);g.rotate(angle);g.globalAlpha=tint;g.drawImage(image,-w*pivot,0,w,h);g.restore();
@@ -49,8 +61,9 @@ function bell(g,image,x,y,w,h,t,period,phase,active){
  g.restore();
 }
 
-function flock(g,t,active){
+function flock(destination,art,t,active){
  if(!active)return;
+ const g=art.birdLayer.getContext('2d');g.clearRect(0,0,1280,720);
  for(let group=0;group<3;group++){
  const seed=31+group*19,start=3+group*40+random(seed)*6;
  const travel=12+random(seed+1)*5,elapsed=t-start;
@@ -65,7 +78,7 @@ function flock(g,t,active){
   const flap=Math.sin(elapsed*(6+random(birdSeed+10)*3)+i*2.4);
   g.save();g.translate(x,y);g.scale(direction*scale,scale);g.rotate(-.04);
   // Muted distant plumage shares the gray-green atmospheric values of the trees.
-  g.fillStyle='#626b61';g.globalAlpha=.78;
+  g.fillStyle='#69695d';g.globalAlpha=.46+.12*Math.sin(x*.013+t*.3);
   g.beginPath();g.ellipse(0,0,7,2.8,-.08,0,TAU);g.fill();
   g.beginPath();g.moveTo(-3,0);g.quadraticCurveTo(-size*.55,-7-flap*size*.7,-size,-3-flap*size);
   g.lineTo(-size*.7,2-flap*size*.75);g.quadraticCurveTo(-size*.25,5,3,2);g.fill();
@@ -75,13 +88,15 @@ function flock(g,t,active){
   g.beginPath();g.moveTo(-5,0);g.lineTo(-14,3);g.lineTo(-6,3);g.fill();g.restore();
  }
  }
+ g.save();g.globalCompositeOperation='destination-in';g.drawImage(art.birdMask,0,0);g.restore();
+ destination.drawImage(art.birdLayer,0,0);
 }
 export function drawScenery(g,index,image,a,time,enabled=[true,true,true]){
  const t=((time%duration)+duration)%duration;
  g.clearRect(0,0,1280,720);g.drawImage(image,0,0,1280,720);
  if(index===0){
   for(const [x,y,w,h,p] of [[187,74,48,184,.1],[329,105,38,154,.4],[479,145,31,128,.7]])ribbon(g,a.moss,x,y,w,h,enabled[0]?t:0,p,enabled[0]?12:0);
-  flock(g,t,enabled[1]);
+  flock(g,a,t,enabled[1]);
   for(const [x,y,w,h,p] of [[1170,386,72,81,.1],[1219,395,46,61,.6]])ribbon(g,a.reeds,x,y,w,h,t,p,enabled[2]?4:0,'root');
  }else if(index===1){
   for(const [x,y,w,h,p] of [[290,180,38,122,.1],[515,207,32,108,.45],[558,180,35,133,.8],[361,124,26,104,.63],[459,149,31,139,.27]])charm(g,p===.63||p===.8?a['bird-skull']:a.charm,x,y,w,h,t,p,enabled[0],p===.45||p===.63?-1:1,p===.27?.11:p===.8?-.08:0);

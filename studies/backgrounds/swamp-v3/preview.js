@@ -1,4 +1,4 @@
-import {screens,duration,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground,drawActor} from './scene.js?revision=3';
+import {screens,duration,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground,drawActor} from './scene.js?revision=4';
 const $=id=>document.getElementById(id),canvas=$('scene-layer'),g=canvas.getContext('2d');
 const actorCanvas=$('actor-layer'),actorContext=actorCanvas.getContext('2d');
 const foregroundCanvas=$('foreground-layer'),foregroundContext=foregroundCanvas.getContext('2d');

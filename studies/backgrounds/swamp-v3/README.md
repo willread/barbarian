@@ -2,7 +2,7 @@
 
 Local preview: http://localhost:3002/swamp-v3/index.html
 
-Review study only; native game assets remain unchanged.
+Integrated into Episode 2. Game preview: http://localhost:3001/ . The workshop remains available for side-by-side review.
 
 | Scene | Animated details | Foreground |
 | --- | --- | --- |
@@ -20,3 +20,5 @@ Art provenance and prompts are in art-prompts.json. Rebuild isolated sprites wit
 Revision: larger scene 1 motion, varied generated bone props, shorter bell suspension and funeral fire. Scene 4 is unchanged. revision-prompts.json records the new prop sheet and existing game fire source. Rebuild the additional props with node tools/godot/bake-swamp-v3-revision.mjs.
 
 Review revision 3: sparse irregular bird passes separated by long quiet periods, distant muted plumage, mirrored and tilted skull charms, shaded bells without exposed clappers. Funeral fire removed. Throne remains unchanged.
+
+Integration revision: painted tree-depth mask occludes birds; warm gray-brown plumage and drifting haze reduce their contrast. Native birds use the same sparse schedule and depth mask under the scene fog. Details bake at full source resolution, 12 fps, without frame interpolation; foreground stays separate. Revised paintings fit above the HUD so the bells and throne remain visible.

@@ -1107,6 +1107,7 @@ func _process(raw: float):
 	sparks=sparks.filter(func(s):return s.life>0)
 	var offset=Vector2((randf()-.5)*shake,(randf()-.5)*shake) if phase!="paused" else Vector2.ZERO
 	for node in [background,blood,ground_fx,air_fx]: node.position=offset
+	background.position+=background.framing_offset
 	for view in views.values(): view.position+=offset
 	for node in flame_views.values(): node.position=offset
 	for item in gear: item.node.position=offset

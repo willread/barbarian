@@ -5,7 +5,7 @@ import {duration,screens,assetFiles,prepareAssets,drawScenery,drawAtmosphere,dra
 const root='studies/backgrounds/swamp-v3/';
 const images=await Promise.all(screens.map(s=>loadImage(root+s.file)));
 const raw=Object.fromEntries(await Promise.all(Object.entries(assetFiles).map(async([key,file])=>[key,await loadImage(root+file)])));
-const art=prepareAssets(images,raw),c=createCanvas(1280,720),g=c.getContext('2d'),sheet=createCanvas(1280,720),sg=sheet.getContext('2d');
+const art=prepareAssets(images,raw,createCanvas),c=createCanvas(1280,720),g=c.getContext('2d'),sheet=createCanvas(1280,720),sg=sheet.getContext('2d');
 const render=(i,t,enabled=[true,true,true])=>{drawScenery(g,i,images[i],art,t,enabled);drawAtmosphere(g,i,t,enabled);drawForeground(g,i,art,t);return Buffer.from(g.getImageData(0,0,1280,720).data)};
 for(let i=0;i<4;i++){
  const start=render(i,0),end=render(i,duration);let delta=0;for(let k=0;k<start.length;k++)delta+=Math.abs(start[k]-end[k]);assert(delta/start.length<.01,'loop endpoints');

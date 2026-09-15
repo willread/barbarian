@@ -3,6 +3,7 @@ var art: CairnArt
 var key="valley"
 var layers: Array=[]
 var clock=0.0
+var framing_offset=Vector2.ZERO
 var screen: Dictionary={}
 var chapter_screens=JSON.parse_string(FileAccess.get_file_as_string("res://worlds/citadel.json"))
 var episode_screens={"swamp":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/swamp.json")),"ashen":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/ashen.json"))}
@@ -13,10 +14,19 @@ func setup(source: CairnArt,name: String):
 	for child in get_children(): child.queue_free()
 	layers.clear()
 	decorations.clear()
+	position=Vector2.ZERO
+	framing_offset=Vector2.ZERO
+	scale=Vector2.ONE
 	screen={}
 	if name.get_slice("-",0) in ["citadel","swamp","ashen"]:
 		var chapter=name.get_slice("-",0)
 		screen=(chapter_screens if chapter=="citadel" else episode_screens[chapter])[int(name.get_slice("-",1))-1]
+		if chapter=="swamp" and screen.get("revision",0)>=3:
+			# New compositions use the whole painting. Fit above the HUD rather than
+			# throwing away the crown, bell arches and banner attachments at the top.
+			position.y=162.0
+			framing_offset.y=162.0
+			scale.y=.8
 		var painting=Sprite2D.new()
 		painting.texture=art.texture(key+"-base.png")
 		painting.centered=false
@@ -40,6 +50,7 @@ func setup(source: CairnArt,name: String):
 			mat.set_shader_parameter("grid",Vector2(a.get("columns",8),a.get("rows",8)))
 			mat.set_shader_parameter("frame_count",float(a.get("count",60)))
 			mat.set_shader_parameter("fps",float(a.get("fps",30)))
+			mat.set_shader_parameter("blend_frames",a.get("blend",true))
 			sprite.material=mat
 			if region.get("foreground",false):
 				sprite.z_as_relative=false
@@ -65,6 +76,15 @@ func setup(source: CairnArt,name: String):
 				add_child(decoration)
 				decorations.append(decoration)
 		if chapter=="swamp":
+			var foreground_layer=Node2D.new()
+			foreground_layer.z_as_relative=false
+			foreground_layer.z_index=1805
+			add_child(foreground_layer)
+			if screen.get("birds",false):
+				var birds=preload("res://scripts/swamp_birds.gd").new()
+				birds.set_meta("continuous_clock",true)
+				add_child(birds)
+				decorations.append(birds)
 			var fog=ColorRect.new()
 			fog.name="DriftingFog"
 			fog.size=Vector2(1440,810)
@@ -115,7 +135,7 @@ func advance(t: float):
 	clock=t
 	for mat in layers: mat.set_shader_parameter("clock",t if mat.get_meta("continuous_clock",false) else fmod(t,24))
 	for decoration in decorations:
-		decoration.clock=fmod(t,24)
+		decoration.clock=t if decoration.get_meta("continuous_clock",false) else fmod(t,24)
 		decoration.queue_redraw()
 	queue_redraw()
 

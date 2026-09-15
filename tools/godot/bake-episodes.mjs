@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 import {splitEpisodeSheet} from './split-episode-sheet.mjs';
-import {screens,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground} from '../../studies/backgrounds/swamp-v2/scene.js';
+import {screens,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground} from '../../studies/backgrounds/swamp-v3/scene.js';
 const out='godot/assets/',source='asset-sources/art/episodes/';
 const stamp=out+'episodes-bake.json';
-const inputs=[import.meta.filename,'tools/godot/split-episode-sheet.mjs',...fs.readdirSync(source).map(f=>source+f),...fs.readdirSync('studies/backgrounds/ashen-v1').map(f=>'studies/backgrounds/ashen-v1/'+f),'studies/backgrounds/swamp-v2/scene.js'];
+const inputs=[import.meta.filename,'tools/godot/split-episode-sheet.mjs',...fs.readdirSync(source).map(f=>source+f),...fs.readdirSync('studies/backgrounds/ashen-v1').map(f=>'studies/backgrounds/ashen-v1/'+f),...['scene.js',...screens.map(s=>s.file),...Object.values(assetFiles)].map(f=>'studies/backgrounds/swamp-v3/'+f)];
 const version=inputs.map(f=>[f,fs.statSync(f).mtimeMs]);
 if(fs.existsSync(stamp)&&fs.readFileSync(stamp,'utf8')===JSON.stringify(version)&&fs.existsSync(out+'ashen-4-base.png'))process.exit(0);
 fs.copyFileSync(source+'mire-effect-v1.png',out+'mire-effect-v1.png');
@@ -31,26 +31,26 @@ for(const kind of ['witch','bearer','king','saint']){
  }
  fs.writeFileSync(`godot/art/${kind}-atlas.json`,JSON.stringify({cellWidth:cw,cellHeight:ch,facing:1,cels},null,2)+'\n');
 }
-const images=await Promise.all(screens.map(s=>loadImage(path.resolve('studies/backgrounds/swamp-v2',s.file))));
-const raw=Object.fromEntries(await Promise.all(Object.entries(assetFiles).map(async([k,f])=>[k,await loadImage('studies/backgrounds/swamp-v2/'+f)])));
+const images=await Promise.all(screens.map(s=>loadImage(path.resolve('studies/backgrounds/swamp-v3',s.file))));
+const raw=Object.fromEntries(await Promise.all(Object.entries(assetFiles).map(async([k,f])=>[k,await loadImage('studies/backgrounds/swamp-v3/'+f)])));
 const assets=prepareAssets(images,raw,createCanvas);
 const emptyScenery=createCanvas(1280,720);
-function bakeLoop(key,rect,draw,foreground=false){
- const [x,y,w,h]=rect,fw=Math.ceil(w/2),fh=Math.ceil(h/2),count=96,columns=8,rows=12;
+fs.writeFileSync(out+'swamp-bird-depth.png',assets.birdMask.toBuffer('image/png'));
+function bakeLoop(key,rect,draw,foreground=false,still=false){
+ const [x,y,w,h]=rect,fw=w,fh=h,count=still?1:288,columns=still?1:12,rows=still?1:24;
  const atlas=createCanvas(fw*columns,fh*rows),ag=atlas.getContext('2d'),c=createCanvas(1280,720),g=c.getContext('2d');
- for(let i=0;i<count;i++){g.clearRect(0,0,1280,720);draw(g,i/4);ag.drawImage(c,x,y,w,h,i%columns*fw,Math.floor(i/columns)*fh,fw,fh)}
+ for(let i=0;i<count;i++){g.clearRect(0,0,1280,720);draw(g,i/12);ag.drawImage(c,x,y,w,h,i%columns*fw,Math.floor(i/columns)*fh,fw,fh)}
  const file=key+'.png';fs.writeFileSync(out+file,atlas.toBuffer('image/png'));
- return {foreground,animation:{atlas:file,rect,columns,rows,count,fps:4}};
+ return {foreground,animation:{atlas:file,rect,columns,rows,count,fps:still?1:12,blend:false}};
 }
 const swamp=[];
 for(let i=0;i<4;i++){
- const key='swamp-'+(i+1);fs.copyFileSync(path.resolve('studies/backgrounds/swamp-v2',screens[i].file),out+key+'-base.png');
- const rects=[[340,265,790,190],[180,130,510,315],[190,70,875,380],[180,200,930,260]];
- const regions=[bakeLoop(key+'-ambient',rects[i],(g,t)=>{drawScenery(g,i,emptyScenery,assets,t);drawAtmosphere(g,i,t)})];
- // Actual transparent foreground is rendered after actors, using its own atlas.
- const foregroundRects=i===1?[[970,65,310,325]]:i===3?[[0,565,430,155],[915,585,365,135]]:i===0?[[0,610,365,110],[1220,620,60,100]]:[[0,640,150,80]];
- for(const [j,rect] of foregroundRects.entries())regions.push(bakeLoop(key+'-front-'+j,rect,(g,t)=>drawForeground(g,i,assets,t),true));
- swamp.push({key,title:screens[i].name,regions,walkable:{polygon:[[0,.72],[1,.72],[1,.92],[0,.92]]},framing:{bottom_crop:.03}});
+ const key='swamp-'+(i+1);fs.copyFileSync(path.resolve('studies/backgrounds/swamp-v3',screens[i].file),out+key+'-base.png');
+ const rects=[[[145,70,75,200],[300,98,65,170],[450,140,65,145],[1120,375,160,110]],[[260,118,330,240]],[[240,90,135,140],[960,172,90,100]],[[338,90,135,185],[820,90,135,185]]];
+ const regions=rects[i].map((rect,j)=>bakeLoop(key+'-v3-detail-'+j,rect,(g,t)=>{drawScenery(g,i,emptyScenery,assets,t,i===0?[true,false,true]:[true,true,true]);drawAtmosphere(g,i,t)}));
+ const foregroundRects=[[[20,660,105,60],[1200,660,80,60]],[[1195,680,85,40]],[[0,682,80,38]],[]][i];
+ for(const [j,rect] of foregroundRects.entries())regions.push(bakeLoop(key+'-v3-front-'+j,rect,(g,t)=>drawForeground(g,i,assets,t),true,!(i===0&&j===1)));
+ swamp.push({key,title:screens[i].name,revision:3,birds:i===0,regions,walkable:{polygon:[[0,.72],[1,.72],[1,.92],[0,.92]]},framing:{bottom_crop:.03}});
 }
 fs.writeFileSync('godot/worlds/swamp.json',JSON.stringify(swamp,null,2)+'\n');
 const ash=[];
