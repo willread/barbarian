@@ -1,0 +1,90 @@
+{
+  "provider": "ElevenLabs",
+  "model": "music_v1",
+  "jobs": [
+    {
+      "id": "blackwater",
+      "name": "Blackwater",
+      "bpm": 66,
+      "description": "Crawling doom riff; thick sustained low chords and spacious half-time drums.",
+      "detail": "66 BPM, crawling doom metal. A memorable descending four-note low guitar motif, long gritty ringing chords between palm-muted notes. Huge restrained kick and deep snare, sparse cymbals. Weight and dread, very little upper-register activity.",
+      "prompt": "Instrumental dark sword-and-sorcery game metal for a sunken swamp kingdom. DEEP BASSY down-tuned baritone guitars dominate, thick low-register distorted riffs, real bass guitar doubling the roots, natural heavy acoustic drums. D minor. Slow, brooding, oppressive ancient menace, not fast combat metal. No vocals, choir, synth leads, bright solos, orchestral trailer hits, sound effects, or ambient water. Clear low end with room for game effects. Maintain a consistent cyclic riff and drum pattern throughout, no intro, no outro, no fade, no final crash, no build-up. Start immediately on the full groove and finish still playing that same groove on compatible bar boundaries for seamless looping. 66 BPM, crawling doom metal. A memorable descending four-note low guitar motif, long gritty ringing chords between palm-muted notes. Huge restrained kick and deep snare, sparse cymbals. Weight and dread, very little upper-register activity.",
+      "source": "blackwater-source.mp3",
+      "file": "blackwater.ogg",
+      "loop": {
+        "duration": 57.0,
+        "estimated_bpm": 67.42,
+        "bars": 16,
+        "source_start": 0.54,
+        "source_end": 57.54,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.00716501846909523,
+        "peak": 0.35046687722206116,
+        "loudness_target_lufs": -19
+      }
+    },
+    {
+      "id": "drowned-procession",
+      "name": "Drowned Procession",
+      "bpm": 72,
+      "description": "A heavy funeral march with low guitar pulses and deep toms.",
+      "detail": "72 BPM, slow funeral procession. Repeating low syncopated power-chord pulses, deep floor toms and an ominous deliberate kick pattern. Small dissonant low guitar intervals, disciplined steady march, thick bass. No military snare rolls.",
+      "prompt": "Instrumental dark sword-and-sorcery game metal for a sunken swamp kingdom. DEEP BASSY down-tuned baritone guitars dominate, thick low-register distorted riffs, real bass guitar doubling the roots, natural heavy acoustic drums. D minor. Slow, brooding, oppressive ancient menace, not fast combat metal. No vocals, choir, synth leads, bright solos, orchestral trailer hits, sound effects, or ambient water. Clear low end with room for game effects. Maintain a consistent cyclic riff and drum pattern throughout, no intro, no outro, no fade, no final crash, no build-up. Start immediately on the full groove and finish still playing that same groove on compatible bar boundaries for seamless looping. 72 BPM, slow funeral procession. Repeating low syncopated power-chord pulses, deep floor toms and an ominous deliberate kick pattern. Small dissonant low guitar intervals, disciplined steady march, thick bass. No military snare rolls.",
+      "source": "drowned-procession-source.mp3",
+      "file": "drowned-procession.ogg",
+      "loop": {
+        "duration": 38.83,
+        "estimated_bpm": 74.07,
+        "bars": 12,
+        "source_start": 5.59,
+        "source_end": 44.42,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.009598992764949799,
+        "peak": 0.3259813189506531,
+        "loudness_target_lufs": -19
+      }
+    },
+    {
+      "id": "roots-below",
+      "name": "Roots Below",
+      "bpm": 60,
+      "description": "The sparsest option: sustained baritone guitars, sub-heavy bass and patient drums.",
+      "detail": "60 BPM, spacious hypnotic doom. Long resonant down-tuned guitar chords with a quiet second baritone guitar playing a low two-note answering motif. Deep warm distorted bass, minimal slow drums, dark organic amplifier sustain. Keep real guitars present, not ambient synth music.",
+      "prompt": "Instrumental dark sword-and-sorcery game metal for a sunken swamp kingdom. DEEP BASSY down-tuned baritone guitars dominate, thick low-register distorted riffs, real bass guitar doubling the roots, natural heavy acoustic drums. D minor. Slow, brooding, oppressive ancient menace, not fast combat metal. No vocals, choir, synth leads, bright solos, orchestral trailer hits, sound effects, or ambient water. Clear low end with room for game effects. Maintain a consistent cyclic riff and drum pattern throughout, no intro, no outro, no fade, no final crash, no build-up. Start immediately on the full groove and finish still playing that same groove on compatible bar boundaries for seamless looping. 60 BPM, spacious hypnotic doom. Long resonant down-tuned guitar chords with a quiet second baritone guitar playing a low two-note answering motif. Deep warm distorted bass, minimal slow drums, dark organic amplifier sustain. Keep real guitars present, not ambient synth music.",
+      "source": "roots-below-source.mp3",
+      "file": "roots-below.ogg",
+      "loop": {
+        "duration": 56.02,
+        "estimated_bpm": 60.0,
+        "bars": 14,
+        "source_start": 3.99,
+        "source_end": 60.01,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.019559338688850403,
+        "peak": 0.3825107216835022,
+        "loudness_target_lufs": -19
+      }
+    },
+    {
+      "id": "bog-iron",
+      "name": "Bog Iron",
+      "bpm": 76,
+      "description": "A slow swamp groove with dragging palm-muted riffs and a heavier backbeat.",
+      "detail": "76 BPM, slow sludgy groove metal. A dragging low palm-muted riff with a slight swung feel, saturated baritone guitar grit, thick bass doubling riff. Deliberate half-time drums and occasional low tom accents. Brooding and menacing, no speed-up or double-kick barrage.",
+      "prompt": "Instrumental dark sword-and-sorcery game metal for a sunken swamp kingdom. DEEP BASSY down-tuned baritone guitars dominate, thick low-register distorted riffs, real bass guitar doubling the roots, natural heavy acoustic drums. D minor. Slow, brooding, oppressive ancient menace, not fast combat metal. No vocals, choir, synth leads, bright solos, orchestral trailer hits, sound effects, or ambient water. Clear low end with room for game effects. Maintain a consistent cyclic riff and drum pattern throughout, no intro, no outro, no fade, no final crash, no build-up. Start immediately on the full groove and finish still playing that same groove on compatible bar boundaries for seamless looping. 76 BPM, slow sludgy groove metal. A dragging low palm-muted riff with a slight swung feel, saturated baritone guitar grit, thick bass doubling riff. Deliberate half-time drums and occasional low tom accents. Brooding and menacing, no speed-up or double-kick barrage.",
+      "source": "bog-iron-source.mp3",
+      "file": "bog-iron.ogg",
+      "loop": {
+        "duration": 50.56,
+        "estimated_bpm": 75.95,
+        "bars": 16,
+        "source_start": 7.76,
+        "source_end": 58.32,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.020770251750946045,
+        "peak": 0.35336926579475403,
+        "loudness_target_lufs": -19
+      }
+    }
+  ]
+}
