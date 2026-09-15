@@ -83,16 +83,26 @@ func check():
  king.hp=king.max*.5
  game.e_ai.king_intent(king,game.hero)
  assert(king.phaseTwo and king.roam_charge_wait==397 and king.escape_cooldown==297,"Phase two doubles charge timer speed immediately")
- # The large boss receives attacks across a broader floor footprint.
+ # King has regular depth but a broad, symmetric horizontal receiving body.
  king.attack={};king.hurtTicks=0;king.down={};king.invTicks=0;king.hp=65;king.x=760;king.y=670
  game.hero.x=700;game.hero.height=0;game.hero.dir=1
  var strike={"type":"light","reach":40,"direction":1}
- for depth in [-81,-65,65,81]:
+ for depth in [-65,-48,-47,47,48,65]:
   game.hero.y=670+depth
-  assert(game.m.can_hit(game.hero,king,strike)==(abs(depth)<80),"King receives blows above and below his broad stance")
- game.hero.y=735;game.hero.hp=100;game.hero.invTicks=0;game.hero.down={}
- strike.direction=-1
- assert(not game.m.can_hit(king,game.hero,strike),"Larger receiving footprint must not extend boss attacks")
+  assert(game.m.can_hit(game.hero,king,strike)==(abs(depth)<48),"King uses normal vertical hit tolerance")
+ game.hero.y=670
+ for facing in [-1,1]:
+  king.dir=facing
+  for side in [-1,1]:
+   strike.direction=-side
+   for pose in [0,1,2]:
+    king.hurtTicks=10 if pose==1 else 0
+    king.attack={"type":"rootSlam"} if pose==2 else {}
+    game.hero.x=king.x+side*300
+    assert(game.m.can_hit(game.hero,king,strike),"Attacks reach his visible body from either side in every pose")
+    game.hero.x=king.x+side*350
+    assert(not game.m.can_hit(game.hero,king,strike),"Hits still require horizontal weapon contact")
+ king.attack={}
  game.queue_free();await process_frame;await create_timer(.15).timeout
  print("CAIRN_KING_CHARGE_OK: sustained pressure, warning, both directions, swept hit, knockdown, recovery and cooldown")
  quit()

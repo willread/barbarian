@@ -128,7 +128,7 @@ func select_strike(f: Dictionary, targets: Array) -> String:
 	var nearest={}
 	for e in targets:
 		var distance=(e.x-f.x)*f.dir
-		if standing(e) and abs(e.y-f.y)<target_lane(f,e,MELEE_LANE) and distance>=0 and distance<=WEAPONS[f.weapon].reach*SCALE:
+		if standing(e) and abs(e.y-f.y)<MELEE_LANE and distance>=0 and distance<=WEAPONS[f.weapon].reach*SCALE:
 			if nearest.is_empty() or distance<abs(nearest.x-f.x): nearest=e
 	if not nearest.is_empty() and nearest.stagger>=2 and nearest.hurtTicks>0:
 		if abs(nearest.x-f.x)/SCALE+4<44: return "kick" if nearest.stagger>=4 else "pommel"
@@ -192,19 +192,18 @@ func rect(f: Dictionary, box: Array, direction: int) -> Rect2:
 	var b=box.map(func(v):return v*f.size)
 	return Rect2(f.x/SCALE+(b[0] if direction>0 else -b[0]-b[1]),f.y/SCALE-f.height+b[2],b[1],b[3])
 
-func target_lane(f: Dictionary,e: Dictionary,lane: float) -> float:
-	# The King's broad rooted stance needs a deeper receiving footprint.
-	# This only helps player attacks connect; his outgoing reach is unchanged.
-	return lane+32.0 if f.player and e.get("kind","")=="king" else lane
-
 func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
 	if a.get("dive",false):return false # Slam damage is resolved once, at ground contact.
-	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=target_lane(f,e,minf(a.get("lane",MELEE_LANE),MELEE_LANE)): return false
+	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=minf(a.get("lane",MELEE_LANE),MELEE_LANE): return false
 	var body=[-15,18,-47,47]
 	if e.player:
 		body=([-16,32,-56,56] if e.stagger==1 else [-8,24,-40,40]) if e.recovering or e.hurtTicks else [-16,28,-60,60]
 	elif e.hurtTicks: body=[-19,25,-37,37]
 	elif not e.attack.is_empty(): body=[-25,24,-45,45]
+	if not e.player and e.get("kind","")=="king":
+		# Broad, centered receiving box follows his rooted body in every pose.
+		# Keep the regular lane tolerance and existing airborne height checks.
+		body[0]=-32;body[1]=64
 	var box=a.get("box",[-4,a.reach+4,-48,64 if a.type=="air" else 48])
 	var strike=rect(f,box,a.direction)
 	var target=rect(e,body,e.dir)
