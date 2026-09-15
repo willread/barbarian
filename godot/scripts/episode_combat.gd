@@ -3,12 +3,14 @@ extends RefCounted
 var hazards: Array=[]
 const BOMB_RADIUS=Vector2(220,85)
 const BOMB_GRAVITY=900.0
+const BOMB_FLIGHT=.45
+const BOMB_FUSE=1.05
 
 static func bomb_height(h: Dictionary) -> float:
-	if h.reflected:
+	if h.reflected or h.get("bouncing",false):
 		var t=h.get("flight_age",0.0)
 		return maxf(0,h.get("launch_height",0.0)+h.get("launch_speed",430.0)*t-.5*BOMB_GRAVITY*t*t)
-	return sin(minf(h.age/.65,1)*PI)*160.0
+	return sin(minf(h.age/BOMB_FLIGHT,1)*PI)*160.0
 
 var bomb_views: Array=[]
 var explosions: Array=[]
@@ -195,7 +197,7 @@ func step(game,dt: float):
 		var target=a.get("target",Vector2(enemy.x,enemy.y))
 		match a.type:
 			"mireCast":hazards.append({"kind":"mire","owner":enemy,"p":target,"age":0.0,"life":8.0})
-			"clinkerThrow":hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":2.25,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
+			"clinkerThrow":hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":BOMB_FUSE,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
 			"kingSweep":
 				enemy["open_ticks"]=64
 				game.audio.play("axe",-5,.65)
@@ -210,7 +212,7 @@ func step(game,dt: float):
 			"furnaceBlast":
 				# The Saint ejects slag so reflection also works in the solo boss encounter.
 				if not hazards.any(func(h):return h.kind=="clinker" and h.owner.id==enemy.id):
-					hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":2.25,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
+					hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":BOMB_FUSE,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
 				var hero=game.hero
 				if hero.invTicks==0 and hero.down.is_empty() and abs(hero.y-target.y)<26 and (hero.x-enemy.x)*a.direction>0:
 					game.damage(hero,{"type":"furnaceBlast","damage":10,"direction":a.direction,"knock":false},enemy)
@@ -248,14 +250,7 @@ func step(game,dt: float):
 		if h.reflected:
 			var before=h.p
 			var old_height=bomb_height(h)
-			var landing=bomb_landing(h)
-			h.flight_age=h.get("flight_age",0.0)+dt
-			if old_height>0 or h.flight_age<=dt:
-				h.p+=h.velocity*dt
-				h.p.x=clampf(h.p.x,35,1405)
-			if bomb_height(h)<=0:
-				h.p=landing
-				h.velocity=Vector2.ZERO
+			advance_bomb(h,dt)
 			for enemy in game.enemies:
 				var point=Vector2(enemy.x,enemy.y)/Vector2(65,35)
 				var nearest=Geometry2D.get_closest_point_to_segment(point,before/Vector2(65,35),h.p/Vector2(65,35))
@@ -263,10 +258,22 @@ func step(game,dt: float):
 					h.p=nearest*Vector2(65,35)
 					h.life=h.age
 					break
-		else:h.p=h.start.lerp(h.target,minf(1,h.age/.65))
+		else:
+			if h.age<BOMB_FLIGHT:h.p=h.start.lerp(h.target,h.age/BOMB_FLIGHT)
+			else:
+				var motion_dt=dt
+				if not h.get("bouncing",false):
+					h.bouncing=true
+					h.p=h.target
+					h.flight_age=0.0
+					h.launch_height=0.0
+					h.launch_speed=120.0
+					h.velocity=Vector2(signf(h.target.x-h.start.x)*85,0)
+					motion_dt=minf(dt,h.age-BOMB_FLIGHT)
+				advance_bomb(h,motion_dt)
 		var hero=game.hero
 		var a=hero.attack
-		if h.age<h.life and not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.3 and bomb_height(h)<100+hero.height*4.5:
+		if h.age<h.life and not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.18 and bomb_height(h)<100+hero.height*4.5:
 			var dx=(h.p.x-hero.x)*a.direction
 			if dx>=-35 and dx<max(100,a.reach*game.m.SCALE) and abs(hero.y-h.p.y)<42:
 				var launch_height=bomb_height(h)
@@ -276,7 +283,6 @@ func step(game,dt: float):
 				h.launch_speed=520.0 if a.type=="charge" else 430.0
 				h.strikes.append(a)
 				h.velocity=Vector2(a.direction*(1050 if a.type=="charge" else 650),0)
-				h.life=max(h.life,h.age+1.35)
 				game.burst(h.p.x,h.p.y-25,10,Color("ffbd69"))
 		if h.life-h.age<.45 and not h.get("warned",false):
 			h.warned=true
@@ -289,12 +295,39 @@ func step(game,dt: float):
 		game.damage(game.hero,{"type":"mireDrain","damage":MIRE_DRAIN*dt,"direction":1 if game.hero.x>=mire.owner.x else -1,"continuous":true,"no_stun":true,"knock":false},mire.owner)
 
 
+func advance_bomb(h: Dictionary,dt: float):
+	# Resolve floor contacts analytically, retaining the rest of the frame for rolling.
+	var remaining=dt
+	for contact in 5:
+		if remaining<=0:break
+		var height=bomb_height(h)
+		var vertical=h.get("launch_speed",430.0)-BOMB_GRAVITY*h.get("flight_age",0.0)
+		if height<=.01 and vertical<=1:
+			var travel=h.velocity*(1-exp(-remaining*5.0))/5.0
+			h.p+=travel
+			h.rotation=h.get("rotation",0.0)+travel.x/24.0
+			h.velocity*=exp(-remaining*5.0)
+			break
+		var impact=maxf(0,(vertical+sqrt(vertical*vertical+2*BOMB_GRAVITY*height))/BOMB_GRAVITY)
+		var step_time=minf(remaining,impact)
+		var travel=h.velocity*step_time
+		h.p+=travel
+		h.rotation=h.get("rotation",0.0)+travel.x/32.0
+		h.flight_age=h.get("flight_age",0.0)+step_time
+		remaining-=step_time
+		if step_time>=impact:
+			var rebound=absf(vertical-BOMB_GRAVITY*impact)*.26
+			h.launch_height=0.0
+			h.launch_speed=rebound if rebound>35 else 0.0
+			h.flight_age=0.0
+			h.velocity*=.48
+
 func bomb_landing(h: Dictionary) -> Vector2:
-	if not h.reflected:return h.target
+	if not h.reflected and not h.get("bouncing",false):return h.target
 	var height=bomb_height(h)
 	var vertical=h.get("launch_speed",430.0)-BOMB_GRAVITY*h.get("flight_age",0.0)
 	var remaining=maxf(0,(vertical+sqrt(vertical*vertical+2*BOMB_GRAVITY*height))/BOMB_GRAVITY)
-	return Vector2(clampf(h.p.x+h.velocity.x*remaining,35,1405),h.p.y)
+	return h.p+h.velocity*remaining
 
 func avoid_bombs(game,enemy: Dictionary) -> Variant:
 	# React to visible throws, with a short delay; committed strikes still finish.
@@ -356,23 +389,13 @@ func draw_ground(game,node: Node2D):
 		if e.hp<=0 or a.is_empty() or a.age>=a.from or not a.has("target"):continue
 		var p=a.target
 		var pulse=.35+.35*float(a.age)/a.from
-		if a.type=="clinkerThrow":
-			ellipse(node,p,BOMB_RADIUS,Color(.9,.65,.25,pulse))
-			ellipse(node,p,BOMB_RADIUS*(1.-float(a.age)/a.from),Color(.9,.7,.3,pulse))
-		elif a.type=="furnaceBlast":
+		if a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
 
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
-			"clinker":
-				var remaining=maxf(0,h.life-h.age)
-				var pulse=.55+.3*sin(h.age*12+pow(h.age,3)*2)
-				var point=bomb_landing(h)
-				var color=Color(.3,.85,1,pulse) if h.reflected else Color(1,.25,.035,pulse)
-				ellipse(node,point,BOMB_RADIUS,Color(color,.09),true)
-				ellipse(node,point,BOMB_RADIUS,color)
-				ellipse(node,point,BOMB_RADIUS*clampf(remaining/2.25,0,1),Color(1,.75,.25,.8))
+
 			"blast":node.draw_rect(Rect2(h.p.x if h.dir>0 else 0,h.p.y-26,1440-h.p.x if h.dir>0 else h.p.x,52),Color(1,.55,.12,fade*.8))
 
 func draw_air(_node: Node2D):

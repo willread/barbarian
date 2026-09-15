@@ -69,8 +69,14 @@ func check():
 	combat.step(game,.35)
 	assert(combat.bomb_height(arc)<peak,"Bomb falls after its apex")
 	combat.step(game,.25)
-	assert(arc.p.distance_to(landing)<.01)
-	assert(combat.bomb_height(arc)==0 and arc.velocity==Vector2.ZERO,"Bomb settles on the floor")
+	assert(arc.p.x>landing.x,"Bomb continues forward through a small bounce")
+	assert(arc.velocity.x>0 and arc.velocity.x<650,"Landing loses momentum")
+	combat.advance_bomb(arc,1.0)
+	assert(combat.bomb_height(arc)==0 and arc.velocity.x<30,"Bounces settle into a short roll")
+	arc.p=Vector2(1435,670);arc.velocity=Vector2(1050,0);arc.flight_age=0.0;arc.launch_height=0.0;arc.launch_speed=520.0
+	combat.advance_bomb(arc,.1)
+	assert(arc.p.x>1440,"Knocked bombs can leave the screen")
+	assert(combat.BOMB_FUSE-combat.BOMB_FLIGHT<=.61,"Short grounded reaction window")
 	# Other enemies avoid a bearer's throw, even before it lands.
 	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.3,"life":2.25,"reflected":false}
 	combat.hazards=[thrown]

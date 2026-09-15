@@ -6,8 +6,9 @@ func _init():
 	material.shader=preload("res://shaders/clinker_body.gdshader")
 func configure(h: Dictionary):
 	clock=h.age
-	urgency=clampf(1-(h.life-h.age)/1.6,0,1)
+	urgency=clampf(1-(h.life-h.age)/.6,0,1)
 	position=h.p-Vector2(0,24+preload("res://scripts/episode_combat.gd").bomb_height(h))
+	rotation=h.get("rotation",0.0)
 	z_index=int(h.p.y)*2+3
 	material.set_shader_parameter("age",clock)
 	material.set_shader_parameter("urgency",urgency)

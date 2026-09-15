@@ -7,10 +7,6 @@ void fragment(){
  vec2 p=UV*vec2(660.,540.)-vec2(330.,410.);
  float t=max(age,.001),spread=1.-exp(-t*12.);
  vec3 color=vec3(0.);float alpha=0.;
- // Ground pressure wave shares the gameplay footprint, followed by dusty turbulence.
- float ground=length(p/vec2(220.,85.));
- float ring=exp(-pow((ground-(1.-exp(-t*16.)))*25.,2.))*exp(-t*7.);
- color=vec3(.9,.62,.3);alpha=ring*.8;
  for(int i=0;i<11;i++){
   float f=float(i);float h=hash(vec2(f,4.));
   vec2 center=vec2(sin(f*2.4)*(45.+h*110.)*spread,-35.-h*100.*spread-t*(28.+h*44.));
