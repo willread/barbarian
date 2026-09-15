@@ -80,6 +80,8 @@ func _draw():
  var ink=Color(1.8,1.7,1.35)
  # Both label and first digit start at x=0, using cropped glyph ink bounds.
  stone("AREA %d/4"%game.screen_for_wave(game.wave),Vector2(0,8),12,125,ink,false,true)
+ var wave_label="BOSS" if game.wave>=13 else "WAVE %d/3"%(1+(game.wave-1)%3)
+ stone(wave_label,Vector2(186,8),12,90,ink,true)
  var digits="%07d"%game.score
  var advance=minf(17.0,126.0/digits.length())
  var widest=0.0
