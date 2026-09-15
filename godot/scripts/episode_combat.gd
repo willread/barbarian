@@ -3,9 +3,10 @@ extends RefCounted
 var hazards: Array=[]
 var root_views: Array=[]
 var root_sequences: Array=[]
-const ROOT_INTERVAL=.48
-const ROOT_PHASE_TWO_INTERVAL=.38
-const ROOT_WARNING=.30
+var root_warning_views: Dictionary={}
+const ROOT_INTERVAL=.72
+const ROOT_PHASE_TWO_INTERVAL=.60
+const ROOT_WARNING=.55
 const MireLayout=preload("res://scripts/mire_layout.gd")
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
@@ -32,6 +33,9 @@ func prepare_actor(actor: Dictionary):
 func clear():
 	hazards.clear()
 	root_sequences.clear()
+	for view in root_warning_views.values():
+		if is_instance_valid(view):view.queue_free()
+	root_warning_views.clear()
 	for view in root_views:
 		if is_instance_valid(view):view.queue_free()
 	root_views.clear()
@@ -43,6 +47,24 @@ func clear():
 	retiring_mire.clear()
 
 func sync_views(game,dt: float=0.0):
+	var warning_ids=[]
+	for enemy in game.enemies:
+		var a=enemy.attack
+		if enemy.hp>0 and a.get("type","")=="rootSlam" and a.age<a.from:
+			var id="tell-%d"%enemy.id
+			show_root_warning(game,id,a.target,float(a.age)/a.from,1.0)
+			warning_ids.append(id)
+	for h in hazards:
+		if h.kind!="root" or h.owner.hp<=0:continue
+		if not h.has("warning_id"):
+			next_mire_id+=1
+			h.warning_id="root-%d"%next_mire_id
+		show_root_warning(game,h.warning_id,h.p,clampf(1+h.age/ROOT_WARNING,0,1),clampf((h.life-h.age)/.4,0,1))
+		warning_ids.append(h.warning_id)
+	for id in root_warning_views.keys():
+		if id not in warning_ids:
+			root_warning_views[id].queue_free()
+			root_warning_views.erase(id)
 	for h in hazards:
 		if h.kind not in ["root","rootSweep"]:continue
 		if not h.has("view"):
@@ -245,14 +267,10 @@ func draw_ground(game,node: Node2D):
 			ellipse(node,p,Vector2(105,42)*(1.-float(a.age)/a.from),Color(.9,.7,.3,pulse))
 		elif a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
-		elif a.type=="rootSlam":
-			root_warning(node,a.target,float(a.age)/a.from)
 
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
-			"root":
-				if h.age<0:root_warning(node,h.p,clampf(1+h.age/ROOT_WARNING,0,1))
 			"clinker":ellipse(node,h.p,Vector2(105,42),Color(1,.4,.07,(.25+.15*sin(h.age*15))*fade))
 			"blast":node.draw_rect(Rect2(h.p.x if h.dir>0 else 0,h.p.y-26,1440-h.p.x if h.dir>0 else h.p.x,52),Color(1,.55,.12,fade*.8))
 
@@ -265,14 +283,12 @@ func draw_air(node: Node2D):
 		node.draw_arc(p,12,0,TAU,12,Color("ffc075"),3,true)
 		node.draw_line(p+Vector2(-7,-7),p+Vector2(5,8),Color("ffe0a0"),2,true)
 
-func root_warning(node: Node2D,p: Vector2,progress: float):
-	# Earth-colored fissures open beneath the locked target; gold edges keep them readable.
-	for i in range(7):
-		var angle=TAU*i/7.0+.18
-		var end=p+Vector2(cos(angle)*62,sin(angle)*31)
-		var middle=p.lerp(end,.55)+Vector2(sin(i*3.1)*6,cos(i)*3)
-		node.draw_polyline(PackedVector2Array([p,middle,end]),Color(.12,.11,.07,.45+progress*.45),2+progress*3,true)
-		if progress>.5:node.draw_line(middle,end,Color(.7,.59,.32,(progress-.5)*1.3),1.5,true)
+func show_root_warning(game,id: String,p: Vector2,progress: float,opacity: float):
+	if not root_warning_views.has(id):
+		var view=preload("res://scripts/root_crack.gd").new()
+		game.arena_clip.add_child(view)
+		root_warning_views[id]=view
+	root_warning_views[id].configure(p,progress,opacity)
 
 func spawn_root(owner: Dictionary,target: Vector2,age: float,previous: int=-1):
 	var variant=randi_range(0,3)

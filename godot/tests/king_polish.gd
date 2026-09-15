@@ -59,8 +59,8 @@ func check():
   king.attack={}
   assert(combat.hazards.size()==1)
   game.hero.x=820
-  var interval=.38 if phase else .48
-  combat.step(game,interval-.30)
+  var interval=.60 if phase else .72
+  combat.step(game,interval-.55)
   assert(combat.hazards.size()==2)
   var second=combat.hazards[1]
   assert(second.p.x==820 and second.age<0,"Second target warns before emerging")
@@ -80,6 +80,13 @@ func check():
   combat.step(game,.3)
   assert(game.hero.hp==hp,"High jump clears roots")
   combat.clear()
+ game.hero.height=0;game.hero.invTicks=0;game.hero.x=400
+ combat.spawn_root(king,Vector2(400,game.hero.y),-combat.ROOT_WARNING)
+ combat.step(game,.50)
+ assert(game.hero.hp==hp and combat.hazards[0].age<0,"Crack warns for at least half a second before roots appear")
+ combat.sync_views(game)
+ assert(combat.root_warning_views.size()==1,"Warning uses the textured crack view")
+ combat.clear()
  combat.spawn_root(king,Vector2(740,670),.5)
  combat.root_sequences.append({"owner":king,"remaining":2,"wait":.1,"variant":0})
  king.hp=0
@@ -96,7 +103,7 @@ func check():
  for frame in range(8):
   king.stride=frame/8.0
   assert(game.art.pose(king)==["king-walk",frame])
- if "--king-capture" in OS.get_cmdline_user_args():
+ if "--king-capture" in OS.get_cmdline_user_args() or "--crack-capture" in OS.get_cmdline_user_args():
   king.moving=false;game.hero.invTicks=0;game.hero.hurtTicks=0;game.hero.recovering=0;game.hero.recoil=0
   game.menu.visible=false
   game.m.begin(king,"rootSlam");king.attack.target=Vector2(740,670);king.attack.age=44
@@ -107,6 +114,9 @@ func check():
    var t=preload("res://scripts/king_roots.gd").TEXTURES[i]
    var height=[135,265,215,245][i]
    h.size=Vector2(float(height)*t.get_width()/t.get_height(),height)
+  if "--crack-capture" in OS.get_cmdline_user_args():
+   combat.clear();king.attack={}
+   for i in range(3):combat.spawn_root(king,Vector2(330+i*310,715),[-.40,-.20,-.01][i])
   game._process(0)
   await create_timer(.3).timeout
   await RenderingServer.frame_post_draw
