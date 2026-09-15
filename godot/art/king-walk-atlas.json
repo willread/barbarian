@@ -1,0 +1,64 @@
+{
+  "cellWidth": 443,
+  "cellHeight": 443,
+  "referenceHeight": 425,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "king-walk-v2-0.png",
+      "left": 24,
+      "top": 12,
+      "width": 390,
+      "height": 423
+    },
+    {
+      "file": "king-walk-v2-1.png",
+      "left": 14,
+      "top": 14,
+      "width": 415,
+      "height": 421
+    },
+    {
+      "file": "king-walk-v2-2.png",
+      "left": 21,
+      "top": 13,
+      "width": 389,
+      "height": 422
+    },
+    {
+      "file": "king-walk-v2-3.png",
+      "left": 23,
+      "top": 13,
+      "width": 387,
+      "height": 421
+    },
+    {
+      "file": "king-walk-v2-4.png",
+      "left": 27,
+      "top": 10,
+      "width": 415,
+      "height": 409
+    },
+    {
+      "file": "king-walk-v2-5.png",
+      "left": 38,
+      "top": 9,
+      "width": 384,
+      "height": 410
+    },
+    {
+      "file": "king-walk-v2-6.png",
+      "left": 29,
+      "top": 11,
+      "width": 390,
+      "height": 407
+    },
+    {
+      "file": "king-walk-v2-7.png",
+      "left": 36,
+      "top": 7,
+      "width": 391,
+      "height": 414
+    }
+  ]
+}

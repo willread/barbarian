@@ -19,7 +19,8 @@ export function splitEpisodeSheet(image,kind){
  }
  const figures=parts.sort((a,b)=>b.points.length-a.points.length).slice(0,8);
  if(figures.length!==8||figures.some(p=>p.points.length<10000))throw Error(kind+': expected eight complete figures '+JSON.stringify(figures.map(p=>[p.points.length,p.x0,p.y0,p.x1,p.y1])));
- figures.sort((a,b)=>Number(a.y0>=h/2)-Number(b.y0>=h/2)||a.x0-b.x0);
+ const row=p=>kind==='king-polish'?Number((p.y0+p.y1)*.5>=h/2):Number(p.y0>=h/2);
+ figures.sort((a,b)=>row(a)-row(b)||a.x0-b.x0);
  const kept=new Set(figures.map(p=>p.id));
  for(let p=0;p<labels.length;p++)if(!kept.has(labels[p]))labels[p]=0;
  // Preserve the original antialiased edge without including a neighboring pose.

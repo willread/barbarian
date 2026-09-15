@@ -136,8 +136,17 @@ func step(game,dt: float):
 		match a.type:
 			"mireCast":hazards.append({"kind":"mire","owner":enemy,"p":target,"age":0.0,"life":8.0})
 			"clinkerThrow":hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":2.25,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
-			"kingSweep":hazards.append({"kind":"rootSweep","owner":enemy,"p":Vector2(enemy.x+enemy.dir*150,enemy.y),"age":0.0,"life":.65})
-			"rootSlam":hazards.append({"kind":"root","owner":enemy,"p":Vector2(enemy.x+enemy.dir*210,enemy.y),"age":0.0,"life":3.5})
+			"kingSweep":
+				enemy["open_ticks"]=64
+				game.audio.play("axe",-5,.65)
+				game.burst(enemy.x+a.direction*160,enemy.y-55,8,Color("847454"))
+			"rootSlam":
+				enemy["open_ticks"]=90
+				game.audio.play("heavy_hit",-5,.7)
+				game.shake=maxf(game.shake,4)
+				for i in range(3 if enemy.phaseTwo else 1):
+					var offset=0 if i==0 else -105 if i==1 else 105
+					hazards.append({"kind":"root","owner":enemy,"p":target+Vector2(offset,0),"age":-i*.16,"life":1.25,"struck":false})
 			"furnaceBlast":
 				# The Saint ejects slag so reflection also works in the solo boss encounter.
 				if not hazards.any(func(h):return h.kind=="clinker" and h.owner.id==enemy.id):
@@ -148,7 +157,14 @@ func step(game,dt: float):
 				hazards.append({"kind":"blast","owner":enemy,"p":Vector2(enemy.x,target.y),"dir":a.direction,"age":0.0,"life":.3})
 	for h in hazards:
 		h.age+=dt
-		if h.kind in ["mire","root"] and h.owner.hp<=0:h.life=min(h.life,h.age+.18)
+		if h.kind=="root" and h.age>=.18 and not h.get("struck",false) and h.owner.hp>0:
+			h.struck=true
+			game.burst(h.p.x,h.p.y-8,10,Color("716348"))
+			game.audio.play("bone",-12,.65)
+			var victim=game.hero
+			if victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height<30 and absf(victim.x-h.p.x)<62 and absf(victim.y-h.p.y)<31:
+				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false},h.owner)
+		if h.kind in ["mire","root","rootSweep"] and h.owner.hp<=0:h.life=h.age
 		if h.kind!="clinker":continue
 		if h.reflected:
 			h.p+=h.velocity*dt
@@ -187,8 +203,6 @@ func movement(actor: Dictionary,before: Vector2):
 			actor.x=lerpf(before.x,actor.x,MIRE_SPEED)
 			actor.y=lerpf(before.y,actor.y,MIRE_SPEED)
 			actor.mired=true
-		if h.kind=="root" and h.owner.hp>0 and abs(actor.y-h.p.y)<60 and abs(actor.x-h.p.x)<28:
-			actor.x=h.p.x+(28 if before.x>=h.p.x else -28)
 
 func ellipse(node: Node2D,p: Vector2,r: Vector2,color: Color,filled: bool=false):
 	node.draw_set_transform(p,0,r)
@@ -208,9 +222,10 @@ func draw_ground(game,node: Node2D):
 		elif a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
 		elif a.type=="rootSlam":
-			var p_root=Vector2(e.x+a.direction*210,e.y)
-			var texture=preload("res://art/king-roots-v1.png")
-			node.draw_texture_rect_region(texture,Rect2(p_root-Vector2(55,8),Vector2(110,22)),Rect2(Vector2(0,texture.get_height()*.82),Vector2(texture.get_width(),texture.get_height()*.12)),Color(1,1,1,pulse))
+			for i in range(3 if e.phaseTwo else 1):
+				var offset=0 if i==0 else -105 if i==1 else 105
+				root_warning(node,a.target+Vector2(offset,0),float(a.age)/a.from)
+
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
@@ -225,3 +240,12 @@ func draw_air(node: Node2D):
 		node.draw_circle(p,15,Color("713622"))
 		node.draw_arc(p,12,0,TAU,12,Color("ffc075"),3,true)
 		node.draw_line(p+Vector2(-7,-7),p+Vector2(5,8),Color("ffe0a0"),2,true)
+
+func root_warning(node: Node2D,p: Vector2,progress: float):
+	# Earth-colored fissures open beneath the locked target; gold edges keep them readable.
+	for i in range(7):
+		var angle=TAU*i/7.0+.18
+		var end=p+Vector2(cos(angle)*62,sin(angle)*31)
+		var middle=p.lerp(end,.55)+Vector2(sin(i*3.1)*6,cos(i)*3)
+		node.draw_polyline(PackedVector2Array([p,middle,end]),Color(.12,.11,.07,.45+progress*.45),2+progress*3,true)
+		if progress>.5:node.draw_line(middle,end,Color(.7,.59,.32,(progress-.5)*1.3),1.5,true)

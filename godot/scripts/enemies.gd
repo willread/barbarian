@@ -12,7 +12,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":65,"speed":.8},"saint":{"hp":120,"speed":.8}})
 	for attack in [
 		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
-		["rootSlam",108,56,62,9,64],["kingSweep",82,38,45,8,72],
+		["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
 		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
 
@@ -221,6 +221,10 @@ func motion(e: Dictionary):
 		e.x+=e.velocityX*m.SCALE
 
 func finish(e: Dictionary,a: Dictionary,h: Dictionary):
+	if e.kind=="king":
+		e.aiRest=28 if e.phaseTwo else 42
+		e["open_ticks"]=e.aiRest
+		return
 	if e.kind=="witch":
 		# Keep readable windups; shorten the full attack/rest cycle by 1 / 1.3.
 		e.aiRest=35 if a.type=="mireCast" else 53
@@ -272,6 +276,7 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 
 func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.kind=="witch":return hag_intent(e,h)
+	if e.kind=="king":return king_intent(e,h)
 	if e.boss and e.hp<=e.max*.5:e.phaseTwo=true
 	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty() or h.hp<=0:return Vector2.ZERO
 	var dx=h.x-e.x
@@ -289,6 +294,23 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.aiRest and not e.phaseTwo and not ranged:return Vector2.ZERO
 	var away=ranged and abs(dx)<250 and e.x>160 and e.x<1280
 	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
+
+func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.hp<=e.max*.5:e.phaseTwo=true
+	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
+	var dx=h.x-e.x
+	var dy=h.y-e.y
+	e.dir=1 if dx>=0 else -1
+	if e.aiRest:return Vector2.ZERO
+	# Alternate a committed close sweep with a ranged, position-locked root eruption.
+	# Long recovery rewards going around the attack instead of trading damage.
+	if abs(dx)<560 and abs(dy)<90:
+		var type="kingSweep" if abs(dx)<230 and abs(dy)<38 and e.moveIndex%2==1 else "rootSlam"
+		if m.begin(e,type):
+			e.attack["target"]=Vector2(clampf(h.x,90,1350),h.y)
+			e.moveIndex+=1
+		return Vector2.ZERO
+	return Vector2(e.dir if abs(dx)>220 else 0,sign(dy) if abs(dy)>18 else 0)*(1.2 if e.phaseTwo else 1.0)
 
 func hag_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO

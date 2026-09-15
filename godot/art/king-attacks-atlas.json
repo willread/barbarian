@@ -1,0 +1,64 @@
+{
+  "cellWidth": 384,
+  "cellHeight": 512,
+  "referenceHeight": 380,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "king-attacks-v2-0.png",
+      "left": 18,
+      "top": 124,
+      "width": 362,
+      "height": 353
+    },
+    {
+      "file": "king-attacks-v2-1.png",
+      "left": -15,
+      "top": 112,
+      "width": 387,
+      "height": 363
+    },
+    {
+      "file": "king-attacks-v2-2.png",
+      "left": -14,
+      "top": 132,
+      "width": 462,
+      "height": 344
+    },
+    {
+      "file": "king-attacks-v2-3.png",
+      "left": -13,
+      "top": 176,
+      "width": 392,
+      "height": 300
+    },
+    {
+      "file": "king-attacks-v2-4.png",
+      "left": 16,
+      "top": 49,
+      "width": 334,
+      "height": 395
+    },
+    {
+      "file": "king-attacks-v2-5.png",
+      "left": -14,
+      "top": -36,
+      "width": 324,
+      "height": 481
+    },
+    {
+      "file": "king-attacks-v2-6.png",
+      "left": -56,
+      "top": 155,
+      "width": 443,
+      "height": 289
+    },
+    {
+      "file": "king-attacks-v2-7.png",
+      "left": 17,
+      "top": 164,
+      "width": 356,
+      "height": 282
+    }
+  ]
+}

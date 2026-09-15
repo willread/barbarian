@@ -24,6 +24,7 @@ if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepar
 }
 run(process.execPath,['tools/godot/bake-world.mjs']);
 run(process.execPath,['tools/godot/bake-episodes.mjs']);
+run(process.execPath,['tools/godot/bake-king.mjs']);
 run(process.execPath,['tools/godot/bake-mire-oil.mjs']);
 if(!fs.existsSync('godot/assets/cheat-letters.json'))run(process.execPath,['tools/godot/bake-cheats.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));
@@ -52,6 +53,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_glass.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/king_polish.gd']);
  run(binary,['--headless','--path','godot','--script','tests/victory.gd']);
  run(binary,['--headless','--path','godot','--script','tests/mire.gd']);
  run(binary,['--headless','--path','godot','--script','tests/mire_audio.gd']);

@@ -1,0 +1,14 @@
+{
+  "generator": "OpenAI built-in imagegen",
+  "reference": "king.png",
+  "prompts": [
+    [
+      "walk",
+      "Use the attached Drowned King character as exact visual reference: ancient pale crowned undead king, huge twisted root left arm, bark and moss body, tarnished gold details. Photorealistic dark fantasy sprite art. Genuine transparent background, no ground shadow or colored backdrop. 4 columns by 2 rows, 8 equal cells, one complete full body pose per cell with generous margins. Same character size and foot baseline across cells, all facing RIGHT. No pose crosses any cell edge. Eight sequential WALK CYCLE keyframes left-to-right then next row: clear heavy lumbering stride, distinct leg separation, lifted foot and bent knee on passing poses, heel strike and planted stance poses, alternate legs across eight frames. Arms counter swing and root cloak trails. NOT eight idle poses or a foot shuffle. Keep crown fully inside each cell. Landscape sheet."
+    ],
+    [
+      "attacks",
+      "Use the attached Drowned King character as exact visual reference: ancient pale crowned undead king, huge twisted root left arm, bark and moss body, tarnished gold details. Photorealistic dark fantasy sprite art. Genuine transparent background, no ground shadow or colored backdrop. 4 columns by 2 rows, 8 equal cells, one complete full body pose per cell with generous margins. Same character size and foot baseline across cells, all facing RIGHT. No pose crosses any cell edge. Eight action keyframes: top row four consecutive ROOT ARM HORIZONTAL SWEEP poses: twist torso and draw giant root arm back; arm raised sideways anticipating; powerful extended sweeping strike forward at waist height; low follow through with weight shifted. Bottom row four consecutive OVERHEAD ROOT SLAM poses: knees brace and root arm curls upward; arm fully lifted above head; violent slam down with roots contacting ground in front; bent forward exhausted recovery. Clear differing silhouettes, whole extended arm contained in each cell. Landscape sheet."
+    ]
+  ]
+}

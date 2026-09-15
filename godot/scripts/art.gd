@@ -15,12 +15,20 @@ func _init():
 	for kind in ["witch","bearer","king","saint"]:
 		data.atlases["enemy-"+kind+"-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/"+kind+"-atlas.json"))
 	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
+	for action in ["walk","attacks"]:
+		data.atlases["king-"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://art/king-"+action+"-atlas.json"))
 
 func texture(file: String) -> Texture2D:
 	if not textures.has(file): textures[file]=load("res://assets/"+file)
 	return textures[file]
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
+	if not f.player and f.kind=="king" and f.hp>0 and f.down.is_empty() and not f.hurtTicks and not f.recovering:
+		if not f.attack.is_empty():
+			var a=f.attack
+			var frame=0 if a.age<a.from-14 else 1 if a.age<a.from else 2 if a.age<a.from+10 else 3
+			return ["king-attacks",frame+(4 if a.type=="rootSlam" else 0)]
+		if f.moving:return ["king-walk",int(f.stride*8)%8]
 	if f.player and f.get("victory_pose",-1)>=0:
 		var salute=int(f.victory_pose)
 		return ["hero-cast-unarmed-v1",0 if salute<5 else 1 if salute<9 else 2 if salute<13 else 3 if salute<17 else 4]
@@ -125,7 +133,7 @@ func hit_box(f: Dictionary,p: Array) -> Array:
 
 func body_rect(f: Dictionary,p: Array) -> Rect2:
 	var l=layout(p)
-	var s=l.rig.scale if f.player else HEIGHTS[f.kind]/data.atlases[p[0]].cels[0].height
+	var s=l.rig.scale if f.player else HEIGHTS[f.kind]/data.atlases[p[0]].get("referenceHeight",data.atlases[p[0]].cels[0].height)
 	return Rect2((l.cel.left-l.atlas.cellWidth*.5)*s,-l.cel.height*s,l.cel.width*s,l.cel.height*s)
 
 func paint_body(node: Node2D,f: Dictionary,p: Array):
