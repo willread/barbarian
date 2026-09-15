@@ -28,7 +28,7 @@ func check():
   game.clock=12
   game.background.advance(12)
   game._process(0)
-  assert(is_equal_approx(game.background.position.y,162.0),"Shake must preserve the painting framing offset")
+  assert(is_equal_approx(game.background.position.y,0.0),"Full world framing must remain unshifted")
   if "--swamp-capture" in OS.get_cmdline_user_args():
    await create_timer(.2).timeout
    await RenderingServer.frame_post_draw

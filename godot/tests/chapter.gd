@@ -21,7 +21,7 @@ func check():
 	assert(game.phase=="playing" and game.background.key=="citadel-1")
 	game.set_process(false)
 	assert(game.scale==Vector2.ONE and game.position.x==0)
-	assert(absf(game.position.y+810*(1.0-float(game.background.screen.get("framing",{}).get("bottom_crop",0.0)))-(game.screen_size.y-252*game.hud.scale.y))<1)
+	assert(game.position.is_zero_approx() and game.hud.position==Vector2(352,16),"Floating HUD must reveal the full world")
 	for pair in [[1,1],[2,1],[3,1],[4,2],[5,2],[6,2],[7,3],[8,3],[9,3],[10,4],[11,4],[12,4],[13,4]]:
 		game.wave=pair[0]
 		game.spawn_wave()

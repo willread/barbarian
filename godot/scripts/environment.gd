@@ -21,12 +21,6 @@ func setup(source: CairnArt,name: String):
 	if name.get_slice("-",0) in ["citadel","swamp","ashen"]:
 		var chapter=name.get_slice("-",0)
 		screen=(chapter_screens if chapter=="citadel" else episode_screens[chapter])[int(name.get_slice("-",1))-1]
-		if chapter=="swamp" and screen.get("revision",0)>=3:
-			# New compositions use the whole painting. Fit above the HUD rather than
-			# throwing away the crown, bell arches and banner attachments at the top.
-			position.y=162.0
-			framing_offset.y=162.0
-			scale.y=.8
 		var painting=Sprite2D.new()
 		painting.texture=art.texture(key+"-base.png")
 		painting.centered=false

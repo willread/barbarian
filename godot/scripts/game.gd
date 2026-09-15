@@ -1558,44 +1558,43 @@ func draw_air():
 				if f.hp>0 and f.x>=0 and f.x<=1440: lightning(air_fx,Vector2(f.x,-55),Vector2(f.x,f.y-100),f.id*7919+cycle*104729,fmod(elapsed,.16)/.04)
 	if not chicken.is_empty() and clock<chicken.get("lightning_until",-1.0):
 		lightning(air_fx,Vector2(chicken.x,-55),Vector2(chicken.x,chicken.y-chicken.height*4.5-25),7193+int(clock/.04)*7919,1.0)
-	for f in enemies:
-		if f.boss and f.hp>0:
-			var top=43-position.y
-			center_text(air_fx,{"champion":"Cairn Champion","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(720,top),20,Color("e6d2aa"))
-			CairnGlassBar.draw(air_fx,Rect2(510,top+11,420,12),f.hp/f.max,Color("bf221e"))
 
 func center_text(node: Node2D,text: String,p: Vector2,size: int,color: Color):
 	node.draw_string(serif,p-Vector2(serif.get_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x*.5,0),text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
 
+func hud_frame(rect: Rect2,source: Rect2,border: float=7.0):
+	var texture=art.texture("hud-native-frame.png")
+	var inset=14.0
+	var sx=[source.position.x,source.position.x+inset,source.end.x-inset,source.end.x]
+	var sy=[source.position.y,source.position.y+inset,source.end.y-inset,source.end.y]
+	var dx=[rect.position.x,rect.position.x+border,rect.end.x-border,rect.end.x]
+	var dy=[rect.position.y,rect.position.y+border,rect.end.y-border,rect.end.y]
+	for y in range(3):
+		for x in range(3):
+			hud.draw_texture_rect_region(texture,Rect2(dx[x],dy[y],dx[x+1]-dx[x],dy[y+1]-dy[y]),Rect2(sx[x],sy[y],sx[x+1]-sx[x],sy[y+1]-sy[y]))
+
 func draw_hud():
-	if phase=="title": return
-	var s=1440.0/2172
-	var extra=screen_size.x/hud.scale.x-1440.
-	var stretch=1.+extra/(901*s)
+	if phase=="title":return
 	hud.draw_set_transform(Vector2.ZERO)
-	var frame=art.texture("hud-native-frame.png")
-	var uv_scale=frame.get_size()/Vector2(1440,296)
-	for section in [Vector3(0,220,220),Vector3(220,550,550+extra),Vector3(770,670,670)]:
-		var x=section.x+(extra if section.x>=770 else 0.)
-		hud.draw_texture_rect_region(frame,Rect2(x,766,section.z,296),Rect2(Vector2(section.x,0)*uv_scale,Vector2(section.y,296)*uv_scale))
-	# Stretch only the meter span; end ornaments and equipment panels retain their shape.
-	hud.draw_set_transform(Vector2(298*s*(1.-stretch),810),0,Vector2(s*stretch,252.0/380))
-	for i in 2:
-		var top=70+i*140
+	# Only clean bronze/stone compartments are reused; neither skull ornament is drawn.
+	hud_frame(Rect2(0,0,736,82),Rect2(1016,61,300,223))
+	hud_frame(Rect2(2,2,78,78),Rect2(842,61,174,223))
+	hero_voice.draw_portrait(hud,Rect2(10,9,62,64))
+	hud_frame(Rect2(518,2,216,78),Rect2(1016,61,300,223))
+	for i in range(2):
+		var meter=Rect2(89,13+i*33,416,22)
+		hud_frame(meter.grow(4),Rect2(185,89,624,75),4)
 		var value=displayed_health if i==0 else displayed_mana
-		var colors=[Color("bf221e"),Color("710807")] if i==0 else [Color("269bff"),Color("074891")]
-		# Readiness persists through attacks and jumps; pulse the visible fill, not just its frame.
-		if i==1 and magic>=100:
-			var pulse=(.5+.5*sin(clock*TAU*1.5))*.65
-			colors[0]=colors[0].lerp(Color("d5f4ff"),pulse)
-			colors[1]=colors[1].lerp(Color("68caff"),pulse)
-		CairnGlassBar.draw(hud,Rect2(298,top+17,901,77),value/100.,colors[0])
-		if i==1 and magic>=100: hud.draw_rect(Rect2(298,top+17,901,77),Color(.6,.86,1,.5+.3*sin(clock*5)),false,4)
-	hud.draw_set_transform(Vector2.ZERO)
-	hero_voice.draw_portrait(hud,Rect2(1400*s+extra-80,810+46,160,180))
-	hud.draw_set_transform(Vector2.ZERO)
-	score_panel.position=Vector2(1758*s+extra,830)
+		var tint=Color("bf221e") if i==0 else Color("104773")
+		if i==1 and magic>=100:tint=tint.lerp(Color("70bdda"),(.5+.5*sin(clock*TAU*1.5))*.65)
+		CairnGlassBar.draw(hud,meter,value/100.0,tint)
+	score_panel.position=Vector2(534,11)
 	score_panel.queue_redraw()
+	for f in enemies:
+		if f.boss and f.hp>0:
+			center_text(hud,{"champion":"Cairn Champion","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(369,109),18,Color(0,0,0,.9))
+			center_text(hud,{"champion":"Cairn Champion","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(368,108),18,Color("e6d2aa"))
+			CairnGlassBar.draw(hud,Rect2(158,116,420,8),f.hp/f.max,Color("bf221e"))
 
 func draw_overlay():
 	if pause_cover>=.5:
@@ -1806,15 +1805,11 @@ func responsive_layout():
 	if window_size==last_window_size:return
 	last_window_size=window_size
 	screen_size=Vector2(1440,810)
-	var hud_scale=clamp(screen_size.y*.23/252.,.4,1.)
-	var hud_height=252*hud_scale
-	# Fit the arena width, reserving the upper painting as vertical crop space.
-	# Bottom alignment preserves the fighting floor immediately above the HUD.
+	# The HUD floats over the full 16:9 world; no bottom reservation or world zoom.
 	scale=Vector2.ONE
-	var bottom_crop=float(background.screen.get("framing",{}).get("bottom_crop",0.0)) if background else 0.0
-	position=Vector2(0,screen_size.y-hud_height-810.+810.*bottom_crop)
-	hud.scale=Vector2.ONE*hud_scale
-	hud.position=Vector2(0,screen_size.y-1062*hud_scale)
+	position=Vector2.ZERO
+	hud.scale=Vector2.ONE
+	hud.position=Vector2((screen_size.x-736.0)*.5,16.0)
 	overlay.position=Vector2.ZERO
 	overlay.scale=Vector2.ONE
 	menu.layout_screen(screen_size,phase in ["title","paused"] or pause_cover>0)
@@ -1849,16 +1844,14 @@ func layout_test():
 		hero.x=720
 		await get_tree().create_timer(.1).timeout
 		await RenderingServer.frame_post_draw
-		assert(abs(hud.to_global(Vector2(0,1062)).y-screen_size.y)<2)
-		assert(abs(hud.scale.x-hud.scale.y)<.001)
-		assert(abs(hud.position.x)<.001)
-		assert(abs(hud.to_global(Vector2(screen_size.x/hud.scale.x,1062)).x-screen_size.x)<.001)
+		assert(hud.position.is_equal_approx(Vector2(352,16)))
+		assert(hud.scale.is_equal_approx(Vector2.ONE))
+		assert(position.is_zero_approx())
 		get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/layout-game-%d.png"%dimensions.x)
 		var capture=get_viewport().get_texture().get_image()
 		var pixel_scale=Vector2(capture.get_size())/screen_size
-		var extra=screen_size.x/hud.scale.x-1440.
 		for meter in 2:
-			var point=hud.to_global(Vector2(298*1440./2172.+(901*1440./2172.+extra)*.25,810+(125+meter*140)*252./380.))*pixel_scale
+			var point=hud.to_global(Vector2(190,24+meter*33))*pixel_scale
 			var color=capture.get_pixel(int(point.x),int(point.y))
 			assert(color.r>color.g*1.4 if meter==0 else color.b>color.r*1.4,"HUD fill must survive responsive downscaling")
 	print("CAIRN_LAYOUT_OK: landscape, ultrawide, portrait; menu bounds and HUD anchor")

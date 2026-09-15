@@ -31,7 +31,7 @@ const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8
 if(!menuManifest.menu['NEW JOURNEY']||!menuManifest.menu['EASY']||!menuManifest.menu['NORMAL']||!menuManifest.menu['HARD']||!menuManifest.menu['HALL OF LEGENDS']||!menuManifest.menu['CONTROLS']||!menuManifest.menu['WEAPON: CANDY CANE']||!menuManifest.menu['8X']||!menuManifest.menu['AREA 4/4']||!menuManifest.menu['WEAPON: GRAVECLEAVER']||!menuManifest.menu['EP 1: THE FALLEN CITADEL']||!menuManifest.menu['EP 2: THE SUNKEN WILDS']||!menuManifest.menu['EP 3: THE ASHEN DEPTHS']||!menuManifest.menu['VOICE: ON']||!menuManifest.menu['VOICE: OFF']||!menuManifest.menu['QUIT']||!menuManifest.menu['RETURN TO BATTLE']||!menuManifest.menu['SOUND']||!menuManifest.menu['VOLUME: 100'])run(process.execPath,['tools/godot/bake-menu.mjs']);
 if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['tools/godot/bake-results.mjs']);
 if(!fs.existsSync('godot/art/controls/hall-of-legends.png'))run(process.execPath,['tools/godot/bake-controls.mjs','--hall']);
-if(!menuManifest.menu['HUD 10X']||menuManifest.hudSmallLabelVersion!==1||menuManifest.hudMultiplierWeightVersion!==1)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
+if(!menuManifest.menu['HUD x10']||menuManifest.hudSmallLabelVersion!==1||menuManifest.hudMultiplierWeightVersion!==2)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
 run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/check-episode-sprites.mjs']);
@@ -54,6 +54,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_glass.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_polish.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/floating_hud.gd']);
  run(binary,['--headless','--path','godot','--script','tests/victory.gd']);
  run(binary,['--headless','--path','godot','--script','tests/mire.gd']);
  run(binary,['--headless','--path','godot','--script','tests/mire_audio.gd']);

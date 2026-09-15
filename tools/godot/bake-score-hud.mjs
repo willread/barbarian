@@ -24,10 +24,10 @@ stone=stone.replace('size*scale*.045','size*scale*.025').replace('size*scale*.12
 stone=stone.replace('g.fillText(ch,x,pad*scale);','if(el.dataset.boldSmall||el.dataset.boldMultiplier){g.strokeStyle="#fff";g.lineJoin="round";g.lineWidth=size*scale*(el.dataset.boldMultiplier?.065:.028);g.strokeText(ch,x,pad*scale);}g.fillText(ch,x,pad*scale);');
 const sc={window:{},document:fakeDoc,Image:function(){return material},getComputedStyle:el=>el.computed,console,Math,Float32Array,Map};vm.createContext(sc);vm.runInContext(stone,sc);
 manifest.menu=manifest.menu||{};
-const labels=[...Array.from({length:10},(_,i)=>String(i)),...Array.from({length:10},(_,i)=>`${i+1}X`),...Array.from({length:4},(_,i)=>`AREA ${i+1}/4`),...Array.from({length:3},(_,i)=>`WAVE ${i+1}/3`),'BOSS'];
+const labels=[...Array.from({length:10},(_,i)=>String(i)),...Array.from({length:10},(_,i)=>`x${i+1}`),...Array.from({length:4},(_,i)=>`AREA ${i+1}/4`),...Array.from({length:3},(_,i)=>`WAVE ${i+1}/3`),'BOSS'];
 for(const label of labels){
  const small=/^(AREA|WAVE|BOSS)/.test(label);
- const multiplier=/^\d+X$/.test(label);
+ const multiplier=/^x\d+$/.test(label);
  if(!small&&!multiplier&&manifest.menu["HUD "+label]&&fs.existsSync(path.join(out,`menu-${manifest.menu["HUD "+label].id}.png`))&&fs.existsSync(path.join(out,`menu-${manifest.menu["HUD "+label].id}-fuel.png`)))continue;
  const el={textContent:label,getClientRects:()=>[1],dataset:{stoneFont:'Cinzel',boldSmall:small,boldMultiplier:multiplier},computed:{fontSize:'75',letterSpacing:'1'},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};sc.window.bakeStone(el);const r=el._stoneFrames,id='hud-'+label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'');
  fs.writeFileSync(path.join(out,`menu-${id}.png`),Buffer.from(r.url.split(',')[1],'base64'));
@@ -36,7 +36,7 @@ for(const label of labels){
  if(global.gc)global.gc();
 }
 manifest.hudSmallLabelVersion=1;
-manifest.hudMultiplierWeightVersion=1;
+manifest.hudMultiplierWeightVersion=2;
 fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest));
 console.log('Asset conversion complete: '+out);
 
