@@ -62,6 +62,12 @@ func setup(source: CairnArt,name: String):
 			foreground.z_as_relative=false
 			foreground.z_index=1805
 			add_child(foreground)
+		if name=="ashen-1":
+			var trains=preload("res://scripts/ashen_trains.gd").new()
+			trains.name="OreTrains"
+			trains.set_meta("continuous_clock",true)
+			add_child(trains)
+			decorations.append(trains)
 		if chapter=="ashen":
 			for front in [false,true]:
 				var decoration=preload("res://scripts/ashen_scenery.gd").new()
@@ -147,6 +153,9 @@ func advance(t: float):
 	clock=t
 	for mat in layers: mat.set_shader_parameter("clock",t if mat.get_meta("continuous_clock",false) else fmod(t,24))
 	for decoration in decorations:
+		if decoration.has_method("advance"):
+			decoration.advance(t)
+			continue
 		decoration.clock=t if decoration.get_meta("continuous_clock",false) else fmod(t,24)
 		decoration.queue_redraw()
 	queue_redraw()
