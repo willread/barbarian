@@ -1,6 +1,9 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
+const BOMB_RADIUS=Vector2(220,85)
+var bomb_views: Array=[]
+var explosions: Array=[]
 var root_views: Array=[]
 var root_sequences: Array=[]
 var root_warning_views: Dictionary={}
@@ -32,6 +35,10 @@ func prepare_actor(actor: Dictionary):
 
 func clear():
 	hazards.clear()
+	for view in bomb_views+explosions:
+		if is_instance_valid(view):view.queue_free()
+	bomb_views.clear()
+	explosions.clear()
 	root_sequences.clear()
 	for view in root_warning_views.values():
 		if is_instance_valid(view):view.queue_free()
@@ -47,6 +54,23 @@ func clear():
 	retiring_mire.clear()
 
 func sync_views(game,dt: float=0.0):
+	for h in hazards:
+		if h.kind!="clinker":continue
+		if not h.has("bomb_view"):
+			h.bomb_view=preload("res://scripts/clinker_visual.gd").new()
+			game.arena_clip.add_child(h.bomb_view)
+			bomb_views.append(h.bomb_view)
+		h.bomb_view.configure(h)
+	for i in range(bomb_views.size()-1,-1,-1):
+		var view=bomb_views[i]
+		if not hazards.any(func(h):return h.get("bomb_view")==view):
+			view.queue_free()
+			bomb_views.remove_at(i)
+	for i in range(explosions.size()-1,-1,-1):
+		explosions[i].advance(dt)
+		if explosions[i].age>=2.4:
+			explosions[i].queue_free()
+			explosions.remove_at(i)
 	var warning_ids=[]
 	for enemy in game.enemies:
 		var a=enemy.attack
@@ -214,18 +238,19 @@ func step(game,dt: float):
 		if h.kind in ["mire","root","rootSweep"] and h.owner.hp<=0:h.life=h.age
 		if h.kind!="clinker":continue
 		if h.reflected:
+			var before=h.p
 			h.p+=h.velocity*dt
 			for enemy in game.enemies:
-				if enemy.hp>0 and abs(enemy.x-h.p.x)<65 and abs(enemy.y-h.p.y)<35:
-					enemy["open_ticks"]=90
-					game.m.interrupt_attack(enemy)
-					game.damage(enemy,{"type":"clinker","damage":15,"direction":int(sign(h.velocity.x)),"knock":false,"reflected":true},game.hero)
+				var point=Vector2(enemy.x,enemy.y)/Vector2(65,35)
+				var nearest=Geometry2D.get_closest_point_to_segment(point,before/Vector2(65,35),h.p/Vector2(65,35))
+				if enemy.hp>0 and point.distance_to(nearest)<1:
+					h.p=nearest*Vector2(65,35)
 					h.life=h.age
 					break
 		else:h.p=h.start.lerp(h.target,minf(1,h.age/.65))
 		var hero=game.hero
 		var a=hero.attack
-		if not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.3:
+		if h.age<h.life and not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.3:
 			var dx=(h.p.x-hero.x)*a.direction
 			if dx>=-35 and dx<max(100,a.reach*game.m.SCALE) and abs(hero.y-h.p.y)<42:
 				h.reflected=true
@@ -233,10 +258,11 @@ func step(game,dt: float):
 				h.velocity=Vector2(a.direction*(1050 if a.type=="charge" else 650),0)
 				h.life=max(h.life,h.age+.75)
 				game.burst(h.p.x,h.p.y-25,10,Color("ffbd69"))
-		if h.age>=h.life:
-			game.burst(h.p.x,h.p.y-20,20,Color("ff8b34"))
-			if not h.reflected and hero.invTicks==0 and hero.down.is_empty() and hero.height<22 and abs(hero.x-h.p.x)<105 and abs(hero.y-h.p.y)<42:
-				game.damage(hero,{"type":"clinker","damage":8,"direction":1 if hero.x>=h.p.x else -1,"knock":false},h.owner)
+		if h.life-h.age<.45 and not h.get("warned",false):
+			h.warned=true
+			game.audio.play("fire",-12,1.6)
+		if h.age>=h.life:detonate(game,h)
+
 	hazards=hazards.filter(func(h):return h.age<h.life)
 	var mire=mire_at(game.hero)
 	if not mire.is_empty() and game.hero.hp>0:
@@ -264,25 +290,53 @@ func draw_ground(game,node: Node2D):
 		var p=a.target
 		var pulse=.35+.35*float(a.age)/a.from
 		if a.type=="clinkerThrow":
-			ellipse(node,p,Vector2(105,42),Color(.9,.65,.25,pulse))
-			ellipse(node,p,Vector2(105,42)*(1.-float(a.age)/a.from),Color(.9,.7,.3,pulse))
+			ellipse(node,p,BOMB_RADIUS,Color(.9,.65,.25,pulse))
+			ellipse(node,p,BOMB_RADIUS*(1.-float(a.age)/a.from),Color(.9,.7,.3,pulse))
 		elif a.type=="furnaceBlast":
 			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
 
 	for h in hazards:
 		var fade=minf(1,(h.life-h.age)*4)
 		match h.kind:
-			"clinker":ellipse(node,h.p,Vector2(105,42),Color(1,.4,.07,(.25+.15*sin(h.age*15))*fade))
+			"clinker":
+				var remaining=maxf(0,h.life-h.age)
+				var pulse=.55+.3*sin(h.age*12+pow(h.age,3)*2)
+				var point=h.p if h.reflected else h.target
+				var color=Color(.3,.85,1,pulse) if h.reflected else Color(1,.25,.035,pulse)
+				ellipse(node,point,BOMB_RADIUS,Color(color,.09),true)
+				ellipse(node,point,BOMB_RADIUS,color)
+				ellipse(node,point,BOMB_RADIUS*clampf(remaining/2.25,0,1),Color(1,.75,.25,.8))
 			"blast":node.draw_rect(Rect2(h.p.x if h.dir>0 else 0,h.p.y-26,1440-h.p.x if h.dir>0 else h.p.x,52),Color(1,.55,.12,fade*.8))
 
-func draw_air(node: Node2D):
-	for h in hazards:
-		if h.kind!="clinker":continue
-		var lift=sin(minf(h.age/.65,1)*PI)*160 if not h.reflected else 70.0
-		var p=h.p-Vector2(0,16+lift)
-		node.draw_circle(p,15,Color("713622"))
-		node.draw_arc(p,12,0,TAU,12,Color("ffc075"),3,true)
-		node.draw_line(p+Vector2(-7,-7),p+Vector2(5,8),Color("ffe0a0"),2,true)
+func draw_air(_node: Node2D):
+	pass # Bomb bodies now use a lit, textured procedural surface.
+
+func detonate(game,h: Dictionary):
+	if h.get("detonated",false):return
+	h.detonated=true
+	var effect=preload("res://scripts/clinker_explosion.gd").new()
+	effect.position=h.p
+	effect.z_index=int(h.p.y)*2+2
+	game.arena_clip.add_child(effect)
+	explosions.append(effect)
+	var victims=game.enemies if h.reflected else [game.hero]
+	for victim in victims:
+		var delta=Vector2(victim.x,victim.y)-h.p
+		var distance=(delta/BOMB_RADIUS).length()
+		if victim.hp<=0 or distance>1 or victim.invTicks>0 or not victim.down.is_empty() or victim.height>55:continue
+		var before_hp=victim.hp
+		if h.reflected:
+			victim["open_ticks"]=90
+			game.m.interrupt_attack(victim)
+		var direction=1 if delta.x>=0 else -1
+		game.damage(victim,{"type":"clinker","damage":lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
+		if victim.hp<before_hp:
+			var outward=Vector2(delta.x,delta.y*2).normalized() if delta.length()>1 else Vector2(direction,0)
+			victim.slamPush=outward*lerpf(700,350,distance)
+			victim.invTicks=maxi(victim.invTicks,45)
+	game.audio.play("landing",-1,.72)
+	game.audio.play("death_fire",-5,.75)
+	game.shake=maxf(game.shake,12)
 
 func show_root_warning(game,id: String,p: Vector2,progress: float,opacity: float):
 	if not root_warning_views.has(id):

@@ -55,6 +55,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/clinker_bombs.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_glass.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_polish.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_charge.gd']);
