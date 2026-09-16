@@ -115,6 +115,7 @@ var screen_size=Vector2(1440,810)
 var last_window_size=Vector2i.ZERO
 var title_background=preload("res://art/title-background.png")
 var title_logo=preload("res://art/cairn-logo.png")
+var shareware_wordmark=preload("res://art/shareware/edition-wordmark.png")
 const CLOSE=.35/.49
 const OPEN=.45/.49
 const HOLD=3.0
@@ -1776,10 +1777,8 @@ func draw_overlay():
 		overlay.draw_set_transform(pivot,0.,Vector2.ONE*zoom)
 		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
 		if shareware:
-			var tag="SHAREWARE EDITION"
-			var tag_size=maxi(14,int(size.x*.037))
-			var tag_width=serif.get_string_size(tag,HORIZONTAL_ALIGNMENT_LEFT,-1,tag_size).x
-			overlay.draw_string(serif,Vector2(-tag_width*.5,size.y*.5+tag_size),tag,HORIZONTAL_ALIGNMENT_LEFT,-1,tag_size,Color("dbb772"))
+			var tag_size=Vector2(size.x*.86,size.x*.86*235./2172.)
+			overlay.draw_texture_rect_region(shareware_wordmark,Rect2(Vector2(-tag_size.x*.5,size.y*.5+3),tag_size),Rect2(0,230,2172,235),Color(1,1,1,smoothstep(0.,.3,t)))
 		overlay.draw_set_transform(Vector2.ZERO)
 
 	overlay.draw_set_transform(Vector2.ZERO)
