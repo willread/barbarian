@@ -3,8 +3,13 @@
 Build both web and Windows editions:
 
 ```powershell
-npm.cmd run godot:build:shareware
+npm.cmd run build:shareware
 ```
+
+The dedicated entry point is `tools/godot/build-shareware.mjs`. You can also
+run `node tools/godot/build-shareware.mjs` directly; the existing
+`godot:build:shareware` command remains available. All three accept the same
+platform flags and always select the shareware export presets.
 
 Choose a platform:
 
