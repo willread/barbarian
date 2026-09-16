@@ -4,7 +4,7 @@ var hazards: Array=[]
 const BOMB_RADIUS=Vector2(250,180)
 const BOMB_GRAVITY=900.0
 const BOMB_FLIGHT=.45
-const BOMB_FUSE=1.05
+const BOMB_FUSE=.7875
 
 static func bomb_height(h: Dictionary) -> float:
 	if h.reflected or h.get("bouncing",false):
