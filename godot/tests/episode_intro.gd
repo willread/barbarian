@@ -21,6 +21,12 @@ func check():
 	intro.age=20
 	intro._process(.01)
 	assert(intro.player.playing and intro.voice_started)
+	intro.age=21.54;intro._process(0)
+	assert(not intro.sting_started,"Guitar waits for the pause before the second line")
+	intro.age=21.55;intro._process(.001)
+	assert(intro.sting_started and intro.sting.playing)
+	intro.age=22.1;intro._process(0)
+	assert(intro.sting.volume_db<=-17,"Guitar tail ducks below the spoken threat")
 	if "--capture" in OS.get_cmdline_user_args():
 		for time in [1.5,12.0,20.5,22.5]:
 			intro.age=time
@@ -30,7 +36,7 @@ func check():
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/intro-%.1f.png"%time)
 	intro.age=25.99
 	intro._process(.02)
-	assert(intro.done and not intro.player.playing)
+	assert(intro.done and not intro.player.playing and not intro.sting.playing)
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing" and game.wave==1)
 	assert(not game.audio.music_preview)
 	await process_frame

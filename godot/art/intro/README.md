@@ -18,5 +18,10 @@ It plays unchanged, starting at 20 seconds. The user supplied the exact words;
 the subtitle change at 2.01 seconds follows the measured pause in the audio.
 Subtitles are white on a solid black bottom strip and remain visible when muted.
 
+A single generated distorted guitar power-chord stab lands 1.55 seconds into
+the recording, 0.46 seconds before "Now". Its short tail ducks by 16 dB as the
+second line starts. It follows music/mute settings and stops on skip.
+The original sound and generation prompt are in `soundboard/cutscenes/`.
+
 Only a fresh Episode 1 selection plays the introduction. Retrying after death
 goes directly to gameplay. Other episodes retain their existing entrances.

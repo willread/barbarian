@@ -9,6 +9,8 @@ var game: Node2D
 var age=0.0
 var done=false
 var voice_started=false
+var sting_started=false
+var sting: AudioStreamPlayer
 var canvas: Node2D
 var player: AudioStreamPlayer
 var picture=preload("res://art/intro/revenge-panorama-v1.png")
@@ -30,6 +32,11 @@ func _ready():
 	player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 	player.bus=&"Voice"
 	add_child(player)
+	sting=AudioStreamPlayer.new()
+	sting.bus=&"Music"
+	sting.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
+	if not ending:sting.stream=load("res://art/intro/revenge-guitar.ogg")
+	add_child(sting)
 	var subtitles=JSON.parse_string(FileAccess.get_file_as_string("res://art/ending/subtitles.json" if ending else "res://art/intro/subtitles.json"))
 	captions=subtitles
 	game.audio.music_preview=true
@@ -46,6 +53,12 @@ func _process(dt: float):
 		voice_started=true
 		player.play()
 	player.volume_db=-80 if game.muted or not game.voice_enabled else 0
+	# Hit the gap before "Now"; duck the ringing tail beneath the second line.
+	var voice_time=age-voice_start
+	sting.volume_db=-80 if game.muted or not game.music_enabled else lerpf(-1,-17,smoothstep(1.86,2.08,voice_time))
+	if not ending and voice_started and voice_time>=1.55 and not sting_started:
+		sting_started=true
+		sting.play()
 	var size=get_viewport().get_visible_rect().size
 	var scale_factor=minf(size.x/1440.0,size.y/810.0)
 	transform=Transform2D(0,Vector2.ONE*scale_factor,0,(size-Vector2(1440,810)*scale_factor)*.5)
@@ -83,11 +96,13 @@ func finish():
 	if done:return
 	done=true
 	player.stop()
+	sting.stop()
 	game.audio.music_preview=false
 	finished.emit()
 
 func _exit_tree():
 	player.stop()
+	sting.stop()
 	if is_instance_valid(game):
 		if is_instance_valid(game.audio):game.audio.music_preview=false
 		if is_instance_valid(game.hero_voice):game.hero_voice.set_process(true)
