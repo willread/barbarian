@@ -364,7 +364,7 @@ func step_furnace(game,enemy: Dictionary,a: Dictionary):
 	var hero=game.hero
 	if hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and preload("res://scripts/saint_flame.gd").hits(enemy,hero):
 		var before=hero.hp
-		game.damage(hero,{"type":"furnaceBlast","damage":12,"direction":a.direction,"knock":true,"push":4.0},enemy)
+		game.damage(hero,{"type":"furnaceBlast","damage":6,"direction":a.direction,"knock":true,"push":4.0},enemy)
 		if hero.hp<before:hero.invTicks=maxi(hero.invTicks,55)
 
 func step_scream(game,enemy: Dictionary,a: Dictionary):

@@ -24,7 +24,7 @@ func check():
   var outgoing={"easy":1.25,"normal":1.0,"hard":.75}[setting]
   var incoming={"easy":.75,"normal":1.0,"hard":1.25}[setting]
   game.damage(foe,{"damage":10,"direction":1},game.hero)
-  assert(is_equal_approx(100-foe.hp,10*game.damage_multiplier*outgoing))
+  assert(is_equal_approx(100-foe.hp,10*1.25*game.damage_multiplier*outgoing))
   game.damage(game.hero,{"damage":2,"direction":-1},foe)
   assert(is_equal_approx(100-game.hero.hp,2*game.damage_multiplier*100/48*incoming))
   game.hero.hp=10;game.hero.down={};game.hero.hurtTicks=0;game.hero.attack={};game.hero.air={}

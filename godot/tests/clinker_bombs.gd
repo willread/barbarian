@@ -70,7 +70,7 @@ func check():
 	bomb.reflected=true;bomb.erase("detonated")
 	combat.detonate(game,bomb)
 	assert(owner.hp<30 and owner.slamPush.x>0 and hero.hp==100,"Reflected blast hits enemies only")
-	assert(is_equal_approx(30-owner.hp,lerpf(18,8,20.0/combat.BOMB_RADIUS.x)*game.damage_multiplier*game.difficulty_damage(false)),"Reflected enemy damage is halved")
+	assert(is_equal_approx(30-owner.hp,lerpf(18,8,20.0/combat.BOMB_RADIUS.x)*1.25*game.damage_multiplier*game.difficulty_damage(false)),"Reflected enemy damage includes the player damage bonus")
 	# Unreflected blasts also damage their thrower and nearby allies.
 	owner.hp=50;owner.invTicks=0;owner.down={};owner.x=730
 	var ally=game.make_actor(760,670,101)
