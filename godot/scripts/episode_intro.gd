@@ -5,7 +5,7 @@ var pan_end=9.0
 var voice_start=1.0
 var second_line_start=6.4
 var second_line_started=false
-var duration=11.5
+var duration=10.5
 var ending=false
 var game: Node2D
 var age=0.0
@@ -74,7 +74,7 @@ func _process(dt: float):
 		second_line_started=true
 		player.stream=load("res://art/intro/revenge-line-two.ogg")
 		player.play()
-	# Hit the gap before "Now"; duck the ringing tail beneath the second line.
+	# Descending three-note phrase leads into "Now"; lower its tail beneath the voice.
 	var voice_time=age-second_line_start
 	sting.volume_db=-80 if game.muted or not game.music_enabled else lerpf(-1,-17,smoothstep(-.15,.07,voice_time))
 	if not ending and voice_started and voice_time>=-.46 and not sting_started:

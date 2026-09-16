@@ -1,7 +1,7 @@
 # Episode 1 opening
 
 The static ink panorama moves left to right by one 1440-pixel viewport over
-8.2 seconds, following a 0.8-second establishing hold. The scene ends at 11.5
+8.2 seconds, following a 0.8-second establishing hold. The scene ends at 10.5
 seconds, including a fade into the normal Episode 1 entrance. Any keyboard key, mouse button, controller button or trigger skips after the
 first half-second. No skip label is shown.
 
@@ -19,9 +19,9 @@ line plays at 1 second; the second at 6.4 seconds, as Cairn comes into view.
 The user supplied the exact words. Subtitles follow the separated lines.
 Subtitles are white on a solid black bottom strip and remain visible when muted.
 
-A single generated distorted guitar power-chord stab lands at 5.94 seconds,
-0.46 seconds before "Now". Its short tail ducks by 16 dB as the
-second line starts. It follows music/mute settings and stops on skip.
+The existing guitar cue remains until a replacement is chosen from the four
+options in `soundboard/cutscenes/stab-options/`. It starts at 5.94 seconds
+and ducks under the second line. It follows music/mute settings and stops on skip.
 The original sound and generation prompt are in `soundboard/cutscenes/`.
 
 Only a fresh Episode 1 selection plays the introduction. Retrying after death

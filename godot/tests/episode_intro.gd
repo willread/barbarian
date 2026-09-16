@@ -41,7 +41,7 @@ func check():
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/intro-%.1f.png"%time)
-	intro.age=11.49
+	intro.age=10.49
 	intro._process(.02)
 	assert(intro.done and not intro.player.playing and not intro.sting.playing)
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing" and game.wave==1)

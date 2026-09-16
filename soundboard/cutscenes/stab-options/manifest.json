@@ -1,0 +1,38 @@
+{
+  "provider": "ElevenLabs",
+  "model": "eleven_text_to_sound_v2",
+  "jobs": [
+    {
+      "id": "iron",
+      "name": "Iron",
+      "detail": "Dry mid-gain electric guitar power chords. Warm rough tube amp, tight two short chords then one deep ringing chord. Understated classic heavy-rock menace. No drums.",
+      "prompt": "Isolated descending three-note sting: DUN, DUN, DUNNNNN. Exactly three attacks at 0, 0.4, 0.8 seconds, stepping DOWN in pitch, short short long. Final note decays to 3 seconds. No extra notes, voice or backing. Dry mid-gain electric guitar power chords. Warm rough tube amp, tight two short chords then one deep ringing chord. Understated classic heavy-rock menace. No drums.",
+      "file": "iron.mp3",
+      "source": "iron-source.mp3"
+    },
+    {
+      "id": "doom",
+      "name": "Doom",
+      "detail": "Low downtuned electric guitar with thick fuzzy amp tone. Three descending power chords, spacious and weighty, final note blooms into a dark low sustain. No percussion, no piercing high frequencies.",
+      "prompt": "Isolated descending three-note sting: DUN, DUN, DUNNNNN. Exactly three attacks at 0, 0.4, 0.8 seconds, stepping DOWN in pitch, short short long. Final note decays to 3 seconds. No extra notes, voice or backing. Low downtuned electric guitar with thick fuzzy amp tone. Three descending power chords, spacious and weighty, final note blooms into a dark low sustain. No percussion, no piercing high frequencies.",
+      "file": "doom.mp3",
+      "source": "doom-source.mp3"
+    },
+    {
+      "id": "omen",
+      "name": "Omen",
+      "detail": "Low bowed cello and bass trombone in unison, short short long descending chords. Vintage gothic cinematic DUN DUN DUNNNN. Dry attacks, dark woody brass sound, tiny room decay. No guitar, no drums.",
+      "prompt": "Isolated descending three-note sting: DUN, DUN, DUNNNNN. Exactly three attacks at 0, 0.4, 0.8 seconds, stepping DOWN in pitch, short short long. Final note decays to 3 seconds. No extra notes, voice or backing. Low bowed cello and bass trombone in unison, short short long descending chords. Vintage gothic cinematic DUN DUN DUNNNN. Dry attacks, dark woody brass sound, tiny room decay. No guitar, no drums.",
+      "file": "omen.mp3",
+      "source": "omen-source.mp3"
+    },
+    {
+      "id": "hex",
+      "name": "Hex",
+      "detail": "Twangy baritone electric guitar with a little spring reverb and gritty edge. Three clearly descending ominous notes, short short long. Dark western meets sword-and-sorcery, final low note hangs in the air. No drums.",
+      "prompt": "Isolated descending three-note sting: DUN, DUN, DUNNNNN. Exactly three attacks at 0, 0.4, 0.8 seconds, stepping DOWN in pitch, short short long. Final note decays to 3 seconds. No extra notes, voice or backing. Twangy baritone electric guitar with a little spring reverb and gritty edge. Three clearly descending ominous notes, short short long. Dark western meets sword-and-sorcery, final low note hangs in the air. No drums.",
+      "file": "hex.mp3",
+      "source": "hex-source.mp3"
+    }
+  ]
+}
