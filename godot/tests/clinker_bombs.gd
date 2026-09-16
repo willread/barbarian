@@ -70,6 +70,7 @@ func check():
 	bomb.reflected=true;bomb.erase("detonated")
 	combat.detonate(game,bomb)
 	assert(owner.hp<30 and owner.slamPush.x>0 and hero.hp==100,"Reflected blast hits enemies only")
+	assert(is_equal_approx(30-owner.hp,lerpf(18,8,20.0/combat.BOMB_RADIUS.x)*game.damage_multiplier*game.difficulty_damage(false)),"Reflected enemy damage is halved")
 	# Unreflected blasts also damage their thrower and nearby allies.
 	owner.hp=50;owner.invTicks=0;owner.down={};owner.x=730
 	var ally=game.make_actor(760,670,101)
@@ -79,6 +80,9 @@ func check():
 	hero.invTicks=30
 	combat.detonate(game,bomb)
 	assert(owner.hp<50 and ally.hp<50,"Thrower and allies take friendly blast damage")
+	for victim in [owner,ally]:
+		var expected=lerpf(14,8,absf(victim.x-bomb.p.x)/combat.BOMB_RADIUS.x)*game.damage_multiplier*game.difficulty_damage(false)*game.e_ai.damage_scale(owner)
+		assert(is_equal_approx(50-victim.hp,expected),"Friendly blast damage is halved for thrower and allies")
 	game.enemies=[owner]
 	combat.clear()
 	assert(combat.explosions.is_empty() and combat.bomb_views.is_empty())
