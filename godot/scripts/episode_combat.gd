@@ -9,7 +9,7 @@ const BOMB_FUSE=1.05
 static func bomb_height(h: Dictionary) -> float:
 	if h.reflected or h.get("bouncing",false):
 		var t=h.get("flight_age",0.0)
-		return maxf(0,h.get("launch_height",0.0)+h.get("launch_speed",430.0)*t-.5*BOMB_GRAVITY*t*t)
+		return maxf(0,h.get("launch_height",0.0)+h.get("launch_speed",430.0)*t-.5*h.get("gravity",BOMB_GRAVITY)*t*t)
 	return sin(minf(h.age/BOMB_FLIGHT,1)*PI)*160.0
 
 var bomb_views: Array=[]
@@ -337,11 +337,12 @@ func strike_bomb(game,h: Dictionary,a: Dictionary):
 	h.launch_height=maxf(0,hero.y-tip.y-27.0)
 	h.reflected=true
 	h.flight_age=0.0
-	h.launch_speed=540.0 if charge else (480.0 if heavy else 450.0)
+	h.gravity=3200.0
+	h.launch_speed=330.0 if charge else (310.0 if heavy else 290.0)
 	h.strikes.append(a)
 	# Transfer swing and body momentum, while retaining a little incoming motion.
 	var carry=clampf(hero.get("velocityX",0.0)*game.m.SCALE*60.0,-250,250)
-	var speed=1450.0 if charge else (1120.0 if heavy else 1000.0)
+	var speed=1180.0 if charge else (980.0 if heavy else 880.0)
 	h.velocity=Vector2(a.direction*speed+carry*.35+h.velocity.x*.12,0)
 	h.spin_velocity=a.direction*(11.0 if charge else 8.0)
 	game.burst(tip.x,tip.y,18,Color("ffc17b"))
@@ -353,17 +354,18 @@ func strike_bomb(game,h: Dictionary,a: Dictionary):
 func advance_bomb(h: Dictionary,dt: float):
 	# Resolve floor contacts analytically, retaining the rest of the frame for rolling.
 	var remaining=dt
+	var gravity=h.get("gravity",BOMB_GRAVITY)
 	for contact in 5:
 		if remaining<=0:break
 		var height=bomb_height(h)
-		var vertical=h.get("launch_speed",430.0)-BOMB_GRAVITY*h.get("flight_age",0.0)
+		var vertical=h.get("launch_speed",430.0)-gravity*h.get("flight_age",0.0)
 		if height<=.01 and vertical<=1:
 			var travel=h.velocity*(1-exp(-remaining*5.0))/5.0
 			h.p+=travel
 			h.rotation=h.get("rotation",0.0)+travel.x/24.0
 			h.velocity*=exp(-remaining*5.0)
 			break
-		var impact=maxf(0,(vertical+sqrt(vertical*vertical+2*BOMB_GRAVITY*height))/BOMB_GRAVITY)
+		var impact=maxf(0,(vertical+sqrt(vertical*vertical+2*gravity*height))/gravity)
 		var step_time=minf(remaining,impact)
 		var travel=h.velocity*step_time
 		h.p+=travel
@@ -371,7 +373,7 @@ func advance_bomb(h: Dictionary,dt: float):
 		h.flight_age=h.get("flight_age",0.0)+step_time
 		remaining-=step_time
 		if step_time>=impact:
-			var rebound=absf(vertical-BOMB_GRAVITY*impact)*.26
+			var rebound=absf(vertical-gravity*impact)*.26
 			h.launch_height=0.0
 			h.launch_speed=rebound if rebound>35 else 0.0
 			h.flight_age=0.0
@@ -381,8 +383,9 @@ func advance_bomb(h: Dictionary,dt: float):
 func bomb_landing(h: Dictionary) -> Vector2:
 	if not h.reflected and not h.get("bouncing",false):return h.target
 	var height=bomb_height(h)
-	var vertical=h.get("launch_speed",430.0)-BOMB_GRAVITY*h.get("flight_age",0.0)
-	var remaining=maxf(0,(vertical+sqrt(vertical*vertical+2*BOMB_GRAVITY*height))/BOMB_GRAVITY)
+	var gravity=h.get("gravity",BOMB_GRAVITY)
+	var vertical=h.get("launch_speed",430.0)-gravity*h.get("flight_age",0.0)
+	var remaining=maxf(0,(vertical+sqrt(vertical*vertical+2*gravity*height))/gravity)
 	return h.p+h.velocity*remaining
 
 func avoid_bombs(game,enemy: Dictionary) -> Variant:
