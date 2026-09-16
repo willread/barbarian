@@ -1,0 +1,7 @@
+# Kiln Saint single-core throw animation
+
+Generated with built-in imagegen using the original `asset-sources/art/episodes/saint.png` and the discarded first toss study as references.
+
+Prompt: Create revised animation sprite sheet, exact same Kiln Saint rusty furnace-armored knight. Four full-body isolated figures in a spacious 2x2 grid with genuine transparent alpha background. Face right, consistent proportions and scale; keep skull-like helmet, rusty shoulder plates, chains, ragged skirt, boots and long furnace hammer in the other hand. Chest furnace door stays hinged OPEN in all four poses, showing a burning orange interior. Top left: reach the forward gauntlet INTO the chest to grab a core. Top right: pull out ONE small round glowing caged metallic ember bomb, elbow loaded. Bottom left: fast underhand toss with EMPTY gauntlet extended right at chest height; airborne bomb is a separate runtime object. Bottom right: return empty hand toward chest. A repeatable grab-one-throw-one animation. Complete uncropped figures, generous gutters, no touching silhouettes, scenery, text or ground shadows. Match reference's realistic dark fantasy rendering and weathered metal.
+
+Extract with `node tools/godot/bake-saint.mjs`. Existing Saint poses are extracted by connected silhouette to avoid the original equal-grid clipping. Runtime animation repeats every 18 ticks; phase one releases three cores and phase two five, each with a separate fuse.

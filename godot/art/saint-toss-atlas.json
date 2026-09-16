@@ -1,0 +1,36 @@
+{
+  "cellWidth": 768,
+  "cellHeight": 512,
+  "referenceHeight": 462,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "../art/saint-toss-0.png",
+      "left": 76,
+      "top": 39,
+      "width": 656,
+      "height": 462
+    },
+    {
+      "file": "../art/saint-toss-1.png",
+      "left": 49,
+      "top": 40,
+      "width": 651,
+      "height": 462
+    },
+    {
+      "file": "../art/saint-toss-2.png",
+      "left": 82,
+      "top": 24,
+      "width": 691,
+      "height": 458
+    },
+    {
+      "file": "../art/saint-toss-3.png",
+      "left": 42,
+      "top": 22,
+      "width": 647,
+      "height": 459
+    }
+  ]
+}

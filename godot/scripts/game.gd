@@ -718,6 +718,15 @@ func kill_visible_enemies():
 
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
+	if f.kind=="saint" and not a.get("instant_kill",false):
+		if not (a.get("type","")=="clinker" and a.get("reflected",false) and a.get("direct_bomb",false)):
+			if attacker.player and not a.get("magic",false) and not a.get("area_blast",false):
+				m.rebound_charge(attacker,int(a.direction))
+				audio.play("resist",-3,.75)
+				burst((f.x+attacker.x)*.5,f.y-145,9,Color("efc486"))
+				hit_stop=.055
+				shake=maxf(shake,3)
+			return
 	if f.player and not f.pickup.is_empty():return
 	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
 	if attacker.player and not f.player and f.kind=="shield" and a.get("spin",false) and not e_ai.guard_open(f):
@@ -752,7 +761,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			a.knock=true
 		else:a.knock=false
 	if not f.player and not a.get("magic",false): f.hitGlow=.1
-	if f.kind in ["king","saint"] and not e_ai.boss_open(f) and not a.get("magic",false):
+	if f.kind=="king" and not e_ai.boss_open(f) and not a.get("magic",false):
 		a=a.duplicate()
 		a.damage*=.65 if f.kind=="king" else .2
 	var previous_hp=f.hp

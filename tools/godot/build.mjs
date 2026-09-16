@@ -12,6 +12,7 @@ function run(command,args){
  if(result.error)throw result.error;
  if(result.status!==0||/^(?:SCRIPT ERROR|SHADER ERROR|ERROR):/m.test((result.stdout||'')+(result.stderr||'')))process.exit(result.status||1);
 }
+run(process.execPath,['tools/godot/bake-saint.mjs']);
 // Keep the tiny Windows resize extension reproducible; web exports exclude it.
 if(process.platform==='win32'&&!process.argv.includes('--web')){
  const dll='godot/native/cairn_aspect.dll';
@@ -56,6 +57,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
  run(binary,['--headless','--path','godot','--script','tests/clinker_bombs.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/saint.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_glass.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_polish.gd']);
  run(binary,['--headless','--path','godot','--script','tests/king_charge.gd']);

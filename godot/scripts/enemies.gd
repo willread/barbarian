@@ -13,7 +13,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	for attack in [
 		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",68,24,-1,0,0],["hellScream",106,36,78,0,0],
 		["kingCharge",138,48,-1,0,0],["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
-		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
+		["saintVolley",156,46,-1,0,0],["furnaceBlast",174,66,138,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
 
 var unlock_order: Array=[]
@@ -288,6 +288,7 @@ func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.kind=="witch":return hag_intent(e,h)
 	if e.kind=="king":return king_intent(e,h)
+	if e.kind=="saint":return saint_intent(e,h)
 	if e.boss and e.hp<=e.max*.5:e.phaseTwo=true
 	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty() or h.hp<=0:return Vector2.ZERO
 	var dx=h.x-e.x
@@ -310,6 +311,23 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.aiRest and not e.phaseTwo and not ranged:return Vector2.ZERO
 	var away=ranged and abs(dx)<250 and e.x>160 and e.x<1280
 	return Vector2(-e.dir if away else e.dir if abs(dx)>reach-35 else 0,sign(dy) if abs(dy)>12 else 0)*(1.55 if e.phaseTwo else 1.0)
+
+func saint_intent(e: Dictionary,h: Dictionary) -> Vector2:
+	if e.hp<=e.max*.5:e.phaseTwo=true
+	if e.hp<=0 or h.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
+	if e.x<315:return Vector2(1,0)
+	if e.x>1125:return Vector2(-1,0)
+	e.dir=facing_target(e,h.x)
+	if not e.aiRest:
+		var type="saintVolley" if e.moveIndex%2==0 else "furnaceBlast"
+		if m.begin(e,type):
+			e.attack["target"]=Vector2(h.x,h.y)
+			e.moveIndex+=1
+		return Vector2.ZERO
+	var dx=h.x-e.x
+	var retreat=-e.dir if absf(dx)<330 else e.dir if absf(dx)>530 else 0
+	if e.x<=320 and retreat<0 or e.x>=1120 and retreat>0:retreat=0
+	return Vector2(retreat,signf(h.y-e.y) if absf(h.y-e.y)>30 else 0)*.65
 
 func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.hp<=e.max*.5:e.phaseTwo=true

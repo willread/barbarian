@@ -1,0 +1,64 @@
+{
+  "cellWidth": 417,
+  "cellHeight": 470,
+  "referenceHeight": 390,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "../art/saint-v2-0.png",
+      "left": 9,
+      "top": 99,
+      "width": 409,
+      "height": 390
+    },
+    {
+      "file": "../art/saint-v2-1.png",
+      "left": 8,
+      "top": 111,
+      "width": 415,
+      "height": 380
+    },
+    {
+      "file": "../art/saint-v2-2.png",
+      "left": 18,
+      "top": 103,
+      "width": 413,
+      "height": 386
+    },
+    {
+      "file": "../art/saint-v2-3.png",
+      "left": 26,
+      "top": 16,
+      "width": 359,
+      "height": 474
+    },
+    {
+      "file": "../art/saint-v2-4.png",
+      "left": 6,
+      "top": 107,
+      "width": 521,
+      "height": 318
+    },
+    {
+      "file": "../art/saint-v2-5.png",
+      "left": 35,
+      "top": 65,
+      "width": 406,
+      "height": 367
+    },
+    {
+      "file": "../art/saint-v2-6.png",
+      "left": 29,
+      "top": 81,
+      "width": 388,
+      "height": 355
+    },
+    {
+      "file": "../art/saint-v2-7.png",
+      "left": -33,
+      "top": 292,
+      "width": 451,
+      "height": 154
+    }
+  ]
+}

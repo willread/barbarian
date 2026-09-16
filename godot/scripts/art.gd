@@ -17,12 +17,23 @@ func _init():
 	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 	for action in ["walk","attacks"]:
 		data.atlases["king-"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://art/king-"+action+"-atlas.json"))
+	data.atlases["enemy-saint-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/saint-v2-atlas.json"))
+	data.atlases["saint-toss"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/saint-toss-atlas.json"))
 
 func texture(file: String) -> Texture2D:
 	if not textures.has(file): textures[file]=load("res://assets/"+file)
 	return textures[file]
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
+	if f.kind=="saint" and f.hp>0 and f.attack.get("type","")=="saintVolley":
+		var a=f.attack
+		var interval=preload("res://scripts/episode_combat.gd").SAINT_THROW_INTERVAL
+		var last=a.from+(a.get("volley_count",5 if f.phaseTwo else 3)-1)*interval
+		var frame=0 if a.age<a.from-6 else 1
+		if a.age>=a.from:
+			var beat=int(a.age-a.from)%interval
+			frame=3 if a.age>last+5 else 2 if beat<5 else 3 if beat<9 else 0 if beat<interval-4 else 1
+		return ["saint-toss",frame]
 	if not f.player and f.kind=="king" and f.hp>0 and f.down.is_empty() and not f.hurtTicks and not f.recovering:
 		if not f.attack.is_empty():
 			var a=f.attack
@@ -70,6 +81,7 @@ func enemy_frame(e: Dictionary) -> int:
 	if e.kind in ["witch","bearer","king","saint"]:
 		if e.hp<=0:return 7
 		if not e.down.is_empty() or e.hurtTicks or e.recovering:return 6
+		if e.kind=="saint":return 5 if e.attack.get("type","")=="furnaceBlast" and e.attack.age>=e.attack.from-24 else 1+int(e.stride*4)%2 if e.moving else 0
 		if e.kind=="witch" and e.get("hazard_live",false) and not e.moving and e.attack.is_empty():return 4
 		if not e.attack.is_empty():return 3 if e.attack.age<e.attack.from else 4 if e.attack.age<=(e.attack.to if e.attack.type=="hellScream" else e.attack.from+8) else 5
 		if e.boss and e.phaseTwo and not e.moving:return 5

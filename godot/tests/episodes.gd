@@ -63,7 +63,7 @@ func check():
 	owner.kind="bearer"
 	game.m.begin(owner,"clinkerThrow")
 	owner.attack.target=Vector2(780,670)
-	owner.attack.age=48
+	owner.attack.age=owner.attack.from
 	combat.step(game,.01)
 	assert(combat.hazards.size()==1)
 	owner.attack={}
@@ -91,13 +91,15 @@ func check():
 		game.enemies.append(e)
 		game.hero.x=720;game.hero.y=680
 		var seen=[]
+		var attacks_seen=[]
 		for tick in 440:
 			game.hero.invTicks=100
 			game.tick(game.m.STEP)
+			if not e.attack.is_empty() and e.attack.type not in attacks_seen:attacks_seen.append(e.attack.type)
 			for hazard in combat.hazards:
 				if hazard.kind not in seen:seen.append(hazard.kind)
 		assert(("mire" if kind=="witch" else "root" if kind=="king" else "clinker") in seen,"AI must actually emit its mechanic: "+kind)
-		if kind=="saint":assert("blast" in seen,"Solo Saint must supply both blast and reflectable slag")
+		if kind=="saint":assert("furnaceBlast" in attacks_seen and "saintVolley" in attacks_seen,"Solo Saint alternates flame column and bomb volleys")
 	combat.clear()
 	print("CAIRN_EPISODES_OK: 300 generated runs, selection, all areas, bosses, art, mire cancellation and clinker reflection")
 	game.queue_free()

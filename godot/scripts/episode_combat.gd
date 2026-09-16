@@ -5,16 +5,19 @@ const BOMB_RADIUS=Vector2(250,180)
 const BOMB_GRAVITY=900.0
 const BOMB_FLIGHT=.45
 const BOMB_FUSE=.7875
+const SAINT_THROW_INTERVAL=18 # Three tenths of a second: grab, load, release, return.
 
 static func bomb_height(h: Dictionary) -> float:
 	if h.reflected or h.get("bouncing",false):
 		var t=h.get("flight_age",0.0)
 		return maxf(0,h.get("launch_height",0.0)+h.get("launch_speed",430.0)*t-.5*h.get("gravity",BOMB_GRAVITY)*t*t)
-	return sin(minf(h.age/BOMB_FLIGHT,1)*PI)*160.0
+	var progress=minf(h.age/BOMB_FLIGHT,1)
+	return lerpf(h.get("throw_height",0.0),0,progress)+sin(progress*PI)*h.get("arc_height",160.0)
 
 var bomb_views: Array=[]
 var explosions: Array=[]
 var scream_views: Dictionary={}
+var furnace_views: Dictionary={}
 var root_views: Array=[]
 var root_sequences: Array=[]
 var root_warning_views: Dictionary={}
@@ -48,6 +51,8 @@ func clear():
 	hazards.clear()
 	for view in scream_views.values():view.queue_free()
 	scream_views.clear()
+	for view in furnace_views.values():view.queue_free()
+	furnace_views.clear()
 	for view in bomb_views+explosions:
 		if is_instance_valid(view):view.queue_free()
 	bomb_views.clear()
@@ -67,6 +72,19 @@ func clear():
 	retiring_mire.clear()
 
 func sync_views(game,dt: float=0.0):
+	var blasting=[]
+	for enemy in game.enemies:
+		if enemy.hp<=0 or enemy.attack.get("type","")!="furnaceBlast":continue
+		blasting.append(enemy.id)
+		if not furnace_views.has(enemy.id):
+			var view=preload("res://scripts/saint_flame.gd").new()
+			game.arena_clip.add_child(view)
+			furnace_views[enemy.id]=view
+		furnace_views[enemy.id].configure(enemy)
+	for id in furnace_views.keys():
+		if id not in blasting:
+			furnace_views[id].queue_free()
+			furnace_views.erase(id)
 	var screaming=[]
 	for enemy in game.enemies:
 		if enemy.hp<=0 or enemy.attack.get("type","")!="hellScream":continue
@@ -202,6 +220,8 @@ func step(game,dt: float):
 		var a=enemy.attack
 		if enemy.hp>0 and a.get("type","")=="kingCharge":step_king_charge(game,enemy,a,dt)
 		if a.get("type","")=="hellScream":step_scream(game,enemy,a)
+		if a.get("type","")=="furnaceBlast":step_furnace(game,enemy,a)
+		if a.get("type","")=="saintVolley":step_saint_volley(game,enemy,a)
 		if a.get("type","")=="mireCast" and not a.get("placed",false):
 			var placement=place_clump(game,enemy,a.target)
 			if placement==null:
@@ -226,14 +246,6 @@ func step(game,dt: float):
 				spawn_root(enemy,target,0.0)
 				var interval=ROOT_PHASE_TWO_INTERVAL if enemy.phaseTwo else ROOT_INTERVAL
 				root_sequences.append({"owner":enemy,"wait":interval-ROOT_WARNING,"interval":interval,"remaining":3 if enemy.phaseTwo else 1,"variant":hazards.back().variant})
-			"furnaceBlast":
-				# The Saint ejects slag so reflection also works in the solo boss encounter.
-				if not hazards.any(func(h):return h.kind=="clinker" and h.owner.id==enemy.id):
-					hazards.append({"kind":"clinker","owner":enemy,"p":Vector2(enemy.x,enemy.y),"start":Vector2(enemy.x,enemy.y),"target":target,"age":0.0,"life":BOMB_FUSE,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
-				var hero=game.hero
-				if hero.invTicks==0 and hero.down.is_empty() and abs(hero.y-target.y)<26 and (hero.x-enemy.x)*a.direction>0:
-					game.damage(hero,{"type":"furnaceBlast","damage":10,"direction":a.direction,"knock":false},enemy)
-				hazards.append({"kind":"blast","owner":enemy,"p":Vector2(enemy.x,target.y),"dir":a.direction,"age":0.0,"life":.3})
 	# Each follow-up locks a fresh position, then gives a short ground tell.
 	for sequence in root_sequences:
 		if sequence.owner.hp<=0:continue
@@ -269,10 +281,12 @@ func step(game,dt: float):
 			var old_height=bomb_height(h)
 			advance_bomb(h,dt)
 			for enemy in game.enemies:
-				var point=Vector2(enemy.x,enemy.y)/Vector2(65,35)
-				var nearest=Geometry2D.get_closest_point_to_segment(point,before/Vector2(65,35),h.p/Vector2(65,35))
+				var body_radius=Vector2(100,48) if enemy.kind=="saint" else Vector2(65,35)
+				var point=Vector2(enemy.x,enemy.y)/body_radius
+				var nearest=Geometry2D.get_closest_point_to_segment(point,before/body_radius,h.p/body_radius)
 				if enemy.hp>0 and point.distance_to(nearest)<1 and minf(old_height,bomb_height(h))<game.art.HEIGHTS.get(enemy.kind,270)*enemy.size-27:
-					h.p=nearest*Vector2(65,35)
+					h.p=nearest*body_radius
+					h.direct_target=enemy.id
 					h.life=h.age
 					break
 		else:
@@ -307,6 +321,50 @@ func step(game,dt: float):
 	if not mire.is_empty() and game.hero.hp>0:
 		game.damage(game.hero,{"type":"mireDrain","damage":MIRE_DRAIN*dt,"direction":1 if game.hero.x>=mire.owner.x else -1,"continuous":true,"no_stun":true,"knock":false},mire.owner)
 
+
+func step_saint_volley(game,enemy: Dictionary,a: Dictionary):
+	if enemy.hp<=0:return
+	if not a.has("volley_targets"):
+		a.volley_count=5 if enemy.phaseTwo else 3
+		a.volley_targets=saint_volley_targets(game,a.volley_count)
+		a.ticks=a.from+(a.volley_count-1)*SAINT_THROW_INTERVAL+38
+		a.volley_released=0
+	if a.age<a.from:return
+	var due=mini(a.volley_count,1+int(a.age-a.from)/SAINT_THROW_INTERVAL)
+	while a.volley_released<due:
+		var point=a.volley_targets[a.volley_released]
+		var start=Vector2(enemy.x+enemy.dir*305*enemy.size,enemy.y)
+		hazards.append({"kind":"clinker","owner":enemy,"p":start,"start":start,"target":point,"age":0.0,"life":BOMB_FUSE,"throw_height":325.0*enemy.size,"arc_height":55.0,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
+		a.volley_released+=1
+		game.audio.play("heavy_hit",-8,1.15)
+
+func saint_volley_targets(game,count: int) -> Array:
+	var targets: Array=[]
+	for i in count:
+		# Stratified random spread; one counterable core stays near the player's lane.
+		var point=Vector2(clampf(game.hero.x+randf_range(-100,100),110,1330),game.hero.y) if i==0 else Vector2(110+(1220.0/count)*(i+randf()),randf_range(600,735))
+		for attempt in 12:
+			if not targets.any(func(other):return (point-other).length()<115):break
+			point=Vector2(randf_range(110,1330),randf_range(600,735))
+		var probe={"x":point.x,"y":point.y}
+		game.background.constrain(probe)
+		point=Vector2(probe.x,probe.y)
+		targets.append(point)
+	return targets
+
+func step_furnace(game,enemy: Dictionary,a: Dictionary):
+	if enemy.hp<=0:return
+	if not a.get("warned",false):
+		a.warned=true
+		game.audio.play("roar",-5,.55)
+	if a.age==a.from:
+		game.audio.play("death_fire",-2,.65)
+		game.shake=maxf(game.shake,7)
+	var hero=game.hero
+	if hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and preload("res://scripts/saint_flame.gd").hits(enemy,hero):
+		var before=hero.hp
+		game.damage(hero,{"type":"furnaceBlast","damage":12,"direction":a.direction,"knock":true,"push":4.0},enemy)
+		if hero.hp<before:hero.invTicks=maxi(hero.invTicks,55)
 
 func step_scream(game,enemy: Dictionary,a: Dictionary):
 	if enemy.hp<=0:return
@@ -396,6 +454,7 @@ func bomb_landing(h: Dictionary) -> Vector2:
 	return h.p+h.velocity*remaining
 
 func avoid_bombs(game,enemy: Dictionary) -> Variant:
+	if enemy.kind=="saint":return null # Armored boss holds his ground for bomb counters.
 	# React only after actual floor contact, including during settling bounces.
 	if enemy.hp<=0 or enemy.hurtTicks or enemy.recovering or not enemy.down.is_empty():return null
 	var threats=[]
@@ -449,20 +508,8 @@ func ellipse(node: Node2D,p: Vector2,r: Vector2,color: Color,filled: bool=false)
 	else:node.draw_arc(Vector2.ZERO,1,0,TAU,48,color,.016,true)
 	node.draw_set_transform(Vector2.ZERO)
 
-func draw_ground(game,node: Node2D):
-	for e in game.enemies:
-		var a=e.attack
-		if e.hp<=0 or a.is_empty() or a.age>=a.from or not a.has("target"):continue
-		var p=a.target
-		var pulse=.35+.35*float(a.age)/a.from
-		if a.type=="furnaceBlast":
-			node.draw_rect(Rect2(e.x if a.direction>0 else 0,p.y-26,1440-e.x if a.direction>0 else e.x,52),Color(1,.38,.08,pulse*.32))
-
-	for h in hazards:
-		var fade=minf(1,(h.life-h.age)*4)
-		match h.kind:
-
-			"blast":node.draw_rect(Rect2(h.p.x if h.dir>0 else 0,h.p.y-26,1440-h.p.x if h.dir>0 else h.p.x,52),Color(1,.55,.12,fade*.8))
+func draw_ground(_game,_node: Node2D):
+	pass # Hazards own their textured, depth-sorted views.
 
 func draw_air(_node: Node2D):
 	pass # Bomb bodies now use a lit, textured procedural surface.
@@ -478,6 +525,8 @@ func detonate(game,h: Dictionary):
 	var victims=game.enemies.duplicate()
 	if not h.reflected:victims.append(game.hero)
 	for victim in victims:
+		var direct=h.reflected and h.get("direct_target",-1)==victim.id
+		if victim.kind=="saint" and not direct:continue
 		var delta=Vector2(victim.x,victim.y)-h.p
 		var distance=(delta/BOMB_RADIUS).length()
 		if victim.hp<=0 or distance>1 or victim.invTicks>0 or not victim.down.is_empty() or victim.height>55:continue
@@ -486,7 +535,7 @@ func detonate(game,h: Dictionary):
 			victim["open_ticks"]=90
 			game.m.interrupt_attack(victim)
 		var direction=1 if delta.x>=0 else -1
-		game.damage(victim,{"type":"clinker","area_blast":true,"damage":(2.0 if victim.player else 1.0)*lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
+		game.damage(victim,{"type":"clinker","area_blast":true,"direct_bomb":direct,"damage":(2.0 if victim.player else 1.0)*lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
 		if victim.hp<before_hp:
 			var outward=Vector2(delta.x,delta.y*2).normalized() if delta.length()>1 else Vector2(direction,0)
 			victim.slamPush=outward*lerpf(700,350,distance)
