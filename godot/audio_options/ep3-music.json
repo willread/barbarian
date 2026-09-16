@@ -1,0 +1,96 @@
+{
+  "provider": "ElevenLabs",
+  "model": "music_v1",
+  "type": "music",
+  "collection": "EP3 · Furnace Heart",
+  "jobs": [
+    {
+      "id": "furnace-heart-piston",
+      "name": "Furnace Heart I — Piston",
+      "bpm": 110,
+      "description": "Tight mechanical stop-start chugs and a crushing kick/snare groove.",
+      "detail": "110 BPM, D minor. Short clipped low guitar stabs, a distinctive three-hit pickup into a syncopated sixteenth-note riff. Dry powerful drums, precise unison bass. A gigantic piston cycling under pressure.",
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery combat metal, FURNACE HEART: a colossal infernal foundry driven by a metal band. Downtuned baritone guitars and distorted bass dominate. Tight syncopated heavy riffs, strong acoustic kick and snare, deep toms, sparse struck-iron percussion accents integrated rhythmically. Relentless physical groove, threatening machinery, molten heat. NOT slow doom, NOT orchestral, NOT electronic dance music. No vocals, choir, organ, bright guitar solos or synth leads. Memorable repeating low guitar hook. Controlled clear bass with space for weapon impacts. No literal machine or fire sound effects. Consistent cyclic arrangement, immediate full groove, no intro, outro, fade, finale or tempo changes; compatible bar boundaries for a seamless game loop. 110 BPM, D minor. Short clipped low guitar stabs, a distinctive three-hit pickup into a syncopated sixteenth-note riff. Dry powerful drums, precise unison bass. A gigantic piston cycling under pressure.",
+      "source": "furnace-heart-piston-source.mp3",
+      "file": "furnace-heart-piston.ogg",
+      "loop": {
+        "duration": 56.17,
+        "estimated_bpm": 111.11,
+        "bars": 26,
+        "source_start": 5.92,
+        "source_end": 62.09,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.02205635979771614,
+        "peak": 0.4257645010948181,
+        "loudness_target_lufs": -19
+      }
+    },
+    {
+      "id": "furnace-heart-pressure",
+      "name": "Furnace Heart II — Pressure",
+      "bpm": 116,
+      "description": "Rolling low riffs, deep toms and a relentless accelerating-feel groove.",
+      "detail": "116 BPM, D minor. Rolling low-register guitar ostinato with displaced accents, steady driving kick and deep tom responses. Tension from rhythm, never actual tempo changes. Sparse metallic strikes every few bars.",
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery combat metal, FURNACE HEART: a colossal infernal foundry driven by a metal band. Downtuned baritone guitars and distorted bass dominate. Tight syncopated heavy riffs, strong acoustic kick and snare, deep toms, sparse struck-iron percussion accents integrated rhythmically. Relentless physical groove, threatening machinery, molten heat. NOT slow doom, NOT orchestral, NOT electronic dance music. No vocals, choir, organ, bright guitar solos or synth leads. Memorable repeating low guitar hook. Controlled clear bass with space for weapon impacts. No literal machine or fire sound effects. Consistent cyclic arrangement, immediate full groove, no intro, outro, fade, finale or tempo changes; compatible bar boundaries for a seamless game loop. 116 BPM, D minor. Rolling low-register guitar ostinato with displaced accents, steady driving kick and deep tom responses. Tension from rhythm, never actual tempo changes. Sparse metallic strikes every few bars.",
+      "source": "furnace-heart-pressure-source.mp3",
+      "file": "furnace-heart-pressure.ogg",
+      "loop": {
+        "duration": 54.13,
+        "estimated_bpm": 115.38,
+        "bars": 26,
+        "source_start": 7.42,
+        "source_end": 61.55,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.014976784586906433,
+        "peak": 0.339275062084198,
+        "loudness_target_lufs": -19
+      }
+    },
+    {
+      "id": "furnace-heart-slag",
+      "name": "Furnace Heart III — Slag",
+      "bpm": 104,
+      "description": "Thick gritty guitars and a lurching, bass-heavy industrial stomp.",
+      "detail": "104 BPM, D minor. Huge gritty low guitar riff with deliberate gaps and a slight swung subdivision, aggressive halftime backbeat over busy guitar rhythm. Bass slides into heavy root notes. The groove should feel dangerously massive, still energetic combat metal.",
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery combat metal, FURNACE HEART: a colossal infernal foundry driven by a metal band. Downtuned baritone guitars and distorted bass dominate. Tight syncopated heavy riffs, strong acoustic kick and snare, deep toms, sparse struck-iron percussion accents integrated rhythmically. Relentless physical groove, threatening machinery, molten heat. NOT slow doom, NOT orchestral, NOT electronic dance music. No vocals, choir, organ, bright guitar solos or synth leads. Memorable repeating low guitar hook. Controlled clear bass with space for weapon impacts. No literal machine or fire sound effects. Consistent cyclic arrangement, immediate full groove, no intro, outro, fade, finale or tempo changes; compatible bar boundaries for a seamless game loop. 104 BPM, D minor. Huge gritty low guitar riff with deliberate gaps and a slight swung subdivision, aggressive halftime backbeat over busy guitar rhythm. Bass slides into heavy root notes. The groove should feel dangerously massive, still energetic combat metal.",
+      "source": "furnace-heart-slag-source.mp3",
+      "file": "furnace-heart-slag.ogg",
+      "loop": {
+        "duration": 55.68,
+        "estimated_bpm": 103.45,
+        "bars": 24,
+        "source_start": 1.71,
+        "source_end": 57.39,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.009957555681467056,
+        "peak": 0.3803311884403229,
+        "loudness_target_lufs": -19
+      }
+    },
+    {
+      "id": "furnace-heart-overdrive",
+      "name": "Furnace Heart IV — Overdrive",
+      "bpm": 122,
+      "description": "The most urgent variant: fast palm-muted patterns and explosive drum accents.",
+      "detail": "122 BPM, D minor. Insistent alternating palm-muted low notes and open power chords, short controlled double-kick bursts, hard snare and hammer-like metal accents. A memorable descending riff answered by one rising dissonant chord. Fierce, focused, no shred solo.",
+      "music": true,
+      "prompt": "Instrumental dark sword-and-sorcery combat metal, FURNACE HEART: a colossal infernal foundry driven by a metal band. Downtuned baritone guitars and distorted bass dominate. Tight syncopated heavy riffs, strong acoustic kick and snare, deep toms, sparse struck-iron percussion accents integrated rhythmically. Relentless physical groove, threatening machinery, molten heat. NOT slow doom, NOT orchestral, NOT electronic dance music. No vocals, choir, organ, bright guitar solos or synth leads. Memorable repeating low guitar hook. Controlled clear bass with space for weapon impacts. No literal machine or fire sound effects. Consistent cyclic arrangement, immediate full groove, no intro, outro, fade, finale or tempo changes; compatible bar boundaries for a seamless game loop. 122 BPM, D minor. Insistent alternating palm-muted low notes and open power chords, short controlled double-kick bursts, hard snare and hammer-like metal accents. A memorable descending riff answered by one rising dissonant chord. Fierce, focused, no shred solo.",
+      "source": "furnace-heart-overdrive-source.mp3",
+      "file": "furnace-heart-overdrive.ogg",
+      "loop": {
+        "duration": 50.92,
+        "estimated_bpm": 122.45,
+        "bars": 26,
+        "source_start": 2.23,
+        "source_end": 53.15,
+        "splice_seconds": 0.04,
+        "seam_peak_difference": 0.01694704219698906,
+        "peak": 0.3748820722103119,
+        "loudness_target_lufs": -19
+      }
+    }
+  ]
+}

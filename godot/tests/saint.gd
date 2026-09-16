@@ -29,6 +29,11 @@ func check():
 		game.e_ai.saint_intent(boss,hero)
 		choices.append(boss.attack.type)
 	assert("saintVolley" in choices and "furnaceBlast" in choices,"Attack choice is random even with the same move index")
+	for i in range(2,choices.size()):
+		assert(choices.slice(i-2,i+1)!=["furnaceBlast","furnaceBlast","furnaceBlast"],"Never three fire blasts in a row")
+	boss.attack={};boss.aiRest=0;boss.fire_streak=2
+	game.e_ai.saint_intent(boss,hero)
+	assert(boss.attack.type=="saintVolley" and boss.fire_streak==0,"Two fire blasts force a bomb attack and reset the streak")
 	assert(choices[0]==choices[1] or range(1,choices.size()).any(func(i):return choices[i]==choices[i-1]),"Random choice allows consecutive repeats")
 	boss.attack={}
 	for second_phase in [false,true]:

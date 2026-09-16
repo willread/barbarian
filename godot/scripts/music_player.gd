@@ -7,6 +7,9 @@ var player: AudioStreamPlayer
 var selected=0
 var current=-1
 var names: Array=[]
+var streams: Array=[]
+var places: Array=[]
+const ROW_HEIGHT=60
 var saved_pauses: Array=[]
 var font=preload("res://art/controls/cinzel.ttf")
 const PLACES=["MAIN MENU","EP I / THE FALLEN CITADEL","EP II / THE SUNKEN WILDS","EP III / THE ASHEN DEPTHS"]
@@ -23,6 +26,15 @@ func _ready():
   for job in manifest.get("jobs",[]):
    if job.get("id","")==id:title=job.get("name",title)
   names.append(title)
+  streams.append(track.stream)
+  places.append(PLACES[places.size()])
+ var candidates=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
+ for job in candidates.jobs:
+  names.append(job.name)
+  var stream=load("res://audio_options/"+job.file)
+  stream.loop=true
+  streams.append(stream)
+  places.append("EP III / CANDIDATE")
  back_menu=load("res://scripts/menu.gd").new()
  add_child(back_menu)
  back_menu.setup(game.art)
@@ -48,15 +60,15 @@ func layout():
  back_menu.position=Vector2(720,732)-Vector2(item.x,item.y+item.height*.5)*action_scale
 func _process(_dt: float):
  player.volume_db=-60 if game.muted else -10+game.audio.volumes.get("music_menu" if current==0 else "music_game",0.0)
- back_menu.items[0].fire.emitting=selected==4
+ back_menu.items[0].fire.emitting=selected==names.size()
  canvas.queue_redraw()
 func play_track(index: int):
  selected=wrapi(index,0,names.size());current=selected
- player.stream=game.audio.tracks[selected].stream
+ player.stream=streams[selected]
  player.stream_paused=false;player.play()
  game.audio.unlocked=true
 func toggle():
- if selected==4:back_menu.activate();return
+ if selected==names.size():back_menu.activate();return
  if current<0 or current!=selected:play_track(selected)
  elif player.playing:player.stream_paused=not player.stream_paused
  else:play_track(selected)
@@ -64,20 +76,20 @@ func handle(event: InputEvent):
  if event is InputEventKey and event.pressed and not event.echo:
   match event.keycode:
    KEY_ESCAPE:closed.emit()
-   KEY_UP:selected=wrapi(selected-1,0,5);game.audio.play("menu_select")
-   KEY_DOWN:selected=wrapi(selected+1,0,5);game.audio.play("menu_select")
+   KEY_UP:selected=wrapi(selected-1,0,names.size()+1);game.audio.play("menu_select")
+   KEY_DOWN:selected=wrapi(selected+1,0,names.size()+1);game.audio.play("menu_select")
    KEY_ENTER,KEY_SPACE:toggle()
  elif event is InputEventMouseMotion or event is InputEventMouseButton:
   var point=transform.affine_inverse()*event.position
-  for i in 4:
-   if Rect2(160,180+i*86,1120,86).has_point(point):
+  for i in names.size():
+   if Rect2(160,180+i*ROW_HEIGHT,1120,ROW_HEIGHT).has_point(point):
     selected=i
     if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:toggle()
     return
   var local=back_menu.get_global_transform_with_canvas().affine_inverse()*event.position
   var item=back_menu.items[0]
   if Rect2(item.node.position-Vector2(item.width*.5,0),Vector2(item.width,item.height)).has_point(local):
-   selected=4
+   selected=names.size()
    back_menu.handle(event)
 func text(value: String,point: Vector2,size: int,color: Color=Color("e4ddc9"),center: bool=false):
  if center:point.x-=font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,size).x*.5
@@ -87,16 +99,16 @@ func paint():
  canvas.draw_rect(Rect2(corner,get_viewport().get_visible_rect().size/transform.get_scale()),Color(0,0,0,.9))
  text("MUSIC PLAYER",Vector2(720,87),40,Color("e4ddc9"),true)
  text("TRACK",Vector2(178,151),16,Color("bdaa7d"))
- text("USED IN",Vector2(720,151),16,Color("bdaa7d"))
- for i in 4:
-  var y=180+i*86
-  if selected==i:canvas.draw_rect(Rect2(160,y,1120,86),Color(.7,.48,.15,.12))
-  elif i%2==0:canvas.draw_rect(Rect2(160,y,1120,86),Color(.7,.65,.48,.025))
+ text("USED IN",Vector2(820,151),16,Color("bdaa7d"))
+ for i in names.size():
+  var y=180+i*ROW_HEIGHT
+  if selected==i:canvas.draw_rect(Rect2(160,y,1120,ROW_HEIGHT),Color(.7,.48,.15,.12))
+  elif i%2==0:canvas.draw_rect(Rect2(160,y,1120,ROW_HEIGHT),Color(.7,.65,.48,.025))
   if current==i and player.stream:
    var progress=clampf(player.get_playback_position()/player.stream.get_length(),0,1)
-   canvas.draw_rect(Rect2(160,y,1120*progress,86),Color(.7,.58,.30,.20))
+   canvas.draw_rect(Rect2(160,y,1120*progress,ROW_HEIGHT),Color(.7,.58,.30,.20))
   canvas.draw_line(Vector2(160,y),Vector2(1280,y),Color(.40,.34,.24,.45))
-  text(names[i],Vector2(178,y+50),27)
-  text(PLACES[i],Vector2(720,y+50),20)
-  if current==i:text("PAUSED" if player.stream_paused else "PLAYING",Vector2(1150,y+50),14,Color("bdaa7d"))
- canvas.draw_line(Vector2(160,524),Vector2(1280,524),Color("bdaa7d"))
+  text(names[i],Vector2(178,y+38),24)
+  text(places[i],Vector2(820,y+38),17)
+  if current==i:text("PAUSED" if player.stream_paused else "PLAYING",Vector2(1150,y+38),14,Color("bdaa7d"))
+ canvas.draw_line(Vector2(160,180+names.size()*ROW_HEIGHT),Vector2(1280,180+names.size()*ROW_HEIGHT),Color("bdaa7d"))
