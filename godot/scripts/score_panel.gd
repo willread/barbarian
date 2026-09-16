@@ -99,5 +99,7 @@ func _draw():
  stone("x%d"%game.combo.multiplier(),Vector2(186,55-combo_height()*.5)+unrest(),combo_height(),54,combo_color(tier),true)
  if game.combo.hits>0 or game.combo.bonus_multiplier>1:
   var fraction=clampf(game.combo.remaining/game.combo.timeout,0.,1.)
-  draw_rect(Rect2(0,62,186,2),Color(.08,.035,.025,.8))
-  draw_rect(Rect2(0,62,186*fraction,2),Color(.6,.45,.25,.9) if tier<=4 else flame_color(tier))
+  # Keep the full timer inside the compartment, above its raised bottom edging.
+  var track=Rect2(4,58,178,2)
+  draw_rect(track,Color(.08,.035,.025,.8))
+  draw_rect(Rect2(track.position,Vector2(track.size.x*fraction,track.size.y)),Color(.6,.45,.25,.9) if tier<=4 else flame_color(tier))
