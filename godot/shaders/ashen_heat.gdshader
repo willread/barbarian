@@ -26,6 +26,15 @@ vec3 post_fire(vec2 uv,vec2 base,vec2 extent,float seed){
  float curl=sin(rise*8.0-clock*(5.0+seed*.07)+seed);
  return vec3(vec2((curl*2.1+(flutter-.5)*3.0)*rise,(flutter-.5)*5.0*rise)*mask/vec2(1672.0,941.0),mask);
 }
+// Source-registered smoke: rising curls deform the pale painted puffs only.
+vec3 reliquary_smoke(vec2 uv,vec2 base,vec2 extent,float seed){
+ vec2 p=(uv*vec2(1672.,941.)-base)/extent;
+ float rise=clamp(-p.y,0.,1.);
+ float mask=(1.-smoothstep(.35,1.,abs(p.x)))*smoothstep(0.,.15,rise)*(1.-smoothstep(.72,1.,rise));
+ float billow=noise(vec2(p.x*2.8+seed,p.y*3.7+clock*.72));
+ float curl=sin(rise*8.-clock*1.15+seed);
+ return vec3(vec2(curl*4.5*rise+(billow-.5)*4.,(billow-.5)*10.-sin(clock*.83+seed)*2.)*mask/vec2(1672.,941.),mask);
+}
 void fragment(){
  vec2 uv=UV;
  if(area<1.5){uv+=banner(UV,vec4(.041,.288,.028,.183),0.0)+banner(UV,vec4(.917,.342,.035,.166),1.7);}
@@ -55,6 +64,39 @@ void fragment(){
   uv.x+=sin(uv.y*57.0-clock*4.0)*.00065*lava;
  }
  float post_mask=0.0;
+ float reliquary_smoke_mask=0.0;
+ if(area>3.5){
+  vec3 puffs=reliquary_smoke(uv,vec2(421,254),vec2(43,77),1.);
+  puffs+=reliquary_smoke(uv,vec2(1250,254),vec2(45,77),7.);
+  puffs+=reliquary_smoke(uv,vec2(111,536),vec2(53,138),3.);
+  puffs+=reliquary_smoke(uv,vec2(319,563),vec2(42,120),11.);
+  puffs+=reliquary_smoke(uv,vec2(451,553),vec2(46,126),5.);
+  puffs+=reliquary_smoke(uv,vec2(1218,553),vec2(46,126),17.);
+  puffs+=reliquary_smoke(uv,vec2(1350,563),vec2(42,120),23.);
+  puffs+=reliquary_smoke(uv,vec2(1555,536),vec2(53,138),29.);
+  vec3 source=texture(TEXTURE,uv).rgb;
+  float pale=(1.-smoothstep(.04,.15,abs(source.r-source.b)))*smoothstep(.15,.32,source.r);
+  reliquary_smoke_mask=clamp(puffs.z,0.,1.)*pale;
+  uv+=puffs.xy*pale;
+  vec3 fires=post_fire(uv,vec2(188,312),vec2(30,62),2.);
+  fires+=post_fire(uv,vec2(1482,310),vec2(29,62),13.);
+  fires+=post_fire(uv,vec2(395,516),vec2(27,105),4.);
+  fires+=post_fire(uv,vec2(1278,516),vec2(27,105),19.);
+  fires+=post_fire(uv,vec2(461,561),vec2(21,44),6.);
+  fires+=post_fire(uv,vec2(1212,562),vec2(21,44),22.);
+  fires+=post_fire(uv,vec2(630,521),vec2(22,59),8.);
+  fires+=post_fire(uv,vec2(1041,521),vec2(22,59),27.);
+  fires+=post_fire(uv,vec2(145,630),vec2(16,39),10.);
+  fires+=post_fire(uv,vec2(298,649),vec2(25,41),12.);
+  fires+=post_fire(uv,vec2(1379,647),vec2(25,41),31.);
+  fires+=post_fire(uv,vec2(1526,630),vec2(16,39),34.);
+  fires+=post_fire(uv,vec2(132,532),vec2(20,36),15.);
+  fires+=post_fire(uv,vec2(318,561),vec2(20,42),16.);
+  fires+=post_fire(uv,vec2(1355,561),vec2(20,42),37.);
+  fires+=post_fire(uv,vec2(1540,532),vec2(20,36),41.);
+  uv+=fires.xy;
+  post_mask=clamp(fires.z,0.,1.);
+ }
  if(area>2.5 && area<3.5){
   vec3 posts=post_fire(uv,vec2(242,137),vec2(30,74),1.0);
   posts+=post_fire(uv,vec2(346,124),vec2(17,59),4.0);
@@ -82,7 +124,7 @@ void fragment(){
  float hot=smoothstep(.12,.42,paint.r-paint.b)*smoothstep(.25,.6,paint.r);
  float fire=noise(vec2(uv.x*160.0,uv.y*85.0+clock*4.4));
  float flicker=.35+.4*fire+.25*sin(clock*2.7+uv.x*39.0);
- if(area>1.5 && area<2.5){
+ if((area>1.5 && area<2.5) || area>3.5){
   // Spatially offset noise gives each window and torch its own irregular
   // burn. Slow fuel variation and faster flutter avoid a synchronized pulse.
   float fuel=noise(vec2(uv.x*23.0+uv.y*11.0,clock*2.5));
@@ -114,6 +156,10 @@ void fragment(){
  float smoke=gray*smoothstep(.17,.34,paint.r)*(1.0-smoothstep(.55,.72,paint.r))*lane;
  float billow=noise(vec2(uv.x*19.0-clock*.06,uv.y*24.0+clock*.25));
  paint.rgb+=vec3(.035,.030,.025)*(billow-.5)*smoke*min(sources+float(area<1.5),1.0);
+ if(reliquary_smoke_mask>0.){
+  float rolling=noise(vec2(uv.x*71.+noise(uv*23.+clock*.1)*2.,uv.y*63.+clock*1.2));
+  paint.rgb+=vec3(.11,.10,.09)*(rolling-.5)*reliquary_smoke_mask;
+ }
  COLOR=paint;
 }
 
