@@ -62,6 +62,16 @@ func check():
 	bomb.reflected=true;bomb.erase("detonated")
 	combat.detonate(game,bomb)
 	assert(owner.hp<30 and owner.slamPush.x>0 and hero.hp==100,"Reflected blast hits enemies only")
+	# Unreflected blasts also damage their thrower and nearby allies.
+	owner.hp=50;owner.invTicks=0;owner.down={};owner.x=730
+	var ally=game.make_actor(760,670,101)
+	ally.kind="bone";ally.hp=50;ally.invTicks=0
+	game.enemies=[owner,ally]
+	bomb.reflected=false;bomb.erase("detonated")
+	hero.invTicks=30
+	combat.detonate(game,bomb)
+	assert(owner.hp<50 and ally.hp<50,"Thrower and allies take friendly blast damage")
+	game.enemies=[owner]
 	combat.clear()
 	assert(combat.explosions.is_empty() and combat.bomb_views.is_empty())
 	# Reflected projectiles rise, descend and settle; their landing tell stays fixed.
@@ -97,7 +107,7 @@ func check():
 	combat.strike_bomb(game,arc,hero.attack)
 	assert(absf(arc.p.x-tip.x-18)<.01)
 	assert(absf((arc.p.y-27-combat.bomb_height(arc))-tip.y)<.01,"Launch must leave the weapon rather than the floor")
-	assert(arc.launch_speed>=740 and arc.velocity.x>1400 and game.bomb_hit_pause>0)
+	assert(arc.launch_speed==540 and arc.velocity.x>1400 and game.bomb_hit_pause>0)
 	assert(arc.life==fuse,"Harder strikes do not reset the short fuse")
 	var paused_clock=game.clock
 	game._process(.01)
@@ -108,7 +118,7 @@ func check():
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-weapon-contact.png")
 	hero.attack={}
 	# Other enemies avoid a bearer's throw, even before it lands.
-	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.3,"life":2.25,"reflected":false}
+	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.5,"life":2.25,"reflected":false}
 	combat.hazards=[thrown]
 	var dodger=game.make_actor(720,670,100)
 	dodger.kind="bone";dodger.attack={};dodger.down={};dodger.hurtTicks=0;dodger.recovering=false
@@ -125,7 +135,36 @@ func check():
 	assert(escape.y>=0,"Do not evade into the upper wall")
 	dodger.hurtTicks=10
 	assert(combat.avoid_bombs(game,dodger)==null,"Stunned enemies cannot evade")
+	owner.x=720;owner.y=560;owner.hp=50;owner.down={};owner.hurtTicks=0;owner.recovering=0;owner.attack={}
+	game.m.begin(owner,"clinkerThrow")
+	owner.attack.age=owner.attack.from+1
+	assert(combat.avoid_bombs(game,owner)!=null and owner.attack.is_empty(),"Thrower can flee its own landed bomb during recovery")
 	combat.clear()
+	# Close pressure selects a warned fire scream, with one damaging blast.
+	owner.x=900;owner.y=670;owner.hp=50;owner.down={};owner.hurtTicks=0;owner.recovering=0;owner.attack={};owner.aiRest=0
+	hero.x=1000;hero.y=670;hero.hp=100;hero.height=0;hero.invTicks=0;hero.down={};hero.attack={}
+	game.e_ai.intent(owner,hero,true)
+	assert(owner.attack.type=="hellScream")
+	owner.attack.age=owner.attack.from-1
+	combat.step(game,.01)
+	assert(hero.hp==100,"Scream windup gives time to escape")
+	owner.attack.age=owner.attack.from
+	combat.step(game,.01)
+	assert(hero.hp<100 and not hero.down.is_empty())
+	var scream_hp=hero.hp
+	combat.step(game,.01)
+	assert(hero.hp==scream_hp,"One hit per scream")
+	combat.sync_views(game,0)
+	assert(combat.scream_views.size()==1)
+	if "--bomb-capture" in OS.get_cmdline_user_args():
+		owner.attack.age=48
+		game._process(0)
+		await process_frame
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bearer-scream.png")
+	owner.attack={}
+	combat.sync_views(game,0)
+	assert(combat.scream_views.is_empty())
 	game.queue_free()
 	await process_frame
 	print("CAIRN_BOMBS_OK: fuse, damage, radial knockdown, ellipse, invulnerability, reflection, pause and cleanup")

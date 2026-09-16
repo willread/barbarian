@@ -712,7 +712,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		hit_stop=.055
 		shake=4
 		return
-	if not f.player and not a.get("instant_kill",false) and e_ai.block(f,a,attacker):
+	if not f.player and not a.get("instant_kill",false) and not a.get("area_blast",false) and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
 		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
 		audio.play("resist",-4)

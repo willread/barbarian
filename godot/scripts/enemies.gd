@@ -11,7 +11,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 	roster["archer"]={"hp":6,"speed":1.05}
 	roster.merge({"witch":{"hp":9,"speed":.85},"bearer":{"hp":13,"speed":.9},"king":{"hp":81.25,"speed":.8},"saint":{"hp":120,"speed":.8}})
 	for attack in [
-		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],
+		["mireCast",132,84,-1,0,0],["hagClaw",54,20,27,5,43],["clinkerThrow",92,48,-1,0,0],["hellScream",106,36,60,0,0],
 		["kingCharge",138,48,-1,0,0],["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
 		["saintSweep",102,52,60,10,76],["furnaceBlast",110,60,-1,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
@@ -293,6 +293,11 @@ func episode_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	var dx=h.x-e.x
 	var dy=h.y-e.y
 	e.dir=facing_target(e,h.x)
+	if e.kind=="bearer" and not e.aiRest and abs(dx)<185 and abs(dy)<65:
+		if m.begin(e,"hellScream"):
+			e.attack["target"]=Vector2(h.x,h.y)
+			e.moveIndex+=1
+		return Vector2.ZERO
 	var ranged=e.kind in ["witch","bearer"]
 	var reach=530.0 if ranged else 270.0
 	if not e.aiRest and abs(dx)<reach and abs(dy)<(130 if e.kind=="witch" else 26):

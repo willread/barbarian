@@ -14,6 +14,7 @@ static func bomb_height(h: Dictionary) -> float:
 
 var bomb_views: Array=[]
 var explosions: Array=[]
+var scream_views: Dictionary={}
 var root_views: Array=[]
 var root_sequences: Array=[]
 var root_warning_views: Dictionary={}
@@ -45,6 +46,8 @@ func prepare_actor(actor: Dictionary):
 
 func clear():
 	hazards.clear()
+	for view in scream_views.values():view.queue_free()
+	scream_views.clear()
 	for view in bomb_views+explosions:
 		if is_instance_valid(view):view.queue_free()
 	bomb_views.clear()
@@ -64,6 +67,19 @@ func clear():
 	retiring_mire.clear()
 
 func sync_views(game,dt: float=0.0):
+	var screaming=[]
+	for enemy in game.enemies:
+		if enemy.hp<=0 or enemy.attack.get("type","")!="hellScream":continue
+		screaming.append(enemy.id)
+		if not scream_views.has(enemy.id):
+			var view=preload("res://scripts/bearer_scream.gd").new()
+			game.arena_clip.add_child(view)
+			scream_views[enemy.id]=view
+		scream_views[enemy.id].configure(enemy)
+	for id in scream_views.keys():
+		if id not in screaming:
+			scream_views[id].queue_free()
+			scream_views.erase(id)
 	for h in hazards:
 		if h.kind!="clinker":continue
 		if not h.has("bomb_view"):
@@ -185,6 +201,7 @@ func step(game,dt: float):
 		enemy["mire_count"]=hazards.filter(func(h):return h.kind=="mire" and h.owner.id==enemy.id).size()
 		var a=enemy.attack
 		if enemy.hp>0 and a.get("type","")=="kingCharge":step_king_charge(game,enemy,a,dt)
+		if a.get("type","")=="hellScream":step_scream(game,enemy,a)
 		if a.get("type","")=="mireCast" and not a.get("placed",false):
 			var placement=place_clump(game,enemy,a.target)
 			if placement==null:
@@ -240,7 +257,7 @@ func step(game,dt: float):
 			var growth=minf(clampf(h.age/.20,0,1),clampf((h.life-h.age)/.30,0,1))
 			var rise=1.0-pow(1.0-growth,3)
 			# Keep contact live after eruption; regular invulnerability and a local cooldown prevent rapid repeated hits.
-			if h.age>=.18 and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<52:
+			if h.age>=BOMB_FLIGHT and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<52:
 				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false,"no_stun":true},h.owner)
 				# One escape window shared across every root, including later eruptions.
 				if victim.hp>0:victim.invTicks=maxi(victim.invTicks,45)
@@ -289,6 +306,25 @@ func step(game,dt: float):
 		game.damage(game.hero,{"type":"mireDrain","damage":MIRE_DRAIN*dt,"direction":1 if game.hero.x>=mire.owner.x else -1,"continuous":true,"no_stun":true,"knock":false},mire.owner)
 
 
+func step_scream(game,enemy: Dictionary,a: Dictionary):
+	if enemy.hp<=0:return
+	if a.age<a.from:
+		if not a.get("warned",false):
+			a.warned=true
+			game.audio.play("roar",-9,.65)
+		return
+	if a.age==a.from:
+		game.audio.play("death_fire",-4,.7)
+		game.audio.play("roar",-3,.8)
+		game.shake=maxf(game.shake,5)
+	if a.age>a.to or a.get("scorched",false):return
+	var hero=game.hero
+	var dx=(hero.x-enemy.x)*a.direction
+	if hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<50 and dx>-55 and dx<225 and absf(hero.y-enemy.y)<65:
+		a.scorched=true
+		game.damage(hero,{"type":"hellScream","damage":11,"direction":a.direction,"knock":true,"push":3.5},enemy)
+		hero.invTicks=maxi(hero.invTicks,45)
+
 func strike_bomb(game,h: Dictionary,a: Dictionary):
 	var hero=game.hero
 	var pose_actor=hero.duplicate()
@@ -301,7 +337,7 @@ func strike_bomb(game,h: Dictionary,a: Dictionary):
 	h.launch_height=maxf(0,hero.y-tip.y-27.0)
 	h.reflected=true
 	h.flight_age=0.0
-	h.launch_speed=740.0 if charge else (665.0 if heavy else 610.0)
+	h.launch_speed=540.0 if charge else (480.0 if heavy else 450.0)
 	h.strikes.append(a)
 	# Transfer swing and body momentum, while retaining a little incoming motion.
 	var carry=clampf(hero.get("velocityX",0.0)*game.m.SCALE*60.0,-250,250)
@@ -354,7 +390,7 @@ func avoid_bombs(game,enemy: Dictionary) -> Variant:
 	if enemy.hp<=0 or enemy.hurtTicks or enemy.recovering or not enemy.down.is_empty():return null
 	var threats=[]
 	for h in hazards:
-		if h.kind=="clinker" and h.age>=.18 and h.age<h.life:threats.append(bomb_landing(h))
+		if h.kind=="clinker" and h.age>=BOMB_FLIGHT and h.age<h.life:threats.append(bomb_landing(h))
 	var point=Vector2(enemy.x,enemy.y)
 	var footprint=BOMB_RADIUS+Vector2(40,25)
 	var danger=Vector2.ZERO
@@ -366,7 +402,7 @@ func avoid_bombs(game,enemy: Dictionary) -> Variant:
 			danger=target
 	if nearest==INF:return null
 	if not enemy.attack.is_empty():
-		if enemy.boss or enemy.attack.age>=enemy.attack.from-6:return null
+		if enemy.attack.age>=enemy.attack.from-6 and enemy.attack.age<=max(enemy.attack.from,enemy.attack.to):return null
 		game.m.interrupt_attack(enemy)
 	var best=point
 	var cost=INF
@@ -386,7 +422,7 @@ func avoid_bombs(game,enemy: Dictionary) -> Variant:
 	var direction=point.direction_to(best)
 	if absf(direction.x)>.2:enemy.dir=1 if direction.x>0 else -1
 	enemy.brace=0
-	return direction
+	return direction*1.85
 
 func movement(actor: Dictionary,before: Vector2):
 	actor["mired"]=false
@@ -429,17 +465,18 @@ func detonate(game,h: Dictionary):
 	effect.z_index=int(h.p.y)*2+2
 	game.arena_clip.add_child(effect)
 	explosions.append(effect)
-	var victims=game.enemies if h.reflected else [game.hero]
+	var victims=game.enemies.duplicate()
+	if not h.reflected:victims.append(game.hero)
 	for victim in victims:
 		var delta=Vector2(victim.x,victim.y)-h.p
 		var distance=(delta/BOMB_RADIUS).length()
 		if victim.hp<=0 or distance>1 or victim.invTicks>0 or not victim.down.is_empty() or victim.height>55:continue
 		var before_hp=victim.hp
-		if h.reflected:
+		if not victim.player:
 			victim["open_ticks"]=90
 			game.m.interrupt_attack(victim)
 		var direction=1 if delta.x>=0 else -1
-		game.damage(victim,{"type":"clinker","damage":lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
+		game.damage(victim,{"type":"clinker","area_blast":true,"damage":lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
 		if victim.hp<before_hp:
 			var outward=Vector2(delta.x,delta.y*2).normalized() if delta.length()>1 else Vector2(direction,0)
 			victim.slamPush=outward*lerpf(700,350,distance)
