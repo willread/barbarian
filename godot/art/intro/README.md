@@ -19,9 +19,9 @@ line plays at 1 second; the second at 6.4 seconds, as Cairn comes into view.
 The user supplied the exact words. Subtitles follow the separated lines.
 Subtitles are white on a solid black bottom strip and remain visible when muted.
 
-The existing guitar cue remains until a replacement is chosen from the four
-options in `soundboard/cutscenes/stab-options/`. It starts at 5.94 seconds
-and ducks under the second line. It follows music/mute settings and stops on skip.
+The approved descending guitar riff (`revenge-riff-v1`) starts at 4.2 seconds,
+with its picked phrase leading into the second line at 6.4 seconds. The ringing
+tail ducks under the voice. The full phrase finishes before the final fade. It follows music/mute settings and stops on skip.
 The original sound and generation prompt are in `soundboard/cutscenes/`.
 
 Only a fresh Episode 1 selection plays the introduction. Retrying after death

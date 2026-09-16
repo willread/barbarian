@@ -40,7 +40,7 @@ func _ready():
 	sting=AudioStreamPlayer.new()
 	sting.bus=&"Music"
 	sting.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
-	if not ending:sting.stream=load("res://art/intro/revenge-guitar.ogg")
+	if not ending:sting.stream=load("res://art/intro/revenge-riff-v1.ogg")
 	add_child(sting)
 	var subtitles=JSON.parse_string(FileAccess.get_file_as_string("res://art/ending/subtitles.json" if ending else "res://art/intro/subtitles.json"))
 	captions=subtitles
@@ -74,10 +74,10 @@ func _process(dt: float):
 		second_line_started=true
 		player.stream=load("res://art/intro/revenge-line-two.ogg")
 		player.play()
-	# Descending three-note phrase leads into "Now"; lower its tail beneath the voice.
+	# Descending guitar riff leads into "Now"; lower its tail beneath the voice.
 	var voice_time=age-second_line_start
 	sting.volume_db=-80 if game.muted or not game.music_enabled else lerpf(-1,-17,smoothstep(-.15,.07,voice_time))
-	if not ending and voice_started and voice_time>=-.46 and not sting_started:
+	if not ending and voice_started and voice_time>=-2.2 and not sting_started:
 		sting_started=true
 		sting.play()
 	var size=get_viewport().get_visible_rect().size
