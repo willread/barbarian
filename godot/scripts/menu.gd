@@ -56,12 +56,7 @@ func show_items(labels: Array, is_title: bool=true, animate: bool=true):
 		group.add_child(face)
 		if is_locked(label):group.modulate=Color(1,1,1,.62)
 		if restricted.is_valid() and restricted.call(label):
-			group.modulate=Color(.75,.7,.62,.72)
-			var note=Label.new();note.text="FULL GAME"
-			note.add_theme_font_override("font",load("res://art/controls/cinzel.ttf"))
-			note.add_theme_font_size_override("font_size",16)
-			note.position=Vector2(meta.width*size*.5+12,meta.height*size*.5-10)
-			group.add_child(note)
+			group.modulate=Color(1,1,1,.72)
 		# Locked text uses the ordinary sprite material so inherited alpha is respected.
 		if not is_locked(label):fire.heat_face(face,Rect2(Vector2(-meta.width*.5,0),Vector2(meta.width,meta.height)))
 		items.append({"node":group,"label":label,"fire":fire,"face":face,"x":center,"y":y,"width":meta.width*size,"height":meta.height*size})

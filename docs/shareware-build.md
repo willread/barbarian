@@ -31,7 +31,7 @@ Thus the last build determines which edition the local preview runs.
 ## Shareware behavior
 
 - Episode 1 is playable, including its opening and death retries.
-- Episodes 2 and 3 are marked FULL GAME. Selecting either opens the upgrade
+- Episodes 2 and 3 are slightly faded. Selecting either opens the upgrade
   screen instead of the difficulty menu. Direct episode startup is guarded too.
 - Quit and the native window close button open the same screen. Its secondary
   button becomes QUIT GAME; Escape/controller B cancels quitting.
