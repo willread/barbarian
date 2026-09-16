@@ -5,6 +5,7 @@ var tier=-1
 var time=0.0
 var bounds={}
 var fire_height=1.0
+var fire_width=1.0
 var impact_age=10.0
 var score_age=10.0
 var last_score=0.0
@@ -53,10 +54,14 @@ func _process(dt):
    var target_height=36
    mask.resize(maxi(1,int(float(used.size.x)*target_height/used.size.y)),target_height,Image.INTERPOLATE_LANCZOS)
    fire_height=target_height
+   fire_width=mask.get_width()
    fire.setup(ImageTexture.create_from_image(mask),Vector2(mask.get_size()),-Vector2(mask.get_size())*.5,false)
  if fire:
-  fire.scale=Vector2.ONE*combo_height()/fire_height
-  fire.position=Vector2(162,55-combo_height()*.5)+unrest()
+  var height=combo_height()
+  var ink=bounds["x%d"%game.combo.multiplier()]
+  var width=height*ink.size.x/ink.size.y
+  fire.scale=Vector2(width/fire_width,height/fire_height)
+  fire.position=Vector2(186-width*.5,55-height*.5)+unrest()
   fire.strength=.3+(tier-5)*.06+exp(-impact_age*7.)*.15
   fire.interior=.025+(tier-5)*.025
   fire.animation_speed=1.0+(tier-5)*.04
@@ -74,7 +79,7 @@ func combo_height() -> float:
 func unrest() -> Vector2:
  var burst=exp(-impact_age*7.)*(1.+tier*.6)
  var idle=maxf(0.,tier-4)*.15
- return Vector2(sin(time*43),cos(time*37)*.6)*(burst+idle)
+ return Vector2(0,cos(time*37)*.6)*(burst+idle)
 func _draw():
  if not game or game.phase=="title":return
  var ink=Color(1.8,1.7,1.35)
@@ -91,7 +96,7 @@ func _draw():
   widest=maxf(widest,float(bounds[digit].size.x)/bounds[digit].size.y)
  var height=minf(25.0,(advance-2.0)/widest)
  for i in digits.length():stone(digits[i],Vector2(i*advance,55-height*.5),height,advance,ink,false,true)
- stone("x%d"%game.combo.multiplier(),Vector2(162,55-combo_height()*.5)+unrest(),combo_height(),54,combo_color(tier))
+ stone("x%d"%game.combo.multiplier(),Vector2(186,55-combo_height()*.5)+unrest(),combo_height(),54,combo_color(tier),true)
  if game.combo.hits>0 or game.combo.bonus_multiplier>1:
   var fraction=clampf(game.combo.remaining/game.combo.timeout,0.,1.)
   draw_rect(Rect2(0,62,186,2),Color(.08,.035,.025,.8))
