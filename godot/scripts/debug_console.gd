@@ -95,13 +95,16 @@ func landed():
 func execute(text: String):
  var success=false
  if game.phase=="playing":
-  success=text.to_upper() in ["TNT","HOH","EMT","KFC","CEO","FWD"]
+  success=text.to_upper() in ["TNT","HOH","EMT","ZAP","KFC","CEO","FWD"]
   match text.to_upper():
    "TNT":game.kill_visible_enemies()
    "HOH":game.unlock_candy_session()
    "EMT":
     game.hero.hp=game.hero.max
     game.displayed_health=game.hero.max
+   "ZAP":
+    game.magic=100
+    game.displayed_mana=100
    "KFC":game.summon_chicken(Vector2(clampf(game.hero.x+120,90,1300),game.hero.y))
    "CEO":travel(game.encounters.size())
    "FWD":

@@ -6,6 +6,9 @@ const TIPS=[
 	"remember to unleash your magic when the gauge is full",
 	"grab a snack when your health is low",
 	"build your score multiplier by landing hits without taking damage",
+	"Big enemy variants are immune to some attacks",
+	"If an enemy throws something at you, hit it right back",
+	"It's rumored that chickens sometimes lay golden eggs with strange powers",
 ]
 var current=""
 var cover: ColorRect

@@ -38,6 +38,12 @@ func check():
  await create_timer(1.2).timeout
  assert(game.hero.hp==game.hero.max and not paused and not console.visible)
  assert(console.feedback.stream==console.success_sound,"Successful cheat plays ka-ching")
+ game.magic=7
+ game.displayed_mana=7
+ console.toggle()
+ console.execute("zap")
+ assert(game.magic==100 and game.displayed_mana==100 and not paused,"ZAP fills mana and its HUD immediately, ignoring case")
+ assert(console.feedback.stream==console.success_sound,"ZAP plays the success sound")
  console.toggle()
  console.execute("HOH")
  assert(game.candy_override and game.weapon_skin=="candy_cane" and not paused)
