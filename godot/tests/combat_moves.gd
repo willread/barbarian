@@ -96,7 +96,9 @@ func _init():
 	assert(runner.attack.is_empty() and runner.hurtTicks==24 and runner.hp==100)
 	for i in 5:m.reaction(runner)
 	assert(runner.x<700 and runner.hurtTicks>0,"Rebound moves backward while stunned")
-	assert(m.begin(runner,"spin"),"Spin must escape charge recoil")
+	assert(runner.spinUsed and not m.begin(runner,"spin"),"Holding after a charge cannot trigger spin, including recoil")
+	runner.spinUsed=false # Attack release re-arms a new press.
+	assert(m.begin(runner,"spin"),"A fresh press can still escape charge recoil")
 	assert(runner.hurtTicks==0 and runner.recovering==0 and runner.chargeRebound==0)
 	var trapped=m.make(11,720,660,100,true)
 	m.hurt(trapped,{"direction":1,"knock":true})

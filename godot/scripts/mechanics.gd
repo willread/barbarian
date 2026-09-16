@@ -136,6 +136,7 @@ func select_strike(f: Dictionary, targets: Array) -> String:
 	return "slash"
 
 func begin(f: Dictionary, type: String) -> bool:
+	if type=="spin" and f.player and f.spinUsed:return false
 	# A held spin is the escape from hit-stun, including knockdown and charge recoil.
 	# Ordinary swings still finish before a spin; release is still required to repeat.
 	if type=="spin" and f.player and f.hp>0 and f.attack.is_empty() and f.air.is_empty() and not f.spinUsed:
@@ -154,6 +155,10 @@ func begin(f: Dictionary, type: String) -> bool:
 	var a=attacks[type].duplicate(true) if type!="spin" else {"ticks":44,"from":3,"to":33,"damage":1.2,"reach":48,"knock":true,"box":[-48,96,-47,47],"spin":true,"push":4.2}
 	a.merge({"type":type,"age":0,"elapsed":0.0,"direction":direction,"connected":false,"hits":[],"animationRate":1.0},true)
 	f.attack=a
+	# Charge consumes this held press; releasing attack re-arms the spin in game input.
+	if f.player and type=="charge":
+		f.spinUsed=true
+		f.holdTicks=0
 	if type=="slash":
 		f.lastSlash=int(f.lastSlash)^1
 		if not f.lastSlash: a.box=[20,32,-64,40]
