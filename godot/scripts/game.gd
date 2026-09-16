@@ -928,7 +928,7 @@ func resolve_slam(origin: Vector2,strike: Dictionary):
 		if enemy.hp<=0:continue
 		var delta=Vector2(enemy.x,enemy.y)-origin
 		var previous_hp=enemy.hp
-		if Vector2(delta.x/(150.0 if hero.weapon=="axe" else 187.5),delta.y/110.0).length_squared()<1.0 and enemy.down.is_empty() and not enemy.invTicks:
+		if Vector2(delta.x/150.0,delta.y/110.0).length_squared()<1.0 and enemy.down.is_empty() and not enemy.invTicks:
 			var blow=strike.duplicate()
 			blow.direction=1 if delta.x>=0 else -1
 			blow.origin_x=origin.x

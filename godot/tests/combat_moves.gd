@@ -43,10 +43,24 @@ func _init():
 	m.start_jump(sword)
 	assert(sword.velocityX==0)
 	m.begin(sword,"air")
-	assert(sword.attack.from==2 and sword.attack.box[1]>hero.attack.box[1] and sword.attack.damage<axe_damage)
+	assert(sword.attack.from==2 and sword.attack.box[1]==hero.attack.box[1] and sword.attack.damage<axe_damage)
 	var spinner=m.make(1,720,660,100,true)
 	assert(m.begin(spinner,"spin"))
 	var art=CairnArt.new()
+	# Every weapon shares Gravecleaver's collision geometry, across swing poses.
+	var baseline=m.make(300,720,660,100,true)
+	baseline.weapon_skin="gravecleaver"
+	for move in ["slash","back","spin"]:
+		baseline.attack={};m.begin(baseline,move)
+		for age in range(int(baseline.attack.from),int(baseline.attack.to)+1):
+			baseline.attack.age=age
+			var pose=art.pose(baseline)
+			var expected=art.hit_box(baseline,pose)
+			for weapon in ["axe","sword"]:
+				for skin in ["gravecleaver","blacktooth","barrow_star","gatebreaker","candy_cane"]:
+					var other=baseline.duplicate(true)
+					other.weapon=weapon;other.weapon_skin=skin
+					assert(art.hit_box(other,pose)==expected,"Weapon appearance must not change combat reach")
 	for weapon in ["axe","sword"]:
 		for facing in [-1,1]:
 			var fighter=m.make(200,720,660,100,true)

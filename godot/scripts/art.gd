@@ -144,9 +144,10 @@ func weapon_tip(f: Dictionary,p: Array) -> Vector2:
 
 func hit_box(f: Dictionary,p: Array) -> Array:
 	var r=layout(p).rig
-	var w=weapon_data(f)
+	# Cosmetic length/grip affect drawing and effect origins, never player reach.
+	var w=armory["gravecleaver"] if f.player else weapon_data(f)
 	var tip=Vector2(r.grip[0]+sin(r.angle)*w.length*w.grip,r.grip[1]-cos(r.angle)*w.length*w.grip)
-	var radius=17 if f.weapon=="axe" else 7
+	var radius=17 if f.player or f.weapon=="axe" else 7
 	var box=[(min(r.grip[0],tip.x)-radius)/4.5,(abs(tip.x-r.grip[0])+radius*2)/4.5,(min(r.grip[1],tip.y)-radius)/4.5,(abs(tip.y-r.grip[1])+radius*2)/4.5]
 	if f.player and f.attack.get("type","")=="slash":
 		# Extend only the forward edge; preserve rear coverage and floor-depth tolerance.

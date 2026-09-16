@@ -6,7 +6,7 @@ const HZ = 59.92274340431231
 const STEP = 1.0 / HZ
 const SCALE = 4.5
 const MELEE_LANE = 48.0
-const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":48}}
+const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":35}}
 const NORMAL_REACH_SCALE=1.2
 var combat_extensions=false
 var attacks: Dictionary
@@ -183,7 +183,7 @@ func begin(f: Dictionary, type: String) -> bool:
 		a.knock=f.weapon=="axe"
 		a.dive=true
 		a.lane=42
-		a.box=[-6,42 if f.weapon=="axe" else 58,-36,90]
+		a.box=[-6,42,-36,90]
 	if type=="spin":a.lane=MELEE_LANE
 	if type not in ["air","charge"]:
 		f.velocityX=0.0
