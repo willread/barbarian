@@ -49,11 +49,19 @@ func check():
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-blast-%.2f.png"%time)
-	for offset in [Vector2(251,0),Vector2(0,101),Vector2(225,80)]:
+	for offset in [Vector2(251,0),Vector2(0,181),Vector2(225,100)]:
 		hero.x=720+offset.x;hero.y=670+offset.y;hero.down={};hero.invTicks=0;hero.hp=100
 		bomb.erase("detonated")
 		combat.detonate(game,bomb)
-		assert(hero.hp==100,"Damage must stay inside warning ellipse")
+		assert(hero.hp==100,"Damage must stay inside blast footprint")
+	# Depth is ground-plane distance, not jump height. Both sides of the bomb hurt.
+	for depth in [-150.0,150.0,0.0]:
+		hero.x=720;hero.y=670+depth;hero.hp=100;hero.down={};hero.invTicks=0;hero.height=0
+		bomb.erase("detonated")
+		combat.detonate(game,bomb)
+		var expected=2.0*lerpf(14,8,absf(depth)/180.0)*game.damage_multiplier*game.difficulty_damage(true)*(100.0/48.0)*game.e_ai.damage_scale(owner)
+		assert(is_equal_approx(100-hero.hp,expected),"Front/back reach and doubled damage must agree")
+	hero.hp=100;hero.down={}
 	hero.x=720;hero.y=670;hero.invTicks=30
 	bomb.erase("detonated")
 	combat.detonate(game,bomb)

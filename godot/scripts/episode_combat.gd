@@ -1,7 +1,7 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
-const BOMB_RADIUS=Vector2(250,100)
+const BOMB_RADIUS=Vector2(250,180)
 const BOMB_GRAVITY=900.0
 const BOMB_FLIGHT=.45
 const BOMB_FUSE=1.05
@@ -486,7 +486,7 @@ func detonate(game,h: Dictionary):
 			victim["open_ticks"]=90
 			game.m.interrupt_attack(victim)
 		var direction=1 if delta.x>=0 else -1
-		game.damage(victim,{"type":"clinker","area_blast":true,"damage":lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
+		game.damage(victim,{"type":"clinker","area_blast":true,"damage":2.0*lerpf(18 if h.reflected else 14,8,distance),"origin_x":h.p.x,"direction":direction,"knock":true,"push":3.0,"reflected":h.reflected},game.hero if h.reflected else h.owner)
 		if victim.hp<before_hp:
 			var outward=Vector2(delta.x,delta.y*2).normalized() if delta.length()>1 else Vector2(direction,0)
 			victim.slamPush=outward*lerpf(700,350,distance)
