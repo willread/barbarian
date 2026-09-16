@@ -10,9 +10,14 @@ var textures: Dictionary={}
 var landing_count=0
 var generation=0
 var glyphs: Dictionary
+var feedback: AudioStreamPlayer
+var success_sound=preload("res://audio/cheat_success.ogg")
+var failure_sound=preload("res://audio/cheat_failure.ogg")
 func _ready():
  process_mode=Node.PROCESS_MODE_ALWAYS
  layer=3000
+ feedback=AudioStreamPlayer.new()
+ add_child(feedback)
  glyphs=JSON.parse_string(FileAccess.get_file_as_string("res://assets/cheat-letters.json")).menu
  for ch in glyphs:textures[ch]=game.art.texture("menu-"+glyphs[ch].id+".png")
  hide()
@@ -88,7 +93,9 @@ func landed():
   await get_tree().create_timer(.08,true).timeout
   if visible and token==generation:execute(code)
 func execute(text: String):
+ var success=false
  if game.phase=="playing":
+  success=text.to_upper() in ["TNT","HOH","EMT","KFC","CEO","FWD"]
   match text.to_upper():
    "TNT":game.kill_visible_enemies()
    "HOH":game.unlock_candy_session()
@@ -100,7 +107,14 @@ func execute(text: String):
    "FWD":
     var area=game.screen_for_wave(game.wave)
     if area<4:travel(area*3+1)
+    else:success=false
  close()
+ feedback.stop()
+ if game.muted or (not success and not game.voice_enabled):return
+ feedback.bus=&"Foley" if success else &"Voice"
+ feedback.stream=success_sound if success else failure_sound
+ feedback.volume_db=0
+ feedback.play()
 func travel(wave: int):
  game.wave=wave
  game.spawn_wave()

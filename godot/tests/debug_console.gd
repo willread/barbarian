@@ -37,6 +37,7 @@ func check():
  assert(console.letters.map(func(letter):return letter.position.x)==slots,"Different glyph widths must never move any slot")
  await create_timer(1.2).timeout
  assert(game.hero.hp==game.hero.max and not paused and not console.visible)
+ assert(console.feedback.stream==console.success_sound,"Successful cheat plays ka-ching")
  console.toggle()
  console.execute("HOH")
  assert(game.candy_override and game.weapon_skin=="candy_cane" and not paused)
@@ -59,11 +60,15 @@ func check():
  console.accept_letter("Z")
  await create_timer(1.2).timeout
  assert(not paused and not console.visible)
+ assert(console.feedback.stream==console.failure_sound,"Invalid code plays the failure voice")
+ console.feedback.stop()
+ console.feedback.stream=null
  console.toggle()
  console.accept_letter("E")
  console.close()
  await create_timer(.7).timeout
  assert(not paused and not console.visible)
+ assert(console.feedback.stream==null and not console.feedback.playing,"Cancellation produces no result sound")
  var brute=game.m.make(900,820,660,100)
  brute.variant="brute"
  brute.size=1.18
