@@ -58,6 +58,7 @@ var cursor_input=preload("res://scripts/cursor_input.gd").new()
 var shareware=OS.has_feature("shareware")
 var upgrade_view: CanvasLayer
 var episode_intro: CanvasLayer
+var controls_hint: CanvasLayer
 var music_player_view: CanvasLayer
 var controls_view: CanvasLayer
 var results_view: CanvasLayer
@@ -251,6 +252,9 @@ func _ready():
 	pause_skull.top_level=true
 	pause_skull.z_index=2110
 	add_child(pause_skull)
+	controls_hint=preload("res://scripts/controls_hint.gd").new()
+	controls_hint.game=self
+	add_child(controls_hint)
 	hero=make_actor(720,660,100,true)
 	loading_menu=OS.has_feature("web")
 	change_phase("title")
@@ -1140,6 +1144,8 @@ func tick(dt: float):
 func _process(raw: float):
 	if is_instance_valid(episode_intro):return
 	if not art: return
+	controls_hint.advance(minf(raw,.25))
+	if controls_hint.active:return
 	responsive_layout()
 	for child in get_children():
 		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
@@ -1259,6 +1265,7 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	if is_instance_valid(controls_hint) and controls_hint.active:return
 	if is_instance_valid(upgrade_view):return
 	if is_instance_valid(episode_intro):
 		episode_intro.handle(event)

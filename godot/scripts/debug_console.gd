@@ -24,7 +24,7 @@ func _ready():
 func toggle():
  if visible:
   close()
- elif game.phase=="playing":
+ elif game.phase=="playing" and not get_tree().paused:
   previous_pause=get_tree().paused
   get_tree().paused=true
   code=""

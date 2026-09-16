@@ -56,6 +56,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/music_player.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/controls_hint.gd']);
  run(binary,['--headless','--path','godot','--script','tests/shareware.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episode_intro.gd']);
  run(binary,['--headless','--path','godot','--script','tests/epilogue.gd']);
