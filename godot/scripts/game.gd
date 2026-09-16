@@ -492,7 +492,7 @@ func close_hall():
 		menu.visible=true
 		menu.select(1,false)
 
-func finish_run(outcome: String):
+func finish_run(outcome: String,show_results: bool=true):
 	if run_stats.is_empty():return
 	if finished_run.is_empty():
 		var snapshot=run_stats.duplicate(true)
@@ -500,7 +500,7 @@ func finish_run(outcome: String):
 		snapshot.merge({"score":int(score),"kills":kills,"episode":current_episode,"difficulty":difficulty,"area":mini(4,1+int((wave-1)/3)),"outcome":outcome},true)
 		finished_run=records.finish(snapshot)
 		if outcome=="won":unlock_episode_weapon(current_episode)
-	if is_instance_valid(results_view):return
+	if not show_results or is_instance_valid(results_view):return
 	results_view=preload("res://scripts/results_view.gd").new()
 	results_view.art=art
 	results_view.result=finished_run
@@ -583,7 +583,7 @@ func difficulty_damage(taken: bool) -> float:
 func begin_epilogue():
 	if is_instance_valid(episode_intro):return
 	# Save the victory before the cinematic; closing or skipping cannot lose it.
-	finish_run("won")
+	finish_run("won",false)
 	episode_intro=preload("res://scripts/episode_intro.gd").new()
 	episode_intro.game=self
 	episode_intro.ending=true

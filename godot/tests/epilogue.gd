@@ -18,6 +18,7 @@ func check():
 	assert(is_instance_valid(scene) and scene.ending,"Episode 3 follows YOU WIN with the epilogue")
 	scene.set_process(false)
 	assert(game.finished_run.outcome=="won" and game.records.board(CairnRunRecords.episode_scope(3)).runs.size()==1,"Victory is saved before the ending")
+	assert(not is_instance_valid(game.results_view),"Results and falling menu blocks must not exist during the epilogue")
 	assert(scene.caption_at(.5)=="I missed you, kid.")
 	for track in game.audio.tracks:assert(not track.playing)
 	assert(scene.ending_music.playing and scene.ending_music.stream.resource_path.ends_with("homeward-lastlight.ogg"),"Last Light replaces combat music for the epilogue")
@@ -26,6 +27,7 @@ func check():
 	assert(is_equal_approx(db_to_linear(scene.ending_music.volume_db-normal_db),.7))
 	scene.age=18.5;scene._process(.01)
 	assert(scene.player.playing)
+	assert(not is_instance_valid(game.results_view),"Results remain deferred throughout the cutscene")
 	if "--capture" in OS.get_cmdline_user_args():
 		for time in [1.5,10.0,19.0]:
 			scene.age=time;scene._process(0)
