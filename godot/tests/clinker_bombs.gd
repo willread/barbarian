@@ -20,7 +20,18 @@ func check():
 	assert(hero.hp==100 and hero.down.is_empty(),"Fuse cannot deal early damage")
 	combat.sync_views(game,0)
 	assert(combat.bomb_views.size()==1)
+	var view=combat.bomb_views[0]
+	assert(view.body.texture!=null and view.ground_light.enabled and view.object_light.enabled)
+	assert(view.ground_light.range_z_max==0 and view.object_light.range_z_max<game.hud.z_index,"Bomb lights exclude HUD")
+	var low_energy=view.ground_light.energy
+	var raised=bomb.duplicate()
+	raised.reflected=true;raised.launch_height=150.0;raised.flight_age=0.0
+	view.configure(raised)
+	assert(view.ground_light.energy<low_energy*.3,"Airborne source dims its floor illumination")
+	assert(view.object_light.position.y<-150,"Object lighting follows the airborne core")
+	view.configure(bomb)
 	if "--bomb-capture" in OS.get_cmdline_user_args():
+		game._process(0)
 		await process_frame
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-warning.png")
