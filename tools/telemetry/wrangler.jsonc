@@ -1,6 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cairn-telemetry",
+  "account_id": "654d1ada7d21f5018eb5141fc3a16d44",
+  "routes": [{ "pattern": "cairn.haqt.com", "custom_domain": true }],
   "main": "src/worker.mjs",
   "compatibility_date": "2026-09-01",
   "workers_dev": false,
@@ -15,8 +17,12 @@
   "d1_databases": [{
     "binding": "DB",
     "database_name": "cairn-telemetry",
-    "database_id": "00000000-0000-0000-0000-000000000000",
+    "database_id": "fb7fa55b-8eeb-4e11-a7ae-87552fdfc689",
     "migrations_dir": "migrations"
   }],
+  "ratelimits": [
+    { "name": "INGEST_LIMITER", "namespace_id": "9162601", "simple": { "limit": 30, "period": 60 } },
+    { "name": "INGEST_TOTAL_LIMITER", "namespace_id": "9162602", "simple": { "limit": 600, "period": 60 } }
+  ],
   "triggers": { "crons": ["0 4 * * *"] }
 }

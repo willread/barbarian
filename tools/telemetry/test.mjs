@@ -21,7 +21,8 @@ function database() {
   };
   return { db, binding };
 }
-function request(payload, extra = {}) { return new Request('https://stats.example/v1/attempt', { method: 'POST', headers: { 'Content-Type': 'application/json', ...extra }, body: JSON.stringify(payload) }); }
+const limits = () => ({ INGEST_LIMITER: { limit: async () => ({ success: true }) }, INGEST_TOTAL_LIMITER: { limit: async () => ({ success: true }) } });
+function request(payload, extra = {}) { return new Request('https://stats.example/v1/attempt', { method: 'POST', headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.1', ...extra }, body: JSON.stringify(payload) }); }
 test('rejects identifiers, arbitrary dimensions, invalid and oversized counters', () => {
   for (const change of [{ player_id: '123' }, { timestamp: 123 }, { episode: 4 }, { score: 4500 }, { moves: { normal: -1 } }, { moves: { normal: 10001 } }, { moves: { normal: 0.5 } }, { moves: { custom: 1 } }, { features: { controls: 'yes' } }]) {
     assert.throws(() => aggregate({ ...sample(), ...change }));
@@ -29,7 +30,7 @@ test('rejects identifiers, arbitrary dimensions, invalid and oversized counters'
 });
 test('valid submissions merge into independent totals without raw attempt rows', async () => {
   const { db, binding } = database();
-  const env = { DB: binding, COLLECTION_ENABLED: 'true' };
+  const env = { DB: binding, COLLECTION_ENABLED: 'true', ...limits() };
   assert.equal((await worker.fetch(request(sample()), env)).status, 204);
   assert.equal((await worker.fetch(request({ ...sample(), outcome: 'died' }), env)).status, 204);
   const rows = db.prepare('SELECT * FROM totals').all();
@@ -43,13 +44,13 @@ test('disabled collection performs no database work', async () => {
   assert.equal((await worker.fetch(request(sample()), {})).status, 204);
 });
 test('rejects malformed, oversized and unapproved browser requests before writing', async () => {
-  const env = { COLLECTION_ENABLED: 'true' };
+  const env = { COLLECTION_ENABLED: 'true', ...limits() };
   assert.equal((await worker.fetch(request({ ...sample(), identifier: 'no' }), env)).status, 400);
   assert.equal((await worker.fetch(request({ extra: 'x'.repeat(5000) }), env)).status, 400);
   assert.equal((await worker.fetch(request(sample(), { Origin: 'https://unapproved.example' }), env)).status, 403);
 });
 test('database failure returns retryable service error without leaking details', async () => {
-  const result = await worker.fetch(request(sample()), { COLLECTION_ENABLED: 'true', DB: { batch() { throw Error('private'); }, prepare() { return { bind() {} }; } } });
+  const result = await worker.fetch(request(sample()), { COLLECTION_ENABLED: 'true', ...limits(), DB: { batch() { throw Error('private'); }, prepare() { return { bind() {} }; } } });
   assert.equal(result.status, 503);
   assert.equal(await result.text(), 'Temporarily unavailable');
 });
@@ -81,4 +82,15 @@ test('Access signature, audience, issuer and expiration are enforced', async () 
   }
   const unrelated = await generateKeyPair('RS256');
   await assert.rejects(verifyAccessToken(await sign(issuer, 'dashboard', '5m'), issuer, 'dashboard', unrelated.publicKey));
+});
+test('ingestion fails closed when limits are missing, exceeded or unavailable', async () => {
+  assert.equal((await worker.fetch(request(sample()), { COLLECTION_ENABLED: 'true' })).status, 503);
+  for (const name of ['INGEST_LIMITER', 'INGEST_TOTAL_LIMITER']) {
+    const env = { COLLECTION_ENABLED: 'true', ...limits(), [name]: { limit: async () => ({ success: false }) } };
+    const rejected = await worker.fetch(request(sample()), env);
+    assert.equal(rejected.status, 429);
+    assert.equal(rejected.headers.get('Retry-After'), '60');
+    env[name].limit = async () => { throw Error('unavailable'); };
+    assert.equal((await worker.fetch(request(sample()), env)).status, 503);
+  }
 });

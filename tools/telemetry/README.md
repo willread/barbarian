@@ -2,6 +2,8 @@
 
 An independent Cloudflare Worker + D1 service. The game is **not yet instrumented** and collection ships disabled. Nothing in this folder publishes automatically or changes the game build.
 
+Configured hostname: `cairn.haqt.com`. Dashboard: `https://cairn.haqt.com/admin`. Collector: `https://cairn.haqt.com/v1/attempt`. Browser origins remain empty because the current game is native; do not add a wildcard. Access team domain and audience must be filled in from the actual Access application before dashboard login works.
+
 ## Local development
 
 From this folder:
@@ -25,7 +27,7 @@ The local endpoint is http://127.0.0.1:8787/v1/attempt. `/admin` intentionally d
 6. Run `npm run db:remote`, `npm run check`, then `npm run deploy` when ready to publish. Open `https://<your-domain>/admin` and verify Access authentication and JSON export. Verify direct unauthenticated requests to both admin routes are denied.
 7. Before enabling collection, review the actual metric schema, applicable consent/default policy, Cloudflare data processing terms, security logs and retention. Set `COLLECTION_ENABLED` to `true` only when the client preferences and disclosure are implemented.
 
-Use a Cloudflare WAF rate-limit rule on `POST /v1/attempt` before public release and budget alerts. IP-based edge rate limiting processes IPs; account for that separately from analytics. An anonymous public collector cannot prove submissions came from genuine players. Do not embed an API secret in the game: it would be extractable. Deliberate spoofing and duplicate reports remain possible.
+The Worker enforces 30 submission attempts per source IP per minute and 600 total per minute **per Cloudflare location** using native rate-limit bindings. Both run before reading the body or writing D1; missing/failed bindings deny collection. These are approximate limits, not global spending caps. Shared-IP players can share the limit. IPs are processed transiently by Cloudflare's limiter and never stored in D1. Add account budget alerts and consider an upstream WAF rule before public release; Worker limits cannot prevent all request charges or distributed abuse. An anonymous public collector cannot prove submissions came from genuine players. Do not embed an API secret in the game: it would be extractable. Deliberate spoofing and duplicate reports remain possible.
 
 ## Client contract
 

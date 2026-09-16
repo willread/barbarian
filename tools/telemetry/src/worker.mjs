@@ -36,6 +36,16 @@ export default {
       if (request.method === 'OPTIONS') return response(null, 204, { ...cors, 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type' });
       if (request.method !== 'POST') return response('Method not allowed', 405, { ...cors, Allow: 'POST' });
       if (env.COLLECTION_ENABLED !== 'true') return response(null, 204, cors);
+      // Network metadata is used transiently for abuse prevention, never analytics.
+      // These approximate limits apply per Cloudflare location, not globally.
+      try {
+        const source = request.headers.get('CF-Connecting-IP');
+        if (!source || !env.INGEST_LIMITER || !env.INGEST_TOTAL_LIMITER) return response('Temporarily unavailable', 503, cors);
+        const perSource = await env.INGEST_LIMITER.limit({ key: source });
+        if (!perSource.success) return response('Rate limited', 429, { ...cors, 'Retry-After': '60' });
+        const total = await env.INGEST_TOTAL_LIMITER.limit({ key: 'cairn-attempts' });
+        if (!total.success) return response('Rate limited', 429, { ...cors, 'Retry-After': '60' });
+      } catch { return response('Temporarily unavailable', 503, cors); }
       if (url.search || request.headers.get('Content-Type')?.split(';')[0].trim() !== 'application/json') return response('Invalid request', 400, cors);
       let payload, metrics;
       try { payload = await bodyJSON(request); metrics = aggregate(payload); }
