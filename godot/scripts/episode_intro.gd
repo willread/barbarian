@@ -18,6 +18,7 @@ var player: AudioStreamPlayer
 var picture=preload("res://art/intro/revenge-panorama-v1.png")
 var font=preload("res://art/controls/cinzel.ttf")
 var captions: Array=[]
+var previous_music_gain=1.0
 
 func _ready():
 	if ending:
@@ -42,11 +43,11 @@ func _ready():
 	add_child(sting)
 	var subtitles=JSON.parse_string(FileAccess.get_file_as_string("res://art/ending/subtitles.json" if ending else "res://art/intro/subtitles.json"))
 	captions=subtitles
-	game.audio.music_preview=true
+	previous_music_gain=game.audio.cutscene_music_gain
+	game.audio.cutscene_music_gain=previous_music_gain*.7
 	game.audio.stop_gameplay()
 	game.hero_voice.reset()
 	game.hero_voice.set_process(false)
-	for track in game.audio.tracks:track.stop()
 	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN
 
 func _process(dt: float):
@@ -105,12 +106,12 @@ func finish():
 	done=true
 	player.stop()
 	sting.stop()
-	game.audio.music_preview=false
+	game.audio.cutscene_music_gain=previous_music_gain
 	finished.emit()
 
 func _exit_tree():
 	player.stop()
 	sting.stop()
 	if is_instance_valid(game):
-		if is_instance_valid(game.audio):game.audio.music_preview=false
+		if is_instance_valid(game.audio):game.audio.cutscene_music_gain=previous_music_gain
 		if is_instance_valid(game.hero_voice):game.hero_voice.set_process(true)

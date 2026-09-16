@@ -6,13 +6,17 @@ func check():
 	game.set_process(false)
 	game.audio.set_process(false)
 	game.loading_menu=false
+	game.audio.unlocked=true;game.muted=false;game.music_enabled=true
 	game.current_episode=1
 	game.audio.tracks[0].play()
 	game.begin_episode()
 	var intro=game.episode_intro
 	intro.set_process(false)
-	assert(is_instance_valid(intro) and game.audio.music_preview)
-	for track in game.audio.tracks:assert(not track.playing)
+	assert(is_instance_valid(intro) and not game.audio.music_preview)
+	assert(game.audio.tracks[0].playing,"Existing music continues through the intro")
+	game.audio._process(2.0)
+	var normal_db=-10.0+game.audio.volumes.get("music_menu",0.0)
+	assert(is_equal_approx(db_to_linear(game.audio.tracks[0].volume_db-normal_db),.7),"Music plays at 70 percent amplitude")
 	var before=game.clock
 	game._process(.2)
 	assert(game.clock==before,"Gameplay stays frozen under the opening")
@@ -40,7 +44,7 @@ func check():
 	intro._process(.02)
 	assert(intro.done and not intro.player.playing and not intro.sting.playing)
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing" and game.wave==1)
-	assert(not game.audio.music_preview)
+	assert(not game.audio.music_preview and game.audio.cutscene_music_gain==1.0)
 	await process_frame
 	game.begin_episode()
 	intro=game.episode_intro
@@ -55,5 +59,6 @@ func check():
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing")
 	game.queue_free()
 	await process_frame
-	print("CAIRN_INTRO_OK: episode gate, frozen gameplay, exclusive narration, subtitles, completion and controller skip")
+	await create_timer(.15).timeout
+	print("CAIRN_INTRO_OK: episode gate, frozen gameplay, continuous ducked music, subtitles, completion and controller skip")
 	quit()

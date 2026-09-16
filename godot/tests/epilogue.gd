@@ -6,8 +6,11 @@ func check():
 	game.set_process(false)
 	game.records=CairnRunRecords.new("")
 	game.current_episode=3
+	game.audio.unlocked=true;game.muted=false;game.music_enabled=true;game.loading_menu=false
 	game.start_game()
 	game.stage_walk="";game.transition=-1
+	game.audio._process(2.0)
+	assert(game.audio.tracks[3].playing)
 	game.begin_victory()
 	game.victory_age=4.7
 	game._process(.2)
@@ -16,7 +19,10 @@ func check():
 	scene.set_process(false)
 	assert(game.finished_run.outcome=="won" and game.records.board(CairnRunRecords.episode_scope(3)).runs.size()==1,"Victory is saved before the ending")
 	assert(scene.caption_at(.5)=="I missed you, kid.")
-	for track in game.audio.tracks:assert(not track.playing)
+	assert(game.audio.tracks[3].playing,"Episode music continues into the epilogue")
+	game.audio._process(2.0)
+	var normal_db=-10.0+game.audio.volumes.get("music_game",0.0)
+	assert(is_equal_approx(db_to_linear(game.audio.tracks[3].volume_db-normal_db),.7))
 	scene.age=18.5;scene._process(.01)
 	assert(scene.player.playing)
 	if "--capture" in OS.get_cmdline_user_args():
@@ -27,6 +33,7 @@ func check():
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/ending-%.1f.png"%time)
 	scene.age=21.99;scene._process(.02)
 	assert(scene.done and not scene.player.playing and game.phase=="won")
+	assert(game.audio.cutscene_music_gain==1.0,"Normal music gain returns after the cutscene")
 	assert(is_instance_valid(game.results_view) and not is_instance_valid(game.episode_intro))
 	assert(game.records.board(CairnRunRecords.episode_scope(3)).runs.size()==1,"Returning to results cannot duplicate the victory")
 	await process_frame
@@ -37,5 +44,5 @@ func check():
 	assert(scene.done and game.phase=="won")
 	game.queue_free()
 	await process_frame
-	print("CAIRN_EPILOGUE_OK: after victory, saved result, exclusive narration, subtitle, finish and skip")
+	print("CAIRN_EPILOGUE_OK: after victory, saved result, continuous ducked music, subtitle, finish and skip")
 	quit()

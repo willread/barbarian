@@ -14,6 +14,7 @@ var voices: Array=[]
 var tracks: Array=[]
 var gates: Dictionary={}
 var music_preview=false
+var cutscene_music_gain=1.0
 var unlocked=false
 var last_spell=-1
 var chicken_clock=0.0
@@ -164,6 +165,7 @@ func _process(dt: float):
 		var track=tracks[i]
 		var selected=game.music_enabled and i==(0 if game.phase=="title" else game.current_episode)
 		var target=-10.0+volumes.get("music_menu" if i==0 else "music_game",0.0) if audible and selected else -60.0
+		if audible and selected:target+=linear_to_db(cutscene_music_gain)
 		if game.phase in ["paused","dying","lost","won"]:target-=8
 		track.volume_db=move_toward(track.volume_db,target,dt*35)
 		if audible and selected and track.stream and not track.playing:track.play()

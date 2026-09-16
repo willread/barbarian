@@ -18,3 +18,7 @@ muscular bare back, fur/leather clothing and low-carried axe, walking beside his
 one unharmed white goat. Gentle reunion after revenge. Fine crosshatching,
 black dry-brush silhouettes and gray washes on warm paper; no text or panels.
 Vertical framing keeps their feet above the subtitle strip.
+
+The existing music continues without restarting during the cutscene at 70%
+of its normal amplitude (about -3.1 dB), then restores the normal mix on exit.
+Narration and the opening guitar sting keep their own levels.

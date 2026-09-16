@@ -26,3 +26,7 @@ The original sound and generation prompt are in `soundboard/cutscenes/`.
 
 Only a fresh Episode 1 selection plays the introduction. Retrying after death
 goes directly to gameplay. Other episodes retain their existing entrances.
+
+The existing music continues without restarting during the cutscene at 70%
+of its normal amplitude (about -3.1 dB), then restores the normal mix on exit.
+Narration and the opening guitar sting keep their own levels.
