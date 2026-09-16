@@ -24,7 +24,14 @@ func check():
 		await process_frame
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/controls-hint.png")
-	hint.choose()
+	game.muted=false
+	var key=InputEventKey.new();key.pressed=true;key.keycode=KEY_TAB
+	hint._input(key)
+	assert(hint.canvas.selected==1)
+	key.shift_pressed=true;hint._input(key)
+	assert(hint.canvas.selected==0)
+	key.shift_pressed=false;key.keycode=KEY_ENTER;hint._input(key)
+	assert(hint.click.playing and hint.click.stream==game.audio.clips.menu_select,"Keyboard activation plays menu select while paused")
 	assert(is_instance_valid(hint.controls) and paused,"Viewing controls keeps gameplay paused")
 	var cancel=InputEventKey.new();cancel.keycode=KEY_ESCAPE;cancel.pressed=true
 	hint._input(cancel)
