@@ -550,6 +550,29 @@ func clear_world():
 func enemy_cap() -> int:
 	return NORMAL_ENEMY_CAP+(-1 if difficulty=="easy" else 1 if difficulty=="hard" else 0)
 
+func chicken_heal_fraction() -> float:
+	return 1.0 if difficulty=="easy" else .25 if difficulty=="hard" else .5
+
+func engaged_enemies() -> Array:
+	var engaged=[]
+	for side in [-1,1]:
+		var nearest={}
+		for f in enemies:
+			if f.hp>0 and f.down.is_empty() and sign(f.x-hero.x)==side:
+				if nearest.is_empty() or abs(f.x-hero.x)<abs(nearest.x-hero.x): nearest=f
+		if not nearest.is_empty(): engaged.append(nearest.id)
+	# Hard adds one intermittent melee challenger, with breathing room between pushes.
+	if difficulty=="hard" and hero.down.is_empty() and hero.hp>0 and fmod(wave_time,4.0)<2.6:
+		var committed=enemies.filter(func(e):return e.hp>0 and not e.attack.is_empty() and e.attack.age<=max(e.attack.from,e.attack.to))
+		if committed.size()<2:
+			var challenger={}
+			for enemy in enemies:
+				if enemy.id in engaged or enemy.boss or enemy.kind in ["archer","witch","bearer"] or enemy.hp<=0 or not enemy.down.is_empty() or enemy.hurtTicks or enemy.recovering:continue
+				var distance=Vector2(enemy.x-hero.x,(enemy.y-hero.y)*2).length()
+				if distance<520 and (challenger.is_empty() or distance<challenger.distance):challenger={"id":enemy.id,"distance":distance}
+			if not challenger.is_empty():engaged.append(challenger.id)
+	return engaged
+
 func difficulty_damage(taken: bool) -> float:
 	if difficulty=="easy":return .75 if taken else 1.25
 	if difficulty=="hard":return 1.25 if taken else .75
@@ -984,13 +1007,7 @@ func tick(dt: float):
 		hero.attack.box=art.hit_box(hero,art.pose(temp))
 	m.tick_attack(hero,enemies,damage)
 	pressed.clear()
-	var engaged=[]
-	for side in [-1,1]:
-		var nearest={}
-		for f in enemies:
-			if f.hp>0 and f.down.is_empty() and sign(f.x-hero.x)==side:
-				if nearest.is_empty() or abs(f.x-hero.x)<abs(nearest.x-hero.x): nearest=f
-		if not nearest.is_empty(): engaged.append(nearest.id)
+	var engaged=engaged_enemies()
 	for f in enemies:
 		if f.hp<=0: continue
 		var enemy_before=Vector2(f.x,f.y)
@@ -1436,7 +1453,7 @@ func step_chicken(dt: float):
 			p.collected=true
 			c.picked=true
 			audio.play("gulp",-3)
-			hero.hp=hero.max
+			hero.hp=minf(hero.max,hero.hp+hero.max*chicken_heal_fraction())
 		if p.age>=1.2:
 			remove_chicken()
 			hero.pickup={}
@@ -1807,8 +1824,9 @@ func integration_test():
 	hero.hurtTicks=0
 	step_chicken(m.STEP)
 	assert(not hero.pickup.is_empty())
+	var food_health=hero.hp
 	for i in 76: step_chicken(m.STEP)
-	assert(hero.hp==100 and chicken.is_empty())
+	assert(hero.hp==minf(hero.max,food_health+hero.max*chicken_heal_fraction()) and chicken.is_empty())
 	# A final enemy can finish burning while the player is still diving.
 	hero.recovering=0
 	hero.attack={}

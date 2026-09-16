@@ -27,6 +27,28 @@ func check():
   assert(is_equal_approx(100-foe.hp,10*game.damage_multiplier*outgoing))
   game.damage(game.hero,{"damage":2,"direction":-1},foe)
   assert(is_equal_approx(100-game.hero.hp,2*game.damage_multiplier*100/48*incoming))
+  game.hero.hp=10;game.hero.down={};game.hero.hurtTicks=0;game.hero.attack={};game.hero.air={}
+  game.summon_chicken()
+  game.roast_chicken(1)
+  game.hero.pickup={"age":.9,"collected":false,"start_x":game.hero.x}
+  game.step_chicken(.03)
+  assert(is_equal_approx(game.hero.hp,{"easy":100.0,"normal":60.0,"hard":35.0}[setting]),"Chicken healing follows difficulty")
+  game.step_chicken(.03)
+  assert(is_equal_approx(game.hero.hp,{"easy":100.0,"normal":60.0,"hard":35.0}[setting]),"Food heals once")
+  game.remove_chicken();game.hero.pickup={}
+  game.hero.x=720;game.hero.y=660;game.wave_time=1
+  game.enemies=[]
+  for x in [600,820,930,1040]:
+   var enemy=game.make_actor(x,660,20)
+   enemy.kind="bone"
+   game.enemies.append(enemy)
+  assert(game.engaged_enemies().size()==(3 if setting=="hard" else 2))
+  if setting=="hard":
+   game.wave_time=3
+   assert(game.engaged_enemies().size()==2,"Hard pressure has a breathing interval")
+   game.wave_time=1
+   for i in 2:game.m.begin(game.enemies[i],"slash")
+   assert(game.engaged_enemies().size()==2,"Do not add a challenger over two committed attacks")
   game.score=1234
   game.finish_run("lost")
   assert(game.finished_run.difficulty==setting and game.finished_run.score==1234,"Difficulty is recorded without a score multiplier")
