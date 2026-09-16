@@ -319,11 +319,12 @@ func step_scream(game,enemy: Dictionary,a: Dictionary):
 		game.shake=maxf(game.shake,5)
 	if a.age>a.to or a.get("scorched",false):return
 	var hero=game.hero
-	var dx=(hero.x-enemy.x)*a.direction
-	if hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and hero.height<50 and dx>-55 and dx<225 and absf(hero.y-enemy.y)<65:
-		a.scorched=true
+	if hero.hp>0 and hero.invTicks==0 and hero.down.is_empty() and preload("res://scripts/scream_shape.gd").hits(enemy,hero,a.age):
+		var before=hero.hp
 		game.damage(hero,{"type":"hellScream","damage":11,"direction":a.direction,"knock":true,"push":3.5},enemy)
-		hero.invTicks=maxi(hero.invTicks,45)
+		if hero.hp<before:
+			a.scorched=true
+			hero.invTicks=maxi(hero.invTicks,45)
 
 func strike_bomb(game,h: Dictionary,a: Dictionary):
 	var hero=game.hero

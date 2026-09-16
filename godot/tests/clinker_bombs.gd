@@ -170,6 +170,11 @@ func check():
 		await process_frame
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bearer-scream.png")
+	for sample in [[48,260,true],[70,100,true],[78,100,false],[35,100,false],[48,-100,false],[48,360,false]]:
+		owner.attack.age=sample[0];owner.attack.erase("scorched")
+		hero.x=owner.x+sample[1];hero.hp=100;hero.down={};hero.invTicks=0;hero.attack={}
+		combat.step_scream(game,owner,owner.attack)
+		assert((hero.hp<100)==sample[2],"Flame envelope must cover its visible reach and fading tail")
 	owner.attack={}
 	combat.sync_views(game,0)
 	assert(combat.scream_views.is_empty())
