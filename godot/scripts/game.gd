@@ -55,6 +55,8 @@ var master_volume=100
 var loading_menu=false
 var bindings=CairnBindings.new()
 var cursor_input=preload("res://scripts/cursor_input.gd").new()
+var shareware=OS.has_feature("shareware")
+var upgrade_view: CanvasLayer
 var episode_intro: CanvasLayer
 var music_player_view: CanvasLayer
 var controls_view: CanvasLayer
@@ -220,6 +222,10 @@ func _ready():
 	add_child(menu)
 	menu.top_level=true
 	menu.setup(art)
+	menu.restricted=func(label):return shareware and (label.begins_with("EP 2:") or label.begins_with("EP 3:"))
+	if shareware:
+		get_tree().auto_accept_quit=false
+		get_window().close_requested.connect(request_quit)
 	menu.unavailable=func(label):return label=="HALL OF LEGENDS" and records.board(CairnRunRecords.episode_scope(current_episode)).runs.is_empty()
 	menu.activated.connect(menu_action)
 	menu.sound_requested.connect(func(id):
@@ -412,6 +418,9 @@ func menu_action(label: String):
 			chapter_select=true
 			menu.switch_items(["EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS","BACK"],true)
 		"EP 1: THE FALLEN CITADEL","EP 2: THE SUNKEN WILDS","EP 3: THE ASHEN DEPTHS":
+			if shareware and int(label.substr(3,1))>1:
+				show_upgrade()
+				return
 			current_episode=int(label.substr(3,1))
 			chapter_select=false
 			difficulty_select=true
@@ -460,12 +469,7 @@ func menu_action(label: String):
 		"FULLSCREEN: ON","FULLSCREEN: OFF":
 			toggle_fullscreen()
 		"RETURN TO BATTLE": change_phase("playing")
-		"QUIT":
-			if OS.has_feature("web"):
-				JavaScriptBridge.eval("window.close(); setTimeout(() => alert('You can close this tab to quit Cairn.'), 100);")
-			else:
-				WindowPreferences.save_window()
-				get_tree().quit()
+		"QUIT": request_quit()
 		"QUIT TO TITLE":
 			clear_world()
 			if is_instance_valid(wipe): wipe.queue_free()
@@ -580,6 +584,30 @@ func difficulty_damage(taken: bool) -> float:
 	if difficulty=="hard":return 1.25 if taken else .75
 	return 1.0
 
+func request_quit():
+	if shareware:show_upgrade(true)
+	else:quit_game()
+
+func quit_game():
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.close(); setTimeout(() => alert('You can close this tab to quit Cairn.'), 100);")
+	else:
+		WindowPreferences.save_window()
+		get_tree().quit()
+
+func show_upgrade(quitting: bool=false):
+	if is_instance_valid(upgrade_view):return
+	upgrade_view=preload("res://scripts/shareware_screen.gd").new()
+	upgrade_view.game=self
+	upgrade_view.quitting=quitting
+	add_child(upgrade_view)
+	upgrade_view.closed.connect(func():
+		upgrade_view.queue_free()
+		upgrade_view=null
+		update_mouse_cursor())
+	upgrade_view.quit_requested.connect(quit_game)
+	Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
+
 func begin_epilogue():
 	if is_instance_valid(episode_intro):return
 	# Save the victory before the cinematic; closing or skipping cannot lose it.
@@ -607,6 +635,10 @@ func begin_episode():
 		start_game())
 
 func start_game():
+	if shareware and current_episode>1:
+		current_episode=1
+		show_upgrade()
+		return
 	bomb_hit_pause=0.0
 	refresh_weapon_day()
 	difficulty_select=false
@@ -1226,6 +1258,7 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	if is_instance_valid(upgrade_view):return
 	if is_instance_valid(episode_intro):
 		episode_intro.handle(event)
 		get_viewport().set_input_as_handled()
@@ -1742,6 +1775,11 @@ func draw_overlay():
 		var pivot=Vector2(center,screen_size.y*.1+size.y*.5)+arc+drift
 		overlay.draw_set_transform(pivot,0.,Vector2.ONE*zoom)
 		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
+		if shareware:
+			var tag="SHAREWARE EDITION"
+			var tag_size=maxi(14,int(size.x*.037))
+			var tag_width=serif.get_string_size(tag,HORIZONTAL_ALIGNMENT_LEFT,-1,tag_size).x
+			overlay.draw_string(serif,Vector2(-tag_width*.5,size.y*.5+tag_size),tag,HORIZONTAL_ALIGNMENT_LEFT,-1,tag_size,Color("dbb772"))
 		overlay.draw_set_transform(Vector2.ZERO)
 
 	overlay.draw_set_transform(Vector2.ZERO)

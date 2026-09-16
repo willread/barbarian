@@ -12,6 +12,7 @@
     "build": "node tools/godot/build.mjs",
     "test": "node tools/godot/build.mjs --test",
     "godot:build": "node tools/godot/build.mjs",
+    "godot:build:shareware": "node tools/godot/build.mjs --shareware",
     "godot:serve": "node tools/godot/serve.mjs",
     "godot:test": "node tools/godot/build.mjs --test",
     "level:editor": "node tools/godot/level-editor.mjs"

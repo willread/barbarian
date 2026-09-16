@@ -55,6 +55,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/music_player.gd']);
  run(binary,['--headless','--path','godot','--script','tests/pause_menu.gd']);
  run(binary,['--headless','--path','godot','--script','tests/chapter.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/shareware.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episode_intro.gd']);
  run(binary,['--headless','--path','godot','--script','tests/epilogue.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episodes.gd']);
@@ -87,11 +88,12 @@ if(process.argv.includes('--test')){
 const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--windows')?['Windows']:['Web','Windows'];
 for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
- run(binary,['--headless','--path','godot','--export-release',target,file]);
+ run(binary,['--headless','--path','godot','--export-release',target+(process.argv.includes('--shareware')?' Shareware':''),file]);
  if(target==='Windows')fs.copyFileSync('godot/native/cairn_aspect.dll',path.join(path.dirname(file),'cairn_aspect.dll'));
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
  // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);
+ run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/shareware.gd'),'--',process.argv.includes('--shareware')?'--expect-shareware':'--expect-full']);
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');

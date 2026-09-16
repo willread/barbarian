@@ -1,5 +1,8 @@
 # Shareware upgrade screen
 
+The approved concept is now implemented. See [Shareware builds](shareware-build.md)
+for the updated copy, purchase destination, controls and export commands.
+
 ## Direction
 
 A classic PC shareware end screen interpreted through Cairn's existing stone,
