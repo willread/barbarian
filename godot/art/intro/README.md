@@ -1,9 +1,9 @@
 # Episode 1 opening
 
 The static ink panorama moves left to right by one 1440-pixel viewport over
-20.5 seconds, following a 1.5-second establishing hold. The scene ends at 26
-seconds, including a fade into the normal Episode 1 entrance. Enter, Space,
-Escape, or controller A/B/Start skips after the first half-second.
+8.2 seconds, following a 0.8-second establishing hold. The scene ends at 11.5
+seconds, including a fade into the normal Episode 1 entrance. Any keyboard key, mouse button, controller button or trigger skips after the
+first half-second. No skip label is shown.
 
 The original panorama was generated with the built-in image-generation tool
 for the user's approved concept: a continuous ink-drawn landscape showing
@@ -14,12 +14,13 @@ There is no animated deformation or movement within the illustration.
 
 Narration is the user's supplied Downloads file:
 `ElevenLabs_2026-09-16T02_57_34_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3`.
-It plays unchanged, starting at 20 seconds. The user supplied the exact words;
-the subtitle change at 2.01 seconds follows the measured pause in the audio.
+The source is split at its natural pause without changing delivery: the first
+line plays at 1 second; the second at 6.4 seconds, as Cairn comes into view.
+The user supplied the exact words. Subtitles follow the separated lines.
 Subtitles are white on a solid black bottom strip and remain visible when muted.
 
-A single generated distorted guitar power-chord stab lands 1.55 seconds into
-the recording, 0.46 seconds before "Now". Its short tail ducks by 16 dB as the
+A single generated distorted guitar power-chord stab lands at 5.94 seconds,
+0.46 seconds before "Now". Its short tail ducks by 16 dB as the
 second line starts. It follows music/mute settings and stops on skip.
 The original sound and generation prompt are in `soundboard/cutscenes/`.
 

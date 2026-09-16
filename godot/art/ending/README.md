@@ -7,7 +7,8 @@ The shared ink-panorama player holds for 1.5 seconds, pans one full viewport
 width by 18 seconds, and finishes at 22 seconds. The user's newest recording,
 `ElevenLabs_2026-09-16T03_04_41_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3`,
 plays unchanged at 18.5 seconds. White subtitles on a black strip read
-"I missed you, kid." Keyboard and controller skip return to results.
+"I missed you, kid." Any key, mouse button, controller button or trigger skips to results; no skip
+label is shown.
 
 Artwork was generated using the built-in image-generation tool, referencing
 the Episode 1 opening for style and Cairn's appearance. Prompt: a continuous

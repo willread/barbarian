@@ -17,24 +17,26 @@ func check():
 	game._process(.2)
 	assert(game.clock==before,"Gameplay stays frozen under the opening")
 	assert(intro.caption_at(-.1)=="" and intro.caption_at(.5)=="They took my goat...")
-	assert(intro.caption_at(2.1)=="Now I'm going to take their lives!")
-	intro.age=20
+	assert(intro.caption_at(5.5)=="Now I'm going to take their lives!")
+	intro.age=1
 	intro._process(.01)
 	assert(intro.player.playing and intro.voice_started)
-	intro.age=21.54;intro._process(0)
+	intro.age=5.93;intro._process(0)
 	assert(not intro.sting_started,"Guitar waits for the pause before the second line")
-	intro.age=21.55;intro._process(.001)
+	intro.age=5.94;intro._process(.001)
 	assert(intro.sting_started and intro.sting.playing)
-	intro.age=22.1;intro._process(0)
+	intro.age=6.5;intro._process(0)
+	assert(intro.second_line_started and intro.player.stream.resource_path.ends_with("revenge-line-two.ogg"))
+	assert(intro.caption_at(3.0)=="","Subtitles clear between the separated lines")
 	assert(intro.sting.volume_db<=-17,"Guitar tail ducks below the spoken threat")
 	if "--capture" in OS.get_cmdline_user_args():
-		for time in [1.5,12.0,20.5,22.5]:
+		for time in [1.5,4.0,6.5,9.0]:
 			intro.age=time
 			intro._process(0)
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/intro-%.1f.png"%time)
-	intro.age=25.99
+	intro.age=11.49
 	intro._process(.02)
 	assert(intro.done and not intro.player.playing and not intro.sting.playing)
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing" and game.wave==1)
@@ -44,7 +46,7 @@ func check():
 	intro=game.episode_intro
 	intro.age=1
 	var skip=InputEventJoypadButton.new()
-	skip.button_index=JOY_BUTTON_A;skip.pressed=true
+	skip.button_index=JOY_BUTTON_RIGHT_SHOULDER;skip.pressed=true
 	game._input(skip)
 	assert(intro.done and not is_instance_valid(game.episode_intro))
 	await process_frame

@@ -1,9 +1,11 @@
 extends CanvasLayer
 signal finished
-const PAN_START=1.5
-var pan_end=22.0
-var voice_start=20.0
-var duration=26.0
+var pan_start=.8
+var pan_end=9.0
+var voice_start=1.0
+var second_line_start=6.4
+var second_line_started=false
+var duration=11.5
 var ending=false
 var game: Node2D
 var age=0.0
@@ -20,6 +22,7 @@ var captions: Array=[]
 func _ready():
 	if ending:
 		picture=load("res://art/ending/reunion-panorama-v1.png")
+		pan_start=1.5
 		pan_end=18.0
 		voice_start=18.5
 		duration=22.0
@@ -28,7 +31,7 @@ func _ready():
 	add_child(canvas)
 	canvas.draw.connect(paint)
 	player=AudioStreamPlayer.new()
-	player.stream=load("res://art/ending/reunion-voice.mp3" if ending else "res://art/intro/revenge-voice.mp3")
+	player.stream=load("res://art/ending/reunion-voice.mp3" if ending else "res://art/intro/revenge-line-one.ogg")
 	player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 	player.bus=&"Voice"
 	add_child(player)
@@ -49,14 +52,18 @@ func _ready():
 func _process(dt: float):
 	if done:return
 	age+=dt
+	player.volume_db=-80 if game.muted or not game.voice_enabled else 0
 	if age>=voice_start and not voice_started:
 		voice_started=true
 		player.play()
-	player.volume_db=-80 if game.muted or not game.voice_enabled else 0
+	if not ending and age>=second_line_start and not second_line_started:
+		second_line_started=true
+		player.stream=load("res://art/intro/revenge-line-two.ogg")
+		player.play()
 	# Hit the gap before "Now"; duck the ringing tail beneath the second line.
-	var voice_time=age-voice_start
-	sting.volume_db=-80 if game.muted or not game.music_enabled else lerpf(-1,-17,smoothstep(1.86,2.08,voice_time))
-	if not ending and voice_started and voice_time>=1.55 and not sting_started:
+	var voice_time=age-second_line_start
+	sting.volume_db=-80 if game.muted or not game.music_enabled else lerpf(-1,-17,smoothstep(-.15,.07,voice_time))
+	if not ending and voice_started and voice_time>=-.46 and not sting_started:
 		sting_started=true
 		sting.play()
 	var size=get_viewport().get_visible_rect().size
@@ -72,7 +79,7 @@ func caption_at(time: float) -> String:
 
 func paint():
 	canvas.draw_rect(Rect2(-2000,-2000,5440,4810),Color.BLACK)
-	var progress=clampf((age-PAN_START)/(pan_end-PAN_START),0,1)
+	var progress=clampf((age-pan_start)/(pan_end-pan_start),0,1)
 	var pan=smoothstep(0,1,progress)*1440.0
 	# Two screen widths of static artwork; only the camera moves.
 	var height=2880.0*picture.get_height()/picture.get_width()
@@ -83,14 +90,15 @@ func paint():
 	if not subtitle.is_empty():
 		var width=font.get_string_size(subtitle,HORIZONTAL_ALIGNMENT_LEFT,-1,30).x
 		canvas.draw_string(font,Vector2((1440-width)*.5,768),subtitle,HORIZONTAL_ALIGNMENT_LEFT,-1,30,Color.WHITE)
-	canvas.draw_string(font,Vector2(1110,40),"ENTER / A TO SKIP",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color(.8,.8,.8,.6))
 	var fade=1.0-minf(clampf(age/.7,0,1),clampf((duration-age)/.7,0,1))
 	canvas.draw_rect(Rect2(0,0,1440,810),Color(0,0,0,fade))
 
 func handle(event: InputEvent):
 	if age<.5:return
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_ENTER,KEY_SPACE,KEY_ESCAPE]:finish()
-	elif event is InputEventJoypadButton and event.pressed and event.button_index in [JOY_BUTTON_A,JOY_BUTTON_B,JOY_BUTTON_START]:finish()
+	if event is InputEventKey and event.pressed and not event.echo:finish()
+	elif event is InputEventJoypadButton and event.pressed:finish()
+	elif event is InputEventMouseButton and event.pressed:finish()
+	elif event is InputEventJoypadMotion and event.axis in [JOY_AXIS_TRIGGER_LEFT,JOY_AXIS_TRIGGER_RIGHT] and event.axis_value>.65:finish()
 
 func finish():
 	if done:return
