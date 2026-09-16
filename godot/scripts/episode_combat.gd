@@ -5,6 +5,7 @@ const BOMB_RADIUS=Vector2(250,180)
 const BOMB_GRAVITY=900.0
 const BOMB_FLIGHT=.45
 const BOMB_FUSE=.7875
+const SAINT_BOMB_FUSE=2.4 # Gives almost two seconds on the floor to line up a return.
 const SAINT_THROW_INTERVAL=18 # Three tenths of a second: grab, load, release, return.
 
 static func bomb_height(h: Dictionary) -> float:
@@ -325,7 +326,7 @@ func step(game,dt: float):
 func step_saint_volley(game,enemy: Dictionary,a: Dictionary):
 	if enemy.hp<=0:return
 	if not a.has("volley_targets"):
-		a.volley_count=5 if enemy.phaseTwo else 3
+		a.volley_count=2 if enemy.phaseTwo else 1
 		a.volley_targets=saint_volley_targets(game,a.volley_count)
 		a.ticks=a.from+(a.volley_count-1)*SAINT_THROW_INTERVAL+38
 		a.volley_released=0
@@ -334,7 +335,7 @@ func step_saint_volley(game,enemy: Dictionary,a: Dictionary):
 	while a.volley_released<due:
 		var point=a.volley_targets[a.volley_released]
 		var start=Vector2(enemy.x+enemy.dir*305*enemy.size,enemy.y)
-		hazards.append({"kind":"clinker","owner":enemy,"p":start,"start":start,"target":point,"age":0.0,"life":BOMB_FUSE,"throw_height":325.0*enemy.size,"arc_height":55.0,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
+		hazards.append({"kind":"clinker","owner":enemy,"p":start,"start":start,"target":point,"age":0.0,"life":SAINT_BOMB_FUSE,"throw_height":325.0*enemy.size,"arc_height":55.0,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
 		a.volley_released+=1
 		game.audio.play("heavy_hit",-8,1.15)
 

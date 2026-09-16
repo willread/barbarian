@@ -25,22 +25,22 @@ func check():
 		var volley=boss.attack
 		combat.step_saint_volley(game,boss,volley)
 		assert(combat.hazards.is_empty())
-		for shot in (5 if second_phase else 3):
+		for shot in (2 if second_phase else 1):
 			volley.age=volley.from+shot*combat.SAINT_THROW_INTERVAL
 			combat.step_saint_volley(game,boss,volley)
 			assert(combat.hazards.size()==shot+1,"Release exactly one core per throw")
 			combat.step_saint_volley(game,boss,volley)
 			assert(combat.hazards.size()==shot+1,"No duplicate release on repeated tick")
-		assert(combat.hazards.size()==(5 if second_phase else 3))
+		assert(combat.hazards.size()==(2 if second_phase else 1))
 		for bomb in combat.hazards:
-			assert(bomb.life==combat.BOMB_FUSE and combat.bomb_height(bomb)==325*boss.size)
+			assert(bomb.life==combat.SAINT_BOMB_FUSE and combat.bomb_height(bomb)==325*boss.size)
 			assert(bomb.target.x>=110 and bomb.target.x<=1330)
 		combat.clear()
 		boss.attack={}
 	boss.phaseTwo=false
 	hero.hurtTicks=0;hero.recovering=0;hero.down={};hero.attack={}
-	# Return a bomb during its actual short fuse; swept contact must tag this boss.
-	var bomb={"kind":"clinker","owner":boss,"p":Vector2(730,690),"start":Vector2(1040,690),"target":Vector2(730,690),"age":.50,"life":combat.BOMB_FUSE,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]}
+	# Return a bomb during its extended fuse; swept contact must tag this boss.
+	var bomb={"kind":"clinker","owner":boss,"p":Vector2(730,690),"start":Vector2(1040,690),"target":Vector2(730,690),"age":.50,"life":combat.SAINT_BOMB_FUSE,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]}
 	combat.strike_bomb(game,bomb,{"type":"slash","direction":1})
 	combat.hazards=[bomb]
 	for i in 18:combat.step(game,1.0/60)
