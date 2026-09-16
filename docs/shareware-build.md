@@ -1,5 +1,9 @@
 # Shareware builds
 
+Double-click `build-shareware.cmd` in the project folder, beside `build.cmd`.
+It builds both browser and Windows shareware editions and keeps the window open
+to show the result. Close any running Cairn windows first.
+
 Build both web and Windows editions:
 
 ```powershell
