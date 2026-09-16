@@ -10,6 +10,8 @@ var ending=false
 var game: Node2D
 var age=0.0
 var done=false
+var close_age=0.0
+var closing_skull: Sprite2D
 var voice_started=false
 var sting_started=false
 var sting_start=2.15
@@ -33,6 +35,14 @@ func _ready():
 	canvas=Node2D.new()
 	add_child(canvas)
 	canvas.draw.connect(paint)
+	closing_skull=Sprite2D.new()
+	closing_skull.texture=game.skull_node.texture
+	closing_skull.centered=false
+	closing_skull.scale=Vector2(1440.,810.)/512.
+	closing_skull.material=game.skull_node.material.duplicate()
+	closing_skull.material.set_shader_parameter("progress",1.0)
+	closing_skull.visible=false
+	add_child(closing_skull)
 	player=AudioStreamPlayer.new()
 	player.stream=load("res://art/ending/reunion-voice.mp3" if ending else "res://art/intro/revenge-line-one.ogg")
 	player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
@@ -70,7 +80,12 @@ func _ready():
 	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN
 
 func _process(dt: float):
-	if done:return
+	if done:
+		if not ending:
+			close_age+=dt
+			closing_skull.material.set_shader_parameter("progress",maxf(0,1-close_age/game.CLOSE))
+			if close_age>=game.CLOSE:complete_finish()
+		return
 	age+=dt
 	update_ending_music()
 	player.volume_db=-80 if game.muted or not game.voice_enabled else 0
@@ -109,12 +124,14 @@ func paint():
 	var height=2880.0*picture.get_height()/picture.get_width()
 	var top=-height*.18 if ending else (810-height)*.5
 	canvas.draw_texture_rect(picture,Rect2(-pan,top,2880,height),false)
-	canvas.draw_rect(Rect2(0,710,1440,100),Color.BLACK)
 	var subtitle=caption_at(age-voice_start)
 	if not subtitle.is_empty():
 		var width=font.get_string_size(subtitle,HORIZONTAL_ALIGNMENT_LEFT,-1,30).x
+		var ascent=font.get_ascent(30)
+		var descent=font.get_descent(30)
+		canvas.draw_rect(Rect2((1440-width)*.5-20,768-ascent-12,width+40,ascent+descent+24),Color(0,0,0,.8))
 		canvas.draw_string(font,Vector2((1440-width)*.5,768),subtitle,HORIZONTAL_ALIGNMENT_LEFT,-1,30,Color.WHITE)
-	var fade=1.0-minf(clampf(age/.7,0,1),clampf((duration-age)/.7,0,1))
+	var fade=1.0-minf(clampf(age/.7,0,1),clampf((duration-age)/.7,0,1) if ending else 1.0)
 	canvas.draw_rect(Rect2(0,0,1440,810),Color(0,0,0,fade))
 
 func handle(event: InputEvent):
@@ -129,6 +146,13 @@ func finish():
 	done=true
 	player.stop()
 	sting.stop()
+	if not ending:
+		closing_skull.visible=true
+		return
+	complete_finish()
+
+func complete_finish():
+	set_process(false)
 	if is_instance_valid(ending_music):ending_music.stop()
 	if ending and is_instance_valid(game.audio):game.audio.music_preview=false
 	game.audio.cutscene_music_gain=previous_music_gain

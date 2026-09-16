@@ -36,7 +36,7 @@ func check():
 	assert(intro.caption_at(3.0)=="","Subtitles clear between the separated lines")
 	assert(is_equal_approx(intro.second_line_start-intro.sting_start-intro.sting.stream.get_length(),1.0),"Full guitar clip ends one second before the second line")
 	assert(intro.sting_start>=intro.voice_start+1.1,"Guitar starts after the first line")
-	if "--capture" in OS.get_cmdline_user_args():
+	if "--intro-capture" in OS.get_cmdline_user_args():
 		for time in [1.5,4.0,6.5,9.0]:
 			intro.age=time
 			intro._process(0)
@@ -46,7 +46,12 @@ func check():
 	intro.age=intro.duration-.01
 	intro._process(.02)
 	assert(intro.done and not intro.player.playing and not intro.sting.playing)
+	assert(is_instance_valid(game.episode_intro) and game.phase=="title","Cutscene remains until skull is closed")
+	intro._process(game.CLOSE*.5)
+	assert(is_instance_valid(game.episode_intro) and intro.closing_skull.visible)
+	intro._process(game.CLOSE*.5)
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing" and game.wave==1)
+	assert(game.skull_node.visible and is_zero_approx(game.skull_node.material.get_shader_parameter("progress")),"Gameplay begins fully hidden by the same skull")
 	assert(not game.audio.music_preview and game.audio.cutscene_music_gain==1.0)
 	await process_frame
 	game.begin_episode()
@@ -55,7 +60,9 @@ func check():
 	var skip=InputEventJoypadButton.new()
 	skip.button_index=JOY_BUTTON_RIGHT_SHOULDER;skip.pressed=true
 	game._input(skip)
-	assert(intro.done and not is_instance_valid(game.episode_intro))
+	assert(intro.done and is_instance_valid(game.episode_intro))
+	intro._process(game.CLOSE)
+	assert(not is_instance_valid(game.episode_intro))
 	await process_frame
 	# The actual death-menu action must bypass the opening on every retry.
 	for retry in 2:
@@ -70,6 +77,7 @@ func check():
 	game.menu_action("NORMAL")
 	assert(is_instance_valid(game.episode_intro),"Fresh menu selection plays the opening")
 	game.episode_intro.finish()
+	game.episode_intro._process(game.CLOSE)
 	await process_frame
 	game.current_episode=2
 	game.begin_episode()

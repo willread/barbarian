@@ -20,6 +20,7 @@ func check():
 	game.menu_action("NORMAL")
 	assert(is_instance_valid(game.episode_intro),"Episode 1 opens with the ink animatic")
 	game.episode_intro.finish()
+	game.episode_intro._process(game.CLOSE)
 	await process_frame
 	assert(game.phase=="playing" and game.background.key=="citadel-1")
 	game.set_process(false)

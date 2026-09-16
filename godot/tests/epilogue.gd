@@ -48,5 +48,6 @@ func check():
 	assert(scene.done and game.phase=="won")
 	game.queue_free()
 	await process_frame
+	await create_timer(.15).timeout
 	print("CAIRN_EPILOGUE_OK: after victory, saved result, continuous ducked music, subtitle, finish and skip")
 	quit()

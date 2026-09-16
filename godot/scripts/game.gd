@@ -631,7 +631,9 @@ func begin_episode():
 	episode_intro.finished.connect(func():
 		episode_intro.queue_free()
 		episode_intro=null
-		start_game())
+		start_game()
+		# Prime the closed gameplay skull before removing the cutscene layer.
+		_process(0))
 
 func start_game():
 	if shareware and current_episode>1:
