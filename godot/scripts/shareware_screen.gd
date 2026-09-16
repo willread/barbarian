@@ -54,6 +54,8 @@ func centered(text: String,point: Vector2,size: int,color: Color):
 func paint():
 	canvas.draw_rect(Rect2(-2000,-2000,6000,5000),Color.BLACK)
 	canvas.draw_texture_rect(art,Rect2(Vector2.ZERO,DESIGN),false)
+	canvas.draw_texture_rect(game.title_logo,Rect2(240,20,550,550./3.),false)
+	canvas.draw_texture_rect_region(game.shareware_wordmark,Rect2(290,204,450,450.*120./1865.),Rect2(150,342,1865,120))
 	centered("2 NEW EPISODES WITH NEW ENEMIES AND UNIQUE BOSSES",Vector2(515,672),20,Color("e8d8b5"))
 	# Draw live text above the highlighted stone button face.
 	queue_redraw_label()

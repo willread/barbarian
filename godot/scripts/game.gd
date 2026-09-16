@@ -1777,8 +1777,8 @@ func draw_overlay():
 		overlay.draw_set_transform(pivot,0.,Vector2.ONE*zoom)
 		overlay.draw_texture_rect(title_logo,Rect2(-size*.5,size),false,Color(1,1,1,smoothstep(0.,.3,t)))
 		if shareware:
-			var tag_size=Vector2(size.x*.86,size.x*.86*235./2172.)
-			overlay.draw_texture_rect_region(shareware_wordmark,Rect2(Vector2(-tag_size.x*.5,size.y*.5+3),tag_size),Rect2(0,230,2172,235),Color(1,1,1,smoothstep(0.,.3,t)))
+			var tag_size=Vector2(size.x*.74,size.x*.74*120./1865.)
+			overlay.draw_texture_rect_region(shareware_wordmark,Rect2(Vector2(-tag_size.x*.5,size.y*.5+6),tag_size),Rect2(150,342,1865,120),Color(1,1,1,smoothstep(0.,.3,t)))
 		overlay.draw_set_transform(Vector2.ZERO)
 
 	overlay.draw_set_transform(Vector2.ZERO)
