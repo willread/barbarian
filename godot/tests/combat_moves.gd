@@ -47,6 +47,26 @@ func _init():
 	var spinner=m.make(1,720,660,100,true)
 	assert(m.begin(spinner,"spin"))
 	var art=CairnArt.new()
+	for weapon in ["axe","sword"]:
+		for facing in [-1,1]:
+			var fighter=m.make(200,720,660,100,true)
+			fighter.weapon=weapon;fighter.dir=facing
+			m.begin(fighter,"slash")
+			fighter.attack.age=fighter.attack.from
+			var pose=art.pose(fighter)
+			var extended=art.hit_box(fighter,pose)
+			fighter.attack.type="back"
+			var original=art.hit_box(fighter,pose)
+			var old_end=original[0]+original[1]
+			var new_end=extended[0]+extended[1]
+			assert(is_equal_approx(new_end,old_end*1.2))
+			assert(extended[0]==original[0] and extended[2]==original[2] and extended[3]==original[3])
+			var target=m.make(201,720+facing*((old_end+new_end)*.5+16)*m.SCALE,660,100)
+			target.dir=facing
+			fighter.attack.box=original
+			assert(not m.can_hit(fighter,target,fighter.attack))
+			fighter.attack.type="slash";fighter.attack.box=extended
+			assert(m.can_hit(fighter,target,fighter.attack),"Normal attack hits in the added reach in either direction")
 	# Real weapon poses must cover both edges of the melee lane symmetrically.
 	for player_move in ["slash","spin"]:
 		for weapon in ["axe","sword"]:

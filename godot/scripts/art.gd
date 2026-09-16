@@ -147,7 +147,11 @@ func hit_box(f: Dictionary,p: Array) -> Array:
 	var w=weapon_data(f)
 	var tip=Vector2(r.grip[0]+sin(r.angle)*w.length*w.grip,r.grip[1]-cos(r.angle)*w.length*w.grip)
 	var radius=17 if f.weapon=="axe" else 7
-	return [(min(r.grip[0],tip.x)-radius)/4.5,(abs(tip.x-r.grip[0])+radius*2)/4.5,(min(r.grip[1],tip.y)-radius)/4.5,(abs(tip.y-r.grip[1])+radius*2)/4.5]
+	var box=[(min(r.grip[0],tip.x)-radius)/4.5,(abs(tip.x-r.grip[0])+radius*2)/4.5,(min(r.grip[1],tip.y)-radius)/4.5,(abs(tip.y-r.grip[1])+radius*2)/4.5]
+	if f.player and f.attack.get("type","")=="slash":
+		# Extend only the forward edge; preserve rear coverage and floor-depth tolerance.
+		box[1]+=maxf(0,box[0]+box[1])*(CairnMechanics.NORMAL_REACH_SCALE-1.0)
+	return box
 
 func body_rect(f: Dictionary,p: Array) -> Rect2:
 	var l=layout(p)

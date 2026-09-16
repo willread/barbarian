@@ -7,6 +7,7 @@ const STEP = 1.0 / HZ
 const SCALE = 4.5
 const MELEE_LANE = 48.0
 const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":48}}
+const NORMAL_REACH_SCALE=1.2
 var combat_extensions=false
 var attacks: Dictionary
 
@@ -171,7 +172,8 @@ func begin(f: Dictionary, type: String) -> bool:
 		a.to=-1 if type=="whiff" else round(a.to*w.speed)
 		a.damage*=w.damage
 		a.reach=w.reach
-		a.box=[0,w.reach,-64,64]
+		if type=="slash":a.reach*=NORMAL_REACH_SCALE
+		a.box=[0,a.reach,-64,64]
 	if combat_extensions and type=="air":
 		f.diveUsed=true
 		a.ticks=90
