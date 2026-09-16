@@ -11,10 +11,13 @@ controller translation, and audio playback. Use a 1440×810 logical canvas scale
 to fit the viewport, as shown in `controls_hint.gd`.
 
 Arrow keys, WASD, Tab/Shift-Tab move focus; Enter/keypad Enter/Space activate;
-Escape cancels. Mouse hover and click work too. Activation requests `menu_select`
+Escape cancels. Mouse hover and click work too. Changing focus requests
+`menu_select` once per change. Activation also requests `menu_select`
 before emitting `chosen`; play it on an always-processing player so it remains
 audible while gameplay is paused. The controls hint also translates controller
 D-pad/stick, A and B/Start through the game's existing bindings.
 
 The plaque was generated from the approved controls-prompt redesign. Gold serif
 text, slate, bronze trim and fading ember highlights match that preview.
+Both states use the same neutral button crop; a shader lights its existing bronze
+bevel so hover and keyboard focus preserve the button's outline exactly.

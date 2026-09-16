@@ -25,6 +25,16 @@ func check():
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/controls-hint.png")
 	game.muted=false
+	var sounds=[]
+	hint.canvas.sound_requested.connect(func(id):sounds.append(id))
+	var hover=InputEventMouseMotion.new()
+	hover.position=hint.canvas.get_global_transform_with_canvas()*hint.canvas.button_rect(1).get_center()
+	hint._input(hover)
+	assert(hint.canvas.selected==1 and hint.click.playing and sounds==["menu_select"],"Hover moves focus and plays the menu select sound")
+	hint._input(hover)
+	assert(sounds.size()==1,"Remaining over a button must not repeat the sound")
+	hover.position=hint.canvas.get_global_transform_with_canvas()*hint.canvas.button_rect(0).get_center()
+	hint._input(hover)
 	var key=InputEventKey.new();key.pressed=true;key.keycode=KEY_TAB
 	hint._input(key)
 	assert(hint.canvas.selected==1)
