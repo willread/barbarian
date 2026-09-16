@@ -49,7 +49,7 @@ func check():
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-blast-%.2f.png"%time)
-	for offset in [Vector2(221,0),Vector2(0,86),Vector2(200,70)]:
+	for offset in [Vector2(251,0),Vector2(0,101),Vector2(225,80)]:
 		hero.x=720+offset.x;hero.y=670+offset.y;hero.down={};hero.invTicks=0;hero.hp=100
 		bomb.erase("detonated")
 		combat.detonate(game,bomb)

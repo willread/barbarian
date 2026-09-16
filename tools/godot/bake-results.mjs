@@ -30,7 +30,7 @@ async function render(text,family,tracking=1){
  const img=await loadImage(el._stoneFrames.url),c=createCanvas(img.width,img.height);c.getContext('2d').drawImage(img,0,0);
  return c;
 }
-for(const [kind,family,chars] of [['score','Cinzel','0123456789,'],['stat','Oswald','0123456789,:×HITS ']]){
+for(const [kind,family,chars] of [['score','Cinzel','0123456789,'],['stat','Oswald','0123456789,:×XHITS ']]){
  manifest.glyphs[kind]={};
  const zero=await render('0',family),box=bounds(zero),pad=75*.28*3;
  for(const ch of chars){

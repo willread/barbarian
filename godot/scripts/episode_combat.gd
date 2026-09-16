@@ -1,7 +1,7 @@
 extends RefCounted
 # Episode hazards share the normal damage path, but keep their own visible tells.
 var hazards: Array=[]
-const BOMB_RADIUS=Vector2(220,85)
+const BOMB_RADIUS=Vector2(250,100)
 const BOMB_GRAVITY=900.0
 const BOMB_FLIGHT=.45
 const BOMB_FUSE=1.05
