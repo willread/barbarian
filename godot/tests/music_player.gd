@@ -14,7 +14,7 @@ func check():
  await process_frame
  game.menu_action("MUSIC PLAYER")
  var view=game.music_player_view
- assert(view.names.size()==7 and view.names[2]=="Roots Below")
+ assert(view.names.size()==4 and view.names[2]=="Roots Below")
  assert(view.names[3]=="Furnace Heart IV — Overdrive")
  assert(view.back_menu.scale==Vector2.ONE,"Back uses the standard menu button scale")
  assert(game.audio.music_preview and not game.menu.visible)
@@ -27,10 +27,7 @@ func check():
  view.toggle();assert(view.player.stream_paused)
  view.toggle();assert(not view.player.stream_paused)
  view.play_track(3);assert(view.current==3)
- for i in range(4,view.names.size()):
-  view.play_track(i)
-  assert(view.player.stream.loop and view.player.stream.get_length()>35)
-  assert(view.names[i].begins_with("Furnace Heart"))
+ assert(view.player.stream.loop_offset>2.0,"Overdrive keeps its opening and repeats from its musical loop point")
  if "--capture" in OS.get_cmdline_user_args():
   await create_timer(.3).timeout
   await RenderingServer.frame_post_draw
@@ -52,5 +49,5 @@ func check():
  assert(game.phase=="paused" and not game.audio.music_preview)
  game.queue_free();await process_frame
  await create_timer(.15).timeout
- print("CAIRN_MUSIC_PLAYER_OK: Overdrive selected, three alternatives, standard Back, looping and restoration")
+ print("CAIRN_MUSIC_PLAYER_OK: four assigned themes only, Overdrive opening/loop offset, standard Back and restoration")
  quit()

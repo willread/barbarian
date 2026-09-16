@@ -13,6 +13,7 @@ func check():
  audio.unlocked=true
  assert(audio.tracks[2].stream.resource_path.ends_with("roots-below.ogg"))
  assert(audio.tracks[3].stream.resource_path.ends_with("furnace-heart-overdrive.ogg"))
+ assert(audio.tracks[3].stream.loop_offset>2.0)
  for episode in [1,2,3]:
   game.current_episode=episode
   game.phase="playing"

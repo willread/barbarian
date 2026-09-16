@@ -81,16 +81,18 @@
       "source": "furnace-heart-overdrive-source.mp3",
       "file": "furnace-heart-overdrive.ogg",
       "loop": {
-        "duration": 47.09,
+        "duration": 49.35,
+        "playback_loop_offset": 2.26,
+        "loop_duration": 47.09,
         "estimated_bpm": 122.31896368655765,
         "bars": 24,
         "source_start": 2.18,
         "source_end": 49.27,
         "splice_seconds": 0.08,
-        "seam_peak_difference": 0.006995461881160736,
-        "peak": 0.3631044626235962,
+        "seam_peak_difference": 0.011933814734220505,
+        "peak": 0.37121692299842834,
         "loudness_target_lufs": -19,
-        "method": "eight-bar phrase groups, full-bar spectral and percussion matching on both sides of seam",
+        "method": "original opening retained; subsequent repeats use eight-bar phrase groups matched across the join",
         "rhythm_correlation": 0.6974090879852852
       }
     }

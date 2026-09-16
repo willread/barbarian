@@ -36,7 +36,9 @@ for bars in [24,32]:
 score,start,end,bars,rhythm=max(candidates)
 a=start*hop;b=end*hop;n=3528 # 80 ms; preserve the full phrase's duration.
 t=np.linspace(0,1,n,dtype=np.float32)[:,None]
-joined=np.concatenate([samples[a+n:b],samples[b:b+n]*(1-t)+samples[a:a+n]*t])
+# Preserve the original opening on first play; subsequent repeats resume after
+# the overlapped head. This keeps the entry attack intact without repeating an intro.
+joined=np.concatenate([samples[:b],samples[b:b+n]*(1-t)+samples[a:a+n]*t])
 temp=pathlib.Path('E:/Cairn-build-tools/overdrive-refined.wav')
 with wave.open(str(temp),'wb') as out:
     out.setnchannels(2);out.setsampwidth(2);out.setframerate(sr)
@@ -44,8 +46,10 @@ with wave.open(str(temp),'wb') as out:
 destination=folder/job['file']
 subprocess.run(['ffmpeg','-v','error','-y','-i',str(temp),'-af','loudnorm=I=-19:TP=-2:LRA=9','-ar',str(sr),'-c:a','libvorbis','-q:a','6',str(destination)],check=True)
 final=decode(destination)
-seam=float(np.max(np.abs(final[-1]-final[0])))
-assert np.isfinite(final).all() and seam<.08 and np.max(np.abs(final))<1
-job['loop']={'duration':len(final)/sr,'estimated_bpm':bars*4*60/((b-a)/sr),'bars':bars,'source_start':a/sr,'source_end':b/sr,'splice_seconds':n/sr,'seam_peak_difference':seam,'peak':float(np.max(np.abs(final))),'loudness_target_lufs':-19,'method':'eight-bar phrase groups, full-bar spectral and percussion matching on both sides of seam','rhythm_correlation':rhythm}
+assert np.isfinite(final).all() and np.max(np.abs(final))<1
+loop_offset=(a+n)/sr
+seam=float(np.max(np.abs(final[-1]-final[a+n])))
+assert seam<.08
+job['loop']={'duration':len(final)/sr,'playback_loop_offset':loop_offset,'loop_duration':(b-a)/sr,'estimated_bpm':bars*4*60/((b-a)/sr),'bars':bars,'source_start':a/sr,'source_end':b/sr,'splice_seconds':n/sr,'seam_peak_difference':seam,'peak':float(np.max(np.abs(final))),'loudness_target_lufs':-19,'method':'original opening retained; subsequent repeats use eight-bar phrase groups matched across the join','rhythm_correlation':rhythm}
 (folder/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print('Overdrive revised loop:',job['loop'])

@@ -29,13 +29,6 @@ func _ready():
   names.append(title)
   streams.append(track.stream)
   places.append(PLACES[places.size()])
- for job in candidates.jobs:
-  if streams.any(func(stream):return stream.resource_path.get_file()==job.file):continue
-  names.append(job.name)
-  var stream=load("res://audio_options/"+job.file)
-  stream.loop=true
-  streams.append(stream)
-  places.append("EP III / CANDIDATE")
  back_menu=load("res://scripts/menu.gd").new()
  add_child(back_menu)
  back_menu.setup(game.art)

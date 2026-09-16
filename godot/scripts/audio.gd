@@ -64,6 +64,10 @@ func setup(source: Node2D):
 		player.stream=clips.get(id) if id in ["music_menu","music_game"] else load("res://audio_options/"+id+".ogg")
 		if player.stream!=null:
 			player.stream.loop=true
+			if id=="furnace-heart-overdrive":
+				var music=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
+				for job in music.jobs:
+					if job.id==id:player.stream.loop_offset=job.loop.get("playback_loop_offset",0.0)
 		player.volume_db=-60
 		tracks.append(player)
 
