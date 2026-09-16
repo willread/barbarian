@@ -18,18 +18,19 @@ func _ready():
  canvas=Node2D.new();add_child(canvas);canvas.draw.connect(paint)
  player=AudioStreamPlayer.new();player.bus=&"Music";player.volume_db=-10;add_child(player)
  var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/manifest.json"))
+ var candidates=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
  for track in game.audio.tracks:
   saved_pauses.append(track.stream_paused)
   track.stream_paused=true
   var id=track.stream.resource_path.get_file().get_basename()
   var title="Roots Below" if id=="roots-below" else "Original Menu Theme" if id=="music_menu" else "Original Battle Theme"
-  for job in manifest.get("jobs",[]):
+  for job in manifest.get("jobs",[])+candidates.jobs:
    if job.get("id","")==id:title=job.get("name",title)
   names.append(title)
   streams.append(track.stream)
   places.append(PLACES[places.size()])
- var candidates=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
  for job in candidates.jobs:
+  if streams.any(func(stream):return stream.resource_path.get_file()==job.file):continue
   names.append(job.name)
   var stream=load("res://audio_options/"+job.file)
   stream.loop=true
@@ -55,7 +56,7 @@ func layout():
  var factor=minf(size.x/1440.0,size.y/810.0)
  transform=Transform2D(0,Vector2.ONE*factor,0,(size-Vector2(1440,810)*factor)*.5)
  var item=back_menu.items[0]
- var action_scale=1.0/.71
+ var action_scale=1.0
  back_menu.scale=Vector2.ONE*action_scale
  back_menu.position=Vector2(720,732)-Vector2(item.x,item.y+item.height*.5)*action_scale
 func _process(_dt: float):

@@ -47,6 +47,6 @@ export function musicLibrary(root=process.cwd()){
   for(const item of fs.readdirSync(dir,{withFileTypes:true}))if(item.isDirectory())walk(path.join(dir,item.name));
  }
  const defaults=read(path.join(root,'godot/audio_defaults.json')).choices||{};
- const assigned=new Map([[defaults.music_menu||'music_menu','Menu default'],[defaults.music_game||'music_game','EP1 default'],['soundboard/ep2-music/roots-below','EP2 default'],['music_game-4','EP3 default']]);
+ const assigned=new Map([[defaults.music_menu||'music_menu','Menu default'],[defaults.music_game||'music_game','EP1 default'],['soundboard/ep2-music/roots-below','EP2 default'],['soundboard/ep3-music/furnace-heart-overdrive','EP3 default']]);
  return [...candidates.values()].map(t=>({...t,pathExtension:path.extname(t.path).slice(1),id:crypto.createHash('sha256').update(t.key).digest('hex').slice(0,20),assignment:assigned.get(t.key)||'',url:'/music/audio/'+crypto.createHash('sha256').update(t.key).digest('hex').slice(0,20)})).sort((a,b)=>a.collection.localeCompare(b.collection)||a.name.localeCompare(b.name));
 }

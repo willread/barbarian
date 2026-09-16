@@ -14,7 +14,9 @@ func check():
  await process_frame
  game.menu_action("MUSIC PLAYER")
  var view=game.music_player_view
- assert(view.names.size()==8 and view.names[2]=="Roots Below")
+ assert(view.names.size()==7 and view.names[2]=="Roots Below")
+ assert(view.names[3]=="Furnace Heart IV — Overdrive")
+ assert(view.back_menu.scale==Vector2.ONE,"Back uses the standard menu button scale")
  assert(game.audio.music_preview and not game.menu.visible)
  for track in game.audio.tracks:
   if track.playing:assert(track.stream_paused)
@@ -25,7 +27,7 @@ func check():
  view.toggle();assert(view.player.stream_paused)
  view.toggle();assert(not view.player.stream_paused)
  view.play_track(3);assert(view.current==3)
- for i in range(4,8):
+ for i in range(4,view.names.size()):
   view.play_track(i)
   assert(view.player.stream.loop and view.player.stream.get_length()>35)
   assert(view.names[i].begins_with("Furnace Heart"))
@@ -35,7 +37,7 @@ func check():
   root.get_texture().get_image().save_png("E:/Cairn-build-tools/music-player.png")
  var down=InputEventKey.new();down.keycode=KEY_DOWN;down.pressed=true
  view.handle(down)
- assert(view.selected==8,"Down from the last track selects the standard Back button")
+ assert(view.selected==view.names.size(),"Down from the last track selects the standard Back button")
  var enter=InputEventKey.new();enter.keycode=KEY_ENTER;enter.pressed=true
  view.handle(enter)
  await process_frame
@@ -50,5 +52,5 @@ func check():
  assert(game.phase=="paused" and not game.audio.music_preview)
  game.queue_free();await process_frame
  await create_timer(.15).timeout
- print("CAIRN_MUSIC_PLAYER_OK: four active tracks plus four Furnace Heart candidates, looping, pause, navigation and restoration")
+ print("CAIRN_MUSIC_PLAYER_OK: Overdrive selected, three alternatives, standard Back, looping and restoration")
  quit()
