@@ -257,7 +257,7 @@ func step(game,dt: float):
 			var growth=minf(clampf(h.age/.20,0,1),clampf((h.life-h.age)/.30,0,1))
 			var rise=1.0-pow(1.0-growth,3)
 			# Keep contact live after eruption; regular invulnerability and a local cooldown prevent rapid repeated hits.
-			if h.age>=BOMB_FLIGHT and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<52:
+			if h.age>=.18 and h.age<h.life-.12 and h.age>=h.get("next_hit",0.0) and victim.hp>0 and victim.invTicks==0 and victim.down.is_empty() and victim.height*4.5<size.y*rise-12 and absf(victim.x-h.p.x)<size.x*.40 and absf(victim.y-h.p.y)<52:
 				game.damage(victim,{"type":"rootEruption","damage":9,"direction":1 if victim.x>=h.owner.x else -1,"knock":false,"no_stun":true},h.owner)
 				# One escape window shared across every root, including later eruptions.
 				if victim.hp>0:victim.invTicks=maxi(victim.invTicks,45)
@@ -281,6 +281,8 @@ func step(game,dt: float):
 				var motion_dt=dt
 				if not h.get("bouncing",false):
 					h.bouncing=true
+					h.landed=true
+					h.bounce_count=1
 					h.p=h.target
 					h.flight_age=0.0
 					h.launch_height=0.0
@@ -337,6 +339,8 @@ func strike_bomb(game,h: Dictionary,a: Dictionary):
 	h.p=Vector2(tip.x+a.direction*18.0,hero.y)
 	h.launch_height=maxf(0,hero.y-tip.y-27.0)
 	h.reflected=true
+	h.landed=false
+	h.bounce_count=0
 	h.flight_age=0.0
 	h.gravity=3200.0
 	h.launch_speed=330.0 if charge else (310.0 if heavy else 290.0)
@@ -374,9 +378,11 @@ func advance_bomb(h: Dictionary,dt: float):
 		h.flight_age=h.get("flight_age",0.0)+step_time
 		remaining-=step_time
 		if step_time>=impact:
-			var rebound=absf(vertical-gravity*impact)*.26
+			h.landed=true
+			h.bounce_count=h.get("bounce_count",0)+1
+			var rebound=minf(absf(vertical-gravity*impact)*.52,sqrt(2*gravity*8.0))
 			h.launch_height=0.0
-			h.launch_speed=rebound if rebound>35 else 0.0
+			h.launch_speed=rebound if rebound>12 and h.bounce_count<5 else 0.0
 			h.flight_age=0.0
 			h.velocity*=.48
 			h.spin_velocity=h.get("spin_velocity",0.0)*.65
@@ -390,11 +396,11 @@ func bomb_landing(h: Dictionary) -> Vector2:
 	return h.p+h.velocity*remaining
 
 func avoid_bombs(game,enemy: Dictionary) -> Variant:
-	# React to visible throws, with a short delay; committed strikes still finish.
+	# React only after actual floor contact, including during settling bounces.
 	if enemy.hp<=0 or enemy.hurtTicks or enemy.recovering or not enemy.down.is_empty():return null
 	var threats=[]
 	for h in hazards:
-		if h.kind=="clinker" and h.age>=BOMB_FLIGHT and h.age<h.life:threats.append(bomb_landing(h))
+		if h.kind=="clinker" and h.get("landed",false) and h.age<h.life:threats.append(bomb_landing(h))
 	var point=Vector2(enemy.x,enemy.y)
 	var footprint=BOMB_RADIUS+Vector2(40,25)
 	var danger=Vector2.ZERO

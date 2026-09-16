@@ -93,6 +93,7 @@ func check():
 	assert(arc.p.x>landing.x,"Bomb continues forward through a small bounce")
 	assert(arc.velocity.x>0 and arc.velocity.x<650,"Landing loses momentum")
 	combat.advance_bomb(arc,1.0)
+	assert(arc.bounce_count>=3,"Bomb makes several small settling contacts")
 	assert(combat.bomb_height(arc)==0 and arc.velocity.x<30,"Bounces settle into a short roll")
 	arc.p=Vector2(1435,670);arc.velocity=Vector2(1050,0);arc.flight_age=0.0;arc.launch_height=0.0;arc.launch_speed=520.0
 	combat.advance_bomb(arc,.1)
@@ -125,11 +126,14 @@ func check():
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-weapon-contact.png")
 	hero.attack={}
-	# Other enemies avoid a bearer's throw, even before it lands.
-	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.5,"life":2.25,"reflected":false}
+	# Other enemies react only after physical ground contact.
+	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.5,"life":2.25,"reflected":false,"landed":true}
 	combat.hazards=[thrown]
 	var dodger=game.make_actor(720,670,100)
 	dodger.kind="bone";dodger.attack={};dodger.down={};dodger.hurtTicks=0;dodger.recovering=false
+	thrown.landed=false
+	assert(combat.avoid_bombs(game,dodger)==null,"Airborne bombs must not trigger flight")
+	thrown.landed=true
 	var escape=combat.avoid_bombs(game,dodger)
 	assert(escape is Vector2 and escape.length()>.9,"Nearby enemy must seek an escape")
 	for tick in 100:

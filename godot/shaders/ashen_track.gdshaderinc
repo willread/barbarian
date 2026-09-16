@@ -14,7 +14,7 @@ float cart_mask(vec2 local,float half_width){
  float aa=max(1.0,length(fwidth(local))*.7);
  float body=(1.0-smoothstep(half_width-2.5-down*.13-aa,half_width-2.5-down*.13+aa,abs(local.x)))*smoothstep(-.5-aa,-.5+aa,down)*(1.0-smoothstep(26.0-aa,26.0+aa,down));
  float lip=(1.0-smoothstep(half_width-.5-aa,half_width-.5+aa,abs(local.x)))*smoothstep(-2.5-aa,-2.5+aa,down)*(1.0-smoothstep(2.0-aa,2.0+aa,down));
- float wheels=max(1.0-smoothstep(4.7-aa,4.7+aa,length(local-vec2(-half_width*.60,-4.0))),1.0-smoothstep(4.7-aa,4.7+aa,length(local-vec2(half_width*.60,2.5))));
+ float wheels=max(1.0-smoothstep(2.9-aa*.65,2.9+aa*.65,length(local-vec2(-half_width*.60,-4.0))),1.0-smoothstep(2.9-aa*.65,2.9+aa*.65,length(local-vec2(half_width*.60,2.5))));
  return max(body,max(lip,wheels));
 }
 float track_box(vec2 p,vec4 b){return step(b.x,p.x)*step(p.x,b.z)*step(b.y,p.y)*step(p.y,b.w);}
@@ -53,6 +53,9 @@ vec4 road_scene(vec2 uv){
    vec2 source=(anchor+local)/vec2(1672.0,941.0);
    vec2 footprint=max(fwidth(source)*.35,vec2(.25)/vec2(1672.0,941.0));
    vec4 cart=(texture(road_original,source+footprint)+texture(road_original,source-footprint)+texture(road_original,source+vec2(footprint.x,-footprint.y))+texture(road_original,source+vec2(-footprint.x,footprint.y)))*.25;
+   // Reject pale source sky/mist carried by the soft cutout border.
+   float pale=smoothstep(.29,.53,dot(cart.rgb,vec3(.2126,.7152,.0722)));
+   mask*=1.0-pale;
    scene=mix(scene,cart,mask);
   }
  }
