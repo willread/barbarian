@@ -14,7 +14,7 @@ func check():
  await process_frame
  game.menu_action("MUSIC PLAYER")
  var view=game.music_player_view
- assert(view.names.size()==8 and view.names[2]=="Roots Below")
+ assert(view.names.size()==5 and view.names[2]=="Roots Below")
  assert(view.names[3]=="Furnace Heart IV — Overdrive")
  assert(view.back_menu.scale==Vector2.ONE,"Back uses the standard menu button scale")
  assert(game.audio.music_preview and not game.menu.visible)
@@ -28,11 +28,11 @@ func check():
  view.toggle();assert(not view.player.stream_paused)
  view.play_track(3);assert(view.current==3)
  assert(view.player.stream.loop_offset>2.0,"Overdrive keeps its opening and repeats from its musical loop point")
- for i in range(4,8):
+ for i in range(4,5):
   view.play_track(i)
   assert(view.player.playing and not view.player.stream.loop)
   assert(view.player.stream.get_length()>21 and view.player.stream.get_length()<23)
-  assert(view.names[i].begins_with("Homeward") and view.places[i]=="ENDING / PREVIEW")
+  assert(view.names[i]=="Last Light" and view.places[i]=="EP III / EPILOGUE")
   for track in game.audio.tracks:
    if track.playing:assert(track.stream_paused,"Candidates play without background music")
  if "--capture" in OS.get_cmdline_user_args():
@@ -56,5 +56,5 @@ func check():
  assert(game.phase=="paused" and not game.audio.music_preview)
  game.queue_free();await process_frame
  await create_timer(.15).timeout
- print("CAIRN_MUSIC_PLAYER_OK: four themes, four ending previews, exclusive playback, standard Back and restoration")
+ print("CAIRN_MUSIC_PLAYER_OK: four themes, selected Last Light epilogue, exclusive playback, standard Back and restoration")
  quit()

@@ -13,6 +13,7 @@ var done=false
 var voice_started=false
 var sting_started=false
 var sting: AudioStreamPlayer
+var ending_music: AudioStreamPlayer
 var canvas: Node2D
 var player: AudioStreamPlayer
 var picture=preload("res://art/intro/revenge-panorama-v1.png")
@@ -45,6 +46,17 @@ func _ready():
 	captions=subtitles
 	previous_music_gain=game.audio.cutscene_music_gain
 	game.audio.cutscene_music_gain=previous_music_gain*.7
+	if ending:
+		game.audio.music_preview=true
+		for track in game.audio.tracks:track.stop()
+		ending_music=AudioStreamPlayer.new()
+		ending_music.bus=&"Music"
+		ending_music.stream=load("res://audio_options/homeward-lastlight.ogg")
+		ending_music.stream.loop=false
+		ending_music.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
+		add_child(ending_music)
+		update_ending_music()
+		ending_music.play()
 	game.audio.stop_gameplay()
 	game.hero_voice.reset()
 	game.hero_voice.set_process(false)
@@ -53,6 +65,7 @@ func _ready():
 func _process(dt: float):
 	if done:return
 	age+=dt
+	update_ending_music()
 	player.volume_db=-80 if game.muted or not game.voice_enabled else 0
 	if age>=voice_start and not voice_started:
 		voice_started=true
@@ -72,6 +85,10 @@ func _process(dt: float):
 	transform=Transform2D(0,Vector2.ONE*scale_factor,0,(size-Vector2(1440,810)*scale_factor)*.5)
 	canvas.queue_redraw()
 	if age>=duration:finish()
+
+func update_ending_music():
+	if is_instance_valid(ending_music):
+		ending_music.volume_db=-80 if game.muted or not game.music_enabled else -10+game.audio.volumes.get("music_game",0.0)+linear_to_db(.7)
 
 func caption_at(time: float) -> String:
 	for caption in captions:
@@ -106,12 +123,16 @@ func finish():
 	done=true
 	player.stop()
 	sting.stop()
+	if is_instance_valid(ending_music):ending_music.stop()
+	if ending and is_instance_valid(game.audio):game.audio.music_preview=false
 	game.audio.cutscene_music_gain=previous_music_gain
 	finished.emit()
 
 func _exit_tree():
 	player.stop()
 	sting.stop()
+	if is_instance_valid(ending_music):ending_music.stop()
+	if ending and is_instance_valid(game.audio):game.audio.music_preview=false
 	if is_instance_valid(game):
 		if is_instance_valid(game.audio):game.audio.cutscene_music_gain=previous_music_gain
 		if is_instance_valid(game.hero_voice):game.hero_voice.set_process(true)

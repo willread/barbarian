@@ -12,6 +12,7 @@ Generated with ElevenLabs `music_v1`; exact prompts and source files are retaine
 -19 LUFS / -2 dBTP, applies a short end fade, and installs Ogg previews and metadata.
 Each prompt requests space at 18–20 seconds for "I missed you, kid."
 
-Preview in **Options → Sound → Music Player**. Existing music pauses while
-previewing; candidates play once and can be restarted. All four are candidates:
-none is assigned to the epilogue yet.
+Preview in **Options → Sound → Music Player**. The selected theme is listed as **Last Light**, used in **EP III / EPILOGUE**.
+It plays once and can be restarted. The other three candidates remain as source
+assets but are no longer listed in the player. Last Light plays during the
+epilogue at 70% normal music volume.

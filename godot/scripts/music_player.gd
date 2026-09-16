@@ -31,11 +31,12 @@ func _ready():
   places.append(PLACES[places.size()])
  var endings=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ending-music.json"))
  for job in endings.jobs:
-  names.append(job.name)
+  if job.id!="homeward-lastlight":continue
+  names.append("Last Light")
   var stream=load("res://audio_options/"+job.file)
   stream.loop=false
   streams.append(stream)
-  places.append("ENDING / PREVIEW")
+  places.append("EP III / EPILOGUE")
  back_menu=load("res://scripts/menu.gd").new()
  add_child(back_menu)
  back_menu.setup(game.art)
