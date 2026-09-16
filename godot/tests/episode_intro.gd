@@ -4,6 +4,7 @@ func check():
 	var game=load("res://main.tscn").instantiate()
 	root.add_child(game)
 	game.set_process(false)
+	game.records=CairnRunRecords.new("")
 	game.audio.set_process(false)
 	game.loading_menu=false
 	game.audio.unlocked=true;game.muted=false;game.music_enabled=true
@@ -53,6 +54,20 @@ func check():
 	skip.button_index=JOY_BUTTON_RIGHT_SHOULDER;skip.pressed=true
 	game._input(skip)
 	assert(intro.done and not is_instance_valid(game.episode_intro))
+	await process_frame
+	# The actual death-menu action must bypass the opening on every retry.
+	for retry in 2:
+		game.hero.hp=0
+		game.change_phase("lost")
+		game.menu_action("RISE AGAIN")
+		assert(not is_instance_valid(game.episode_intro),"Death restart never replays the cutscene")
+		assert(game.phase=="playing" and game.wave==1 and game.hero.hp>0)
+	# A fresh episode selection still plays it, even after a previous run.
+	game.change_phase("title")
+	game.menu_action("EP 1: THE FALLEN CITADEL")
+	game.menu_action("NORMAL")
+	assert(is_instance_valid(game.episode_intro),"Fresh menu selection plays the opening")
+	game.episode_intro.finish()
 	await process_frame
 	game.current_episode=2
 	game.begin_episode()
