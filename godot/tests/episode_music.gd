@@ -27,6 +27,13 @@ func check():
   audio.stop_gameplay()
   audio._process(.1)
   assert(audio.tracks[episode].playing)
+ # Switching must be exclusive on the very first frame, not after a fade.
+ for episode in [0,3,1,2,0,2,3]:
+  game.phase="title" if episode==0 else "playing"
+  game.current_episode=maxi(1,episode)
+  audio._process(1.0/60)
+  for i in audio.tracks.size():
+   assert(not audio.tracks[i].playing or i==episode,"Previous music stops before the next track starts")
  game.phase="title"
  audio._process(3.)
  assert(audio.tracks[0].playing)

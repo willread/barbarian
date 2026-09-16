@@ -152,6 +152,13 @@ func _process(dt: float):
 	if game.phase!="paused" and not get_tree().paused:mire_loop.volume_db=move_toward(mire_loop.volume_db,linear_to_db(.3) if bubbling else -60.0,dt*(90 if bubbling else 180))
 	mire_loop.stream_paused=game.phase=="paused" or get_tree().paused
 	if game.muted or (not bubbling and not mire_loop.stream_paused and mire_loop.volume_db<=-59):mire_loop.stop()
+	# Retire every other song before starting the selected one, including rapid changes.
+	var selected_music=0 if game.phase=="title" else game.current_episode
+	if not music_preview:
+		for i in tracks.size():
+			if i!=selected_music or not game.music_enabled:
+				tracks[i].stop()
+				tracks[i].volume_db=-60
 	for i in tracks.size():
 		if music_preview:continue
 		var track=tracks[i]

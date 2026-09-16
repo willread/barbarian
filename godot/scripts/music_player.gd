@@ -41,6 +41,7 @@ func _ready():
  get_viewport().size_changed.connect(layout)
  layout()
 func _exit_tree():
+ player.stop()
  if is_instance_valid(game) and is_instance_valid(game.audio):
   game.audio.music_preview=false
   for i in mini(saved_pauses.size(),game.audio.tracks.size()):game.audio.tracks[i].stream_paused=saved_pauses[i]
@@ -57,6 +58,7 @@ func _process(_dt: float):
  back_menu.items[0].fire.emitting=selected==names.size()
  canvas.queue_redraw()
 func play_track(index: int):
+ player.stop()
  selected=wrapi(index,0,names.size());current=selected
  player.stream=streams[selected]
  player.stream_paused=false;player.play()
