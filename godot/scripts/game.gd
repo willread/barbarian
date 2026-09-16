@@ -54,6 +54,7 @@ var voice_enabled=true
 var master_volume=100
 var loading_menu=false
 var bindings=CairnBindings.new()
+var cursor_input=preload("res://scripts/cursor_input.gd").new()
 var music_player_view: CanvasLayer
 var controls_view: CanvasLayer
 var results_view: CanvasLayer
@@ -1191,6 +1192,9 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	var used_mouse=cursor_input.mouse_active
+	if not cursor_input.accept(event):return
+	if used_mouse!=cursor_input.mouse_active:update_mouse_cursor()
 	if phase=="victory":return
 	if is_instance_valid(debug_console) and debug_console.visible:return
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
@@ -1317,7 +1321,7 @@ func toggle_weapon():
 	cycle_weapon(1)
 
 func update_mouse_cursor():
-	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN if phase in ["playing","dying","victory"] and get_window().has_focus() else Input.MOUSE_MODE_VISIBLE
+	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN if (phase in ["playing","dying","victory"] or not cursor_input.mouse_active) and get_window().has_focus() else Input.MOUSE_MODE_VISIBLE
 
 func _notification(what: int):
 	if what==NOTIFICATION_APPLICATION_FOCUS_IN:update_mouse_cursor()

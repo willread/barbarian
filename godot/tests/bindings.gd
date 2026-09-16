@@ -6,6 +6,25 @@ func key(code: int,down: bool) -> InputEventKey:
  return e
 func _init():call_deferred("check")
 func check():
+ var cursor=preload("res://scripts/cursor_input.gd").new()
+ assert(cursor.mouse_active)
+ cursor.accept(key(KEY_DOWN,true))
+ assert(not cursor.mouse_active)
+ var motion=InputEventMouseMotion.new()
+ for i in 40:
+  motion.relative=Vector2(1 if i%2==0 else -1,0)
+  assert(not cursor.accept(motion),"Jitter cannot reveal the cursor or change hovered selection")
+ motion.relative=Vector2(7,0)
+ assert(cursor.accept(motion) and cursor.mouse_active)
+ var drift=InputEventJoypadMotion.new()
+ drift.axis=JOY_AXIS_LEFT_X;drift.axis_value=.1
+ cursor.accept(drift)
+ assert(cursor.mouse_active,"Controller drift must not hide the cursor")
+ drift.axis_value=.7;cursor.accept(drift)
+ assert(not cursor.mouse_active)
+ motion.relative=Vector2(2,0)
+ assert(not cursor.accept(motion));assert(not cursor.accept(motion))
+ assert(cursor.accept(motion) and cursor.mouse_active,"Slow deliberate motion accumulates")
  var b=CairnBindings.new()
  assert(b.gameplay(key(KEY_J,true))==[[KEY_J,true]])
  var mouse=InputEventMouseButton.new()
