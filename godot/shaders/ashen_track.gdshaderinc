@@ -9,13 +9,24 @@ float track_y(float x){
  if(x<1180.0)return mix(500.0,565.0,(x-720.0)/460.0);
  return mix(565.0,610.0,(x-1180.0)/320.0);
 }
-float cart_mask(vec2 local,float half_width){
+float cart_mask(vec2 local,float half_width,float cart_index){
  float down=local.y-local.x*.145+32.0;
  float aa=max(1.0,length(fwidth(local))*.7);
  float body=(1.0-smoothstep(half_width-2.5-down*.13-aa,half_width-2.5-down*.13+aa,abs(local.x)))*smoothstep(-.5-aa,-.5+aa,down)*(1.0-smoothstep(26.0-aa,26.0+aa,down));
  float lip=(1.0-smoothstep(half_width-.5-aa,half_width-.5+aa,abs(local.x)))*smoothstep(-2.5-aa,-2.5+aa,down)*(1.0-smoothstep(2.0-aa,2.0+aa,down));
- float wheels=max(1.0-smoothstep(2.9-aa*.65,2.9+aa*.65,length(local-vec2(-half_width*.60,-4.0))),1.0-smoothstep(2.9-aa*.65,2.9+aa*.65,length(local-vec2(half_width*.60,2.5))));
- return max(body,max(lip,wheels));
+ // Preserve the real bottom beam and axle hangers instead of detached circles.
+ float frame=(1.0-smoothstep(half_width-5.0-aa,half_width-5.0+aa,abs(local.x)))*smoothstep(23.0-aa,23.0+aa,down)*(1.0-smoothstep(29.5-aa,29.5+aa,down));
+ float wheels=0.0;
+ float mounts=0.0;
+ for(int wheel=0;wheel<2;wheel++){
+  float axle_x=wheel==0?mix(-22.0,-29.0,cart_index):mix(9.0,13.0,cart_index);
+  float axle_down=mix(33.4,32.0,cart_index);
+  vec2 axle=vec2(axle_x,axle_x*.145+axle_down-32.0);
+  wheels=max(wheels,1.0-smoothstep(3.9-aa*.55,3.9+aa*.55,length(local-axle)));
+  float hanger=(1.0-smoothstep(3.0,4.0,abs(local.x-axle_x)))*smoothstep(26.0-aa,26.0+aa,down)*(1.0-smoothstep(axle_down,axle_down+aa,down));
+  mounts=max(mounts,hanger);
+ }
+ return max(max(body,lip),max(frame,max(mounts,wheels)));
 }
 float track_box(vec2 p,vec4 b){return step(b.x,p.x)*step(p.x,b.z)*step(b.y,p.y)*step(p.y,b.w);}
 float track_beam(vec2 p,vec2 a,vec2 b){
@@ -49,7 +60,7 @@ vec4 road_scene(vec2 uv){
   float x=cart_positions[i];
   vec2 local=p-vec2(x,track_y(x));
   if(abs(local.x)<49.0 && local.y>-44.0 && local.y<12.0){
-   float mask=cart_mask(local,i==0?41.0:47.0)*(1.0-occlusion);
+   float mask=cart_mask(local,i==0?41.0:47.0,float(i))*(1.0-occlusion);
    vec2 source=(anchor+local)/vec2(1672.0,941.0);
    vec2 footprint=max(fwidth(source)*.35,vec2(.25)/vec2(1672.0,941.0));
    vec4 cart=(texture(road_original,source+footprint)+texture(road_original,source-footprint)+texture(road_original,source+vec2(footprint.x,-footprint.y))+texture(road_original,source+vec2(-footprint.x,footprint.y)))*.25;
