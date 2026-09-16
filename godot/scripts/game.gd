@@ -55,6 +55,7 @@ var master_volume=100
 var loading_menu=false
 var bindings=CairnBindings.new()
 var cursor_input=preload("res://scripts/cursor_input.gd").new()
+var episode_intro: CanvasLayer
 var music_player_view: CanvasLayer
 var controls_view: CanvasLayer
 var results_view: CanvasLayer
@@ -418,7 +419,7 @@ func menu_action(label: String):
 		"EASY","NORMAL","HARD":
 			difficulty=label.to_lower()
 			difficulty_select=false
-			start_game()
+			begin_episode()
 		"RISE AGAIN": start_game()
 		"OPTIONS":
 			options=true
@@ -578,6 +579,19 @@ func difficulty_damage(taken: bool) -> float:
 	if difficulty=="easy":return .75 if taken else 1.25
 	if difficulty=="hard":return 1.25 if taken else .75
 	return 1.0
+
+func begin_episode():
+	if current_episode!=1:
+		start_game()
+		return
+	if is_instance_valid(episode_intro):return
+	episode_intro=preload("res://scripts/episode_intro.gd").new()
+	episode_intro.game=self
+	add_child(episode_intro)
+	episode_intro.finished.connect(func():
+		episode_intro.queue_free()
+		episode_intro=null
+		start_game())
 
 func start_game():
 	bomb_hit_pause=0.0
@@ -1078,6 +1092,7 @@ func tick(dt: float):
 	else:wave_clear_time=0.0
 
 func _process(raw: float):
+	if is_instance_valid(episode_intro):return
 	if not art: return
 	responsive_layout()
 	for child in get_children():
@@ -1195,6 +1210,10 @@ func toggle_fullscreen():
 	if options and settings_page=="display":refresh_settings(0)
 
 func _input(event: InputEvent):
+	if is_instance_valid(episode_intro):
+		episode_intro.handle(event)
+		get_viewport().set_input_as_handled()
+		return
 	var used_mouse=cursor_input.mouse_active
 	if not cursor_input.accept(event):return
 	if used_mouse!=cursor_input.mouse_active:update_mouse_cursor()

@@ -18,6 +18,9 @@ func check():
 	await create_timer(.6).timeout
 	assert(game.difficulty_select and game.menu.items[game.menu.selected].label=="NORMAL")
 	game.menu_action("NORMAL")
+	assert(is_instance_valid(game.episode_intro),"Episode 1 opens with the ink animatic")
+	game.episode_intro.finish()
+	await process_frame
 	assert(game.phase=="playing" and game.background.key=="citadel-1")
 	game.set_process(false)
 	assert(game.scale==Vector2.ONE and game.position.x==0)
