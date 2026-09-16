@@ -29,6 +29,13 @@ func _ready():
   names.append(title)
   streams.append(track.stream)
   places.append(PLACES[places.size()])
+ var endings=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ending-music.json"))
+ for job in endings.jobs:
+  names.append(job.name)
+  var stream=load("res://audio_options/"+job.file)
+  stream.loop=false
+  streams.append(stream)
+  places.append("ENDING / PREVIEW")
  back_menu=load("res://scripts/menu.gd").new()
  add_child(back_menu)
  back_menu.setup(game.art)
@@ -106,5 +113,5 @@ func paint():
   canvas.draw_line(Vector2(160,y),Vector2(1280,y),Color(.40,.34,.24,.45))
   text(names[i],Vector2(178,y+38),24)
   text(places[i],Vector2(820,y+38),17)
-  if current==i:text("PAUSED" if player.stream_paused else "PLAYING",Vector2(1150,y+38),14,Color("bdaa7d"))
+  if current==i:text("PAUSED" if player.stream_paused else "PLAYING" if player.playing else "FINISHED",Vector2(1150,y+38),14,Color("bdaa7d"))
  canvas.draw_line(Vector2(160,180+names.size()*ROW_HEIGHT),Vector2(1280,180+names.size()*ROW_HEIGHT),Color("bdaa7d"))
