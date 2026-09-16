@@ -567,7 +567,7 @@ func engaged_enemies() -> Array:
 	for side in [-1,1]:
 		var nearest={}
 		for f in enemies:
-			if f.hp>0 and f.down.is_empty() and sign(f.x-hero.x)==side:
+			if f.hp>0 and f.down.is_empty() and not f.kind in ["archer","witch","bearer","king","saint"] and (1 if f.x>=hero.x else -1)==side:
 				if nearest.is_empty() or abs(f.x-hero.x)<abs(nearest.x-hero.x): nearest=f
 		if not nearest.is_empty(): engaged.append(nearest.id)
 	# Hard adds one intermittent melee challenger, with breathing room between pushes.
@@ -1739,7 +1739,7 @@ func draw_hud():
 	# Only clean bronze/stone compartments are reused; neither skull ornament is drawn.
 	hud_frame(Rect2(0,0,736,82),Rect2(1016,61,300,223))
 	hud_frame(Rect2(2,2,78,78),Rect2(842,61,174,223))
-	hero_voice.draw_portrait(hud,Rect2(10,9,62,64))
+	hero_voice.draw_portrait(hud,Rect2(9,9,64,67))
 	hud_frame(Rect2(518,2,216,78),Rect2(1016,61,300,223))
 	for i in range(2):
 		var meter=Rect2(89,13+i*33,416,22)

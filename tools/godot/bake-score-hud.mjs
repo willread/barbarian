@@ -28,15 +28,15 @@ const labels=[...Array.from({length:10},(_,i)=>String(i)),...Array.from({length:
 for(const label of labels){
  const small=/^(AREA|WAVE|BOSS)/.test(label);
  const multiplier=/^x\d+$/.test(label);
- if(!small&&!multiplier&&manifest.menu["HUD "+label]&&fs.existsSync(path.join(out,`menu-${manifest.menu["HUD "+label].id}.png`))&&fs.existsSync(path.join(out,`menu-${manifest.menu["HUD "+label].id}-fuel.png`)))continue;
- const el={textContent:label,getClientRects:()=>[1],dataset:{stoneFont:'Cinzel',boldSmall:small,boldMultiplier:multiplier},computed:{fontSize:'75',letterSpacing:'1'},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};sc.window.bakeStone(el);const r=el._stoneFrames,id='hud-'+label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'');
+ if(!multiplier&&manifest.hudSmallLabelVersion===1&&manifest.menu["HUD "+label]&&fs.existsSync(path.join(out,`menu-${manifest.menu["HUD "+label].id}.png`))&&fs.existsSync(path.join(out,`menu-${manifest.menu["HUD "+label].id}-fuel.png`)))continue;
+ const el={textContent:label,getClientRects:()=>[1],dataset:{stoneFont:'Cinzel',boldSmall:small,boldMultiplier:multiplier},computed:{fontSize:'75',letterSpacing:multiplier?'10':'1'},querySelector:()=>true,classList:{add(){}},style:{setProperty(){}}};sc.window.bakeStone(el);const r=el._stoneFrames,id='hud-'+label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'');
  fs.writeFileSync(path.join(out,`menu-${id}.png`),Buffer.from(r.url.split(',')[1],'base64'));
  const c=createCanvas(r.sw,r.sh),g=c.getContext('2d'),p=g.createImageData(r.sw,r.sh);for(let i=0;i<r.fuel.length;i++){p.data[i*4]=p.data[i*4+1]=p.data[i*4+2]=255;p.data[i*4+3]=r.fuel[i]*255;}g.putImageData(p,0,0);write(`menu-${id}-fuel`,c);
  manifest.menu["HUD "+label]={id,width:r.width,height:r.height,fw:r.fw,fh:r.fh,pad:r.firePad};
  if(global.gc)global.gc();
 }
 manifest.hudSmallLabelVersion=1;
-manifest.hudMultiplierWeightVersion=2;
+manifest.hudMultiplierWeightVersion=3;
 fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest));
 console.log('Asset conversion complete: '+out);
 

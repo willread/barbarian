@@ -319,7 +319,9 @@ func legion_intent(e: Dictionary, h: Dictionary, engaged: bool) -> Vector2:
 	var x=(h.x-e.x)/SCALE
 	var y=(h.y-e.y)/SCALE
 	e.dir=-1 if x<0 else 1
-	var post=33 if engaged else 74
+	# The weapon box is shorter than its nominal reach. Close far enough to
+	# overlap either facing of an idle player's body before holding position.
+	var post=24 if engaged else 74
 	if engaged and abs(y)<8 and abs(x)<=43:
 		var a=attacks.enemy.duplicate(true)
 		a.direction=e.dir
