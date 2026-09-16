@@ -22,6 +22,15 @@ func check():
 		assert(game.art.texture(game.art.layout(pose).cel.file)!=null)
 	boss.moving=false
 	assert(game.art.pose(boss)[0]=="enemy-saint-v1","Stopping returns to the standing pose")
+	seed(712)
+	var choices=[]
+	for attempt in 40:
+		boss.attack={};boss.aiRest=0;boss.moveIndex=0
+		game.e_ai.saint_intent(boss,hero)
+		choices.append(boss.attack.type)
+	assert("saintVolley" in choices and "furnaceBlast" in choices,"Attack choice is random even with the same move index")
+	assert(choices[0]==choices[1] or range(1,choices.size()).any(func(i):return choices[i]==choices[i-1]),"Random choice allows consecutive repeats")
+	boss.attack={}
 	for second_phase in [false,true]:
 		boss.phaseTwo=second_phase
 		for attack in [{"type":"slash","damage":99,"direction":1},{"type":"magic","magic":true,"damage":99,"direction":1},{"type":"clinker","reflected":true,"area_blast":true,"damage":99,"direction":1}]:
@@ -33,13 +42,13 @@ func check():
 		var volley=boss.attack
 		combat.step_saint_volley(game,boss,volley)
 		assert(combat.hazards.is_empty())
-		for shot in (2 if second_phase else 1):
+		for shot in (3 if second_phase else 2):
 			volley.age=volley.from+shot*combat.SAINT_THROW_INTERVAL
 			combat.step_saint_volley(game,boss,volley)
 			assert(combat.hazards.size()==shot+1,"Release exactly one core per throw")
 			combat.step_saint_volley(game,boss,volley)
 			assert(combat.hazards.size()==shot+1,"No duplicate release on repeated tick")
-		assert(combat.hazards.size()==(2 if second_phase else 1))
+		assert(combat.hazards.size()==(3 if second_phase else 2))
 		for bomb in combat.hazards:
 			assert(bomb.life==combat.SAINT_BOMB_FUSE and combat.bomb_height(bomb)==325*boss.size)
 			assert(bomb.target.x>=110 and bomb.target.x<=1330)

@@ -319,7 +319,7 @@ func saint_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.x>1125:return Vector2(-1,0)
 	e.dir=facing_target(e,h.x)
 	if not e.aiRest:
-		var type="saintVolley" if e.moveIndex%2==0 else "furnaceBlast"
+		var type="saintVolley" if randf()<.5 else "furnaceBlast"
 		if m.begin(e,type):
 			e.attack["target"]=Vector2(h.x,h.y)
 			e.moveIndex+=1

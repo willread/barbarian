@@ -98,8 +98,8 @@ func check():
 			if not e.attack.is_empty() and e.attack.type not in attacks_seen:attacks_seen.append(e.attack.type)
 			for hazard in combat.hazards:
 				if hazard.kind not in seen:seen.append(hazard.kind)
-		assert(("mire" if kind=="witch" else "root" if kind=="king" else "clinker") in seen,"AI must actually emit its mechanic: "+kind)
-		if kind=="saint":assert("furnaceBlast" in attacks_seen and "saintVolley" in attacks_seen,"Solo Saint alternates flame column and bomb volleys")
+		if kind=="saint":assert(not attacks_seen.is_empty() and attacks_seen.all(func(type):return type in ["furnaceBlast","saintVolley"]),"Saint randomly selects from his two attacks")
+		else:assert(("mire" if kind=="witch" else "root" if kind=="king" else "clinker") in seen,"AI must actually emit its mechanic: "+kind)
 	combat.clear()
 	print("CAIRN_EPISODES_OK: 300 generated runs, selection, all areas, bosses, art, mire cancellation and clinker reflection")
 	game.queue_free()

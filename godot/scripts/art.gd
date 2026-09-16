@@ -31,7 +31,7 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 	if f.kind=="saint" and f.hp>0 and f.attack.get("type","")=="saintVolley":
 		var a=f.attack
 		var interval=preload("res://scripts/episode_combat.gd").SAINT_THROW_INTERVAL
-		var last=a.from+(a.get("volley_count",2 if f.phaseTwo else 1)-1)*interval
+		var last=a.from+(a.get("volley_count",3 if f.phaseTwo else 2)-1)*interval
 		var frame=0 if a.age<a.from-6 else 1
 		if a.age>=a.from:
 			var beat=int(a.age-a.from)%interval
