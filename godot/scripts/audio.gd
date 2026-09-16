@@ -26,8 +26,9 @@ func setup(source: Node2D):
 	mire_loop=AudioStreamPlayer.new()
 	mire_loop.bus=Mix.bus_for("mire_loop")
 	mire_loop.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
-	mire_loop.stream=preload("res://audio/mire_loop.ogg")
-	mire_loop.stream.loop=true
+	if not OS.has_feature("shareware"):
+		mire_loop.stream=load("res://audio/mire_loop.ogg")
+		mire_loop.stream.loop=true
 	mire_loop.pitch_scale=.7
 	mire_loop.volume_db=-60
 	add_child(mire_loop)
@@ -45,7 +46,7 @@ func setup(source: Node2D):
 	for id in defaults.get("volumes",{}): set_volume(id,float(defaults.volumes[id]),false)
 	for id in defaults.get("pools",{}):pools[id]=defaults.pools[id]
 	var saved=ConfigFile.new()
-	if saved.load("user://soundboard.cfg")==OK:
+	if not OS.has_feature("shareware") and saved.load("user://soundboard.cfg")==OK:
 		for id in saved.get_section_keys("choices"):
 			set_variant(id,saved.get_value("choices",id),false)
 	if saved.has_section("pools"):
@@ -57,7 +58,8 @@ func setup(source: Node2D):
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
 		voices.append(player)
-	for id in ["music_menu","music_game","roots-below","furnace-heart-overdrive"]:
+	var music_ids=["music_menu","music_game"] if OS.has_feature("shareware") else ["music_menu","music_game","roots-below","furnace-heart-overdrive"]
+	for id in music_ids:
 		var player=AudioStreamPlayer.new()
 		player.bus=&"Music"
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM

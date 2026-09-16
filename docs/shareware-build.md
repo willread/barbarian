@@ -60,6 +60,27 @@ all artwork, frames and other lettering.
 Episode 1 access and full-edition access. Export checks verify the edition flag
 in the actual pack. `--shareware-capture` writes screenshots under the build-tools folder.
 
-Paid-episode assets remain packaged; this mode restricts play rather than serving
-as DRM or claiming that those resources cannot be extracted.
+## Smaller shareware package
+
+`tools/godot/shareware-assets.mjs` regenerates the shareware preset exclusions
+on every build. Episode 2–3 backgrounds, enemies, bosses, effects, world metadata,
+boss voice clips, epilogue and music are omitted from the exported pack. The
+upgrade screen keeps its embedded episode illustrations. Shared combat effects,
+episode 1's enemies and boss, and unlockable weapon art remain available.
+
+The music player shows only the menu and episode 1 tracks in shareware. Unused
+audio audition variants are excluded; selected sounds and impact pools come from
+`audio_defaults.json`. Shareware ignores local soundboard overrides so a developer's
+saved selections cannot request excluded audio. The audio debug menu is disabled
+in both editions. Full-edition resources and source artwork remain in the project.
+
+Shareware web exports also remove the known generated preview directories from
+the web output (background/controls studies, episode 2 music, soundboard and trailer).
+No source study folders are removed.
+
+`godot/tests/shareware_assets.gd` runs against each exported pack, checking removed
+assets, all 13 episode 1 waves, four backgrounds, active sounds and the two-track
+music player. The September 16 build reduced the web game-data pack from
+271,095,580 bytes to 142,079,616 bytes (47.6%). This comparison excludes the engine
+runtime and external web splash images; it is not the total download size.
 

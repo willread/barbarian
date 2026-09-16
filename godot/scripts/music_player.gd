@@ -22,6 +22,7 @@ func _ready():
  for track in game.audio.tracks:
   saved_pauses.append(track.stream_paused)
   track.stream_paused=true
+  if game.shareware and names.size()>=2:continue
   var id=track.stream.resource_path.get_file().get_basename()
   var title="Roots Below" if id=="roots-below" else "Original Menu Theme" if id=="music_menu" else "Original Battle Theme"
   for job in manifest.get("jobs",[])+candidates.jobs:
@@ -31,6 +32,7 @@ func _ready():
   places.append(PLACES[places.size()])
  var endings=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ending-music.json"))
  for job in endings.jobs:
+  if game.shareware:break
   if job.id!="homeward-lastlight":continue
   names.append("Last Light")
   var stream=load("res://audio_options/"+job.file)

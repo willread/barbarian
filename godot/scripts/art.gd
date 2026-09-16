@@ -12,9 +12,10 @@ func _init():
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
 	data.atlases["enemy-legion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/minotaur-atlas.json"))
 	data.atlases["hero-eat"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/eat-atlas.json"))
+	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
+	if OS.has_feature("shareware"):return
 	for kind in ["witch","bearer","king","saint"]:
 		data.atlases["enemy-"+kind+"-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/"+kind+"-atlas.json"))
-	data.atlases["hero-spin"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/spin-atlas.json"))
 	for action in ["walk","attacks"]:
 		data.atlases["king-"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://art/king-"+action+"-atlas.json"))
 	data.atlases["enemy-saint-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/saint-v2-atlas.json"))

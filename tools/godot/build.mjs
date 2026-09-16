@@ -34,6 +34,7 @@ if(!menuManifest.menu['MUSIC PLAYER']||!menuManifest.menu['NEW JOURNEY']||!menuM
 if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['tools/godot/bake-results.mjs']);
 if(!fs.existsSync('godot/art/controls/hall-of-legends.png'))run(process.execPath,['tools/godot/bake-controls.mjs','--hall']);
 if(!menuManifest.menu['HUD x10']||menuManifest.hudSmallLabelVersion!==1||menuManifest.hudMultiplierWeightVersion!==2)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
+run(process.execPath,['tools/godot/shareware-assets.mjs']);
 run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/check-episode-sprites.mjs']);
@@ -90,10 +91,11 @@ for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
  run(binary,['--headless','--path','godot','--export-release',target+(process.argv.includes('--shareware')?' Shareware':''),file]);
  if(target==='Windows')fs.copyFileSync('godot/native/cairn_aspect.dll',path.join(path.dirname(file),'cairn_aspect.dll'));
- run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
+ if(!process.argv.includes('--shareware'))run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
  // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/shareware.gd'),'--',process.argv.includes('--shareware')?'--expect-shareware':'--expect-full']);
+ if(process.argv.includes('--shareware'))run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/shareware_assets.gd')]);
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.
   let html=fs.readFileSync(file,'utf8');
@@ -138,7 +140,18 @@ cairnCheck();
   fs.copyFileSync('godot/art/studio-background.png',path.join(path.dirname(file),'studio-background.png'));
   fs.copyFileSync('godot/art/maximum-force-logo.png',path.join(path.dirname(file),'maximum-force-logo.png'));
   for(const icon of ['loading-stones-v2.png','cairn.ico','cairn-icon-32.png','cairn-icon-180.png','cairn-icon-256.png'])fs.copyFileSync('godot/art/branding/'+icon,path.join(path.dirname(file),icon));
-  fs.cpSync('studies/backgrounds',path.join(path.dirname(file),'background-study'),{recursive:true});
+  if(process.argv.includes('--shareware')){
+   // Remove only known generated preview directories inside this web output.
+   const webRoot=fs.realpathSync(path.dirname(file));
+   for(const name of ['background-study','controls-study','ep2-music','soundboard','trailer']){
+    const preview=path.resolve(webRoot,name);
+    if(path.dirname(preview)!==webRoot)throw Error('Preview cleanup escaped web output');
+    if(!fs.existsSync(preview))continue;
+    if(fs.lstatSync(preview).isSymbolicLink())throw Error('Refusing to remove linked preview: '+preview);
+    if(fs.realpathSync(preview)!==preview)throw Error('Unexpected preview target: '+preview);
+    fs.rmSync(preview,{recursive:true});
+   }
+  }else fs.cpSync('studies/backgrounds',path.join(path.dirname(file),'background-study'),{recursive:true});
   fs.writeFileSync(file,html);
  }
  console.log(`${target}: ${file}`);

@@ -1,5 +1,5 @@
 extends Node2D
-const CORE=preload("res://art/ember-core-v1.png")
+var CORE=load("res://art/ember-core-v1.png")
 var clock=0.0
 var urgency=0.0
 var body: Sprite2D

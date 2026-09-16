@@ -44,7 +44,7 @@ func _init():
 	var cel=atlas.cels[5]
 	var ratio=420.0/atlas.referenceHeight
 	chest=Sprite2D.new()
-	chest.texture=preload("res://art/saint-v2-5.png")
+	chest.texture=load("res://art/saint-v2-5.png")
 	chest.centered=false
 	chest.position=Vector2((cel.left-atlas.cellWidth*.5)*ratio,-cel.height*ratio)
 	chest.scale=Vector2.ONE*ratio

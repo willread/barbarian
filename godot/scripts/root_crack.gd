@@ -1,6 +1,6 @@
 extends Sprite2D
 func _init():
- texture=preload("res://art/king-crack-v1.png")
+ texture=load("res://art/king-crack-v1.png")
  material=ShaderMaterial.new()
  material.shader=preload("res://shaders/root_crack.gdshader")
  z_index=0

@@ -6,7 +6,7 @@ var clock=0.0
 var framing_offset=Vector2.ZERO
 var screen: Dictionary={}
 var chapter_screens=JSON.parse_string(FileAccess.get_file_as_string("res://worlds/citadel.json"))
-var episode_screens={"swamp":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/swamp.json")),"ashen":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/ashen.json"))}
+var episode_screens={} if OS.has_feature("shareware") else {"swamp":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/swamp.json")),"ashen":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/ashen.json"))}
 var decorations: Array=[]
 func setup(source: CairnArt,name: String):
 	art=source

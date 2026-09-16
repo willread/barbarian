@@ -1,5 +1,5 @@
 extends Node2D
-const TEXTURES=[preload("res://assets/king-root-v2-0.png"),preload("res://assets/king-root-v2-1.png"),preload("res://assets/king-root-v2-2.png"),preload("res://assets/king-root-v2-3.png")]
+static var TEXTURES=[] if OS.has_feature("shareware") else [load("res://assets/king-root-v2-0.png"),load("res://assets/king-root-v2-1.png"),load("res://assets/king-root-v2-2.png"),load("res://assets/king-root-v2-3.png")]
 var growth=0.0
 var facing=1
 var variant=0

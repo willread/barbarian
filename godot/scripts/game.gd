@@ -193,9 +193,7 @@ func _ready():
 		master_volume=clampi(settings.get_value("audio","volume",100),0,100)
 	initialize_weapon(settings,Time.get_date_string_from_system())
 	apply_settings()
-	var soundboard=preload("res://scripts/soundboard.gd").new()
-	soundboard.audio=audio
-	add_child(soundboard)
+	# Audio audition/debug menu is disabled in game builds.
 	blood=BloodScript.new()
 	add_child(blood)
 	ground_fx=Node2D.new()
