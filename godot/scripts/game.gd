@@ -719,7 +719,7 @@ func kill_visible_enemies():
 
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
-	if f.kind=="saint" and not a.get("instant_kill",false):
+	if f.kind=="saint" and not a.get("instant_kill",false) and not a.get("magic",false):
 		if not (a.get("type","")=="clinker" and a.get("reflected",false) and a.get("direct_bomb",false)):
 			if attacker.player and not a.get("magic",false) and not a.get("area_blast",false):
 				m.rebound_charge(attacker,int(a.direction))
@@ -729,7 +729,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 				shake=maxf(shake,3)
 			return
 	if f.player and not f.pickup.is_empty():return
-	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to:return
+	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to and a.get("type","")!="clinker":return
 	if attacker.player and not f.player and f.kind=="shield" and a.get("spin",false) and not e_ai.guard_open(f):
 		var push_direction=1 if f.x>=attacker.x else -1
 		f.x=clampf(f.x+push_direction*42,70,1370)

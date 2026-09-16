@@ -35,7 +35,11 @@ func check():
 		await process_frame
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-warning.png")
+	hero.attack={};hero.hurtTicks=0;hero.recovering=0
+	assert(game.m.begin(hero,"spin"))
+	hero.attack.age=hero.attack.from
 	combat.step(game,.56)
+	assert(hero.attack.is_empty(),"Bomb explosion interrupts an active spin")
 	assert(hero.hp<100 and not hero.down.is_empty() and hero.slamPush.x>0,"Blast must hurt, knock down and push outward")
 	var hp=hero.hp
 	combat.detonate(game,bomb)
@@ -86,6 +90,11 @@ func check():
 	game.enemies=[owner]
 	combat.clear()
 	assert(combat.explosions.is_empty() and combat.bomb_views.is_empty())
+	var slammed=bomb.duplicate(true)
+	slammed.reflected=false
+	var slam_position=slammed.p
+	combat.strike_bomb(game,slammed,{"type":"dive","dive":true,"direction":1})
+	assert(not slammed.reflected and slammed.p==slam_position,"Slam cannot launch a bomb")
 	# Reflected projectiles rise, descend and settle; their landing tell stays fixed.
 	var arc={"kind":"clinker","owner":owner,"p":Vector2(400,670),"target":Vector2(400,670),"age":.8,"life":3.0,"reflected":true,"velocity":Vector2(650,0),"strikes":[],"flight_age":0.0,"launch_height":0.0,"launch_speed":430.0}
 	combat.hazards=[arc]

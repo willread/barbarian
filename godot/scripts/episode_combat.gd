@@ -330,11 +330,16 @@ func step_saint_volley(game,enemy: Dictionary,a: Dictionary):
 		a.volley_targets=saint_volley_targets(game,a.volley_count)
 		a.ticks=a.from+(a.volley_count-1)*SAINT_THROW_INTERVAL+38
 		a.volley_released=0
+	if a.age<a.from or (int(a.age-a.from)%SAINT_THROW_INTERVAL)<1:
+		enemy.dir=1 if game.hero.x>=enemy.x else -1
+		a.direction=enemy.dir
 	if a.age<a.from:return
 	var due=mini(a.volley_count,1+int(a.age-a.from)/SAINT_THROW_INTERVAL)
 	while a.volley_released<due:
 		var point=a.volley_targets[a.volley_released]
 		var start=Vector2(enemy.x+enemy.dir*305*enemy.size,enemy.y)
+		# Every core travels outward from the hand, never back through his body.
+		point.x=maxf(point.x,start.x+30) if enemy.dir>0 else minf(point.x,start.x-30)
 		hazards.append({"kind":"clinker","owner":enemy,"p":start,"start":start,"target":point,"age":0.0,"life":SAINT_BOMB_FUSE,"throw_height":325.0*enemy.size,"arc_height":55.0,"reflected":false,"velocity":Vector2.ZERO,"strikes":[]})
 		a.volley_released+=1
 		game.audio.play("heavy_hit",-8,1.15)
@@ -388,6 +393,7 @@ func step_scream(game,enemy: Dictionary,a: Dictionary):
 			hero.invTicks=maxi(hero.invTicks,45)
 
 func strike_bomb(game,h: Dictionary,a: Dictionary):
+	if a.get("dive",false):return
 	var hero=game.hero
 	var pose_actor=hero.duplicate()
 	pose_actor.dir=a.direction

@@ -38,19 +38,23 @@ func check():
 	boss.attack={}
 	for second_phase in [false,true]:
 		boss.phaseTwo=second_phase
-		for attack in [{"type":"slash","damage":99,"direction":1},{"type":"magic","magic":true,"damage":99,"direction":1},{"type":"clinker","reflected":true,"area_blast":true,"damage":99,"direction":1}]:
+		for attack in [{"type":"slash","damage":99,"direction":1},{"type":"clinker","reflected":true,"area_blast":true,"damage":99,"direction":1}]:
 			game.damage(boss,attack,hero)
-			assert(boss.hp==120,"Armor rejects melee, magic and nearby explosions in both phases")
+			assert(boss.hp==120,"Armor rejects melee and nearby explosions in both phases")
 		assert(hero.hurtTicks>0,"Melee recoils against armor")
-		boss.attack={}
+		boss.attack={};boss.x=720
 		assert(game.m.begin(boss,"saintVolley"))
 		var volley=boss.attack
 		combat.step_saint_volley(game,boss,volley)
 		assert(combat.hazards.is_empty())
 		for shot in (3 if second_phase else 2):
+			hero.x=300 if shot%2==0 else 1200
 			volley.age=volley.from+shot*combat.SAINT_THROW_INTERVAL
 			combat.step_saint_volley(game,boss,volley)
 			assert(combat.hazards.size()==shot+1,"Release exactly one core per throw")
+			var released=combat.hazards.back()
+			assert(boss.dir==(-1 if hero.x<boss.x else 1) and volley.direction==boss.dir)
+			assert((released.target.x-released.start.x)*boss.dir>0,"Bomb travels forward from the throwing hand")
 			combat.step_saint_volley(game,boss,volley)
 			assert(combat.hazards.size()==shot+1,"No duplicate release on repeated tick")
 		assert(combat.hazards.size()==(3 if second_phase else 2))
@@ -59,6 +63,12 @@ func check():
 			assert(bomb.target.x>=110 and bomb.target.x<=1330)
 		combat.clear()
 		boss.attack={}
+	for second_phase in [false,true]:
+		boss.phaseTwo=second_phase
+		game.damage(boss,{"magic":true,"continuous":true,"damage":.12,"direction":1},hero)
+		assert(boss.hp<120 and boss.electricTicks>0,"Lightning penetrates furnace armor in both phases")
+		boss.hp=120
+	boss.hurtTicks=0;boss.attack={};boss.dir=-1;boss.x=1040;hero.x=670
 	boss.phaseTwo=false
 	hero.hurtTicks=0;hero.recovering=0;hero.down={};hero.attack={}
 	# Return a bomb during its extended fuse; swept contact must tag this boss.
