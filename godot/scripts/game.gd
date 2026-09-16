@@ -580,6 +580,19 @@ func difficulty_damage(taken: bool) -> float:
 	if difficulty=="hard":return 1.25 if taken else .75
 	return 1.0
 
+func begin_epilogue():
+	if is_instance_valid(episode_intro):return
+	# Save the victory before the cinematic; closing or skipping cannot lose it.
+	finish_run("won")
+	episode_intro=preload("res://scripts/episode_intro.gd").new()
+	episode_intro.game=self
+	episode_intro.ending=true
+	add_child(episode_intro)
+	episode_intro.finished.connect(func():
+		episode_intro.queue_free()
+		episode_intro=null
+		change_phase("won"))
+
 func begin_episode():
 	if current_episode!=1:
 		start_game()
@@ -1111,6 +1124,9 @@ func _process(raw: float):
 		if victory_age>=4.8:
 			wipe.queue_free()
 			wipe=null
+			if current_episode==3:
+				begin_epilogue()
+				return
 			change_phase("won")
 	if phase=="title" and not loading_menu: title_intro=min(1.25,title_intro+raw)
 	if hit_stop>0 and phase=="playing":
