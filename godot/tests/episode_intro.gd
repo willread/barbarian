@@ -22,19 +22,20 @@ func check():
 	game._process(.2)
 	assert(game.clock==before,"Gameplay stays frozen under the opening")
 	assert(intro.caption_at(-.1)=="" and intro.caption_at(.5)=="They took my goat...")
-	assert(intro.caption_at(5.5)=="Now I'm going to take their lives!")
+	assert(intro.caption_at(intro.second_line_start-intro.voice_start+.1)=="Now I'm going to take their lives!")
 	intro.age=1
 	intro._process(.01)
 	assert(intro.player.playing and intro.voice_started)
-	intro.age=4.19;intro._process(0)
+	intro.age=intro.sting_start-.01;intro._process(0)
 	assert(not intro.sting_started,"Riff waits until the gap between lines")
-	intro.age=4.2;intro._process(.001)
+	intro.age=intro.sting_start;intro._process(.001)
 	assert(intro.sting_started and intro.sting.playing)
 	assert(intro.sting.stream.resource_path.ends_with("revenge-riff-v1.ogg"))
-	intro.age=6.5;intro._process(0)
+	intro.age=intro.second_line_start+.01;intro._process(0)
 	assert(intro.second_line_started and intro.player.stream.resource_path.ends_with("revenge-line-two.ogg"))
 	assert(intro.caption_at(3.0)=="","Subtitles clear between the separated lines")
-	assert(intro.sting.volume_db<=-17,"Guitar tail ducks below the spoken threat")
+	assert(is_equal_approx(intro.second_line_start-intro.sting_start-intro.sting.stream.get_length(),1.0),"Full guitar clip ends one second before the second line")
+	assert(intro.sting_start>=intro.voice_start+1.1,"Guitar starts after the first line")
 	if "--capture" in OS.get_cmdline_user_args():
 		for time in [1.5,4.0,6.5,9.0]:
 			intro.age=time
@@ -42,7 +43,7 @@ func check():
 			await process_frame
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("E:/Cairn-build-tools/intro-%.1f.png"%time)
-	intro.age=10.49
+	intro.age=intro.duration-.01
 	intro._process(.02)
 	assert(intro.done and not intro.player.playing and not intro.sting.playing)
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing" and game.wave==1)

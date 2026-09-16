@@ -1,8 +1,8 @@
 # Episode 1 opening
 
 The static ink panorama moves left to right by one 1440-pixel viewport over
-8.2 seconds, following a 0.8-second establishing hold. The scene ends at 10.5
-seconds, including a fade into the normal Episode 1 entrance. Any keyboard key, mouse button, controller button or trigger skips after the
+8.2 seconds, following a 0.8-second establishing hold. The scene ends after the final spoken line and a short fade into the normal
+Episode 1 entrance. Any keyboard key, mouse button, controller button or trigger skips after the
 first half-second. No skip label is shown.
 
 The original panorama was generated with the built-in image-generation tool
@@ -15,13 +15,14 @@ There is no animated deformation or movement within the illustration.
 Narration is the user's supplied Downloads file:
 `ElevenLabs_2026-09-16T02_57_34_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3`.
 The source is split at its natural pause without changing delivery: the first
-line plays at 1 second; the second at 6.4 seconds, as Cairn comes into view.
+line plays at 1 second; the second at about 8.19 seconds, as Cairn comes into view.
 The user supplied the exact words. Subtitles follow the separated lines.
 Subtitles are white on a solid black bottom strip and remain visible when muted.
 
-The approved descending guitar riff (`revenge-riff-v1`) starts at 4.2 seconds,
-with its picked phrase leading into the second line at 6.4 seconds. The ringing
-tail ducks under the voice. The full phrase finishes before the final fade. It follows music/mute settings and stops on skip.
+The approved descending guitar riff (`revenge-riff-v1`) starts at 2.15 seconds,
+after the first line. Its full 5.04-second clip finishes before a one-second gap;
+the second line starts at about 8.19 seconds. Subtitles and the final fade follow
+the actual clip lengths. The pan still completes at 9 seconds. It follows music/mute settings and stops on skip.
 The original sound and generation prompt are in `soundboard/cutscenes/`.
 
 Only a fresh Episode 1 selection plays the introduction. Retrying after death

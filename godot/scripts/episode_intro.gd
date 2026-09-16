@@ -12,6 +12,7 @@ var age=0.0
 var done=false
 var voice_started=false
 var sting_started=false
+var sting_start=2.15
 var sting: AudioStreamPlayer
 var ending_music: AudioStreamPlayer
 var canvas: Node2D
@@ -44,6 +45,12 @@ func _ready():
 	add_child(sting)
 	var subtitles=JSON.parse_string(FileAccess.get_file_as_string("res://art/ending/subtitles.json" if ending else "res://art/intro/subtitles.json"))
 	captions=subtitles
+	if not ending:
+		second_line_start=sting_start+sting.stream.get_length()+1.0
+		var second_length=load("res://art/intro/revenge-line-two.ogg").get_length()
+		duration=second_line_start+second_length+.85
+		captions[1].start=second_line_start-voice_start
+		captions[1].end=captions[1].start+second_length+.25
 	previous_music_gain=game.audio.cutscene_music_gain
 	game.audio.cutscene_music_gain=previous_music_gain*.7
 	if ending:
@@ -74,10 +81,9 @@ func _process(dt: float):
 		second_line_started=true
 		player.stream=load("res://art/intro/revenge-line-two.ogg")
 		player.play()
-	# Descending guitar riff leads into "Now"; lower its tail beneath the voice.
-	var voice_time=age-second_line_start
-	sting.volume_db=-80 if game.muted or not game.music_enabled else lerpf(-1,-17,smoothstep(-.15,.07,voice_time))
-	if not ending and voice_started and voice_time>=-2.2 and not sting_started:
+	# Complete the full riff, then leave one second before the threat.
+	sting.volume_db=-80 if game.muted or not game.music_enabled else -1
+	if not ending and voice_started and age>=sting_start and not sting_started:
 		sting_started=true
 		sting.play()
 	var size=get_viewport().get_visible_rect().size
