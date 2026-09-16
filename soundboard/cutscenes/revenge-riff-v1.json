@@ -1,0 +1,5 @@
+{
+  "provider": "ElevenLabs",
+  "model": "music_v1",
+  "prompt": "A five-second SOLO ELECTRIC GUITAR musical cue for a dark sword-and-sorcery revenge scene. A barbarian sees his humble hut burning and demons stealing his beloved goat; his grief hardens into cold, deliberate anger just before he says he will take their lives. Perform a SHORT, CLEARLY ARTICULATED DESCENDING RIFF, not a single sustained chord: immediately pick a low gritty note, answer it with two quick palm-muted notes, descend through two heavier accented notes, then land on a lower open power chord that rings and decays. Six distinct pick attacks in the first two seconds, ending in a long low growl. A concise memorable musical sentence with the rhythm dun-da-dun, dun, DUNNN. Restrained, ominous, grimly determined classic heavy-rock attitude, dry mid-gain tube amplifier, audible pick definition, warm rough edges, human guitar performance. No triumphant solo, no shredding, no squeals, no drums, no bass instrument, no orchestra, no vocals, no pad or ambient swell, no repeating loop. Only one electric guitar phrase followed by natural amp decay and silence."
+}
