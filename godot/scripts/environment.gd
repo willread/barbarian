@@ -65,6 +65,14 @@ func setup(source: CairnArt,name: String):
 			foreground.z_as_relative=false
 			foreground.z_index=1805
 			add_child(foreground)
+			for kind in ["distant","ground","near"]:
+				var rain=preload("res://scripts/citadel_rain.gd").new()
+				rain.name="CitadelRain"+kind.capitalize()
+				rain.configure(screen.walkable.polygon,int(name.get_slice("-",1)),kind)
+				rain.z_as_relative=false
+				rain.z_index=1804 if kind=="near" else -40 if kind=="ground" else -50
+				add_child(rain)
+				decorations.append(rain)
 		if name=="ashen-3":
 			var brazier=preload("res://scripts/crucible_brazier.gd").new()
 			brazier.name="HangingBrazier"

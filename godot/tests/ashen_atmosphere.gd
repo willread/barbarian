@@ -36,7 +36,7 @@ func check():
 	await process_frame
 	assert(not game.background.has_node("AshenSceneHeat") and not game.background.has_node("AshenSceneCapture"))
 	assert(not game.background.has_node("AshenVeil"),"Episode transition must remove soot overlays")
-	assert(game.background.decorations.is_empty())
+	assert(game.background.decorations.all(func(d):return d.name.begins_with("CitadelRain")))
 	game.queue_free()
 	await process_frame
 	print("CAIRN_ASHEN_ATMOSPHERE_OK: four screens, continuous heat and ash, foreground input passthrough, transition cleanup")
