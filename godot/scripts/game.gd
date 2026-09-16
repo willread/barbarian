@@ -765,6 +765,9 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.kind=="king" and not e_ai.boss_open(f) and not a.get("magic",false):
 		a=a.duplicate()
 		a.damage*=.65 if f.kind=="king" else .2
+	if f.kind=="saint" and a.get("type","")=="clinker" and a.get("direct_bomb",false):
+		a=a.duplicate()
+		a.damage*=1.4
 	var previous_hp=f.hp
 	f.hp=0 if a.get("instant_kill",false) and not f.player else max(0,f.hp-a.damage*damage_multiplier*difficulty_damage(f.player)*(100.0/48 if f.player else 1)*(e_ai.damage_scale(attacker) if not attacker.player else 1.25))
 	if f.hp<previous_hp:

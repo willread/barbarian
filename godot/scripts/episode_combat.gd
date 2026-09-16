@@ -327,7 +327,7 @@ func step_saint_volley(game,enemy: Dictionary,a: Dictionary):
 	if enemy.hp<=0:return
 	if not a.has("volley_targets"):
 		a.volley_count=3 if enemy.phaseTwo else 2
-		a.volley_targets=saint_volley_targets(game,a.volley_count)
+		a.volley_targets=saint_volley_targets(game,enemy,a.volley_count)
 		a.ticks=a.from+(a.volley_count-1)*SAINT_THROW_INTERVAL+38
 		a.volley_released=0
 	if a.age<a.from or (int(a.age-a.from)%SAINT_THROW_INTERVAL)<1:
@@ -344,18 +344,20 @@ func step_saint_volley(game,enemy: Dictionary,a: Dictionary):
 		a.volley_released+=1
 		game.audio.play("heavy_hit",-8,1.15)
 
-func saint_volley_targets(game,count: int) -> Array:
+func saint_volley_targets(game,enemy: Dictionary,count: int) -> Array:
 	var targets: Array=[]
+	var facing=1 if game.hero.x>=enemy.x else -1
+	var hand_x=enemy.x+facing*305*enemy.size
+	var center=Vector2(clampf(game.hero.x+randf_range(-25,25),210,1230),clampf(game.hero.y,630,685))
+	# Move the whole cluster beyond the hand so individual throws retain their spacing.
+	center.x=maxf(center.x,hand_x+140) if facing>0 else minf(center.x,hand_x-140)
+	var rotation=randf_range(.35,PI-.35)+(PI if randf()<.5 else 0) if count==2 else randf()*TAU
 	for i in count:
-		# Stratified random spread; one counterable core stays near the player's lane.
-		var point=Vector2(clampf(game.hero.x+randf_range(-100,100),110,1330),game.hero.y) if i==0 else Vector2(110+(1220.0/count)*(i+randf()),randf_range(600,735))
-		for attempt in 12:
-			if not targets.any(func(other):return (point-other).length()<115):break
-			point=Vector2(randf_range(110,1330),randf_range(600,735))
-		var probe={"x":point.x,"y":point.y}
-		game.background.constrain(probe)
-		point=Vector2(probe.x,probe.y)
+		# A small irregular oval gives overlapping danger zones without touching cores.
+		var angle=rotation+TAU*i/count+randf_range(-.12,.12)
+		var point=center+Vector2(cos(angle)*randf_range(95,110),sin(angle)*randf_range(55,65))
 		targets.append(point)
+	targets.shuffle()
 	return targets
 
 func step_furnace(game,enemy: Dictionary,a: Dictionary):

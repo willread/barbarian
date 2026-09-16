@@ -22,6 +22,20 @@ func check():
 		assert(game.art.texture(game.art.layout(pose).cel.file)!=null)
 	boss.moving=false
 	assert(game.art.pose(boss)[0]=="enemy-saint-v1","Stopping returns to the standing pose")
+	# Both batch sizes stay threatening together, with visible gaps and depth variation.
+	for count in [2,3]:
+		for sample in 100:
+			var targets=combat.saint_volley_targets(game,boss,count)
+			var min_depth=1000.0
+			var max_depth=0.0
+			for i in count:
+				min_depth=minf(min_depth,targets[i].y)
+				max_depth=maxf(max_depth,targets[i].y)
+				assert(((targets[i]-Vector2(hero.x,hero.y))/combat.BOMB_RADIUS).length()<1,"Every bomb threatens the player's lane")
+				for j in range(i):
+					var gap=targets[i].distance_to(targets[j])
+					assert(gap>70 and gap<235,"Cores are separated inside one compact batch")
+			assert(max_depth-min_depth>1,"Batch has front-to-back variation")
 	seed(712)
 	var choices=[]
 	for attempt in 40:
@@ -68,6 +82,9 @@ func check():
 		game.damage(boss,{"magic":true,"continuous":true,"damage":.12,"direction":1},hero)
 		assert(boss.hp<120 and boss.electricTicks>0,"Lightning penetrates furnace armor in both phases")
 		boss.hp=120
+	game.damage(boss,{"type":"clinker","reflected":true,"direct_bomb":true,"area_blast":true,"damage":10.0,"direction":1},hero)
+	assert(is_equal_approx(120-boss.hp,10.0*1.4*1.25*game.damage_multiplier*game.difficulty_damage(false)),"Direct bomb damage to Saint is increased by 40 percent")
+	boss.hp=120;boss.down={};boss.invTicks=0
 	boss.hurtTicks=0;boss.attack={};boss.dir=-1;boss.x=1040;hero.x=670
 	boss.phaseTwo=false
 	hero.hurtTicks=0;hero.recovering=0;hero.down={};hero.attack={}
