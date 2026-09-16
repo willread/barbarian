@@ -1,0 +1,38 @@
+{
+  "provider": "ElevenLabs",
+  "model": "eleven_text_to_sound_v2",
+  "jobs": [
+    {
+      "id": "womp-1",
+      "name": "Womp 1 — Classic Sad Trombone",
+      "duration": 1.8,
+      "prompt": "Very quick WOMP WOMP, exactly two descending notes. First at 0 seconds, second at 0.35 seconds, fully finished by 1.6 seconds, brief decay. Classic warm acoustic sad trombone, dry and comedic, second note droops downward. No voice, backing music, percussion, extra notes or opening silence.",
+      "file": "womp-1.mp3",
+      "source": "womp-1-source.mp3"
+    },
+    {
+      "id": "womp-2",
+      "name": "Womp 2 — Muted and Pitiful",
+      "duration": 1.8,
+      "prompt": "Very quick WOMP WOMP, exactly two descending notes. First at 0 seconds, second at 0.35 seconds, fully finished by 1.6 seconds, brief decay. Pitiful plunger-muted trombone, pinched nasal wah-wah tone, second note droops downward. No voice, backing music, percussion, extra notes or opening silence.",
+      "file": "womp-2.mp3",
+      "source": "womp-2-source.mp3"
+    },
+    {
+      "id": "womp-3",
+      "name": "Womp 3 — Big Deflated Tuba",
+      "duration": 1.8,
+      "prompt": "Very quick WOMP WOMP, exactly two descending notes. First at 0 seconds, second at 0.35 seconds, fully finished by 1.6 seconds, brief decay. Deep deflated tuba and bass trombone together, round low comic brass, second note sags in pitch. No voice, backing music, percussion, extra notes or opening silence.",
+      "file": "womp-3.mp3",
+      "source": "womp-3-source.mp3"
+    },
+    {
+      "id": "womp-4",
+      "name": "Womp 4 — Retro Synth Failure",
+      "duration": 1.8,
+      "prompt": "Very quick WOMP WOMP, exactly two descending notes. First at 0 seconds, second at 0.35 seconds, fully finished by 1.6 seconds, brief decay. Retro analog synth brass with a closing low-pass wah, round soft comic failure tone. No voice, backing music, percussion, extra notes or opening silence.",
+      "file": "womp-4.mp3",
+      "source": "womp-4-source.mp3"
+    }
+  ]
+}

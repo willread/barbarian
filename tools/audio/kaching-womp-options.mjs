@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
 
-const directory='soundboard/kaching-womp-options';
+const fast=process.argv.includes('--fast-womp');
+const directory=fast?'soundboard/kaching-womp-options/fast':'soundboard/kaching-womp-options';
 fs.mkdirSync(directory,{recursive:true});
 const key=fs.readFileSync('.env.local','utf8').match(/^ELEVENLABS_API_KEY\s*=\s*(.+)$/m)?.[1].trim().replace(/^['"]|['"]$/g,'');
 if(!key)throw Error('ElevenLabs key is not configured');
@@ -14,7 +15,16 @@ const jobs=[
  {id:'womp-2',name:'Womp 2 — Muted and Pitiful',duration:3,prompt:'A lonely plunger-muted trombone plays WOMP WOOOMP, exactly two notes stepping down. First note pinched and short, second note lower, longer and slowly bending downward with a very sad wah-wah finish. Small pathetic comedic disappointment, intimate dry recording. No voice, accompaniment, percussion or other notes.'},
  {id:'womp-3',name:'Womp 3 — Big Deflated Tuba',duration:3.5,prompt:'Deep comic tuba and bass trombone in unison play WOMP WOOOOOMP. Exactly two descending notes: one short round low note then a much lower long flabby brass note sagging in pitch as breath runs out. Huge defeated disappointment, warm acoustic brass, clean isolated sound. No voice, percussion, backing music or extra notes.'},
  {id:'womp-4',name:'Womp 4 — Retro Synth Failure',duration:2.5,prompt:'Short retro arcade sadness WOMP WOOOMP sting. Exactly two descending notes on a round analog synth brass patch, short first note then a lower sustained note with a drooping pitch bend and low-pass wah closing at the end. Funny defeated disappointment, rich soft tone, clear attack. No voice, drums, backing track or extra melody.'},
-].map(job=>({...job,file:job.id+'.mp3',source:job.id+'-source.mp3'}));
+].filter(job=>!fast||job.id.startsWith('womp-')).map(job=>({
+ ...job,
+ ...(fast?{duration:1.8,prompt:'Very quick WOMP WOMP, exactly two descending notes. First at 0 seconds, second at 0.35 seconds, fully finished by 1.6 seconds, brief decay. '+[
+  'Classic warm acoustic sad trombone, dry and comedic, second note droops downward.',
+  'Pitiful plunger-muted trombone, pinched nasal wah-wah tone, second note droops downward.',
+  'Deep deflated tuba and bass trombone together, round low comic brass, second note sags in pitch.',
+  'Retro analog synth brass with a closing low-pass wah, round soft comic failure tone.'
+ ][Number(job.id.slice(-1))-1]+' No voice, backing music, percussion, extra notes or opening silence.'}:{}),
+ file:job.id+'.mp3',source:job.id+'-source.mp3'
+}));
 fs.writeFileSync(directory+'/manifest.json',JSON.stringify({provider:'ElevenLabs',model:'eleven_text_to_sound_v2',jobs},null,2)+'\n');
 let cursor=0;
 async function worker(){while(cursor<jobs.length){
@@ -24,7 +34,7 @@ async function worker(){while(cursor<jobs.length){
   if(!response.ok)throw Error('Generation HTTP '+response.status+' for '+job.id);
   fs.writeFileSync(source,Buffer.from(await response.arrayBuffer()));
  }
- const result=spawnSync('ffmpeg',['-v','error','-y','-i',source,'-af',`afade=t=out:st=${job.duration-.2}:d=0.2,loudnorm=I=-19:TP=-3:LRA=7`,'-ar','44100','-c:a','libmp3lame','-q:a','2',directory+'/'+job.file],{encoding:'utf8',windowsHide:true});
+ const result=spawnSync('ffmpeg',['-v','error','-y','-i',source,'-af',`atrim=duration=${job.duration},afade=t=out:st=${job.duration-.2}:d=0.2,loudnorm=I=-19:TP=-3:LRA=7`,'-ar','44100','-c:a','libmp3lame','-q:a','2',directory+'/'+job.file],{encoding:'utf8',windowsHide:true});
  if(result.status!==0)throw Error('Audio conversion failed for '+job.id);
  console.log('Ready '+job.name);
 }}
