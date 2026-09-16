@@ -254,7 +254,7 @@ func step(game,dt: float):
 			for enemy in game.enemies:
 				var point=Vector2(enemy.x,enemy.y)/Vector2(65,35)
 				var nearest=Geometry2D.get_closest_point_to_segment(point,before/Vector2(65,35),h.p/Vector2(65,35))
-				if enemy.hp>0 and point.distance_to(nearest)<1 and minf(old_height,bomb_height(h))<95*enemy.size:
+				if enemy.hp>0 and point.distance_to(nearest)<1 and minf(old_height,bomb_height(h))<game.art.HEIGHTS.get(enemy.kind,270)*enemy.size-27:
 					h.p=nearest*Vector2(65,35)
 					h.life=h.age
 					break
@@ -276,14 +276,8 @@ func step(game,dt: float):
 		if h.age<h.life and not a.is_empty() and a.age>=a.from and a.age<=a.to and not a in h.strikes and h.age>.18 and bomb_height(h)<100+hero.height*4.5:
 			var dx=(h.p.x-hero.x)*a.direction
 			if dx>=-35 and dx<max(100,a.reach*game.m.SCALE) and abs(hero.y-h.p.y)<42:
-				var launch_height=bomb_height(h)
-				h.reflected=true
-				h.flight_age=0.0
-				h.launch_height=launch_height
-				h.launch_speed=520.0 if a.type=="charge" else 430.0
-				h.strikes.append(a)
-				h.velocity=Vector2(a.direction*(1050 if a.type=="charge" else 650),0)
-				game.burst(h.p.x,h.p.y-25,10,Color("ffbd69"))
+				strike_bomb(game,h,a)
+
 		if h.life-h.age<.45 and not h.get("warned",false):
 			h.warned=true
 			game.audio.play("fire",-12,1.6)
@@ -294,6 +288,31 @@ func step(game,dt: float):
 	if not mire.is_empty() and game.hero.hp>0:
 		game.damage(game.hero,{"type":"mireDrain","damage":MIRE_DRAIN*dt,"direction":1 if game.hero.x>=mire.owner.x else -1,"continuous":true,"no_stun":true,"knock":false},mire.owner)
 
+
+func strike_bomb(game,h: Dictionary,a: Dictionary):
+	var hero=game.hero
+	var pose_actor=hero.duplicate()
+	pose_actor.dir=a.direction
+	var tip=game.art.weapon_tip(pose_actor,game.art.pose(pose_actor))
+	var charge=a.type=="charge"
+	var heavy=hero.weapon=="axe"
+	# The visual centre leaves the actual animated weapon tip, at blade height.
+	h.p=Vector2(tip.x+a.direction*18.0,hero.y)
+	h.launch_height=maxf(0,hero.y-tip.y-27.0)
+	h.reflected=true
+	h.flight_age=0.0
+	h.launch_speed=740.0 if charge else (665.0 if heavy else 610.0)
+	h.strikes.append(a)
+	# Transfer swing and body momentum, while retaining a little incoming motion.
+	var carry=clampf(hero.get("velocityX",0.0)*game.m.SCALE*60.0,-250,250)
+	var speed=1450.0 if charge else (1120.0 if heavy else 1000.0)
+	h.velocity=Vector2(a.direction*speed+carry*.35+h.velocity.x*.12,0)
+	h.spin_velocity=a.direction*(11.0 if charge else 8.0)
+	game.burst(tip.x,tip.y,18,Color("ffc17b"))
+	game.audio.play("shield",-5,.65)
+	game.audio.play("heavy_hit",-5,.72)
+	game.shake=maxf(game.shake,6.0 if charge else 4.0)
+	game.bomb_hit_pause=maxf(game.bomb_hit_pause,.045 if charge else .032)
 
 func advance_bomb(h: Dictionary,dt: float):
 	# Resolve floor contacts analytically, retaining the rest of the frame for rolling.
@@ -312,7 +331,7 @@ func advance_bomb(h: Dictionary,dt: float):
 		var step_time=minf(remaining,impact)
 		var travel=h.velocity*step_time
 		h.p+=travel
-		h.rotation=h.get("rotation",0.0)+travel.x/32.0
+		h.rotation=h.get("rotation",0.0)+h.get("spin_velocity",h.velocity.x/70.0)*step_time
 		h.flight_age=h.get("flight_age",0.0)+step_time
 		remaining-=step_time
 		if step_time>=impact:
@@ -321,6 +340,7 @@ func advance_bomb(h: Dictionary,dt: float):
 			h.launch_speed=rebound if rebound>35 else 0.0
 			h.flight_age=0.0
 			h.velocity*=.48
+			h.spin_velocity=h.get("spin_velocity",0.0)*.65
 
 func bomb_landing(h: Dictionary) -> Vector2:
 	if not h.reflected and not h.get("bouncing",false):return h.target
@@ -405,7 +425,7 @@ func detonate(game,h: Dictionary):
 	if h.get("detonated",false):return
 	h.detonated=true
 	var effect=preload("res://scripts/clinker_explosion.gd").new()
-	effect.position=h.p
+	effect.position=h.p-Vector2(0,bomb_height(h))
 	effect.z_index=int(h.p.y)*2+2
 	game.arena_clip.add_child(effect)
 	explosions.append(effect)

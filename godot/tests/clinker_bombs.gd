@@ -88,6 +88,25 @@ func check():
 	combat.advance_bomb(arc,.1)
 	assert(arc.p.x>1440,"Knocked bombs can leave the screen")
 	assert(combat.BOMB_FUSE-combat.BOMB_FLIGHT<=.61,"Short grounded reaction window")
+	# Launch originates at the animated blade, with a brief impact beat and no fuse reset.
+	hero.down={};hero.hurtTicks=0;hero.recovering=0;hero.attack={};hero.height=0;hero.x=500;hero.y=670;hero.dir=1
+	game.m.begin(hero,"charge")
+	hero.attack.age=hero.attack.from
+	var tip=game.art.weapon_tip(hero,game.art.pose(hero))
+	var fuse=arc.life
+	combat.strike_bomb(game,arc,hero.attack)
+	assert(absf(arc.p.x-tip.x-18)<.01)
+	assert(absf((arc.p.y-27-combat.bomb_height(arc))-tip.y)<.01,"Launch must leave the weapon rather than the floor")
+	assert(arc.launch_speed>=740 and arc.velocity.x>1400 and game.bomb_hit_pause>0)
+	assert(arc.life==fuse,"Harder strikes do not reset the short fuse")
+	var paused_clock=game.clock
+	game._process(.01)
+	assert(game.clock==paused_clock and game.bomb_hit_pause>0,"Impact beat briefly holds simulation")
+	if "--bomb-capture" in OS.get_cmdline_user_args():
+		await process_frame
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("E:/Cairn-build-tools/bomb-weapon-contact.png")
+	hero.attack={}
 	# Other enemies avoid a bearer's throw, even before it lands.
 	var thrown={"kind":"clinker","owner":owner,"p":Vector2(1000,670),"target":Vector2(720,670),"age":.3,"life":2.25,"reflected":false}
 	combat.hazards=[thrown]

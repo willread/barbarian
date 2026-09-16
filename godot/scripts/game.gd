@@ -91,6 +91,7 @@ var keys: Dictionary={}
 var pressed: Dictionary={}
 var stage_walk=""
 var transition=-1.0
+var bomb_hit_pause=0.0
 var transition_tips: CanvasLayer
 var swapped=false
 var wipe: Node2D
@@ -555,6 +556,7 @@ func difficulty_damage(taken: bool) -> float:
 	return 1.0
 
 func start_game():
+	bomb_hit_pause=0.0
 	refresh_weapon_day()
 	difficulty_select=false
 	finished_run={}
@@ -1081,12 +1083,19 @@ func _process(raw: float):
 		if transition>=CLOSE+HOLD+OPEN: transition=-1
 	var frozen=phase in ["paused","lost","won","victory"] or pause_cover>0
 	var dt=0.0 if frozen else raw*(.3 if phase=="dying" and hero.death<1.3 else 1)
+	if not frozen and bomb_hit_pause>0:
+		var held=minf(dt,bomb_hit_pause)
+		bomb_hit_pause-=held
+		dt-=held
 	clock+=dt
 	if not frozen:
 		accumulator+=dt
 		while accumulator+1e-10>=m.STEP:
 			tick(m.STEP)
 			accumulator-=m.STEP
+			if bomb_hit_pause>0:
+				accumulator=0.0
+				break
 			if phase in ["lost","won","victory"]: break
 	displayed_health=lerpf(displayed_health,float(hero.hp),1-exp(-dt*12))
 	displayed_mana=lerpf(displayed_mana,magic,1-exp(-dt*12))

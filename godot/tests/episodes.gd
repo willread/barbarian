@@ -72,9 +72,9 @@ func check():
 	game.hero.dir=1
 	game.hero.attack={"type":"charge","age":10,"from":8,"to":16,"reach":60,"direction":1}
 	combat.step(game,.01)
-	assert(clinker.reflected and clinker.velocity.x==1050)
+	assert(clinker.reflected and clinker.velocity.x>=1400)
 	game.hero.attack={}
-	owner.x=810
+	owner.x=clinker.p.x+clinker.velocity.x*.03
 	var hp=owner.hp
 	combat.step(game,.03)
 	assert(owner.hp<hp,"Reflected clinker must hurt enemies")
