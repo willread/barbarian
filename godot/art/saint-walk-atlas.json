@@ -1,0 +1,64 @@
+{
+  "cellWidth": 417,
+  "cellHeight": 470,
+  "referenceHeight": 387,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "../art/saint-walk-0.png",
+      "left": 17,
+      "top": 83,
+      "width": 456,
+      "height": 387
+    },
+    {
+      "file": "../art/saint-walk-1.png",
+      "left": 94,
+      "top": 83,
+      "width": 342,
+      "height": 394
+    },
+    {
+      "file": "../art/saint-walk-2.png",
+      "left": 52,
+      "top": 83,
+      "width": 413,
+      "height": 389
+    },
+    {
+      "file": "../art/saint-walk-3.png",
+      "left": 65,
+      "top": 83,
+      "width": 354,
+      "height": 392
+    },
+    {
+      "file": "../art/saint-walk-4.png",
+      "left": 15,
+      "top": 37,
+      "width": 443,
+      "height": 394
+    },
+    {
+      "file": "../art/saint-walk-5.png",
+      "left": 78,
+      "top": 37,
+      "width": 355,
+      "height": 392
+    },
+    {
+      "file": "../art/saint-walk-6.png",
+      "left": 52,
+      "top": 44,
+      "width": 404,
+      "height": 386
+    },
+    {
+      "file": "../art/saint-walk-7.png",
+      "left": 52,
+      "top": 36,
+      "width": 357,
+      "height": 393
+    }
+  ]
+}

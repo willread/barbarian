@@ -14,6 +14,14 @@ func check():
 	var hero=game.hero
 	hero.x=670;hero.y=690;hero.hp=100;hero.max=100
 	var combat=game.episode_combat
+	boss.moving=true
+	for frame in 8:
+		boss.stride=frame/8.0
+		var pose=game.art.pose(boss)
+		assert(pose==["saint-walk",frame])
+		assert(game.art.texture(game.art.layout(pose).cel.file)!=null)
+	boss.moving=false
+	assert(game.art.pose(boss)[0]=="enemy-saint-v1","Stopping returns to the standing pose")
 	for second_phase in [false,true]:
 		boss.phaseTwo=second_phase
 		for attack in [{"type":"slash","damage":99,"direction":1},{"type":"magic","magic":true,"damage":99,"direction":1},{"type":"clinker","reflected":true,"area_blast":true,"damage":99,"direction":1}]:
@@ -80,6 +88,13 @@ func check():
 				await process_frame
 				await RenderingServer.frame_post_draw
 				root.get_texture().get_image().save_png("E:/Cairn-build-tools/saint-%s-%d.png"%[type,age])
+		boss.attack={};boss.moving=true
+		for frame in 8:
+			boss.stride=frame/8.0
+			game._process(0)
+			await process_frame
+			await RenderingServer.frame_post_draw
+			root.get_texture().get_image().save_png("E:/Cairn-build-tools/saint-walk-%d.png"%frame)
 	boss.hp=0
 	combat.sync_views(game)
 	assert(combat.furnace_views.is_empty(),"Death removes the flame and light")

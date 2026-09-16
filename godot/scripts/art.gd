@@ -19,12 +19,15 @@ func _init():
 		data.atlases["king-"+action]=JSON.parse_string(FileAccess.get_file_as_string("res://art/king-"+action+"-atlas.json"))
 	data.atlases["enemy-saint-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/saint-v2-atlas.json"))
 	data.atlases["saint-toss"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/saint-toss-atlas.json"))
+	data.atlases["saint-walk"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/saint-walk-atlas.json"))
 
 func texture(file: String) -> Texture2D:
 	if not textures.has(file): textures[file]=load("res://assets/"+file)
 	return textures[file]
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
+	if f.kind=="saint" and f.hp>0 and f.moving and f.attack.is_empty() and f.down.is_empty() and not f.hurtTicks and not f.recovering:
+		return ["saint-walk",int(f.stride*8)%8]
 	if f.kind=="saint" and f.hp>0 and f.attack.get("type","")=="saintVolley":
 		var a=f.attack
 		var interval=preload("res://scripts/episode_combat.gd").SAINT_THROW_INTERVAL

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {loadImage} from '@napi-rs/canvas';
 import {splitEpisodeSheet} from './split-episode-sheet.mjs';
-for(const [kind,source,key] of [['saint','asset-sources/art/episodes/saint.png','saint-v2'],['saint-toss','godot/art/saint-toss-v2.png','saint-toss']]){
+for(const [kind,source,key] of [['saint','asset-sources/art/episodes/saint.png','saint-v2'],['saint-toss','godot/art/saint-toss-v2.png','saint-toss'],['saint-walk','godot/art/saint-walk-v1.png','saint-walk']]){
  // The existing four-figure roots layout is also a 2x2 transparent sheet.
  const image=await loadImage(source),frames=splitEpisodeSheet(image,kind==='saint-toss'?'king-roots':kind),columns=frames.length===4?2:4;
  const cels=frames.map((frame,i)=>{

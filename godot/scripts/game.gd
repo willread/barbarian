@@ -1030,7 +1030,12 @@ func tick(dt: float):
 			f.x+=f.velocityX*m.SCALE
 			f.y=clamp(f.y+f.velocityY*m.SCALE,560,755)
 			f.moving=intent!=Vector2.ZERO
-			if f.moving: f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
+			if f.moving:
+				if f.kind=="saint":
+					var travel=Vector2(f.x,f.y)-enemy_before
+					var direction=-1.0 if travel.x*f.dir<-.01 else 1.0
+					f.stride=fposmod(f.stride+direction*travel.length()/(220*f.size),1)
+				else:f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
 		episode_combat.movement(f,enemy_before)
 		f.x=clamp(f.x,-2400,3840)
 		var finished=m.tick_attack(f,[hero],damage)
