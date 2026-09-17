@@ -724,6 +724,7 @@ func spawn_wave(preserve_corpses: bool=false):
 		blood.reset()
 		scorches.clear()
 	if background.key!=next:background.setup(art,next)
+	if not background.screen.is_empty():blood.set_walk_mask(background.screen.walkable.polygon)
 	last_window_size=Vector2i.ZERO
 	responsive_layout()
 	pending_enemies=encounters[wave-1].duplicate()
@@ -802,7 +803,15 @@ func can_cast() -> bool:
 func kill_visible_enemies():
 	for enemy in enemies:
 		if enemy.hp>0 and enemy.x>=0 and enemy.x<=1440:
-			damage(enemy,{"type":"cheat","damage":enemy.hp,"direction":1 if enemy.x>=hero.x else -1,"knock":true,"magic":true,"instant_kill":true},hero)
+			var effect=preload("res://scripts/clinker_explosion.gd").new()
+			effect.position=Vector2(enemy.x,enemy.y-enemy.height*4.5)
+			effect.z_index=int(enemy.y)*2+2
+			arena_clip.add_child(effect)
+			episode_combat.explosions.append(effect)
+			damage(enemy,{"type":"cheat","damage":enemy.hp,"direction":1 if enemy.x>=hero.x else -1,"knock":true,"magic":true,"instant_kill":true,"blood_quantity":5,"blood_spray":2.2},hero)
+	if not episode_combat.explosions.is_empty():
+		audio.play("death_fire",-3,.7)
+		shake=maxf(shake,10)
 
 func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 	if f.hp<=0: return
@@ -909,10 +918,10 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			f.invTicks=30
 		if f.hp<=0 and not f.player and not f.down.is_empty(): f.down.vx*=.48
 		impact.down=f.down
-		blood.hit(impact,a.direction,f.hp<=0)
+		blood.hit(impact,a.direction,f.hp<=0,a.get("blood_quantity",1),a.get("blood_spray",1.0))
 		if a.get("dive",false):blood.hit(impact,a.direction,true)
 		if f.hp<=0 and not f.player:
-			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
+			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true,a.get("blood_quantity",1),a.get("blood_spray",1.0))
 		shake=7 if a.get("dive",false) else (5 if a.get("knock",false) else 2)
 		audio.play("charge_hit" if a.get("type","")=="charge" else "arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "enemy_impact")
 		if f.player and not a.get("no_stun",false):audio.play("hero_pain",-6)

@@ -7,11 +7,17 @@ var air_view: Node2D
 var floor_viewport: SubViewport
 var ink: Node2D
 var pending: Array=[]
+var walk_polygon=PackedVector2Array()
+var ground_clip: Polygon2D
+var drop_limit=700
 func _ready():
 	z_index=-10
 	var ground_material=ShaderMaterial.new()
 	ground_material.shader=preload("res://shaders/ground_blood.gdshader")
-	material=ground_material
+	ground_clip=Polygon2D.new()
+	ground_clip.clip_children=CanvasItem.CLIP_CHILDREN_ONLY
+	ground_clip.polygon=PackedVector2Array([Vector2(0,535),Vector2(1440,535),Vector2(1440,810),Vector2(0,810)])
+	add_child(ground_clip)
 	floor_viewport=SubViewport.new()
 	floor_viewport.size=Vector2i(1440,810)
 	floor_viewport.disable_3d=true
@@ -19,6 +25,11 @@ func _ready():
 	floor_viewport.render_target_clear_mode=SubViewport.CLEAR_MODE_ONCE
 	floor_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 	add_child(floor_viewport)
+	var ground=Sprite2D.new()
+	ground.centered=false
+	ground.texture=floor_viewport.get_texture()
+	ground.material=ground_material
+	ground_clip.add_child(ground)
 	ink=Node2D.new()
 	ink.draw.connect(draw_pending)
 	floor_viewport.add_child(ink)
@@ -28,6 +39,7 @@ func _ready():
 	air_view.draw.connect(draw_air)
 	add_child(air_view)
 func reset():
+	drop_limit=700
 	drops.clear()
 	marks.clear()
 	wet.clear()
@@ -37,9 +49,15 @@ func reset():
 		floor_viewport.render_target_update_mode=SubViewport.UPDATE_ONCE
 		ink.queue_redraw()
 	queue_redraw()
+func set_walk_mask(polygon: Array):
+	walk_polygon.clear()
+	for point in polygon:walk_polygon.append(Vector2(point[0]*1440,point[1]*810))
+	if ground_clip:ground_clip.polygon=walk_polygon
+func on_ground(point: Vector2) -> bool:
+	return Geometry2D.is_point_in_polygon(point,walk_polygon) if walk_polygon.size()>=3 else point.x>=0 and point.x<1440 and point.y>=535 and point.y<810
 func cell(x: float,y: float) -> Vector2i: return Vector2i(floor(x/16),floor(y/16))
 func stain(x: float,y: float,r: float,amount: float=1,track: bool=false,angle: float=0):
-	if x<0 or x>=1440 or y<535 or y>=810: return
+	if not on_ground(Vector2(x,y)):return
 	var points=PackedVector2Array()
 	for i in 14:
 		var a=i/14.0*TAU
@@ -52,16 +70,20 @@ func stain(x: float,y: float,r: float,amount: float=1,track: bool=false,angle: f
 		ink.queue_redraw()
 	if not track:
 		for yy in range(int((y-r*.34)/16),int((y+r*.34)/16)+1):
-			for xx in range(int((x-r)/16),int((x+r)/16)+1): wet[Vector2i(xx,yy)]=65.0
+			for xx in range(int((x-r)/16),int((x+r)/16)+1):
+				if on_ground(Vector2(xx*16+8,yy*16+8)):wet[Vector2i(xx,yy)]=65.0
 	queue_redraw()
-func hit(f: Dictionary,direction: int,fatal: bool):
-	var count=(36+randi()%17) if fatal else (18+randi()%11)
+func hit(f: Dictionary,direction: int,fatal: bool,quantity: int=1,spray: float=1.0):
+	var count=((36+randi()%17) if fatal else (18+randi()%11))*quantity
+	drop_limit=maxi(drop_limit,700*quantity)
 	var units=4.5/CairnMechanics.STEP
 	var launched=not f.down.is_empty() and not f.down.ground
 	var horizontal=f.down.vx if launched else f.velocityX
 	var vertical=f.down.vz if launched else f.air.get("vz",f.attack.get("vz",0))
 	var force=(25 if launched else 80)+randf()*(65 if launched else 120)
 	var fan=.65+randf()*1.1
+	fan*=spray
+	force*=spray
 	var lift=(10 if launched else 75)+randf()*(85 if launched else 160)
 	var height=85+randf()*50+f.height*4.5
 	stain(f.x,f.y,7 if launched else 42 if fatal else 19)
@@ -69,7 +91,7 @@ func hit(f: Dictionary,direction: int,fatal: bool):
 		var angle=(randf()-.5)*fan
 		var speed=force*(.5+randf()*.8)
 		drops.append({"x":f.x+(randf()-.5)*18,"y":f.y+(randf()-.5)*12,"z":height+(randf()-.5)*65,"vx":horizontal*units*(1 if launched else .6)+direction*cos(angle)*speed,"vy":f.velocityY*units*.6+sin(angle)*speed*.9,"vz":-vertical*units*(1 if launched else .45)+lift+(randf()-.5)*530,"gravity":.25*units/CairnMechanics.STEP if launched else 850.0,"drag":0.0 if launched else .8,"r":1.5+pow(randf(),2.1)*(16 if fatal else 11)})
-	while drops.size()>700: drops.pop_front()
+	while drops.size()>drop_limit: drops.pop_front()
 func step(dt: float,fighters: Array):
 	for d in drops:
 		d.x+=d.vx*dt
@@ -77,7 +99,7 @@ func step(dt: float,fighters: Array):
 		d.z+=d.vz*dt
 		d.vz-=d.gravity*dt
 		d.vx*=exp(-dt*d.drag)
-		if d.z<=0: stain(d.x,clamp(d.y,540,790),d.r*2.3)
+		if d.z<=0: stain(d.x,d.y,d.r*2.3)
 	drops=drops.filter(func(d):return d.z>0)
 	for key in wet.keys():
 		wet[key]-=dt
@@ -103,10 +125,9 @@ func step(dt: float,fighters: Array):
 			var point=now+Vector2(-sin(angle)*f.bootSide*9,cos(angle)*f.bootSide*5)
 			stain(point.x,point.y,15 if not f.down.is_empty() else 7,f.bootCoat,true,angle)
 			f.bootCoat*=.82
-	while drops.size()>700: drops.pop_front()
+	while drops.size()>drop_limit: drops.pop_front()
+	if drops.is_empty():drop_limit=700
 	if air_view: air_view.queue_redraw()
-func _draw():
-	if floor_viewport: draw_texture(floor_viewport.get_texture(),Vector2.ZERO)
 func draw_pending():
 	for mark in pending:
 		ink.draw_colored_polygon(mark.points,Color(.282,.027,.043,mark.alpha))
