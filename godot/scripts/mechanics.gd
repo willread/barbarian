@@ -10,6 +10,8 @@ const MELEE_LANE = 48.0
 const WEAPONS = {"axe":{"speed":1.22,"damage":1.5,"reach":35},"sword":{"speed":.78,"damage":1.0,"reach":35}}
 const NORMAL_REACH_SCALE=1.2
 var combat_extensions=false
+var lane_min=560.0
+var lane_max=755.0
 var attacks: Dictionary
 
 func _init(data: Dictionary = {}):
@@ -122,7 +124,7 @@ func motion(f: Dictionary, dx: float, dy: float, edge: int = 0, bounded: bool = 
 			f.velocityX=0.0
 			f.running=false
 		f.x=x
-		f.y=clamp(f.y,560,755)
+		f.y=clamp(f.y,lane_min,lane_max)
 
 func select_strike(f: Dictionary, targets: Array) -> String:
 	if not f.air.is_empty(): return "air"

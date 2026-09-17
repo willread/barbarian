@@ -11,7 +11,7 @@ func check():
  for area in range(4):
   game.wave=area*3+1
   game.spawn_wave()
-  assert(game.background.screen.revision==3)
+  assert(game.background.screen.revision==4)
   for region in game.background.screen.regions:
    assert(region.animation.blend==false)
    assert(region.animation.fps==12 or region.animation.count==1)
@@ -24,9 +24,14 @@ func check():
    for sample in range(40):
     game.background.advance(8+sample*.2)
     await process_frame
-  if area==3:assert(game.background.screen.regions.all(func(r):return not r.foreground),"Throne stays clear of foreground")
+  var front=game.background.screen.regions.filter(func(r):return r.foreground)
+  assert(front.size()==(1 if area==3 else 0),"Only painted throne rocks remain in foreground")
+  if area==3:assert(front[0].animation.count==1,"Throne foreground is static rock occlusion")
   game.clock=12
   game.background.advance(12)
+  game.stage_walk=""
+  game.hero.x=100 if area==3 else 720
+  game.hero.y=760
   game._process(0)
   assert(is_equal_approx(game.background.position.y,0.0),"Full world framing must remain unshifted")
   if "--swamp-capture" in OS.get_cmdline_user_args():
@@ -35,5 +40,5 @@ func check():
    root.get_texture().get_image().save_png("E:/Cairn-build-tools/swamp-v3-game-%d.png"%(area+1))
  game.queue_free()
  await process_frame
- print("CAIRN_SWAMP_V3_OK: four baked scenes, sharp frames, no blending, continuous bird timing and clear throne")
+ print("CAIRN_SWAMP_V3_OK: four baked scenes, sharp frames, continuous birds, no foreground effects and static throne rocks")
  quit()

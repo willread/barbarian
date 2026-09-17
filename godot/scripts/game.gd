@@ -979,7 +979,7 @@ func tick_actor(f: Dictionary,dt: float):
 	var push=f.get("slamPush",Vector2.ZERO)
 	if push.length_squared()>1:
 		f.x=clamp(f.x+push.x*dt,70,1370)
-		f.y=clamp(f.y+push.y*dt,560,755)
+		f.y=clamp(f.y+push.y*dt,m.lane_min,m.lane_max)
 		f.slamPush=push*exp(-dt*7.0)
 	f.hitGlow=max(0,f.hitGlow-dt)
 	f.electricTicks=max(0,f.electricTicks-1)
@@ -1015,6 +1015,8 @@ func step_combo(dt: float):
 	hero.hp=minf(hero.max,hero.hp+combo.advance(dt))
 
 func tick(dt: float):
+	var movement_y=background.screen.get("movement_y",[560.0,755.0])
+	m.lane_min=movement_y[0];m.lane_max=movement_y[1]
 	if stage_walk:
 		hero.x+=322*dt
 		hero.moving=true
@@ -1119,7 +1121,7 @@ func tick(dt: float):
 			f.velocityX=intent.x*speed
 			f.velocityY=intent.y*speed
 			f.x+=f.velocityX*m.SCALE
-			f.y=clamp(f.y+f.velocityY*m.SCALE,560,755)
+			f.y=clamp(f.y+f.velocityY*m.SCALE,m.lane_min,m.lane_max)
 			f.moving=intent!=Vector2.ZERO
 			if f.moving:
 				if f.kind=="saint":

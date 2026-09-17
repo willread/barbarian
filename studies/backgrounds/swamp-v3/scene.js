@@ -1,4 +1,9 @@
 export const duration=120;
+export const lane={top:.63,bottom:.95};
+export const throneForeground=[
+ [[0,781],[31,783],[55,799],[66,831],[91,854],[108,883],[145,893],[170,884],[202,886],[215,907],[239,941],[0,941]],
+ [[1450,941],[1463,898],[1490,882],[1525,866],[1568,854],[1590,819],[1623,816],[1650,824],[1672,820],[1672,941]]
+];
 export const screens=[
  {name:'Leechwater Crossing',file:'crossing.png',mood:'Open water. Wind in the cypress.',motion:'Occasional small groups of distant marsh birds cross the water with varied routes, spacing and wingbeats. Longer moss strands catch the wind while reeds bow along the bank.',effects:['Hanging moss','Crossing marsh flock','Bank reeds'],bounds:[[.08,.1,.38,.4],[0,.24,1,.3],[.84,.48,.14,.15]]},
  {name:'The Witch’s Hollow',file:'hollow.png',mood:'An inhabited hollow, dense with old rituals.',motion:'A dense mix of skull charms, paired bones and rib mobiles swings at different lengths. Rag strips flutter between them and fungal spores drift from the hollow.',effects:['Bone charms','Rag strips','Fungal spores'],bounds:[[.2,.22,.3,.32],[.29,.22,.2,.34],[.22,.3,.22,.25]]},
@@ -122,12 +127,10 @@ export function drawAtmosphere(g,index,time,enabled=[true,true,true]){
   g.fillStyle=`rgba(182,170,123,${alpha})`;g.beginPath();g.arc(320+random(i+30)*150+Math.sin(p*TAU+i)*10,340-p*115,.65+random(i+80)*.7,0,TAU);g.fill();
  }
 }
-export function drawForeground(g,index,a,t,{visible=true,motion=true}={}){
- if(!visible)return;
- // Keep near details sharp and small. No foreground at all in the royal court.
- if(index===0){sprite(g,a.branch,63,679,150,36,-.05,.5);ribbon(g,a.reeds,1241,665,56,55,t,.2,motion?2:0,'root')}
- if(index===1){sprite(g,a.branch,1243,687,113,28,.13,.5)}
- if(index===2){sprite(g,a.branch,39,690,105,25,-.06,.5)}
+export function drawForeground(g,index,a,t,{visible=true,image=null}={}){
+ if(!visible||index!==3||!image)return;
+ // Only existing painted rocks occlude the actors; no added foreground effects.
+ for(const polygon of throneForeground){g.save();g.beginPath();polygon.forEach(([x,y],i)=>i?g.lineTo(x/1672*1280,y/941*720):g.moveTo(x/1672*1280,y/941*720));g.closePath();g.clip();g.drawImage(image,0,0,1280,720);g.restore()}
 }
 export function drawActor(g,x,y){
  g.save();g.translate(x*1280,y*720);g.fillStyle='#d9c9a1';g.strokeStyle='#181c17';g.lineWidth=2;

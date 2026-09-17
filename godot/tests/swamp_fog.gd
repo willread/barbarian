@@ -10,10 +10,16 @@ func check():
  for area in range(1,5):
   game.background.setup(game.art,"swamp-%d"%area)
   await process_frame
-  var fog=game.background.get_children().filter(func(node):return node is ColorRect and node.material.get_meta("continuous_clock",false))[0]
-  assert(fog.z_index>1805 and not fog.z_as_relative)
-  game.background.advance(24.1)
-  assert(is_equal_approx(fog.material.get_shader_parameter("clock"),24.1))
+  assert(not game.background.has_node("DriftingFog"),"Foreground fog is removed from every E2 screen")
+  game.tick(0)
+  assert(is_equal_approx(game.m.lane_min,.63*810) and is_equal_approx(game.m.lane_max,.95*810),"Shared E2 lane margins reach actual movement limits")
+  var actor=game.m.make(999,720,650,100,true)
+  for frame in 180:game.m.motion(actor,0,-1,0,true)
+  game.background.constrain(actor)
+  assert(is_equal_approx(actor.y,.63*810+2),"Player can reach the expanded shoreline edge with normal boundary padding")
+  for frame in 180:game.m.motion(actor,0,1,0,true)
+  game.background.constrain(actor)
+  assert(is_equal_approx(actor.y,.95*810-2),"Player can reach the shared bottom edge with normal boundary padding")
   if area==1 and "--fog-capture" in OS.get_cmdline_user_args():
    await create_timer(.3).timeout
    await RenderingServer.frame_post_draw
@@ -24,5 +30,5 @@ func check():
  assert(not game.background.has_node("DriftingFog"))
  game.queue_free()
  await process_frame
- print("CAIRN_FOG_OK: all swamp areas, foreground depth, continuous drift, no fog in other episodes")
+ print("CAIRN_SWAMP_LANES_OK: no foreground fog; all four lanes reachable at shoreline and shared bottom margin")
  quit()

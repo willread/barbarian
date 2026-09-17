@@ -353,7 +353,7 @@ func king_intent(e: Dictionary,h: Dictionary) -> Vector2:
 			if aim==Vector2.ZERO:aim=Vector2(e.dir,0)
 			var distance=1000.0
 			if absf(aim.x)>.001:distance=minf(distance,absf(((1350.0 if aim.x>0 else 90.0)-origin.x)/aim.x))
-			if absf(aim.y)>.001:distance=minf(distance,absf(((750.0 if aim.y>0 else 570.0)-origin.y)/aim.y))
+			if absf(aim.y)>.001:distance=minf(distance,absf(((m.lane_max-5.0 if aim.y>0 else m.lane_min+10.0)-origin.y)/aim.y))
 			e.attack.target=origin+aim*distance
 			e.attack["charge_hit"]=false
 			e.attack["arrived"]=false
@@ -437,5 +437,5 @@ func separate(actors: Array):
 					correction=Vector2((1 if b.x>=a.x else -1)*(radius.x-abs(b.x-a.x)),0)
 				a.x-=correction.x*wa/(wa+wb)
 				b.x+=correction.x*wb/(wa+wb)
-				a.y=clampf(a.y-correction.y*wa/(wa+wb),560,755)
-				b.y=clampf(b.y+correction.y*wb/(wa+wb),560,755)
+				a.y=clampf(a.y-correction.y*wa/(wa+wb),m.lane_min,m.lane_max)
+				b.y=clampf(b.y+correction.y*wb/(wa+wb),m.lane_min,m.lane_max)

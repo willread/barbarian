@@ -144,28 +144,11 @@ func setup(source: CairnArt,name: String):
 			add_child(scene_heat)
 			layers.append(scene_material)
 		if chapter=="swamp":
-			var foreground_layer=Node2D.new()
-			foreground_layer.z_as_relative=false
-			foreground_layer.z_index=1805
-			add_child(foreground_layer)
 			if screen.get("birds",false):
 				var birds=preload("res://scripts/swamp_birds.gd").new()
 				birds.set_meta("continuous_clock",true)
 				add_child(birds)
 				decorations.append(birds)
-			var fog=ColorRect.new()
-			fog.name="DriftingFog"
-			fog.size=Vector2(1440,810)
-			fog.mouse_filter=Control.MOUSE_FILTER_IGNORE
-			fog.z_as_relative=false
-			fog.z_index=1810
-			var fog_material=ShaderMaterial.new()
-			fog_material.set_meta("continuous_clock",true)
-			fog_material.shader=preload("res://shaders/swamp_fog.gdshader")
-			fog_material.set_shader_parameter("area",float(name.get_slice("-",1)))
-			fog.material=fog_material
-			add_child(fog)
-			layers.append(fog_material)
 		z_index=-100
 		return
 	var base=Sprite2D.new()

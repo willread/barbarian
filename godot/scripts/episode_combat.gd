@@ -488,7 +488,7 @@ func avoid_bombs(game,enemy: Dictionary) -> Variant:
 	for i in 16:
 		var angle=TAU*i/16.0
 		var candidate=danger+Vector2(cos(angle),sin(angle))*footprint*1.12
-		var probe={"x":clampf(candidate.x,game.e_ai.arena_margin(enemy),1440-game.e_ai.arena_margin(enemy)),"y":clampf(candidate.y,560,755)}
+		var probe={"x":clampf(candidate.x,game.e_ai.arena_margin(enemy),1440-game.e_ai.arena_margin(enemy)),"y":clampf(candidate.y,game.m.lane_min,game.m.lane_max)}
 		game.background.constrain(probe)
 		candidate=Vector2(probe.x,probe.y)
 		var penalty=0.0

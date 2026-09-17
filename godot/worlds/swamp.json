@@ -2,7 +2,7 @@
   {
     "key": "swamp-1",
     "title": "Leechwater Crossing",
-    "revision": 3,
+    "revision": 4,
     "birds": true,
     "regions": [
       {
@@ -72,62 +72,32 @@
           "fps": 12,
           "blend": false
         }
-      },
-      {
-        "foreground": true,
-        "animation": {
-          "atlas": "swamp-1-v3-front-0.png",
-          "rect": [
-            20,
-            660,
-            105,
-            60
-          ],
-          "columns": 1,
-          "rows": 1,
-          "count": 1,
-          "fps": 1,
-          "blend": false
-        }
-      },
-      {
-        "foreground": true,
-        "animation": {
-          "atlas": "swamp-1-v3-front-1.png",
-          "rect": [
-            1200,
-            660,
-            80,
-            60
-          ],
-          "columns": 12,
-          "rows": 24,
-          "count": 288,
-          "fps": 12,
-          "blend": false
-        }
       }
     ],
     "walkable": {
       "polygon": [
         [
           0,
-          0.72
+          0.63
         ],
         [
           1,
-          0.72
+          0.63
         ],
         [
           1,
-          0.92
+          0.95
         ],
         [
           0,
-          0.92
+          0.95
         ]
       ]
     },
+    "movement_y": [
+      510.3,
+      769.5
+    ],
     "framing": {
       "bottom_crop": 0.03
     }
@@ -135,7 +105,7 @@
   {
     "key": "swamp-2",
     "title": "The Witch’s Hollow",
-    "revision": 3,
+    "revision": 4,
     "birds": false,
     "regions": [
       {
@@ -154,45 +124,32 @@
           "fps": 12,
           "blend": false
         }
-      },
-      {
-        "foreground": true,
-        "animation": {
-          "atlas": "swamp-2-v3-front-0.png",
-          "rect": [
-            1195,
-            680,
-            85,
-            40
-          ],
-          "columns": 1,
-          "rows": 1,
-          "count": 1,
-          "fps": 1,
-          "blend": false
-        }
       }
     ],
     "walkable": {
       "polygon": [
         [
           0,
-          0.72
+          0.63
         ],
         [
           1,
-          0.72
+          0.63
         ],
         [
           1,
-          0.92
+          0.95
         ],
         [
           0,
-          0.92
+          0.95
         ]
       ]
     },
+    "movement_y": [
+      510.3,
+      769.5
+    ],
     "framing": {
       "bottom_crop": 0.03
     }
@@ -200,7 +157,7 @@
   {
     "key": "swamp-3",
     "title": "The Drowned Procession",
-    "revision": 3,
+    "revision": 4,
     "birds": false,
     "regions": [
       {
@@ -236,45 +193,32 @@
           "fps": 12,
           "blend": false
         }
-      },
-      {
-        "foreground": true,
-        "animation": {
-          "atlas": "swamp-3-v3-front-0.png",
-          "rect": [
-            0,
-            682,
-            80,
-            38
-          ],
-          "columns": 1,
-          "rows": 1,
-          "count": 1,
-          "fps": 1,
-          "blend": false
-        }
       }
     ],
     "walkable": {
       "polygon": [
         [
           0,
-          0.72
+          0.63
         ],
         [
           1,
-          0.72
+          0.63
         ],
         [
           1,
-          0.92
+          0.95
         ],
         [
           0,
-          0.92
+          0.95
         ]
       ]
     },
+    "movement_y": [
+      510.3,
+      769.5
+    ],
     "framing": {
       "bottom_crop": 0.03
     }
@@ -282,7 +226,7 @@
   {
     "key": "swamp-4",
     "title": "The Sunken Throne",
-    "revision": 3,
+    "revision": 4,
     "birds": false,
     "regions": [
       {
@@ -318,28 +262,49 @@
           "fps": 12,
           "blend": false
         }
+      },
+      {
+        "foreground": true,
+        "animation": {
+          "atlas": "swamp-4-v4-rocks.png",
+          "rect": [
+            0,
+            590,
+            1280,
+            130
+          ],
+          "columns": 1,
+          "rows": 1,
+          "count": 1,
+          "fps": 1,
+          "blend": false
+        }
       }
     ],
     "walkable": {
       "polygon": [
         [
           0,
-          0.72
+          0.63
         ],
         [
           1,
-          0.72
+          0.63
         ],
         [
           1,
-          0.92
+          0.95
         ],
         [
           0,
-          0.92
+          0.95
         ]
       ]
     },
+    "movement_y": [
+      510.3,
+      769.5
+    ],
     "framing": {
       "bottom_crop": 0.03
     }

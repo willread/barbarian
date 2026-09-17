@@ -1,4 +1,4 @@
-import {screens,duration,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground,drawActor} from './scene.js?revision=4';
+import {screens,lane,duration,assetFiles,prepareAssets,drawScenery,drawAtmosphere,drawForeground,drawActor} from './scene.js?revision=5';
 const $=id=>document.getElementById(id),canvas=$('scene-layer'),g=canvas.getContext('2d');
 const actorCanvas=$('actor-layer'),actorContext=actorCanvas.getContext('2d');
 const foregroundCanvas=$('foreground-layer'),foregroundContext=foregroundCanvas.getContext('2d');
@@ -17,13 +17,13 @@ function draw(){
   actorContext.clearRect(0,0,1280,720);
   if($('scale').checked)drawActor(actorContext,actor.x,actor.y);
   foregroundContext.clearRect(0,0,1280,720);
-  drawForeground(foregroundContext,selected,assets,frameTime,{visible:$('foreground').checked,motion:!still&&$('wind').checked});
+  drawForeground(foregroundContext,selected,assets,frameTime,{visible:$('foreground').checked,image:images[selected]});
   if($('compare').checked){g.drawImage(previous[selected],0,0,1280,720);foregroundContext.clearRect(0,0,1280,720);}
   const only=$('foreground-only').checked;
   canvas.style.visibility=actorCanvas.style.visibility=only?'hidden':'visible';
   guideContext.clearRect(0,0,1280,720);
   const q=guideContext;
-  if(!only&&$('lane').checked){q.fillStyle='#8ccd8b22';q.fillRect(0,720*.68,1280,720*.22);q.strokeStyle='#b1d2a1';q.strokeRect(1,720*.68,1278,720*.22)}
+  if(!only&&$('lane').checked){q.fillStyle='#8ccd8b22';q.fillRect(0,720*lane.top,1280,720*(lane.bottom-lane.top));q.strokeStyle='#b1d2a1';q.strokeRect(1,720*lane.top,1278,720*(lane.bottom-lane.top))}
   if(!only&&$('bounds').checked){q.strokeStyle='#dec584';q.setLineDash([5,6]);screens[selected].bounds.forEach(([x,y,w,h])=>q.strokeRect(x*1280,y*720,w*1280,h*720));q.setLineDash([])}
   if(!only&&$('crop').checked){q.fillStyle='#070a09cc';q.fillRect(0,0,1280,720*.23);q.fillStyle='#ddd5b7';q.font='13px system-ui';q.fillText('Upper band cropped in the native 16:9 arena',18,26)}
   $('clock').textContent=time.toFixed(2)+' / '+duration.toFixed(2)+'s';$('timeline').value=time;
@@ -39,7 +39,7 @@ $('foreground-only').onchange=()=>{if($('foreground-only').checked)$('foreground
 $('export-foreground').onclick=()=>{
   draw();foregroundCanvas.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`swamp-0${selected+1}-foreground-${time.toFixed(2)}s.png`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png');
 };
-$('stage').onclick=e=>{if($('foreground-only').checked)return;const r=canvas.getBoundingClientRect();actor={x:Math.max(.02,Math.min(.98,(e.clientX-r.left)/r.width)),y:Math.max(.68,Math.min(.9,(e.clientY-r.top)/r.height))};$('scale').checked=true;draw()};
+$('stage').onclick=e=>{if($('foreground-only').checked)return;const r=canvas.getBoundingClientRect();actor={x:Math.max(.02,Math.min(.98,(e.clientX-r.left)/r.width)),y:Math.max(lane.top,Math.min(lane.bottom,(e.clientY-r.top)/r.height))};$('scale').checked=true;draw()};
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','SELECT','BUTTON'].includes(e.target.tagName)){e.preventDefault();setRunning(!running)}});
 function frame(now){if(running){const dt=Math.min(.1,(now-last)/1000)*Number($('speed').value);time=(time+dt)%duration;if($('seam').checked&&time>.35&&time<duration-.35)time=duration-.35}last=now;draw();requestAnimationFrame(frame)}
 select(Math.max(0,Math.min(3,(Number(location.hash.slice(1))||1)-1)));setRunning(running);requestAnimationFrame(frame);
