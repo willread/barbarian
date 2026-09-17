@@ -50,7 +50,8 @@ third.foreground=[
  shape('Right foreground branch',[[1619,842],[1622,811],[1627,779],[1636,747],[1641,717],[1649,704],[1651,706],[1645,719],[1640,751],[1632,782],[1629,812],[1625,841]]),
  shape('Right branch fork',[[1627,817],[1606,795],[1596,769],[1583,748],[1586,746],[1600,767],[1610,792],[1631,811]])
 ];
-third.notes='Original painting and fire loops retained. Expanded front foot area; traced foreground rocks and branches now render over characters.';
+for(const region of third.foreground)if(/branch/i.test(region.name))region.dark_silhouette=true;
+third.notes='Original painting and fire loops retained. Expanded front foot area; foreground twigs use soft pixel silhouettes to exclude the ground between branches.';
 save(third.id,third);
 
 const second=read('citadel-02-v1');

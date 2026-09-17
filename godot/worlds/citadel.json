@@ -1249,7 +1249,8 @@
             0.028708133971291867,
             0.8746014877789585
           ]
-        ]
+        ],
+        "dark_silhouette": true
       },
       {
         "name": "Left branch fork",
@@ -1286,7 +1287,8 @@
             0.031698564593301434,
             0.8374070138150903
           ]
-        ]
+        ],
+        "dark_silhouette": true
       },
       {
         "name": "Right foreground branch",
@@ -1339,7 +1341,8 @@
             0.97188995215311,
             0.8937300743889479
           ]
-        ]
+        ],
+        "dark_silhouette": true
       },
       {
         "name": "Right branch fork",
@@ -1376,10 +1379,11 @@
             0.9754784688995215,
             0.8618490967056323
           ]
-        ]
+        ],
+        "dark_silhouette": true
       }
     ],
-    "notes": "Original painting and fire loops retained. Expanded front foot area; traced foreground rocks and branches now render over characters.",
+    "notes": "Original painting and fire loops retained. Expanded front foot area; foreground twigs use soft pixel silhouettes to exclude the ground between branches.",
     "composition_review": {
       "status": "first-pass",
       "actor_height_fraction": 0.22,
