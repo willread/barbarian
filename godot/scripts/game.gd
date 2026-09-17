@@ -815,7 +815,7 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 				shake=maxf(shake,3)
 			return
 	if f.player and not f.pickup.is_empty():return
-	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to and a.get("type","")!="clinker":return
+	if f.player and not f.attack.is_empty() and f.attack.get("spin",false) and f.attack.age<=f.attack.to and a.get("type","")!="clinker" and not a.get("whirlwind",false):return
 	if attacker.player and not f.player and f.kind=="shield" and a.get("spin",false) and not e_ai.guard_open(f):
 		var push_direction=1 if f.x>=attacker.x else -1
 		f.x=clampf(f.x+push_direction*42,70,1370)
@@ -1125,7 +1125,9 @@ func tick(dt: float):
 			f.y=clamp(f.y+f.velocityY*m.SCALE,m.lane_min,m.lane_max)
 		episode_combat.movement(f,enemy_before)
 		f.x=clamp(f.x,-2400,3840)
-		var finished=m.tick_attack(f,[hero],damage)
+		if f.attack.get("whirlwind",false) and f.attack.age in [1,54]:audio.play("roar" if f.attack.age==1 else "sword",-5)
+		var targets=[hero]+enemies.filter(func(other):return other.id!=f.id) if f.attack.get("whirlwind",false) else [hero]
+		var finished=m.tick_attack(f,targets,damage)
 		if f.kind=="archer" and f.attack.get("type","")=="archerShot" and f.attack.age==40:
 			var arrow=preload("res://scripts/arrow.gd").new()
 			arena_clip.add_child(arrow)

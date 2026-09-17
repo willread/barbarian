@@ -118,6 +118,7 @@ func pose(f: Dictionary, spell: int = -1) -> Array:
 	return ["hero-actions-unarmed-v8",0] if f.player else ["enemy-walk-v4",0]
 
 func enemy_frame(e: Dictionary) -> int:
+	if e.attack.get("whirlwind",false):return 15 if e.attack.age<e.attack.from else 6 if e.attack.age<=e.attack.to else 10
 	if e.kind in ["witch","bearer","king","saint"]:
 		if e.hp<=0:return 7
 		if not e.down.is_empty() or e.hurtTicks or e.recovering:return 6

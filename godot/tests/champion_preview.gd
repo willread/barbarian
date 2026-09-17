@@ -21,9 +21,22 @@ func run():
 	viewport.size=Vector2i(1600,1600)
 	viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS
 	root.add_child(viewport)
-	viewport.add_child(Sheet.new())
+	if "--whirlwind" in OS.get_cmdline_user_args():
+		var art=CairnArt.new()
+		var m=CairnMechanics.new(art.data.attacks)
+		CairnEnemies.new(m,art.data.roster)
+		for i in 6:
+			var actor=m.make(i+1,260+(i%3)*520,600+(i/3)*750,100)
+			actor.kind="champion";actor.boss=true
+			m.begin(actor,"wardenWhirlwind")
+			actor.attack.age=[30,54,58,62,68,240][i]
+			var view=load("res://scripts/fighter_view.gd").new()
+			view.art=art;view.actor=actor
+			viewport.add_child(view)
+			view.update_view(-1)
+	else:viewport.add_child(Sheet.new())
 	await process_frame
 	await process_frame
 	await RenderingServer.frame_post_draw
-	viewport.get_texture().get_image().save_png("E:/Cairn-build-tools/champion-runtime.png")
+	viewport.get_texture().get_image().save_png("E:/Cairn-build-tools/warden-whirlwind.png" if "--whirlwind" in OS.get_cmdline_user_args() else "E:/Cairn-build-tools/champion-runtime.png")
 	quit()

@@ -15,6 +15,7 @@ func _init(mechanics: CairnMechanics, data: Dictionary):
 		["kingCharge",138,48,-1,0,0],["rootSlam",104,52,-1,0,0],["kingSweep",80,36,43,8,58],
 		["saintVolley",156,46,-1,0,0],["furnaceBlast",174,66,138,0,0]]:
 		m.attacks[attack[0]]={"ticks":attack[1],"from":attack[2],"to":attack[3],"damage":attack[4],"reach":attack[5],"knock":false}
+	m.attacks["wardenWhirlwind"]={"ticks":288,"from":54,"to":222,"damage":8,"reach":40,"box":[-40,80,-66,66],"knock":true,"push":4.8,"whirlwind":true}
 
 var unlock_order: Array=[]
 var variant_order: Array=[]
@@ -205,6 +206,13 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 		e.rushCombo=true
 		return Vector2.ZERO
 	var reach=48 if e.kind=="champion" else (34 if e.kind=="shield" else 43)
+	if e.kind=="champion" and e.get("entered_arena",false) and e.clock>=e.get("whirlwind_ready_at",0.0) and randf()<.018:
+		if m.begin(e,"wardenWhirlwind"):
+			var heading=Vector2(h.x-e.x,(h.y-e.y)*2.0)
+			if absf(heading.y)<100:heading.y=180 if e.y<(m.lane_min+m.lane_max)*.5 else -180
+			e.attack["travel"]=heading.normalized()* (11.0 if e.phaseTwo else 9.0)
+			e["whirlwind_ready_at"]=e.clock+10.0
+			return Vector2.ZERO
 	if abs(y)<5 and abs(x)<reach:
 		var type="boneCut" if e.kind=="bone" else ("shieldBash" if e.kind=="shield" else "marauderChop")
 		if e.kind=="champion":
@@ -235,11 +243,25 @@ func motion(e: Dictionary):
 	e.moving=false
 	e.velocityX=0.0
 	e.velocityY=0.0
+	if a.get("whirlwind",false):
+		if a.age>=a.from and a.age<=a.to:
+			var travel: Vector2=a.travel
+			var margin=arena_margin(e)
+			var next=Vector2(e.x,e.y)+travel
+			if next.x<margin or next.x>1440.-margin:travel.x=-travel.x
+			if next.y<m.lane_min+12 or next.y>m.lane_max-12:travel.y=-travel.y
+			a.travel=travel
+			e.x=clampf(e.x+travel.x,margin,1440.-margin)
+			e.y=clampf(e.y+travel.y,m.lane_min+12,m.lane_max-12)
+		return
 	if a.get("lunge",0) and a.age>=(a.from if a.get("rush",false) else a.from-4) and a.age<=a.to:
 		e.velocityX=a.direction*a.lunge
 		e.x+=e.velocityX*m.SCALE
 
 func finish(e: Dictionary,a: Dictionary,h: Dictionary):
+	if a.get("whirlwind",false):
+		e.aiRest=54
+		return
 	if e.kind=="king":
 		e.aiRest=randi_range(54,144) if e.phaseTwo else randi_range(66,168)
 		e["open_ticks"]=e.aiRest

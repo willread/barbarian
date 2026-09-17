@@ -243,7 +243,7 @@ func tick_attack(f: Dictionary, targets: Array, hit: Callable) -> Dictionary:
 				a.hits.append(e.id)
 				a.connected=true
 				var strike=a.duplicate()
-				if a.get("spin",false):strike.direction=1 if e.x>=f.x else -1
+				if a.get("spin",false) or a.get("whirlwind",false):strike.direction=1 if e.x>=f.x else -1
 				hit.call(e,strike,f)
 				if f.attack.is_empty():return {}
 	if a.age>=a.ticks:
