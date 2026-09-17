@@ -15,11 +15,12 @@ function run(command,args){
 }
 run(process.execPath,['tools/godot/bake-saint.mjs']);
 run(process.execPath,['tools/godot/bake-easter-eggs.mjs']);
-// Keep the tiny Windows resize extension reproducible; web exports exclude it.
-if(process.platform==='win32'&&!process.argv.includes('--web')){
- const dll='godot/native/cairn_aspect.dll';
- if(!fs.existsSync(dll)||fs.statSync('tools/native-window/aspect.c').mtimeMs>fs.statSync(dll).mtimeMs)
-  run('powershell',['-NoProfile','-ExecutionPolicy','Bypass','-File','tools/native-window/build.ps1']);
+// Windows releases statically include the resize hook. Reuse the cached engine.
+if(process.platform==='win32'&&!process.argv.includes('--web')&&!process.argv.includes('--test')){
+ const template='E:/Cairn-build-tools/godot/cairn-windows-release.exe';
+ const inputs=['tools/native-window/aspect.c','tools/native-window/build-template.ps1',...fs.readdirSync('tools/native-window/module/cairn_aspect').map(name=>'tools/native-window/module/cairn_aspect/'+name)];
+ if(!fs.existsSync(template)||inputs.some(file=>fs.statSync(file).mtimeMs>fs.statSync(template).mtimeMs))
+  run('powershell',['-NoProfile','-ExecutionPolicy','Bypass','-File','tools/native-window/build-template.ps1']);
 }
 if(!fs.existsSync('godot/assets/manifest.json')||process.argv.includes('--prepare')){
  run(process.execPath,['tools/godot/bake-assets.mjs']);
@@ -104,7 +105,10 @@ const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--wi
 for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
  run(binary,['--headless','--path','godot','--export-release',target+(process.argv.includes('--shareware')?' Shareware':''),file]);
- if(target==='Windows')fs.copyFileSync('godot/native/cairn_aspect.dll',path.join(path.dirname(file),'cairn_aspect.dll'));
+ if(target==='Windows'){
+  fs.rmSync(path.join(path.dirname(file),'cairn_aspect.dll'),{force:true});
+  run(file,['--headless','--','--native-template-test']);
+ }
  if(!process.argv.includes('--shareware'))run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
  // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);

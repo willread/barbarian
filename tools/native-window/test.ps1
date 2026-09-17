@@ -1,4 +1,4 @@
-param([switch]$Exported)
+param([switch]$Exported, [switch]$Game)
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 Add-Type @'
@@ -28,9 +28,14 @@ $godot = 'E:/Cairn-build-tools/godot/Godot_v4.7.2-stable_win64.exe'
 $arguments=@('--path', 'godot', '--script', 'tests/native_window.gd', '--', '--native-window-test')
 if ($Exported) {
  $godot='E:/Cairn-build-tools/build/windows/Cairn.exe'
- $arguments=@('--script', "$taskRoot/godot/tests/native_window.gd", '--', '--native-window-test')
+ if (Test-Path 'E:/Cairn-build-tools/build/windows/cairn_aspect.dll') { throw 'Remove the legacy build DLL before testing the embedded hook' }
+ # Production templates intentionally reject external --script overrides.
+ $arguments=@('--', '--native-window-test')
 }
-$testProcess = Start-Process -FilePath $godot -ArgumentList $arguments -WorkingDirectory $taskRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput 'E:/Cairn-build-tools/native-window/test.log' -RedirectStandardError 'E:/Cairn-build-tools/native-window/test-error.log'
+$testName = if ($Game) { 'game' } elseif ($Exported) { 'exported' } else { 'editor' }
+$outputLog = "E:/Cairn-build-tools/native-window/$testName-test.log"
+$errorLog = "E:/Cairn-build-tools/native-window/$testName-test-error.log"
+$testProcess = Start-Process -FilePath $godot -ArgumentList $arguments -WorkingDirectory $taskRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $outputLog -RedirectStandardError $errorLog
 try {
  $message = [NativeAspectTest]::RegisterWindowMessage('Cairn.NativeAspectRatio.16x9')
  $window = [IntPtr]::Zero
@@ -41,6 +46,16 @@ try {
   if ($window -ne [IntPtr]::Zero -and [NativeAspectTest]::Probe($window,$message,[IntPtr]::Zero,[IntPtr]::Zero).ToInt64() -eq 0x169) { break }
  }
  if ($window -eq [IntPtr]::Zero -or [NativeAspectTest]::Probe($window,$message,[IntPtr]::Zero,[IntPtr]::Zero).ToInt64() -ne 0x169) { throw 'Native resize hook was not installed' }
+ if ($Game) {
+  Start-Sleep -Seconds 12
+  $testProcess.Refresh()
+  if ($testProcess.HasExited) { throw 'Game exited during startup' }
+ }
+ if ($Exported) {
+  $testProcess.Refresh()
+  if ($testProcess.Modules | Where-Object ModuleName -EQ 'cairn_aspect.dll') { throw 'The process loaded the legacy DLL' }
+  Write-Output 'CAIRN_NO_ASPECT_DLL_OK: no DLL in the build folder or loaded process modules'
+ }
  $outer=New-Object NativeAspectTest+Rect
  $client=New-Object NativeAspectTest+Rect
  [void][NativeAspectTest]::GetWindowRect($window,[ref]$outer)
@@ -74,3 +89,4 @@ try {
  if (!$testProcess.HasExited) { [void][NativeAspectTest]::Probe($window,0x10,[IntPtr]::Zero,[IntPtr]::Zero); if (!$testProcess.WaitForExit(5000)) { Stop-Process -Id $testProcess.Id } }
  [void][NativeAspectTest]::SetThreadDpiAwarenessContext($priorDpi)
 }
+if (Select-String -LiteralPath $errorLog,$outputLog -Pattern '^(SCRIPT ERROR|SHADER ERROR|ERROR):' -Quiet) { throw 'Native run reported errors; inspect the test logs' }

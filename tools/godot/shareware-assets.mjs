@@ -23,7 +23,7 @@ for(const file of fs.readdirSync('godot/audio_options').sort()){
 const file='godot/export_presets.cfg';
 const original=fs.readFileSync(file,'utf8');
 const updated=original.replace(/(\[preset\.[23]\][\s\S]*?exclude_filter=")[^"]*(")/g,(_,before,after)=>{
- const native=before.includes('platform="Web"')?'native/*,':'';
+ const native='native/*,';
  return before+native+'tests/*,audio/*.mp3,audio/foot_*,audio/bow_draw*,audio/arrow_ground*,'+omitted.join(',')+after;
 });
 if(updated!==original)fs.writeFileSync(file,updated);

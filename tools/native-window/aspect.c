@@ -2,7 +2,9 @@
 #include <windows.h>
 #include <math.h>
 #include <wchar.h>
+#ifndef CAIRN_BUILTIN
 #include "vendor/gdextension_interface.h"
+#endif
 
 static HWND game_window;
 static WNDPROC original_proc;
@@ -83,8 +85,7 @@ static int has_argument(const wchar_t *command, const wchar_t *argument) {
     return 0;
 }
 
-static void initialize(void *data, GDExtensionInitializationLevel level) {
-    if (level != GDEXTENSION_INITIALIZATION_SCENE) return;
+static void start_aspect(void) {
     const wchar_t *command = GetCommandLineW();
     if (has_argument(command, L"--editor") || has_argument(command, L"--headless")) return;
     probe_message = RegisterWindowMessageW(L"Cairn.NativeAspectRatio.16x9");
@@ -92,8 +93,7 @@ static void initialize(void *data, GDExtensionInitializationLevel level) {
     if (!game_window) discovery_timer = SetTimer(NULL, 0, 50, discover);
 }
 
-static void deinitialize(void *data, GDExtensionInitializationLevel level) {
-    if (level != GDEXTENSION_INITIALIZATION_SCENE) return;
+static void stop_aspect(void) {
     if (discovery_timer) KillTimer(NULL, discovery_timer);
     discovery_timer = 0;
     if (game_window && IsWindow(game_window) && (WNDPROC)GetWindowLongPtrW(game_window, GWLP_WNDPROC) == aspect_proc)
@@ -102,6 +102,13 @@ static void deinitialize(void *data, GDExtensionInitializationLevel level) {
     original_proc = NULL;
 }
 
+#ifndef CAIRN_BUILTIN
+static void initialize(void *data, GDExtensionInitializationLevel level) {
+    if (level == GDEXTENSION_INITIALIZATION_SCENE) start_aspect();
+}
+static void deinitialize(void *data, GDExtensionInitializationLevel level) {
+    if (level == GDEXTENSION_INITIALIZATION_SCENE) stop_aspect();
+}
 __declspec(dllexport) GDExtensionBool cairn_aspect_init(GDExtensionInterfaceGetProcAddress get_proc,
     GDExtensionClassLibraryPtr library, GDExtensionInitialization *initialization) {
     initialization->minimum_initialization_level = GDEXTENSION_INITIALIZATION_SCENE;
@@ -110,3 +117,4 @@ __declspec(dllexport) GDExtensionBool cairn_aspect_init(GDExtensionInterfaceGetP
     initialization->deinitialize = deinitialize;
     return 1;
 }
+#endif

@@ -7,8 +7,15 @@ var windowed_size=Vector2i(1280,720)
 var windowed_position=Vector2i.ZERO
 func _ready():
 	process_mode=Node.PROCESS_MODE_ALWAYS
-	# Load only on native Windows; the browser needs no OS resize hook.
-	if OS.has_feature("windows") and DisplayServer.get_name()!="headless" and not Engine.is_editor_hint():
+	if "--native-template-test" in OS.get_cmdline_user_args():
+		var builtin=Engine.has_singleton("CairnNativeAspect")
+		var no_extension=not FileAccess.file_exists("res://native/cairn_aspect.dll") and not FileAccess.file_exists("res://native/cairn_aspect.cfg")
+		if builtin and no_extension:print("CAIRN_NATIVE_TEMPLATE_OK: statically linked aspect module, no DLL/config in pack")
+		else:push_error("Windows export must contain the built-in aspect module and no extension files")
+		get_tree().call_deferred("quit",0 if builtin and no_extension else 1)
+		return
+	# Exports contain the native hook in the engine; stock editor runs use the DLL.
+	if OS.has_feature("windows") and DisplayServer.get_name()!="headless" and not Engine.is_editor_hint() and not Engine.has_singleton("CairnNativeAspect"):
 		var status=GDExtensionManager.load_extension("res://native/cairn_aspect.cfg")
 		if status not in [GDExtensionManager.LOAD_STATUS_OK,GDExtensionManager.LOAD_STATUS_ALREADY_LOADED]:
 			push_error("Could not load the native 16:9 window constraint")
