@@ -811,7 +811,6 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 			if attacker.player and not a.get("magic",false) and not a.get("area_blast",false):
 				m.rebound_charge(attacker,int(a.direction))
 				audio.play("resist",-3,.75)
-				burst((f.x+attacker.x)*.5,f.y-145,9,Color("efc486"))
 				hit_stop=.055
 				shake=maxf(shake,3)
 			return
@@ -823,18 +822,15 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		f.brace=14
 		f.aiRest=max(f.aiRest,12)
 		audio.play("shield",-5)
-		burst(f.x-push_direction*35,f.y-110,6,Color("b9a077"))
 		return
 	if attacker.player and not f.player and (a.get("type","")=="charge" and e_ai.heavy(f) or a.get("spin",false) and f.get("variant","")=="brute"):
 		m.rebound_charge(attacker,int(a.direction))
 		audio.play("resist",-4)
-		burst((f.x+attacker.x)*.5,f.y-105,7,Color("b7a58c"))
 		hit_stop=.055
 		shake=4
 		return
 	if not f.player and not a.get("instant_kill",false) and not a.get("area_blast",false) and e_ai.block(f,a,attacker):
 		f.x=clamp(f.x,70,1370)
-		burst(f.x+f.dir*40,f.y-110,8,Color("cfbd94"))
 		audio.play("resist",-4)
 		return
 	if a.get("dive",false):
@@ -917,7 +913,6 @@ func damage(f: Dictionary,a: Dictionary,attacker: Dictionary):
 		if a.get("dive",false):blood.hit(impact,a.direction,true)
 		if f.hp<=0 and not f.player:
 			for i in (4 if f.boss else 1): blood.hit(impact,a.direction,true)
-		burst(f.x,f.y-105,12,Color("e97b4f") if f.player else Color("ffc473"))
 		shake=7 if a.get("dive",false) else (5 if a.get("knock",false) else 2)
 		audio.play("charge_hit" if a.get("type","")=="charge" else "arrow_hit" if a.get("no_stun",false) else "flesh" if f.player else "enemy_impact")
 		if f.player and not a.get("no_stun",false):audio.play("hero_pain",-6)
