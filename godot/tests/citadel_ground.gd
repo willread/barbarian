@@ -13,6 +13,12 @@ func check():
 		game.hero.y=745;game.hero.height=0;game.hero.attack={}
 		game.background.constrain(game.hero)
 		assert(game.hero.y>730,"Expanded terrace permits foot positions nearer the foreground")
+		if area==3:
+			var points=game.background.screen.walkable.polygon
+			assert(points.size()==4,"Foundry foot area has four rectangular corners")
+			for i in 4:
+				var expected=[[0,.625],[1,.625],[1,.93],[0,.93]][i]
+				assert(Vector2(points[i][0],points[i][1]).is_equal_approx(Vector2(expected[0],expected[1])),"Foundry foot area is rectangular across its full width")
 		if area in [2,3]:
 			assert(game.background.screen.foreground.size()>=2,"Foundry rubble has foreground masks")
 			var foreground=game.background.get_children().filter(func(node):return node is Sprite2D and node.z_index==1805)

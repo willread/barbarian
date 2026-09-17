@@ -722,8 +722,8 @@
     "key": "citadel-2"
   },
   {
-    "id": "citadel-03-v2",
-    "title": "The silent foundry — deeper floor and foreground rubble",
+    "id": "citadel-03-v3",
+    "title": "The silent foundry — rectangular floor and foreground rubble",
     "status": "Revised walkable depth and foreground occlusion",
     "biome": "citadel",
     "size": [
@@ -919,24 +919,106 @@
         ],
         [
           1,
-          0.92
-        ],
-        [
-          0.9,
-          0.93
-        ],
-        [
-          0.22,
           0.93
         ],
         [
           0,
-          0.92
+          0.93
         ]
       ],
-      "description": "Extended fighting floor; foreground rocks and branches overlap actors at the near edge."
+      "description": "Rectangular fighting floor with a level front edge; overlapping rocks and branches render in the foreground."
     },
     "foreground": [
+      {
+        "name": "Front center loose rock",
+        "polygon": [
+          [
+            0.388755980861244,
+            0.9628055260361318
+          ],
+          [
+            0.3923444976076555,
+            0.9426142401700319
+          ],
+          [
+            0.4007177033492823,
+            0.9341126461211477
+          ],
+          [
+            0.41208133971291866,
+            0.9373007438894793
+          ],
+          [
+            0.4216507177033493,
+            0.9489904357066951
+          ],
+          [
+            0.4270334928229665,
+            0.9723698193411264
+          ],
+          [
+            0.4192583732057416,
+            0.9798087141339001
+          ],
+          [
+            0.3965311004784689,
+            0.9766206163655685
+          ]
+        ]
+      },
+      {
+        "name": "Front center broken slab",
+        "polygon": [
+          [
+            0.47547846889952156,
+            0.9511158342189161
+          ],
+          [
+            0.4826555023923445,
+            0.9362380446333688
+          ],
+          [
+            0.49940191387559807,
+            0.926673751328374
+          ],
+          [
+            0.5173444976076556,
+            0.9330499468650372
+          ],
+          [
+            0.5257177033492823,
+            0.944739638682253
+          ],
+          [
+            0.5466507177033493,
+            0.9500531349628055
+          ],
+          [
+            0.5663875598086124,
+            0.9500531349628055
+          ],
+          [
+            0.5789473684210527,
+            0.9670563230605739
+          ],
+          [
+            0.5765550239234449,
+            0.9851222104144527
+          ],
+          [
+            0.5496411483253588,
+            0.9968119022316685
+          ],
+          [
+            0.5173444976076556,
+            0.9883103081827843
+          ],
+          [
+            0.49282296650717705,
+            0.9798087141339001
+          ]
+        ]
+      },
       {
         "name": "Left foreground rocks",
         "polygon": [

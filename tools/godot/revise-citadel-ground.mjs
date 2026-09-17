@@ -31,14 +31,16 @@ g.drawImage(overlay,0,0);
 fs.writeFileSync(root+first.id+'/base.png',canvas.toBuffer('image/png'));
 
 const third=read('citadel-03-v1');
-third.id='citadel-03-v2';third.title='The silent foundry — deeper floor and foreground rubble';
+third.id='citadel-03-v3';third.title='The silent foundry — rectangular floor and foreground rubble';
 third.status='Revised walkable depth and foreground occlusion';
 third.frames=['../citadel-03-v1/base.png'];
 for(const r of third.regions)r.animation.atlas='../citadel-03-v1/'+r.animation.atlas;
-third.walkable.polygon=[[0,.625],[1,.625],[1,.92],[.9,.93],[.22,.93],[0,.92]];
-third.walkable.description='Extended fighting floor; foreground rocks and branches overlap actors at the near edge.';
+third.walkable.polygon=[[0,.625],[1,.625],[1,.93],[0,.93]];
+third.walkable.description='Rectangular fighting floor with a level front edge; overlapping rocks and branches render in the foreground.';
 const shape=(name,points)=>({name,polygon:points.map(([x,y])=>[x/1672,y/941])});
 third.foreground=[
+ shape('Front center loose rock',[[650,906],[656,887],[670,879],[689,882],[705,893],[714,915],[701,922],[663,919]]),
+ shape('Front center broken slab',[[795,895],[807,881],[835,872],[865,878],[879,889],[914,894],[947,894],[968,910],[964,927],[919,938],[865,930],[824,922]]),
  shape('Left foreground rocks',[[0,827],[38,817],[78,827],[114,819],[158,803],[179,795],[209,811],[242,831],[266,855],[302,844],[338,836],[372,847],[402,858],[414,878],[452,883],[485,904],[493,941],[0,941]]),
  shape('Right foreground rocks',[[1358,941],[1362,918],[1398,907],[1431,895],[1430,844],[1448,813],[1481,817],[1512,833],[1547,838],[1580,829],[1615,823],[1635,802],[1672,800],[1672,941]]),
  shape('Left foreground branch',[[41,822],[47,790],[44,760],[39,731],[37,701],[30,678],[33,677],[40,699],[43,731],[49,756],[64,733],[75,714],[78,715],[69,735],[52,765],[51,781],[72,764],[89,744],[94,746],[75,769],[53,790],[48,823]]),
