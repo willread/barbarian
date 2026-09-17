@@ -31,7 +31,7 @@ func setup(source: Node2D):
 	add_child(mire_loop)
 	unlocked=not OS.has_feature("web") and DisplayServer.get_name()!="headless"
 	# Imported audio is listed as .ogg.import in exports. Load resource paths directly.
-	for id in CLIP_IDS+["egg_lay"]:
+	for id in CLIP_IDS+["egg_lay","roar_marauder","roar_warden"]+([] if OS.has_feature("shareware") else ["roar_bearer","roar_king","roar_saint"]):
 		clips[id]=load("res://audio/"+("slam_boom" if id=="landing" else id)+".ogg")
 	clips["menu_activate"]=clips["menu_land"]
 	clips["enemy_impact"]=clips["flesh"]
@@ -136,7 +136,7 @@ func stop_gameplay():
 
 func play(id: String,db: float=-4,pitch: float=1.0):
 	if game.get("phase") in ["dying","lost"] and id not in ["menu_select","menu_activate","menu_land","resist","death"]:return
-	if game.get("voice_enabled")==false and id in ["hero_effort","hero_pain","magic_shout","roar","death"]:return
+	if game.get("voice_enabled")==false and id in Mix.VOCALS:return
 	if not unlocked or game.muted or clips.get(id)==null:return
 	if game.get("hero_voice") and game.hero_voice.player.playing:
 		if id=="hero_effort":return
@@ -191,7 +191,7 @@ func _process(dt: float):
 		if track.volume_db<=-59 and track.playing:track.stop()
 	if game.get("voice_enabled")==false:
 		for voice in voices:
-			if voice.get_meta("sound_id","") in ["hero_effort","hero_pain","magic_shout","roar","death"]:voice.stop()
+			if voice.get_meta("sound_id","") in Mix.VOCALS:voice.stop()
 	if game.muted:
 		for voice in voices:voice.stop()
 	if game.phase in ["paused","dying","lost"]:return
@@ -208,7 +208,7 @@ func _process(dt: float):
 		if burning and not state.burn:play("death_fire",-10+BURN_GAIN_DB)
 		if ground and not state.ground:play("body_fall",-8)
 		if attack!=state.attack:
-			if attack=="marauderRush":play("roar",-8)
+			if attack=="marauderRush":play("roar_marauder",-8)
 			if attack=="spin":play("axe" if h.weapon=="axe" else "sword",-6,.85)
 		watched[key]={"burn":burning,"ground":ground,"attack":attack}
 	chicken_clock-=dt

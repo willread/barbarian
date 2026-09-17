@@ -1131,7 +1131,7 @@ func tick(dt: float):
 			f.y=clamp(f.y+f.velocityY*m.SCALE,m.lane_min,m.lane_max)
 		episode_combat.movement(f,enemy_before)
 		f.x=clamp(f.x,-2400,3840)
-		if f.attack.get("whirlwind",false) and f.attack.age in [1,54]:audio.play("roar" if f.attack.age==1 else "sword",-5)
+		if f.attack.get("whirlwind",false) and f.attack.age in [1,54]:audio.play("roar_warden" if f.attack.age==1 else "sword",-5)
 		var targets=[hero]+enemies.filter(func(other):return other.id!=f.id) if f.attack.get("whirlwind",false) else [hero]
 		var finished=m.tick_attack(f,targets,damage)
 		if f.kind=="archer" and f.attack.get("type","")=="archerShot" and f.attack.age==40:

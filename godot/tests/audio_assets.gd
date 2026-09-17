@@ -4,7 +4,7 @@ func _init():
 	var audio=load("res://scripts/audio.gd").new()
 	source.add_child(audio)
 	audio.setup(source)
-	assert(audio.clips.size()==32,"Expected 32 active sound slots")
+	assert(audio.clips.size()==(34 if OS.has_feature("shareware") else 37),"Expected edition-specific voice slots")
 	for id in audio.originals:
 		var stream=audio.originals[id]
 		assert(stream is AudioStreamOggVorbis and stream.get_length()>.08,"Invalid audio: "+id)

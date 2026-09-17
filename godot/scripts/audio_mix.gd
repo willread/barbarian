@@ -1,6 +1,6 @@
 extends RefCounted
 const COMBAT=["sword","axe","flesh","heavy_hit","charge_hit","enemy_impact","bone","shield","resist","body_fall","landing","arrow_hit","lightning","fire","death_fire"]
-const VOCALS=["hero_effort","hero_pain","magic_shout","roar","death"]
+const VOCALS=["hero_effort","hero_pain","magic_shout","roar","death","roar_marauder","roar_warden","roar_bearer","roar_king","roar_saint"]
 static func bus_for(id: String) -> StringName:
 	if id.begins_with("music_"):return &"Music"
 	if id in COMBAT:return &"Combat"

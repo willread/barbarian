@@ -6,7 +6,7 @@ const omitted = [
  'assets/enemy-witch-*','assets/enemy-bearer-*','assets/enemy-king-*','assets/enemy-saint-*',
  'art/witch-*','art/bearer-*','art/king-*','art/saint-*','art/ember-core-*','art/ending/*',
  'worlds/swamp.json','worlds/ashen.json','audio/mire_loop.*',
- 'voice/boss-king.*','voice/boss-saint.*','scripts/soundboard.gd',
+ 'audio/roar_bearer.*','audio/roar_king.*','audio/roar_saint.*','voice/boss-king.*','voice/boss-saint.*','scripts/soundboard.gd',
 ];
 const defaults=JSON.parse(fs.readFileSync('godot/audio_defaults.json','utf8'));
 const active=new Set([...Object.values(defaults.choices),...Object.values(defaults.pools).flat()]);

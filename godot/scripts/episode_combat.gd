@@ -364,7 +364,7 @@ func step_furnace(game,enemy: Dictionary,a: Dictionary):
 	if enemy.hp<=0:return
 	if not a.get("warned",false):
 		a.warned=true
-		game.audio.play("roar",-5,.55)
+		game.audio.play("roar_saint",-5)
 	if a.age==a.from:
 		game.audio.play("death_fire",-2,.65)
 		game.shake=maxf(game.shake,7)
@@ -379,11 +379,11 @@ func step_scream(game,enemy: Dictionary,a: Dictionary):
 	if a.age<a.from:
 		if not a.get("warned",false):
 			a.warned=true
-			game.audio.play("roar",-9,.65)
+			game.audio.play("roar_bearer",-9)
 		return
 	if a.age==a.from:
 		game.audio.play("death_fire",-4,.7)
-		game.audio.play("roar",-3,.8)
+		game.audio.play("roar_bearer",-3)
 		game.shake=maxf(game.shake,5)
 	if a.age>a.to or a.get("scorched",false):return
 	var hero=game.hero
@@ -575,7 +575,7 @@ func step_king_charge(game,king: Dictionary,a: Dictionary,dt: float):
 	if a.age<a.from:
 		if not a.get("warned",false):
 			a.warned=true
-			game.audio.play("roar",-4,.7)
+			game.audio.play("roar_king",-4)
 		if a.age%12==0:
 			game.burst(king.x+king.dir*32,king.y-5,5,Color("827865"))
 			game.audio.play("heavy_hit",-15,.6)
