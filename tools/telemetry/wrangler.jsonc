@@ -10,8 +10,8 @@
   "observability": { "enabled": false },
   "vars": {
     "COLLECTION_ENABLED": "false",
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": "",
+    "ACCESS_TEAM_DOMAIN": "willread.cloudflareaccess.com",
+    "ACCESS_AUD": "114f4f0dd25c47ebd68ef19993a6356a6e20ce356e44b6fc0d557a1d7ffe8fad",
     "ALLOWED_ORIGINS": ""
   },
   "d1_databases": [{
