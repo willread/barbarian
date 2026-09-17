@@ -1,0 +1,157 @@
+{
+  "provider": "ElevenLabs",
+  "model": "eleven_text_to_sound_v2",
+  "previewOnly": true,
+  "jobs": [
+    {
+      "id": "marauder-1",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "name": "Berserker bark",
+      "duration": 2,
+      "prompt": "A feral muscular human raider, raw adult male voice with coarse throat rasp and furious breath. Aggressive mid-low human register, not supernatural or bovine. One explosive rasping RAAH battle bark on one breath. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "marauder-1.mp3",
+      "source": "marauder-1-source.mp3"
+    },
+    {
+      "id": "marauder-2",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "name": "Savage charge",
+      "duration": 2,
+      "prompt": "A feral muscular human raider, raw adult male voice with coarse throat rasp and furious breath. Aggressive mid-low human register, not supernatural or bovine. One wild open-vowel battle yell, hoarse and slightly cracked. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "marauder-2.mp3",
+      "source": "marauder-2-source.mp3"
+    },
+    {
+      "id": "marauder-3",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "name": "Blood rage",
+      "duration": 2,
+      "prompt": "A feral muscular human raider, raw adult male voice with coarse throat rasp and furious breath. Aggressive mid-low human register, not supernatural or bovine. A clipped growled HAH swelling into a brief furious yell. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "marauder-3.mp3",
+      "source": "marauder-3-source.mp3"
+    },
+    {
+      "id": "warden-1",
+      "character": "warden",
+      "label": "The Iron Warden",
+      "name": "Commanding challenge",
+      "duration": 2,
+      "prompt": "A proud crowned human warlord in brass plate. Powerful mature male baritone, disciplined commanding authority, natural human chest resonance, controlled grit. No monster growling. One thunderous controlled HAAH challenge, firm voiced finish. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "warden-1.mp3",
+      "source": "warden-1-source.mp3"
+    },
+    {
+      "id": "warden-2",
+      "character": "warden",
+      "label": "The Iron Warden",
+      "name": "Execution cry",
+      "duration": 2,
+      "prompt": "A proud crowned human warlord in brass plate. Powerful mature male baritone, disciplined commanding authority, natural human chest resonance, controlled grit. No monster growling. One low forceful RAAH execution shout with restrained rasp. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "warden-2.mp3",
+      "source": "warden-2-source.mp3"
+    },
+    {
+      "id": "warden-3",
+      "character": "warden",
+      "label": "The Iron Warden",
+      "name": "Royal fury",
+      "duration": 2,
+      "prompt": "A proud crowned human warlord in brass plate. Powerful mature male baritone, disciplined commanding authority, natural human chest resonance, controlled grit. No monster growling. One fierce short open-vowel battle cry, regal authority breaking into anger. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "warden-3.mp3",
+      "source": "warden-3-source.mp3"
+    },
+    {
+      "id": "bearer-1",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "name": "Ember screech",
+      "duration": 2,
+      "prompt": "A compact furnace demon carrying burning bombs. High-mid cracked demonic throat, hot wheezing rasp and papery ember crackle woven into the voice. Agile and spiteful, smaller and higher than a furnace giant. One hot cracked screech with a brief sizzling breath tail. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "bearer-1.mp3",
+      "source": "bearer-1-source.mp3"
+    },
+    {
+      "id": "bearer-2",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "name": "Coal hack",
+      "duration": 2,
+      "prompt": "A compact furnace demon carrying burning bombs. High-mid cracked demonic throat, hot wheezing rasp and papery ember crackle woven into the voice. Agile and spiteful, smaller and higher than a furnace giant. One hacking dry demonic bark followed by a tiny ember-like rasp. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "bearer-2.mp3",
+      "source": "bearer-2-source.mp3"
+    },
+    {
+      "id": "bearer-3",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "name": "Hell scream",
+      "duration": 2,
+      "prompt": "A compact furnace demon carrying burning bombs. High-mid cracked demonic throat, hot wheezing rasp and papery ember crackle woven into the voice. Agile and spiteful, smaller and higher than a furnace giant. One sharp rising hellish shriek, fierce nasal edge and scorched throat. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "bearer-3.mp3",
+      "source": "bearer-3-source.mp3"
+    },
+    {
+      "id": "king-1",
+      "character": "king",
+      "label": "The Drowned King",
+      "name": "Drowned challenge",
+      "duration": 2,
+      "prompt": "An enormous drowned undead monarch from a black swamp. Deep waterlogged male throat, wet bubbling resonance and congested gurgle, exhausted ancient menace. Organic wet voice, no ocean ambience. One deep gurgling bellow emerging from a flooded throat. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "king-1.mp3",
+      "source": "king-1-source.mp3"
+    },
+    {
+      "id": "king-2",
+      "character": "king",
+      "label": "The Drowned King",
+      "name": "Sunken wrath",
+      "duration": 2,
+      "prompt": "An enormous drowned undead monarch from a black swamp. Deep waterlogged male throat, wet bubbling resonance and congested gurgle, exhausted ancient menace. Organic wet voice, no ocean ambience. A low choking growl that opens into a wet resonant roar. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "king-2.mp3",
+      "source": "king-2-source.mp3"
+    },
+    {
+      "id": "king-3",
+      "character": "king",
+      "label": "The Drowned King",
+      "name": "Blackwater cry",
+      "duration": 2,
+      "prompt": "An enormous drowned undead monarch from a black swamp. Deep waterlogged male throat, wet bubbling resonance and congested gurgle, exhausted ancient menace. Organic wet voice, no ocean ambience. One mournful bass howl with irregular watery throat flutter. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "king-3.mp3",
+      "source": "king-3-source.mp3"
+    },
+    {
+      "id": "saint-1",
+      "character": "saint",
+      "label": "The Kiln Saint",
+      "name": "Furnace bellow",
+      "duration": 2,
+      "prompt": "A towering possessed walking furnace. Vast cavernous sub-bass voice through a hollow iron chest, rough combustion breath and deep metallic resonance, slow and immense. Lower and heavier than the smaller bomb demon. One enormous low furnace-throat bellow, heavy iron resonance and short hot exhale. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "saint-1.mp3",
+      "source": "saint-1-source.mp3"
+    },
+    {
+      "id": "saint-2",
+      "character": "saint",
+      "label": "The Kiln Saint",
+      "name": "Iron abyss",
+      "duration": 2,
+      "prompt": "A towering possessed walking furnace. Vast cavernous sub-bass voice through a hollow iron chest, rough combustion breath and deep metallic resonance, slow and immense. Lower and heavier than the smaller bomb demon. One ominous sub-bass groan erupting into a compact roaring cry. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "saint-2.mp3",
+      "source": "saint-2-source.mp3"
+    },
+    {
+      "id": "saint-3",
+      "character": "saint",
+      "label": "The Kiln Saint",
+      "name": "Kiln wrath",
+      "duration": 2,
+      "prompt": "A towering possessed walking furnace. Vast cavernous sub-bass voice through a hollow iron chest, rough combustion breath and deep metallic resonance, slow and immense. Lower and heavier than the smaller bomb demon. One crushing deep demonic roar with a grainy burning breath tail. Immediate onset, under 1.3s cry. Dry isolated voice. No words, music, weapons or ambience.",
+      "file": "saint-3.mp3",
+      "source": "saint-3-source.mp3"
+    }
+  ]
+}
