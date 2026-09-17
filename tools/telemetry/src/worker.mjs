@@ -34,8 +34,8 @@ export default {
       const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
       if (origin && !allowed.includes(origin)) return response('Origin denied', 403);
       // Edge-derived country only; never trust a client-provided country header.
-      // No geolocation or request record is persisted. Unknown and Canada opt in.
-      return response(JSON.stringify({ default_enabled: ['GB', 'US', 'AU'].includes(request.cf?.country) }), 200, { 'Content-Type': 'application/json', ...(origin ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {}) });
+      // No geolocation or request record is persisted. Unknown countries opt in.
+      return response(JSON.stringify({ default_enabled: ['GB', 'US', 'AU', 'CA'].includes(request.cf?.country) }), 200, { 'Content-Type': 'application/json', ...(origin ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {}) });
     }
     if (url.pathname === '/v1/attempt') {
       const origin = request.headers.get('Origin');

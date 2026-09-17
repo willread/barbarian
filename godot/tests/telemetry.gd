@@ -23,20 +23,23 @@ func check():
 	assert(reports.size()==2 and reports[1].outcome=="completed" and t.active.level==2)
 	game.change_phase("title");assert(reports.size()==3 and reports[2].outcome=="quit")
 	t.policy_completed(0,200,[], '{"default_enabled":false}'.to_utf8_buffer());assert(t.enabled,"Late policy must not overwrite choice")
-	game.change_phase("title");game.title_intro=1.25;game.statistics_panel.focused=false
+	game.change_phase("title");game.title_intro=1.25
 	game.menu.selected=game.menu.items.size()-1
 	var key=InputEventKey.new();key.pressed=true;key.keycode=KEY_DOWN
-	assert(game.statistics_panel.handle(key) and game.statistics_panel.focused)
-	key.keycode=KEY_ENTER;game.statistics_panel.handle(key);assert(not t.enabled)
-	key.keycode=KEY_RIGHT;game.statistics_panel.handle(key);assert(game.statistics_panel.details)
-	key.keycode=KEY_ESCAPE;game.statistics_panel.handle(key);assert(not game.statistics_panel.details)
+	assert(not game.statistics_panel.handle(key),"Statistics checkbox does not intercept menu navigation")
+	key.keycode=KEY_ENTER;assert(not game.statistics_panel.handle(key) and t.enabled)
 	var controller=InputEventJoypadButton.new();controller.button_index=JOY_BUTTON_A;controller.pressed=true
-	game._input(controller);assert(t.enabled,"Controller confirms the focused statistics toggle")
+	assert(not game.statistics_panel.handle(controller) and t.enabled,"Statistics checkbox ignores controller input")
+	var click=InputEventMouseButton.new();click.button_index=MOUSE_BUTTON_LEFT;click.pressed=true
+	click.position=game.statistics_panel.canvas.get_global_transform_with_canvas()*game.statistics_panel.CHECK.get_center()
+	assert(game.statistics_panel.handle(click) and not t.enabled,"Checkbox click toggles preference")
+	click.position=game.statistics_panel.canvas.get_global_transform_with_canvas()*Vector2(1230,775)
+	assert(game.statistics_panel.handle(click) and t.enabled,"Label click toggles preference")
 	t.save_path="user://statistics-test.cfg";t.network_enabled=true;t.set_enabled(false)
 	var saved=ConfigFile.new();assert(saved.load(t.save_path)==OK and saved.get_value("statistics","enabled")==false)
 	t.network_enabled=false
 	if "--statistics-capture" in OS.get_cmdline_user_args():
-		t.set_enabled(true);game.statistics_panel.focused=false
+		t.set_enabled(true)
 		game.transition=-1;game.pause_cover=0;game._process(0)
 		game.menu.set_process(true)
 		await create_timer(2.0).timeout

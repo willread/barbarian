@@ -99,7 +99,7 @@ test('regional defaults use edge country only and never cache decisions', async 
     const req = new Request('https://stats.example/v1/policy', { headers: { 'X-Country': 'US' } });
     if (country) req.cf = { country };
     const result = await worker.fetch(req, {});
-    assert.equal((await result.json()).default_enabled, ['GB', 'US', 'AU'].includes(country));
+    assert.equal((await result.json()).default_enabled, ['GB', 'US', 'AU', 'CA'].includes(country));
     assert.equal(result.headers.get('Cache-Control'), 'no-store');
   }
 });

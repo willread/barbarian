@@ -6,9 +6,9 @@ Configured hostname: `cairn.haqt.com`. Dashboard: `https://cairn.haqt.com/admin`
 
 ## Game integration
 
-`godot/scripts/telemetry.gd` owns counters and HTTP requests. `statistics_panel.gd` provides the bottom-right title/pause control and details panel. Preferences live in a separate `user://statistics.cfg` file, so normal settings saves cannot erase them. No test or capture session sends network requests or changes the player's telemetry preference.
+`godot/scripts/telemetry.gd` owns counters and HTTP requests. `statistics_panel.gd` provides the bottom-right, mouse-only title/pause checkbox and label. Preferences live in a separate `user://statistics.cfg` file, so normal settings saves cannot erase them. No test or capture session sends network requests or changes the player's telemetry preference.
 
-On the first title screen, a five-second, best-effort `/v1/policy` lookup uses Cloudflare's country metadata (not Windows locale) to default on in GB/US/AU and off elsewhere, including Canada. No location is written to D1. Saved explicit choices override the lookup. Entering a game before it completes locks the default off for that launch. Defaults are a product policy, not a jurisdiction/compliance guarantee; review them as laws and deployment conditions change.
+On the first title screen, a five-second, best-effort `/v1/policy` lookup uses Cloudflare's country metadata (not Windows locale) to default on in GB/US/AU/CA and off elsewhere. No location is written to D1. Saved explicit choices override the lookup. Entering a game before it completes locks the default off for that launch. Defaults are a product policy, not a jurisdiction/compliance guarantee; review them as laws and deployment conditions change.
 
 Actual attack starts are counted once. `normal` groups slash/back/kick/pommel; `slam` is the airborne attack; `throw` counts bombs knocked back. Time excludes pauses, transitions and cutscenes. Reports occur on screen completion, death and abandoning a run. Immediate process exits/crashes can lose a final in-flight report; the game never waits on analytics to quit. Toggling the preference discards the current attempt; enabling mid-run starts fresh at the current score/time. Intro and menu feature flags are carried into the next attempt and cleared on submission or preference change.
 
