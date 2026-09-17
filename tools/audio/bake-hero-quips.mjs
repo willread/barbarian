@@ -3,6 +3,7 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 const jobs=[['waves_coming','when-coming','ElevenLabs_2026-09-17T04_25_54_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3','When will they stop coming?',4],['goat_search','seen-goat','ElevenLabs_2026-09-17T04_26_24_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3','Has anyone seen my goat?',1]];
 const lines=JSON.parse(fs.readFileSync('godot/voice/lines.json'));
+jobs.push(['boss_saint','boss-saint','ElevenLabs_2026-09-17T04_39_15_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3',"It's time to extinguish your flame.",10]);
 jobs.push(['nice_place','nice-place','ElevenLabs_2026-09-17T04_33_36_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3',"Nice place you've got here.",3]);
 jobs.push(['low_health','feel-tomorrow','ElevenLabs_2026-09-17T04_34_19_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3',"I'm going to feel this tomorrow.",6]);
 jobs.push(['knocked_aside','pay-for-that','ElevenLabs_2026-09-17T04_35_47_Cairn_gen_sp90_s50_sb75_se0_b_m2.mp3',"You'll pay for that.",7]);

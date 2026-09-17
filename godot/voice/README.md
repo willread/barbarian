@@ -1,4 +1,6 @@
 # Hero voice lines
+The Kiln Saint introduction uses the September 17 recording: "It's time to extinguish your flame."
+
 Gameplay dialogue now uses one slot per episode/wave (including the boss encounter), consumed when playback starts even if interrupted. Spoken IDs remain unavailable until a new run; pause, area changes and voice resets retain this history. Queued lines expire or are dropped on wave changes without consuming their ID.
 
 September 17 recordings: `waves_coming` can trigger 1.5–3.5 seconds into the second or third wave of an area; `nice_place` can trigger 2–4 seconds after an area starts; `goat_search` is randomly delayed 8–22 seconds during normal waves; `low_health` triggers at 25 HP or below. Timers wait for entry/transition to finish. All share the same dialogue slot; effort, pain, menu and cutscene audio are separate. Source clips and the loudness/envelope bake live in `asset-sources/audio/` and `tools/audio/bake-hero-quips.mjs`.
