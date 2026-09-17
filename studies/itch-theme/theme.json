@@ -20,10 +20,10 @@
   },
   "images": {
     "banner": "assets/header-v3.png",
-    "background": "assets/panel-stone-fine.jpg",
+    "background": "assets/stone-tile-512.jpg",
     "backgroundPosition": "center top",
-    "backgroundRepeat": "no repeat",
-    "backgroundSize": "cover"
+    "backgroundRepeat": "repeat",
+    "backgroundSize": "original / 512px"
   },
   "screenshots": [
     "assets/aqueduct.jpg",

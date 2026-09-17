@@ -35,8 +35,8 @@ or custom CSS access is required.
 | Banner image | cairn-header.png |
 | Background image | cairn-stone-background.jpg |
 | Background placement | Center top |
-| Background repeat | No repeat |
-| Background size | Cover / fill, if provided |
+| Background repeat | Repeat / tile both directions |
+| Background size | Original size (512px); do not use cover/fill |
 
 The desired panel opacity is 68%, which is 32% transparency if the UI labels the
 control that way. Keep the banner as PNG: converting to JPEG flattens the jagged
@@ -45,7 +45,7 @@ do not upload it again as an additional heading image. Leave custom CSS empty.
 
 The header is 2172 × 724 (3:1). Use it at the full content-column width, with its
 aspect ratio preserved and no cropping. This size is our asset size, not an itch.io
-required size. The stone background is 1600 × 1600 (561 KB JPEG; stones about half the prior displayed size). Screenshots are 1920 × 1080.
+required size. The stone background is 512 × 512 (39 KB JPEG; staggered masonry, repeat at original size). Screenshots are 1920 × 1080.
 
 The mockup uses a 960px panel and zero header padding. Standard-editor spacing,
 background sizing controls and font-size increments have not been verified on

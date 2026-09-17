@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $kitRoot = 'E:\Cairn-build-tools\itch-page-assets'
 New-Item -ItemType Directory -Force -Path $kitRoot, "$kitRoot\screenshots", "$kitRoot\trailer" | Out-Null
 Copy-Item -LiteralPath "$PSScriptRoot\assets\header-v3.png" -Destination "$kitRoot\cairn-header.png"
-Copy-Item -LiteralPath "$PSScriptRoot\assets\panel-stone-fine.jpg" -Destination "$kitRoot\cairn-stone-background.jpg"
+Copy-Item -LiteralPath "$PSScriptRoot\assets\stone-tile-512.jpg" -Destination "$kitRoot\cairn-stone-background.jpg"
 Copy-Item -LiteralPath "$PSScriptRoot\assets\aqueduct.jpg" -Destination "$kitRoot\screenshots\01-aqueduct.jpg"
 Copy-Item -LiteralPath "$PSScriptRoot\assets\foundry.jpg" -Destination "$kitRoot\screenshots\02-foundry.jpg"
 Copy-Item -LiteralPath "$PSScriptRoot\assets\keep.jpg" -Destination "$kitRoot\screenshots\03-keep.jpg"

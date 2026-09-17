@@ -79,3 +79,8 @@ The background is panel-stone-fine.jpg: 1600 x 1600, JPEG quality 70, 560638 byt
 A mirrored 2 x 2 arrangement reduces displayed stone scale by half while joining
 the texture edges. Original source PNG is retained. Run package-kit.ps1 to refresh
 the folder; it no longer creates an archive.
+
+Latest background supersedes the mirrored version: stone-tile-512.jpg, 512 x 512,
+39369 bytes. New staggered masonry generated with built-in image generation,
+reduced and compressed with opposing borders matched in a narrow feather band.
+Reviewed as a 2 x 2 repeat. Use repeat both directions at original size, not cover.
