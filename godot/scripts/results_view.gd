@@ -160,7 +160,8 @@ func draw_panel():
 		if key=="peak_multiplier":value="X"+value
 		lettering.number(content,value,"stat",Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
 		record_label(key,Vector2(x,y+row*.83))
-		if i<4:rule(Vector2(left+sw*.5*col+20,y+row),Vector2(left+sw*.5*(col+1)-20,y+row))
+		# Match the first row: each divider sits 18 units above the next label.
+		if i<4:rule(Vector2(left+sw*.5*col+20,y+row-7),Vector2(left+sw*.5*(col+1)-20,y+row-7))
 
 func _process(dt: float):
 	if not visible:return
