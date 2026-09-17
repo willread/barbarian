@@ -6,7 +6,7 @@
       "screens": [
         {
           "order": 1,
-          "id": "citadel-01-v5",
+          "id": "citadel-01-v6",
           "name": "Aqueduct approach",
           "status": "approved"
         },
@@ -18,7 +18,7 @@
         },
         {
           "order": 3,
-          "id": "citadel-03-v1",
+          "id": "citadel-03-v2",
           "name": "The silent foundry",
           "status": "approved",
           "boss_arena": false

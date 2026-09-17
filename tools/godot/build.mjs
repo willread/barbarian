@@ -49,6 +49,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/weapon_unlocks.gd']);
  run(binary,['--headless','--path','godot','--script','tests/combat_moves.gd']);
  run(binary,['--headless','--path','godot','--script','tests/idle_pressure.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/citadel_ground.gd']);
  run(binary,['--headless','--path','godot','--script','tests/combat_balance.gd']);
  run(binary,['--headless','--path','godot','--script','tests/audio_assets.gd']);
  run(binary,['--headless','--path','godot','--script','tests/episode_music.gd']);
