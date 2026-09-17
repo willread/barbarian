@@ -6,6 +6,9 @@ func check():
 	game.start_game()
 	var voice=game.hero_voice
 	voice.set_process(false)
+	game.set_process(false)
+	game.transition=-1;game.stage_walk=""
+	voice.scheduled_wave=voice.wave_key()
 	voice.request_line("dinner",.9,4)
 	voice.request_line("dinner",.9,4)
 	assert(voice.pending.size()==1)
@@ -42,13 +45,14 @@ func check():
 	foe.x=300
 	voice.observe_milestones()
 	voice.observe_milestones()
-	assert(voice.pending.size()==2 and voice.milestones.has("tiny_enemy"))
+	assert(voice.pending.size()==2)
 	game.magic=100
 	voice.observe_milestones()
 	assert(voice.pending.size()==3)
 	voice.reset()
 	voice.observe_milestones()
-	assert(voice.pending.is_empty())
+	assert(voice.pending.size()==2)
+	game.magic=0
 	# Boss cues remain eligible after both ordinary enemy milestones have fired.
 	for kind in ["champion","king","saint"]:
 		voice.reset()
@@ -61,7 +65,9 @@ func check():
 		voice.observe_milestones()
 		assert(voice.pending.size()==1 and voice.pending[0].id=="boss_"+kind)
 	game.start_game()
-	assert(voice.milestones.is_empty())
+	assert(voice.milestones.is_empty() and voice.played.is_empty() and voice.spoken_waves.is_empty())
+	game.transition=-1;game.stage_walk=""
+	voice.scheduled_wave=voice.wave_key()
 	game.voice_enabled=false
 	voice.request_once("mana_full")
 	assert(voice.pending.is_empty())
@@ -71,6 +77,46 @@ func check():
 	game.voice_enabled=true
 	game.muted=false
 	game.audio.unlocked=true
+	var saved_enemies=game.enemies.duplicate()
+	game.enemies.clear();game.magic=0;game.hero.hp=100
+	voice.new_run();voice.scheduled_wave=voice.wave_key();voice.gap=0
+	voice.request_line("dinner")
+	voice._process(.01)
+	assert(voice.active=="dinner" and voice.played.has("dinner"))
+	voice.interrupt()
+	voice.request_line("goat_search")
+	assert(voice.pending.is_empty(),"An interrupted line still consumes this wave's slot")
+	voice.reset()
+	voice.request_line("mana_full")
+	assert(voice.pending.is_empty(),"Voice reset cannot reopen a spent wave")
+	game.wave=2;voice.schedule_wave();voice.pending.clear();voice.gap=0
+	voice.request_line("dinner")
+	assert(voice.pending.is_empty(),"Spoken lines cannot repeat in later waves")
+	voice.request_line("goat_search")
+	voice._process(1.)
+	assert(voice.active=="goat_search" and voice.played.size()==2)
+	voice.interrupt();game.wave=13;voice.schedule_wave();voice.gap=0
+	voice.request_line("boss_champion")
+	voice._process(1.)
+	assert(voice.active=="boss_champion")
+	voice.request_line("low_health")
+	assert(voice.pending.is_empty(),"Boss battle also allows only one line")
+	voice.new_run();voice.scheduled_wave=voice.wave_key();voice.gap=0
+	assert(voice.played.is_empty() and voice.spoken_waves.is_empty())
+	game.hero.hp=25;voice.previous_hp=25
+	voice.observe_milestones()
+	assert(voice.pending.size()==1 and voice.pending[0].id=="low_health")
+	voice._process(1.)
+	assert(voice.active=="low_health")
+	game.enemies.assign(saved_enemies)
+	voice.new_run();voice.scheduled_wave=voice.wave_key();voice.gap=0
+	game.hero.hp=100;voice.previous_hp=100
+	game.hero.down={"ground":true}
+	voice.observe_milestones()
+	assert(voice.pending.is_empty(),"Retort waits until knockdown recovery")
+	game.hero.down={}
+	voice.observe_milestones()
+	assert(voice.pending[0].id=="knocked_aside")
 	game.damage(game.hero,{"damage":1000,"direction":-1,"knock":true},game.enemies[0])
 	assert(game.phase=="dying")
 	assert(game.audio.voices.any(func(v):return v.playing and v.get_meta("sound_id","")=="death" and v.stream==game.audio.clips.magic_shout),"Death shout must survive the dying transition and match the selected player voice")

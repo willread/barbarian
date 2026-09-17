@@ -660,7 +660,7 @@ func start_game():
 	difficulty_select=false
 	finished_run={}
 	run_stats={"id":str(Time.get_unix_time_from_system())+"-"+str(Time.get_ticks_usec()),"date":Time.get_date_string_from_system(),"time":0.0,"best_combo":0,"peak_multiplier":1,"damage_dealt":0.0,"damage_taken":0.0}
-	hero_voice.milestones.clear()
+	hero_voice.new_run()
 	chapter_select=false
 	clear_world()
 	if is_instance_valid(wipe): wipe.queue_free()
