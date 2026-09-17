@@ -48,4 +48,17 @@ third.foreground=[
 ];
 third.notes='Original painting and fire loops retained. Expanded front foot area; traced foreground rocks and branches now render over characters.';
 save(third.id,third);
+
+const second=read('citadel-02-v1');
+second.id='citadel-02-v2';
+second.status='Original composition and floor; revised foreground rock masks';
+second.frames=['../citadel-02-v1/base.png'];
+for(const r of second.regions)r.animation.atlas='../citadel-02-v1/'+r.animation.atlas;
+second.foreground=[
+ shape('Foreground — left rock silhouettes',[[0,781],[24,784],[57,775],[81,774],[90,797],[97,825],[116,832],[130,826],[147,837],[160,849],[173,858],[185,863],[210,858],[235,854],[250,863],[263,878],[273,898],[299,906],[320,899],[341,885],[359,887],[371,895],[381,912],[404,923],[421,941],[0,941]]),
+ shape('Foreground — right rock silhouettes',[[1232,941],[1264,925],[1293,919],[1305,888],[1318,866],[1341,858],[1370,856],[1400,857],[1426,862],[1452,858],[1456,826],[1466,800],[1484,782],[1507,784],[1530,798],[1568,801],[1604,804],[1638,812],[1672,812],[1672,941]]),
+ shape('Foreground — loose center stones',[[1008,940],[1016,925],[1031,922],[1040,914],[1061,909],[1081,911],[1096,923],[1120,930],[1136,941]])
+];
+second.notes+=' Revised foreground contours include the overlapping front rocks and loose center stones. Artwork, animation and walkable polygon unchanged.';
+save(second.id,second);
 console.log('Rebuilt citadel ground revisions');

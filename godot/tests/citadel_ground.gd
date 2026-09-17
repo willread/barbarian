@@ -6,14 +6,14 @@ func check():
 	game.set_process(false)
 	game.start_game();game.transition=-1;game.stage_walk=""
 	game.pending_enemies.clear();game.enemies.clear()
-	for area in [1,3]:
-		game.wave=1 if area==1 else 7
+	for area in [1,2,3]:
+		game.wave=1+(area-1)*3
 		game.background.setup(game.art,"citadel-%d"%area)
-		game.hero.x=720 if area==1 else 160
+		game.hero.x=720 if area==1 else 120 if area==2 else 160
 		game.hero.y=745;game.hero.height=0;game.hero.attack={}
 		game.background.constrain(game.hero)
 		assert(game.hero.y>730,"Expanded terrace permits foot positions nearer the foreground")
-		if area==3:
+		if area in [2,3]:
 			assert(game.background.screen.foreground.size()>=2,"Foundry rubble has foreground masks")
 			var foreground=game.background.get_children().filter(func(node):return node is Sprite2D and node.z_index==1805)
 			assert(foreground.size()==1 and foreground[0].texture.get_image().get_used_rect().has_area())
