@@ -19,7 +19,7 @@
     "screenshots": "Sidebar"
   },
   "images": {
-    "banner": "assets/banner.png",
+    "banner": "assets/header-v2.png",
     "background": "assets/panel-stone.png",
     "backgroundPosition": "center top",
     "backgroundRepeat": "no repeat",

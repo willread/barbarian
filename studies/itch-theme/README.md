@@ -10,11 +10,10 @@ upload `index.html`, JavaScript, or `preview.css` as a theme.
 
 ## Scope and accuracy
 
-Uses the ordinary theme editor with the original transparent Cairn logo, no
+Uses the ordinary theme editor with a smaller original Cairn logo over generated ruined arches and mist, no
 subtitle, a continuous stone page background, Cinzel headings, Georgia body,
 bronze links and a bronze native button. BG2 is #101213 at 68% opacity. The same
-translucent panel spans header and body, revealing one background with no header
-image junction. The stone also extends outside the panel. No separate panel
+translucent panel spans header and body, revealing one background beneath the alpha-faded header. The stone also extends outside the panel. No separate panel
 texture, custom button shape, bevel, or other custom-CSS effect is simulated.
 The documented desktop column is 960px and the description is 553px. Platform
 chrome, gaps, native buttons, and responsive breakpoints are approximated.
@@ -33,12 +32,20 @@ The local trailer player maps to the public supported-host trailer URL on itch.i
 The server reads E:/Cairn-build-tools/trailer/cairn-first-cut.mp4 without copying
 the video into Git. Other machines need that file or a changed server mapping.
 
+## Current header
+
+`assets/header-v2.png` is the uploadable PNG banner. The original logo is scaled
+to 50% of its width and composited over generated `header-scenery-v2.png`; its
+lettering is not regenerated. Run `node studies/itch-theme/compose-header.mjs`
+to reproduce. The alpha channel reveals the shared page texture and the bottom
+edge is fully transparent. No custom CSS is required.
+
 ## Assets
 
 - `assets/masthead-v1.png`: unused first-iteration promotional art, built-in image generation.
   Exact generation prompt: `masthead-prompt.txt`. Native output 2172 × 724;
   Retained for history; not displayed in the current concept.
-- `assets/banner.png`: original transparent Cairn logo in the header and embed mockup.
+- `assets/banner.png`: original transparent Cairn logo source and embed mockup.
 - `assets/panel-stone.png`: unmodified `godot/art/stone-border-v1.png`, used as the page background.
 - `assets/background.png`: original `godot/art/title-background.png`, used in the browser embed mockup only.
 - `assets/aqueduct.jpg`, `foundry.jpg`, `keep.jpg`: actual native trailer frames
