@@ -5,6 +5,11 @@ func check():
  root.add_child(game)
  game.start_game()
  var console=game.debug_console
+ var snapshot=game.hero.duplicate(true)
+ console.execute("HIT")
+ assert(game.hitboxes_enabled and game.hero==snapshot,"HIT only enables the overlay")
+ console.execute("HIT")
+ assert(not game.hitboxes_enabled and game.hero==snapshot,"HIT toggles off without changing combat state")
  game.change_phase("paused")
  console.toggle()
  assert(not console.visible and not paused,"Cheats must not open on pause menus")

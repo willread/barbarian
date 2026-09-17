@@ -95,8 +95,9 @@ func landed():
 func execute(text: String):
  var success=false
  if game.phase=="playing":
-  success=text.to_upper() in ["TNT","HOH","EMT","ZAP","KFC","CEO","FWD","BUN"]
+  success=text.to_upper() in ["TNT","HOH","EMT","ZAP","KFC","CEO","FWD","BUN","HIT"]
   match text.to_upper():
+   "HIT":game.hitboxes_enabled=not game.hitboxes_enabled
    "TNT":game.kill_visible_enemies()
    "HOH":game.unlock_candy_session()
    "BUN":game.enable_easter_session()

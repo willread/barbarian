@@ -114,6 +114,7 @@ var heat_node: ColorRect
 var audio: Node
 var scenery_shade: Node2D
 var arena_clip: Control
+var hitboxes_enabled=false
 var screen_backdrop: Node2D
 var screen_size=Vector2(1440,810)
 var last_window_size=Vector2i.ZERO
@@ -145,6 +146,10 @@ func _ready():
 	arena_clip.clip_contents=true
 	arena_clip.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	add_child(arena_clip)
+	var hitbox_overlay=preload("res://scripts/hitbox_overlay.gd").new()
+	hitbox_overlay.game=self
+	hitbox_overlay.z_index=4095
+	arena_clip.add_child(hitbox_overlay)
 	screen_backdrop=Node2D.new()
 	screen_backdrop.top_level=true
 	screen_backdrop.z_index=-200

@@ -1,0 +1,30 @@
+extends Node2D
+var game: Node2D
+func _process(_dt):
+	visible=game.hitboxes_enabled and game.phase in ["playing","paused"]
+	if visible:queue_redraw()
+func box(rect: Rect2,color: Color):
+	draw_rect(rect,Color(color,.10),true)
+	draw_rect(rect,color,false,2.)
+func _draw():
+	# Read-only projection of mechanics.can_hit; no actor or attack mutation.
+	for f in [game.hero]+game.enemies:
+		if f.is_empty() or f.hp<=0:continue
+		var body=[-15,18,-47,47]
+		if f.player:body=([-16,32,-56,56] if f.stagger==1 else [-8,24,-40,40]) if f.recovering or f.hurtTicks else [-16,28,-60,60]
+		elif f.hurtTicks:body=[-19,25,-37,37]
+		elif not f.attack.is_empty():body=[-25,24,-45,45]
+		if not f.player and f.kind=="king":body[0]=-32;body[1]=64
+		var target=game.m.rect(f,body,f.dir)
+		box(Rect2(target.position*game.m.SCALE,target.size*game.m.SCALE),Color.GRAY if f.invTicks or not f.down.is_empty() else Color.CYAN)
+		draw_circle(Vector2(f.x,f.y),3,Color.WHITE)
+		if f.attack.is_empty():continue
+		var a=f.attack
+		if a.get("dive",false):continue
+		var active=a.age>=a.from and a.age<=a.to
+		var strike=game.m.rect(f,a.get("box",[-4,a.reach+4,-48,64 if a.type=="air" else 48]),a.direction)
+		var color=Color.RED if active else Color(1,.7,.1,.65)
+		box(Rect2(strike.position*game.m.SCALE,strike.size*game.m.SCALE),color)
+		# Grounded hits use horizontal overlap plus this independent foot-depth band.
+		var lane=minf(a.get("lane",game.m.MELEE_LANE),game.m.MELEE_LANE)
+		draw_rect(Rect2(strike.position.x*game.m.SCALE,f.y-lane,strike.size.x*game.m.SCALE,lane*2),Color(color,.35),false,1.)
