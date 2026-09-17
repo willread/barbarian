@@ -13,6 +13,18 @@ func check():
 		await process_frame
 		assert(game.background.has_node("AshenVeil"))
 		assert(game.background.has_node("SanctuaryAtmosphere")== (area==4),"Final-arena effects remain local to the sanctuary")
+		assert(game.background.has_node("SanctuaryLanterns")== (area==4))
+		if area==4:
+			var lanterns=game.background.get_node("SanctuaryLanterns")
+			assert(not lanterns.z_as_relative and lanterns.z_index>1805 and lanterns.z_index<game.hud.z_index,"Chains and cages sit in front of fighters but beneath HUD")
+			assert(lanterns.lamps.size()==2)
+			game.background.advance(12.)
+			assert(not is_equal_approx(lanterns.lamps[0].pivot.rotation,lanterns.lamps[1].pivot.rotation),"Independent pendulum timing")
+			for lamp in lanterns.lamps:
+				assert(absf(lamp.pivot.rotation)<.025,"Foreground sway remains gentle")
+				var sprite=lamp.pivot.get_child(0)
+				var bottom=lamp.pivot.position.y+sprite.texture.get_height()*sprite.scale.y
+				assert(bottom>570 and bottom<635,"Lantern tips hang just below the back edge of the floor")
 		var heat=game.background.get_node("AshenSceneHeat")
 		var capture=game.background.get_node("AshenSceneCapture")
 		assert(capture.copy_mode==BackBufferCopy.COPY_MODE_VIEWPORT)

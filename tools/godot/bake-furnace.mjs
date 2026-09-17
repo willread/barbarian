@@ -5,6 +5,8 @@ const sources={
  '02-mouth.png':'ashen-2-base.png',
  '03-crucible.png':'ashen-3-base.png',
  '03-brazier.png':'crucible-brazier.png',
+ '04-reliquary-asymmetric.png':'ashen-4-base.png',
+ '04-lantern.png':'sanctuary-lantern.png',
  '01-track-clear.png':'ashen-track-clear.png',
 };
 for(const [file,asset] of Object.entries(sources)){

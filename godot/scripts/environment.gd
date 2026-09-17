@@ -86,6 +86,13 @@ func setup(source: CairnArt,name: String):
 			atmosphere.material=atmosphere_material
 			add_child(atmosphere)
 			layers.append(atmosphere_material)
+			var lanterns=preload("res://scripts/sanctuary_lanterns.gd").new()
+			lanterns.name="SanctuaryLanterns"
+			lanterns.set_meta("continuous_clock",true)
+			lanterns.z_as_relative=false
+			lanterns.z_index=1806
+			add_child(lanterns)
+			decorations.append(lanterns)
 		if name=="ashen-3":
 			var brazier=preload("res://scripts/crucible_brazier.gd").new()
 			brazier.name="HangingBrazier"
