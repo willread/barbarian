@@ -20,7 +20,6 @@ var font=preload("res://art/controls/cinzel.ttf")
 var caption_font=FontVariation.new()
 var ink=Color("e7d5b0")
 var gold=Color("bda06d")
-var multiplier_bounds={}
 const STATS=[["kills","ENEMIES SLAIN"],["time","TIME SURVIVED"],["best_combo","BEST COMBO"],["peak_multiplier","PEAK MULTIPLIER"],["damage_dealt","DAMAGE DEALT"],["damage_taken","DAMAGE TAKEN"]]
 
 func _ready():
@@ -158,22 +157,10 @@ func draw_panel():
 		lettering.label(content,title,Vector2(x,y+11),12 if compact else 14,sw*.43,Color(1.6,1.65,1.7))
 		var value=CairnRunRecords.duration(result.get(key,0)) if key=="time" else CairnRunRecords.number(result.get(key,0))
 		if key=="best_combo":value+=" HITS"
-		if key=="peak_multiplier":
-			draw_multiplier(Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
-		else:lettering.number(content,value,"stat",Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
+		if key=="peak_multiplier":value="X"+value
+		lettering.number(content,value,"stat",Vector2(x,y+row*.50),36 if compact else minf(46,row*.47),sw*.41)
 		record_label(key,Vector2(x,y+row*.83))
 		if i<4:rule(Vector2(left+sw*.5*col+20,y+row),Vector2(left+sw*.5*(col+1)-20,y+row))
-
-func draw_multiplier(center: Vector2,height: float,max_width: float):
-	# Reuse the HUD artwork, including its X-first order and glyph spacing.
-	var value=clampi(int(result.get("peak_multiplier",1)),1,10)
-	var meta=art.data.menu["HUD x%d"%value]
-	var texture=art.texture("menu-"+meta.id+".png")
-	if not multiplier_bounds.has(value):multiplier_bounds[value]=texture.get_image().get_used_rect()
-	var crop=multiplier_bounds[value]
-	var factor=minf(height/crop.size.y,max_width/crop.size.x)
-	var size=Vector2(crop.size)*factor
-	content.draw_texture_rect_region(texture,Rect2(center-size*.5,size),crop,Color(1.25,1.2,1.1))
 
 func _process(dt: float):
 	if not visible:return

@@ -12,12 +12,13 @@ func check():
 		view.content.queue_redraw()
 		await process_frame
 		await RenderingServer.frame_post_draw
-		assert(view.multiplier_bounds.has(value),"Results draw the matching HUD multiplier asset")
+		for ch in "X%d"%value:
+			assert(view.lettering.textures.has(view.lettering.data.glyphs.stat[ch].file),"Multiplier uses the same carved stat glyphs")
 	view.result.peak_multiplier=1
 	view.content.queue_redraw()
 	await create_timer(.5).timeout
 	await RenderingServer.frame_post_draw
 	if "--multiplier-capture" in OS.get_cmdline_user_args():root.get_texture().get_image().save_png("E:/Cairn-build-tools/results-multiplier.png")
 	game.queue_free();await process_frame
-	print("CAIRN_RESULTS_MULTIPLIER_OK: HUD artwork used for X1, X3 and X10")
+	print("CAIRN_RESULTS_MULTIPLIER_OK: Matching stat lettering used for X1, X3 and X10")
 	quit()
