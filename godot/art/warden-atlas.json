@@ -1,120 +1,120 @@
 {
-  "cellWidth": 313,
-  "cellHeight": 313,
-  "referenceHeight": 273,
+  "cellWidth": 384,
+  "cellHeight": 256,
+  "referenceHeight": 243,
   "facing": 1,
   "cels": [
     {
       "file": "iron-warden-v1-0.png",
-      "left": 62,
-      "top": 32,
-      "width": 176,
-      "height": 273
-    },
-    {
-      "file": "iron-warden-v1-1.png",
-      "left": 65,
-      "top": 33,
-      "width": 195,
-      "height": 271
-    },
-    {
-      "file": "iron-warden-v1-2.png",
-      "left": 66,
-      "top": 33,
-      "width": 191,
-      "height": 269
-    },
-    {
-      "file": "iron-warden-v1-3.png",
-      "left": 69,
-      "top": 33,
-      "width": 192,
-      "height": 270
-    },
-    {
-      "file": "iron-warden-v1-4.png",
-      "left": 51,
-      "top": 35,
-      "width": 200,
-      "height": 262
-    },
-    {
-      "file": "iron-warden-v1-5.png",
-      "left": 54,
-      "top": 28,
-      "width": 216,
-      "height": 269
-    },
-    {
-      "file": "iron-warden-v1-6.png",
-      "left": 19,
-      "top": 54,
-      "width": 343,
+      "left": 94,
+      "top": 11,
+      "width": 225,
       "height": 243
     },
     {
+      "file": "iron-warden-v1-1.png",
+      "left": 81,
+      "top": 11,
+      "width": 255,
+      "height": 242
+    },
+    {
+      "file": "iron-warden-v1-2.png",
+      "left": 95,
+      "top": 11,
+      "width": 235,
+      "height": 240
+    },
+    {
+      "file": "iron-warden-v1-3.png",
+      "left": 99,
+      "top": 11,
+      "width": 227,
+      "height": 245
+    },
+    {
+      "file": "iron-warden-v1-4.png",
+      "left": 91,
+      "top": 9,
+      "width": 236,
+      "height": 243
+    },
+    {
+      "file": "iron-warden-v1-5.png",
+      "left": 60,
+      "top": -11,
+      "width": 206,
+      "height": 275
+    },
+    {
+      "file": "iron-warden-v1-6.png",
+      "left": 33,
+      "top": 35,
+      "width": 346,
+      "height": 224
+    },
+    {
       "file": "iron-warden-v1-7.png",
-      "left": 44,
-      "top": 58,
-      "width": 266,
-      "height": 239
+      "left": 49,
+      "top": 69,
+      "width": 323,
+      "height": 190
     },
     {
       "file": "iron-warden-v1-8.png",
-      "left": 46,
-      "top": 15,
-      "width": 218,
-      "height": 281
+      "left": 92,
+      "top": -13,
+      "width": 191,
+      "height": 293
     },
     {
       "file": "iron-warden-v1-9.png",
-      "left": 40,
-      "top": 79,
-      "width": 254,
-      "height": 214
+      "left": 44,
+      "top": 76,
+      "width": 325,
+      "height": 199
     },
     {
       "file": "iron-warden-v1-10.png",
-      "left": 31,
-      "top": 114,
-      "width": 278,
-      "height": 174
-    },
-    {
-      "file": "iron-warden-v1-11.png",
-      "left": 75,
-      "top": 58,
-      "width": 208,
-      "height": 238
-    },
-    {
-      "file": "iron-warden-v1-12.png",
-      "left": 53,
-      "top": 83,
-      "width": 249,
-      "height": 177
-    },
-    {
-      "file": "iron-warden-v1-13.png",
-      "left": 28,
-      "top": 161,
-      "width": 284,
-      "height": 120
-    },
-    {
-      "file": "iron-warden-v1-14.png",
-      "left": 61,
-      "top": 76,
-      "width": 249,
+      "left": 65,
+      "top": 85,
+      "width": 318,
       "height": 181
     },
     {
+      "file": "iron-warden-v1-11.png",
+      "left": 59,
+      "top": 47,
+      "width": 296,
+      "height": 209
+    },
+    {
+      "file": "iron-warden-v1-12.png",
+      "left": 36,
+      "top": 35,
+      "width": 266,
+      "height": 208
+    },
+    {
+      "file": "iron-warden-v1-13.png",
+      "left": 8,
+      "top": 129,
+      "width": 394,
+      "height": 98
+    },
+    {
+      "file": "iron-warden-v1-14.png",
+      "left": 58,
+      "top": 61,
+      "width": 324,
+      "height": 175
+    },
+    {
       "file": "iron-warden-v1-15.png",
-      "left": 67,
-      "top": 9,
-      "width": 212,
-      "height": 257
+      "left": 76,
+      "top": 0,
+      "width": 201,
+      "height": 251
     }
   ]
 }

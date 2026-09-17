@@ -20,7 +20,20 @@ func _ready():
 	material=ShaderMaterial.new()
 	material.shader=preload("res://shaders/egg_shell.gdshader")
 	material.set_shader_parameter("golden",golden)
+	setup_fire()
+func setup_fire():
+	if fire!=null:return
 	if golden:
+		if easter and shell!=null:
+			fire=ContourFire.new()
+			fire.menu_palette=true
+			fire.yellow_palette=true
+			fire.show_behind_parent=true
+			add_child(fire)
+			var width=34.*shell.get_width()/shell.get_height()
+			fire.setup(shell,Vector2(width,34),Vector2(-width*.5,-17),false)
+			sync_fire()
+			return
 		var mask=Image.create(32,40,false,Image.FORMAT_RGBA8)
 		for y in 40:
 			for x in 32:
@@ -41,6 +54,7 @@ func dress_for_easter():
 		fire.queue_free()
 		fire=null
 	shell=game.art.texture("../art/easter-eggs-v1-%d.png"%(2 if golden else randi_range(0,1)))
+	setup_fire()
 	queue_redraw()
 func advance(dt: float):
 	age+=dt

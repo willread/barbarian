@@ -80,7 +80,8 @@ func check():
 	egg.advance(.01);egg.advance(.93)
 	assert(game.hero.hp==65,"Decorated egg retains normal healing")
 	egg=game.drop_egg(Vector2(1000,660),true)
-	assert(egg.golden and egg.shell.resource_path.ends_with("easter-eggs-v1-2.png") and egg.fire==null,"Golden Easter eggs use gold paint without effects")
+	assert(egg.golden and egg.shell.resource_path.ends_with("easter-eggs-v1-2.png") and egg.fire!=null,"Golden Easter eggs retain their flames")
+	assert(egg.fire.yellow_palette and egg.fire.menu_palette)
 	egg.advance(.3)
 	game.hero.pickup={}
 	egg.position=Vector2(720,660);egg.height=0;egg.velocity=0
