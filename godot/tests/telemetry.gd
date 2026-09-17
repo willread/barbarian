@@ -31,9 +31,9 @@ func check():
 	var controller=InputEventJoypadButton.new();controller.button_index=JOY_BUTTON_A;controller.pressed=true
 	assert(not game.statistics_panel.handle(controller) and t.enabled,"Statistics checkbox ignores controller input")
 	var click=InputEventMouseButton.new();click.button_index=MOUSE_BUTTON_LEFT;click.pressed=true
-	click.position=game.statistics_panel.canvas.get_global_transform_with_canvas()*game.statistics_panel.CHECK.get_center()
+	click.position=game.statistics_panel.canvas.get_global_transform_with_canvas()*game.statistics_panel.check.get_center()
 	assert(game.statistics_panel.handle(click) and not t.enabled,"Checkbox click toggles preference")
-	click.position=game.statistics_panel.canvas.get_global_transform_with_canvas()*Vector2(1230,775)
+	click.position=game.statistics_panel.canvas.get_global_transform_with_canvas()*(game.statistics_panel.text_origin+Vector2(15,-5))
 	assert(game.statistics_panel.handle(click) and t.enabled,"Label click toggles preference")
 	t.save_path="user://statistics-test.cfg";t.network_enabled=true;t.set_enabled(false)
 	var saved=ConfigFile.new();assert(saved.load(t.save_path)==OK and saved.get_value("statistics","enabled")==false)
