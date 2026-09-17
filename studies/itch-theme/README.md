@@ -1,4 +1,4 @@
-# Cairn — Bronze & Ash itch.io theme study
+# Cairn — Stone & Bronze itch.io theme study
 
 Local preview: http://localhost:3014/ . Start from the repository root with
 `node studies/itch-theme/serve.mjs`. No packages or build step required.
@@ -10,8 +10,12 @@ upload `index.html`, JavaScript, or `preview.css` as a theme.
 
 ## Scope and accuracy
 
-Uses the ordinary theme editor, with a new 3:1 masthead, existing atmospheric
-background, Cinzel headings, Georgia body, bronze links and rust-red buttons.
+Uses the ordinary theme editor with the original transparent Cairn logo, no
+subtitle, a continuous stone page background, Cinzel headings, Georgia body,
+bronze links and a bronze native button. BG2 is #101213 at 68% opacity. The same
+translucent panel spans header and body, revealing one background with no header
+image junction. The stone also extends outside the panel. No separate panel
+texture, custom button shape, bevel, or other custom-CSS effect is simulated.
 The documented desktop column is 960px and the description is 553px. Platform
 chrome, gaps, native buttons, and responsive breakpoints are approximated.
 The mockup is not the live itch.io renderer and needs a final draft-page check.
@@ -31,11 +35,12 @@ the video into Git. Other machines need that file or a changed server mapping.
 
 ## Assets
 
-- `assets/masthead-v1.png`: new promotional art, built-in image generation.
+- `assets/masthead-v1.png`: unused first-iteration promotional art, built-in image generation.
   Exact generation prompt: `masthead-prompt.txt`. Native output 2172 × 724;
-  shown without cropping. This ratio is a design choice, not an itch.io limit.
-- `assets/banner.png`: original transparent Cairn logo used only in embed mockup.
-- `assets/background.png`: original `godot/art/title-background.png`.
+  Retained for history; not displayed in the current concept.
+- `assets/banner.png`: original transparent Cairn logo in the header and embed mockup.
+- `assets/panel-stone.png`: unmodified `godot/art/stone-border-v1.png`, used as the page background.
+- `assets/background.png`: original `godot/art/title-background.png`, used in the browser embed mockup only.
 - `assets/aqueduct.jpg`, `foundry.jpg`, `keep.jpg`: actual native trailer frames
   at 1.1, 9.5 and 19 seconds, extracted with ffmpeg without visual alterations.
   These are staged gameplay from the previous trailer, not latest-build captures.
@@ -57,7 +62,6 @@ A listing cover was not generated as part of this theme study.
 
 No game code changed; no native export required. The preview and all 13 local
 image/font/content routes were checked over HTTP, including video byte ranges.
-Measured contrast on the opaque panel: body 12.51:1, links 8.36:1; white text on
-the button is 7.69:1. The panel is 96% opaque in the preview. Browser visual QA
-and live itch.io validation were not performed.
+The original logo and stone texture were checked for byte identity with their
+source files. Browser visual QA and live itch.io validation were not performed.
 No live itch.io account was changed or content published.
