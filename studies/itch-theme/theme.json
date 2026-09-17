@@ -1,0 +1,10 @@
+{
+  "name": "Cairn — Bronze & Ash",
+  "mode": "Standard itch.io theme editor; no custom CSS required",
+  "colors": {"BG": "#101213", "BG2": "#171819", "BG2 Alpha": 0.96, "Text": "#ded8ca", "Link": "#d2ac70", "Buttons": "#8c3929", "Headers": "#e0bd83"},
+  "fonts": {"body": "Georgia", "headers": "Cinzel", "size": "17px"},
+  "layout": {"screenshots": "Sidebar"},
+  "images": {"banner": "assets/masthead-v1.png", "background": "assets/background.png", "backgroundPosition": "center top", "backgroundRepeat": "no repeat", "backgroundSize": "cover"},
+  "screenshots": ["assets/aqueduct.jpg", "assets/foundry.jpg", "assets/keep.jpg"],
+  "notes": "Human-readable recipe, not an itch.io import format. Confirm background control names and font-size increments in the live editor. Download and browser variants are review simulations."
+}

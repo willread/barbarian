@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cairn — itch.io theme study</title>
+<link rel="stylesheet" href="preview.css">
+</head>
+<body>
+<aside class="review-bar" aria-label="Local mockup controls">
+  <span><strong>CAIRN</strong> / itch.io theme study</span>
+  <nav aria-label="Preview modes"><button id="download-mode" aria-pressed="true">Download page</button><button id="browser-mode" aria-pressed="false">Browser page</button><a href="guide.html">Theme recipe ↗</a></nav>
+</aside>
+<div class="itch-chrome"><a href="https://itch.io/" aria-label="itch.io home">itch.io</a><span>Local concept · no store is connected</span></div>
+<main id="wrapper">
+<div id="inner_column">
+  <header class="header"><h1><img src="assets/masthead-v1.png" alt="Cairn — Steel. Blood. Thunder." width="2172" height="724"></h1></header>
+  <section class="embed_wrapper" hidden aria-label="Browser game placement">
+    <div class="game_frame"><div><img src="assets/banner.png" alt="Cairn"><button id="launch-preview">▶ Run game</button><p>Browser embed preview</p></div></div>
+  </section>
+  <div class="columns">
+    <div class="left_col column">
+      <article class="formatted_description" id="description"></article>
+      <details class="more"><summary>More information</summary><dl><dt>Author</dt><dd>Maximum Force</dd><dt>Genre</dt><dd>Action</dd><dt>Inputs</dt><dd>Keyboard, mouse, controller</dd></dl></details>
+      <section class="download-area"><h2>Download</h2><button class="itch-button" id="download">Download Now</button><p class="small">Windows · Cairn</p><p id="download-note" class="small" hidden>Theme preview only. Price, release status, and downloadable files are not configured.</p></section>
+    </div>
+    <aside class="right_col column" aria-label="Gameplay media">
+      <video controls preload="none" poster="assets/aqueduct.jpg" aria-label="Cairn first-cut trailer"><source src="trailer.mp4" type="video/mp4"></video>
+      <p class="media-note">Trailer · 30 seconds</p>
+      <a href="assets/aqueduct.jpg" target="_blank" rel="noopener"><img src="assets/aqueduct.jpg" alt="Axe combat at the ruined aqueduct" width="1920" height="1080"></a>
+      <a href="assets/foundry.jpg" target="_blank" rel="noopener"><img src="assets/foundry.jpg" alt="Close combat in the firelit foundry" width="1920" height="1080"></a>
+      <a href="assets/keep.jpg" target="_blank" rel="noopener"><img src="assets/keep.jpg" alt="Combat and fire outside the ruined keep" width="1920" height="1080"></a>
+    </aside>
+  </div>
+  <footer class="footer"><a href="https://itch.io/">itch.io</a><span>·</span><a href="https://itch.io/docs/creators/design">Page design documentation</a><span>·</span><a href="guide.html">About this mockup</a></footer>
+</div>
+</main>
+<script type="module">
+const response = await fetch('description.html');
+if (!response.ok) throw new Error('Description could not be loaded');
+document.querySelector('#description').innerHTML = await response.text();
+const embed = document.querySelector('.embed_wrapper');
+for (const mode of ['download', 'browser']) {
+ document.querySelector(`#${mode}-mode`).addEventListener('click', () => {
+  embed.hidden = mode !== 'browser';
+  for (const other of ['download', 'browser']) document.querySelector(`#${other}-mode`).setAttribute('aria-pressed', String(mode === other));
+ });
+}
+document.querySelector('#download').addEventListener('click', () => document.querySelector('#download-note').hidden = false);
+document.querySelector('#launch-preview').addEventListener('click', () => {
+ window.open('http://localhost:3001/', '_blank', 'noopener');
+ document.querySelector('.game_frame p').textContent = 'Opens the local game preview (requires the game server on port 3001).';
+});
+</script>
+</body></html>
