@@ -75,6 +75,17 @@ func setup(source: CairnArt,name: String):
 				rain.z_index=1804 if kind=="near" else -40 if kind=="ground" else -50
 				add_child(rain)
 				decorations.append(rain)
+		if name=="ashen-4":
+			var atmosphere=ColorRect.new()
+			atmosphere.name="SanctuaryAtmosphere"
+			atmosphere.size=Vector2(1440,810)
+			atmosphere.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			var atmosphere_material=ShaderMaterial.new()
+			atmosphere_material.shader=preload("res://shaders/sanctuary_atmosphere.gdshader")
+			atmosphere_material.set_meta("continuous_clock",true)
+			atmosphere.material=atmosphere_material
+			add_child(atmosphere)
+			layers.append(atmosphere_material)
 		if name=="ashen-3":
 			var brazier=preload("res://scripts/crucible_brazier.gd").new()
 			brazier.name="HangingBrazier"

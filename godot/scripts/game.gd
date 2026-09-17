@@ -135,6 +135,9 @@ func _ready():
 			keys.clear()
 			pressed.clear()
 			if phase=="playing":change_phase("paused"))
+	if not OS.has_feature("shareware") and ("--sanctuary-preview" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('sanctuary-preview')"))):
+		WindowPreferences.open_scene.call_deferred("res://sanctuary_preview.tscn")
+		return
 	if "--enemy-fire-study" in OS.get_cmdline_user_args() or (OS.has_feature("web") and JavaScriptBridge.eval("new URLSearchParams(location.search).has('enemy-fire-study')")):
 		WindowPreferences.open_scene.call_deferred("res://enemy_fire_study.tscn")
 		return

@@ -12,6 +12,7 @@ func check():
 		game.background.setup(game.art,"ashen-%d"%area)
 		await process_frame
 		assert(game.background.has_node("AshenVeil"))
+		assert(game.background.has_node("SanctuaryAtmosphere")== (area==4),"Final-arena effects remain local to the sanctuary")
 		var heat=game.background.get_node("AshenSceneHeat")
 		var capture=game.background.get_node("AshenSceneCapture")
 		assert(capture.copy_mode==BackBufferCopy.COPY_MODE_VIEWPORT)

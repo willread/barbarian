@@ -36,6 +36,17 @@ func embers(origin: Vector2,count: int,spread: float,rise: float,seed_value: flo
 		var alpha=pow(sin(age*PI),2)*(.23+.17*sin(i*9.1+clock*3))
 		draw_line(p,p+Vector2(-1,2+i%3),Color(1,.44+.1*sin(i),.10,alpha),.7+(i%3)*.25,true)
 
+func sanctuary_sparks(origin: Vector2,seed_value: float):
+	for i in 34:
+		var period=5.7+seed_value*.13
+		var age=fposmod(clock+i*.047+seed_value,period)
+		if age>2.2:continue
+		var t=age/2.2
+		var spread=sin(i*37.1+seed_value)
+		var p=origin+Vector2(spread*(24+34*t)*t,-(130+45*sin(i*13.7))*t+30*t*t)
+		var alpha=sin(t*PI)*(.55+.3*sin(i*7.))
+		draw_line(p,p+Vector2(-spread*1.5,3.5),Color(1,.43+.2*(1-t),.09,alpha),1.1,true)
+
 func ash(count: int,front: bool):
 	for i in count:
 		var age=fposmod(clock/(13.1+i%7)+i/float(count),1.0)
@@ -86,6 +97,8 @@ func _draw():
 					var origin=Vector2(594 if i%2==0 else 846,350)
 					var p=origin+Vector2(sin(i*7.3)*dust_age*18,dust_age*dust_age*94)
 					draw_circle(p,.65+i%3*.15,Color(.49,.43,.35,sin(dust_age*PI)*.27))
+			sanctuary_sparks(Vector2(337,445),1.)
+			sanctuary_sparks(Vector2(1101,445),9.)
 			# The sealed sanctuary breathes slowly; side fires remain independent.
 			var breath=.65+.2*sin(clock*.43)
 			exhaust(Vector2(295,533),65,234,2,Color(.43,.39,.34,.52*breath))

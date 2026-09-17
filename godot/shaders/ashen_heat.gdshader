@@ -160,6 +160,17 @@ void fragment(){
   float rolling=noise(vec2(uv.x*71.+noise(uv*23.+clock*.1)*2.,uv.y*63.+clock*1.2));
   paint.rgb+=vec3(.11,.10,.09)*(rolling-.5)*reliquary_smoke_mask;
  }
+ if(area>3.5){
+  vec2 p=UV*vec2(1440.,810.);
+  float left=exp(-length((p-vec2(340.,442.))/vec2(95.,130.))*2.);
+  float right=exp(-length((p-vec2(1100.,442.))/vec2(100.,135.))*2.);
+  float upper=exp(-length((p-vec2(354.,238.))/vec2(90.,95.))*2.);
+  upper+=exp(-length((p-vec2(1082.,238.))/vec2(90.,95.))*2.);
+  float reflected=left*(.8+.2*noise(vec2(clock*2.7,3.)))+right*(.8+.2*noise(vec2(clock*2.3,17.)))+upper*.5;
+  paint.rgb+=vec3(.25,.075,.009)*reflected;
+  // Extra light follows only existing hot painted seams, not new floor cracks.
+  paint.rgb+=vec3(.09,.034,.003)*hot*lane*(.6+.4*fire);
+ }
  COLOR=paint;
 }
 
