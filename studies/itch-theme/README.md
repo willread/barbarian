@@ -10,7 +10,7 @@ upload `index.html`, JavaScript, or `preview.css` as a theme.
 
 ## Scope and accuracy
 
-Uses the ordinary theme editor with a smaller original Cairn logo over generated ruined arches and mist, no
+Uses the ordinary theme editor with a smaller original Cairn logo over a full-width firelit stone war hall, no
 subtitle, a continuous stone page background, Cinzel headings, Georgia body,
 bronze links and a bronze native button. BG2 is #101213 at 68% opacity. The same
 translucent panel spans header and body, revealing one background beneath the alpha-faded header. The stone also extends outside the panel. No separate panel
@@ -34,10 +34,11 @@ the video into Git. Other machines need that file or a changed server mapping.
 
 ## Current header
 
-`assets/header-v2.png` is the uploadable PNG banner. The original logo is scaled
-to 50% of its width and composited over generated `header-scenery-v2.png`; its
+`assets/header-v3.png` is the uploadable PNG banner. The original logo is scaled
+to 43% of the banner width and composited over generated `header-scenery-v3.png`; its
 lettering is not regenerated. Run `node studies/itch-theme/compose-header.mjs`
-to reproduce. The alpha channel reveals the shared page texture and the bottom
+to reproduce. Header padding is zero so artwork fills the panel width. Only the bottom edge
+breaks into transparent jagged stone, revealing the shared page texture and the bottom
 edge is fully transparent. No custom CSS is required.
 
 ## Assets
