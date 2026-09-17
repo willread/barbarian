@@ -4,11 +4,24 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import worker from './src/worker.mjs';
 import { aggregate } from './src/metrics.mjs';
-import { dashboard } from './src/dashboard.mjs';
+import { dashboard, levelSummary } from './src/dashboard.mjs';
 import { dateRange, dailyRows } from './src/reporting.mjs';
 import { verifyAccessToken } from './src/auth.mjs';
 import { generateKeyPair, SignJWT } from 'jose';
 const sample = () => ({ schema: 1, episode: 1, level: 2, difficulty: 'normal', outcome: 'completed', duration: '3_5m', score: '5000_9999', moves: { normal: 42, slam: 3 }, features: { controls: true } });
+test('level summary combines days and difficulties without counting relationship metrics twice', () => {
+  const rows=[
+    ...aggregate({...sample(),outcome:'died'}).map(([metric,value])=>({day:'2026-09-15',episode:1,level:2,difficulty:'normal',metric,value})),
+    ...aggregate({...sample(),difficulty:'hard'}).map(([metric,value])=>({day:'2026-09-16',episode:1,level:2,difficulty:'hard',metric,value})),
+    ...aggregate({...sample(),episode:2,level:4,outcome:'quit'}).map(([metric,value])=>({day:'2026-09-16',episode:2,level:4,difficulty:'normal',metric,value}))
+  ];
+  const levels=levelSummary(rows);
+  assert.equal(levels.length,12);
+  assert.deepEqual(levels[1],{episode:1,level:2,attempts:2,completed:1,died:1,quit:0});
+  assert.deepEqual(levels[7],{episode:2,level:4,attempts:1,completed:0,died:0,quit:1});
+  assert.equal(levels[11].attempts,0);
+  assert.match(dashboard(rows,dateRange(new URLSearchParams('days=all'))),/Progress by level/);
+});
 function database() {
   const db = new DatabaseSync(':memory:');
   db.exec(readFileSync(new URL('./migrations/0001_aggregates.sql', import.meta.url), 'utf8'));

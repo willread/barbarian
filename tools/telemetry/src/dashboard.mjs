@@ -1,4 +1,13 @@
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function levelSummary(rows) {
+  const levels = Array.from({length:12}, (_,i)=>({episode:Math.floor(i/4)+1,level:i%4+1,attempts:0,completed:0,died:0,quit:0}));
+  const fields={attempts:'attempts','outcome:completed':'completed','outcome:died':'died','outcome:quit':'quit'};
+  for(const row of rows){
+    const level=levels.find(v=>v.episode===row.episode&&v.level===row.level);
+    if(level&&Object.hasOwn(fields,row.metric))level[fields[row.metric]]+=row.value;
+  }
+  return levels;
+}
 export function dashboard(rows, range) {
   const count = metric => rows.filter(r => r.metric === metric).reduce((n, r) => n + r.value, 0);
   const attempts = count('attempts'), completed = count('outcome:completed');
@@ -15,7 +24,8 @@ export function dashboard(rows, range) {
   <header><small>CAIRN / PRIVATE DASHBOARD</small><h1>How the battles unfold</h1><p>${escape(range.label)}. Aggregate attempts, not unique players.</p></header>
   <nav><a href="?days=1">Today</a><a href="?days=7">7 days</a><a href="?days=30">30 days</a><a href="?days=90">90 days</a><a href="?days=all">All time</a><a href="/admin/data?${escape(range.query)}">Download JSON</a><a href="/cdn-cgi/access/logout">Sign out</a></nav>
   <form method="get" action="/admin"><label>View a UTC day <input type="date" name="day" value="${escape(range.day)}" required></label><button type="submit">View day</button></form>
-  <section class="cards"><div class="card">Attempts<strong>${attempts.toLocaleString('en')}</strong></div><div class="card">Completed<strong>${completed.toLocaleString('en')}</strong></div><div class="card">Completion rate<strong>${percent(completed,attempts)}</strong></div></section>
+  <section class="cards"><div class="card">Reported level attempts<strong>${attempts.toLocaleString('en')}</strong></div><div class="card">Level completions<strong>${completed.toLocaleString('en')}</strong></div><div class="card">Level completion rate<strong>${percent(completed,attempts)}</strong></div></section>
+  <h2>Progress by level</h2><p>Totals across all difficulties in the selected dates. Retries count as additional attempts. Only received end-of-attempt reports are included.</p><div class="scroll"><table><thead><tr><th>Episode</th><th>Level</th><th>Attempts</th><th>Completed</th><th>Died</th><th>Quit</th><th>Completion rate</th></tr></thead><tbody>${levelSummary(rows).map(v=>`<tr><td>${v.episode}</td><td>${v.level}</td><td>${v.attempts}</td><td>${v.completed}</td><td>${v.died}</td><td>${v.quit}</td><td>${percent(v.completed,v.attempts)}</td></tr>`).join('')}</tbody></table></div>
   <h2>By day</h2><div class="scroll"><table><thead><tr><th>UTC day</th><th>Attempts</th><th>Completed</th><th>Died</th><th>Quit</th><th>Completion rate</th></tr></thead><tbody>${[...days].sort(([a],[b])=>b.localeCompare(a)).map(([day,v])=>`<tr><td><a href="?day=${escape(day)}">${escape(day)}</a></td><td>${v.attempts}</td><td>${v.completed}</td><td>${v.died}</td><td>${v.quit}</td><td>${percent(v.completed,v.attempts)}</td></tr>`).join('') || '<tr><td colspan="6">No statistics received in this period.</td></tr>'}</tbody></table></div>
   <h2>Daily metric detail</h2><div class="scroll"><table><thead><tr><th>UTC day</th><th>Episode</th><th>Level</th><th>Difficulty</th><th>Metric</th><th>Total</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${escape(r.day)}</td><td>${escape(r.episode)}</td><td>${escape(r.level)}</td><td>${escape(r.difficulty)}</td><td>${escape(r.metric)}</td><td>${escape(r.value)}</td></tr>`).join('') || '<tr><td colspan="6">No statistics received in this period.</td></tr>'}</tbody></table></div><p>Daily aggregates are retained indefinitely. Days with no reports are omitted. Dates reflect when reports reached the service. Time and score are ranges. No player or session drill-down is stored.</p></html>`;
 }
