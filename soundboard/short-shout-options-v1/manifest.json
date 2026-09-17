@@ -1,0 +1,67 @@
+{
+  "provider": "ElevenLabs",
+  "model": "eleven_text_to_sound_v2",
+  "previewOnly": true,
+  "jobs": [
+    {
+      "id": 1,
+      "prompt": "One short, forceful male battle shout. Dry recording. No words or effects.",
+      "file": "shout-1.mp3"
+    },
+    {
+      "id": 2,
+      "prompt": "One brief, rough, low-pitched aggressive yell. Dry recording. No words or effects.",
+      "file": "shout-2.mp3"
+    },
+    {
+      "id": 3,
+      "prompt": "One sharp, raspy male attack cry, under one second. Dry recording. No words or effects.",
+      "file": "shout-3.mp3"
+    },
+    {
+      "id": 4,
+      "prompt": "One short, deep male shout of effort. Dry recording. No words or effects.",
+      "file": "shout-4.mp3"
+    },
+    {
+      "id": 5,
+      "prompt": "One brief, angry male yell. Dry recording. No words or effects.",
+      "file": "shout-5.mp3"
+    },
+    {
+      "id": 6,
+      "prompt": "One loud, breathy male battle cry, under one second. Dry recording. No words or effects.",
+      "file": "shout-6.mp3"
+    },
+    {
+      "id": 7,
+      "prompt": "One short, hoarse male shout. Dry recording. No words or effects.",
+      "file": "shout-7.mp3"
+    },
+    {
+      "id": 8,
+      "prompt": "One quick, powerful male attack grunt. Dry recording. No words or effects.",
+      "file": "shout-8.mp3"
+    },
+    {
+      "id": 9,
+      "prompt": "One brief, low male battle yell. Dry recording. No words or effects.",
+      "file": "shout-9.mp3"
+    },
+    {
+      "id": 10,
+      "prompt": "One short, raw male cry of rage. Dry recording. No words or effects.",
+      "file": "shout-10.mp3"
+    },
+    {
+      "id": 11,
+      "prompt": "One sharp, forceful male shout of effort. Dry recording. No words or effects.",
+      "file": "shout-11.mp3"
+    },
+    {
+      "id": 12,
+      "prompt": "One brief, gravelly male battle shout. Dry recording. No words or effects.",
+      "file": "shout-12.mp3"
+    }
+  ]
+}
