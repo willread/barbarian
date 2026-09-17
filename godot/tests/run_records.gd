@@ -32,6 +32,16 @@ func check():
 	var reloaded=CairnRunRecords.new(path)
 	assert(reloaded.board(CairnRunRecords.episode_scope(2)).runs.size()==2)
 	assert(reloaded.board().runs.size()==20 and reloaded.board().bests.best_combo==90)
+	var ep3=sample("episode-three",75,4)
+	ep3.episode=3
+	reloaded.finish(ep3)
+	var combined=reloaded.all_runs()
+	assert(combined.size()==23 and combined.any(func(run):return run.episode==3) and combined.any(func(run):return run.episode==2))
+	combined[0].score=-1
+	assert(reloaded.all_runs()[0].score>=0,"Table sorting and edits must not mutate saved episode records")
+	var names=[1,2,3]
+	names.sort_custom(func(a,b):return CairnRunRecords.episode_name(a)<CairnRunRecords.episode_name(b))
+	assert(names==[3,1,2],"Episode titles sort alphabetically")
 	# Corrupt primary must recover the previous complete backup.
 	var file=FileAccess.open(path,FileAccess.WRITE)
 	file.store_string("interrupted")

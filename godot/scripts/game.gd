@@ -223,7 +223,7 @@ func _ready():
 	if shareware:
 		get_tree().auto_accept_quit=false
 		get_window().close_requested.connect(request_quit)
-	menu.unavailable=func(label):return label=="HALL OF LEGENDS" and records.board(CairnRunRecords.episode_scope(current_episode)).runs.is_empty()
+	menu.unavailable=func(label):return label=="HALL OF LEGENDS" and records.all_runs().is_empty()
 	menu.activated.connect(menu_action)
 	menu.sound_requested.connect(func(id):
 		audio.play(id,-8)
@@ -396,7 +396,7 @@ func menu_action(label: String):
 		# Keep the previous screen visible beneath the hall overlay.
 		hall_view=preload("res://scripts/hall_view.gd").new()
 		hall_view.art=art
-		hall_view.runs=records.board(CairnRunRecords.episode_scope(current_episode)).runs.duplicate(true)
+		hall_view.runs=records.all_runs()
 		hall_view.current_id=finished_run.get("id","") if phase in ["lost","won"] else ""
 		add_child(hall_view)
 		hall_view.closed.connect(close_hall)

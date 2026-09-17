@@ -6,8 +6,8 @@ var runs: Array=[]
 var current_id=""
 var selected=0
 var headers: Array=[]
-var sort_key="score"
-var descending=true
+var sort_key="reached"
+var descending=false
 const COLUMNS=[["rank","RANK",.0,.08],["score","SCORE",.08,.20],["reached","REACHED",.28,.28],["difficulty","DIFFICULTY",.56,.16],["time","TIME",.72,.12],["date","DATE",.84,.16]]
 var scroll: ScrollContainer
 var content: Control
@@ -50,6 +50,11 @@ func _ready():
 	actions.sound_requested.connect(func(id):get_parent().audio.play(id,-8))
 	for i in runs.size():
 		runs[i]["table_rank"]=i+1
+	runs.sort_custom(func(a,b):
+		var an=CairnRunRecords.episode_name(int(a.get("episode",1)))
+		var bn=CairnRunRecords.episode_name(int(b.get("episode",1)))
+		return an<bn if an!=bn else a.table_rank<b.table_rank)
+	for i in runs.size():
 		if runs[i].get("id")==current_id:selected=i
 	for column in COLUMNS:
 		var button=Button.new()
@@ -145,7 +150,7 @@ func draw_table():
 
 		elif i%2==0:content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.65,.48,.025))
 		content.draw_line(Vector2(0,y),Vector2(w,y),Color(.40,.34,.24,.45))
-		var reached="EP %d - BEAT"%run.get("episode",1) if run.get("outcome","")=="won" else "EP %d · AREA %d/4"%[run.get("episode",1),run.get("area",1)]
+		var reached=CairnRunRecords.episode_name(int(run.get("episode",1)))+" - "+("BEAT" if run.get("outcome","")=="won" else "AREA %d/4"%run.get("area",1))
 		var time=CairnRunRecords.duration(run.get("time",0))
 		var date=display_date(str(run.get("date","")))
 		if compact:
@@ -169,7 +174,7 @@ func reveal_selected():
 func sort_value(run: Dictionary,key: String):
 	match key:
 		"rank":return run.table_rank
-		"reached":return int(run.get("episode",1))*100+int(run.get("area",1))*2+int(run.get("outcome","")=="won")
+		"reached":return CairnRunRecords.episode_name(int(run.get("episode",1)))
 		"difficulty":return ["easy","normal","hard"].find(run.get("difficulty","normal"))
 		"date":return str(run.get("date",""))
 	return float(run.get(key,0))

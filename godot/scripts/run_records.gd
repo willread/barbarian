@@ -13,6 +13,19 @@ static func episode_scope(episode: int) -> String:
 	# Existing saves belong to episode 1; retain their original key and stat bests.
 	return RULES if episode==1 else "episode-%d-v1"%episode
 
+static func episode_name(episode: int) -> String:
+	return {1:"The Fallen Citadel",2:"The Sunken Wilds",3:"The Ashen Depths"}.get(episode,"Episode %d"%episode)
+
+func all_runs() -> Array:
+	var result: Array=[]
+	for episode in [1,2,3]:
+		for saved in board(episode_scope(episode)).runs:
+			var run=saved.duplicate(true)
+			run.episode=episode
+			result.append(run)
+	result.sort_custom(func(a,b):return a.score>b.score if a.score!=b.score else str(a.id)<str(b.id))
+	return result
+
 func _init(save_path: String="user://records.json"):
 	path=save_path
 	if path.is_empty():return
