@@ -1792,8 +1792,8 @@ func draw_hud():
 	score_panel.queue_redraw()
 	for f in enemies:
 		if f.boss and f.hp>0:
-			center_text(hud,{"champion":"The Iron Warden","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(369,109),18,Color(0,0,0,.9))
-			center_text(hud,{"champion":"The Iron Warden","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss")+(" - Unbound" if f.phaseTwo else ""),Vector2(368,108),18,Color("e6d2aa"))
+			center_text(hud,{"champion":"The Iron Warden","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss"),Vector2(369,109),18,Color(0,0,0,.9))
+			center_text(hud,{"champion":"The Iron Warden","king":"The Drowned King","saint":"The Kiln Saint"}.get(f.kind,"Boss"),Vector2(368,108),18,Color("e6d2aa"))
 			CairnGlassBar.draw(hud,Rect2(158,116,420,8),f.hp/f.max,Color("bf221e"))
 
 func draw_overlay():

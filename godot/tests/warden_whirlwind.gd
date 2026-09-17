@@ -40,7 +40,7 @@ func _init():
 	ai.motion(boss)
 	assert(Vector2(boss.x,boss.y)==origin and art.enemy_frame(boss)==10,"Recovery stops movement and shows exhaustion")
 	ai.finish(boss,boss.attack,hero)
-	assert(boss.aiRest==54)
+	assert(boss.aiRest==24)
 	print("CAIRN_WARDEN_WHIRLWIND_OK: warning, ricochets, friendly fire, outward knockback, single hits and recovery")
 	call_deferred("check_game")
 func check_game():

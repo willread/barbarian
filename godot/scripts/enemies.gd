@@ -79,7 +79,7 @@ static func shield_limit(area: int) -> int:
 func variant(e: Dictionary, allowed: Array=[]):
 	if e.kind in ["archer","witch","bearer"]:return
 	if e.boss:
-		e.speedFactor=.75
+		e.speedFactor=1.0 if e.kind=="champion" else .75
 		return
 	var available=allowed.filter(func(kind):return kind in ENABLED_VARIANTS and kind not in used_variants)
 	e.variant=available.pick_random() if not available.is_empty() and randf()<.25 else "regular"
@@ -182,10 +182,10 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 	if e.aiRest and e.kind=="marauder": return Vector2.ZERO
 	if e.dir!=face:
 		e.turnTicks+=1
-		if e.turnTicks<(5 if swift else (22 if e.kind=="shield" else 10)+(14 if heavy(e) else 0)): return Vector2.ZERO
+		if e.turnTicks<(6 if e.kind=="champion" else 5 if swift else (22 if e.kind=="shield" else 10)+(14 if heavy(e) else 0)): return Vector2.ZERO
 		e.dir=face
 		e.turnTicks=0
-		e.aiRest=max(e.aiRest,16 if heavy(e) else 8)
+		e.aiRest=max(e.aiRest,4 if e.kind=="champion" else 16 if heavy(e) else 8)
 	else: e.turnTicks=0
 	if e.aiRest or h.hp<=0 or not h.down.is_empty(): return Vector2.ZERO
 	if not engaged: return Vector2(-face if abs(x)<75 else (face if abs(x)>95 else 0),(1 if e.id%2 else -1) if abs(y)<12 else (-sign(y) if abs(y)>24 else 0))
@@ -210,8 +210,8 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 		if m.begin(e,"wardenWhirlwind"):
 			var heading=Vector2(h.x-e.x,(h.y-e.y)*2.0)
 			if absf(heading.y)<100:heading.y=180 if e.y<(m.lane_min+m.lane_max)*.5 else -180
-			e.attack["travel"]=heading.normalized()* (11.0 if e.phaseTwo else 9.0)
-			e["whirlwind_ready_at"]=e.clock+10.0
+			e.attack["travel"]=heading.normalized()* (14.3 if e.phaseTwo else 9.0)
+			e["whirlwind_ready_at"]=e.clock+8.0
 			return Vector2.ZERO
 	if abs(y)<5 and abs(x)<reach:
 		var type="boneCut" if e.kind=="bone" else ("shieldBash" if e.kind=="shield" else "marauderChop")
@@ -260,7 +260,7 @@ func motion(e: Dictionary):
 
 func finish(e: Dictionary,a: Dictionary,h: Dictionary):
 	if a.get("whirlwind",false):
-		e.aiRest=54
+		e.aiRest=24
 		return
 	if e.kind=="king":
 		e.aiRest=randi_range(54,144) if e.phaseTwo else randi_range(66,168)
@@ -297,7 +297,7 @@ func finish(e: Dictionary,a: Dictionary,h: Dictionary):
 	if next: m.begin(e,next)
 	else:
 		e.rushCombo=false
-		e.aiRest=72 if e.kind=="marauder" else (36 if e.kind=="champion" else 20+randi()%25)
+		e.aiRest=72 if e.kind=="marauder" else (14 if e.kind=="champion" else 20+randi()%25)
 
 func archer_intent(e: Dictionary,h: Dictionary) -> Vector2:
 	if e.hp<=0 or not e.down.is_empty() or e.hurtTicks or e.recovering or not e.attack.is_empty():return Vector2.ZERO
