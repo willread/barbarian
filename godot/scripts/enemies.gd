@@ -206,12 +206,12 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 		e.rushCombo=true
 		return Vector2.ZERO
 	var reach=48 if e.kind=="champion" else (34 if e.kind=="shield" else 43)
-	if e.kind=="champion" and e.get("entered_arena",false) and e.clock>=e.get("whirlwind_ready_at",0.0) and randf()<.018:
+	if e.kind=="champion" and e.get("entered_arena",false) and e.clock>=e.get("whirlwind_ready_at",0.0) and randf()<.024:
 		if m.begin(e,"wardenWhirlwind"):
 			var heading=Vector2(h.x-e.x,(h.y-e.y)*2.0)
 			if absf(heading.y)<100:heading.y=180 if e.y<(m.lane_min+m.lane_max)*.5 else -180
-			e.attack["travel"]=heading.normalized()* (14.3 if e.phaseTwo else 9.0)
-			e["whirlwind_ready_at"]=e.clock+8.0
+			e.attack["travel"]=heading.normalized()*9.0*(1.2 if e.phaseTwo else 1.0)
+			e["whirlwind_ready_at"]=e.clock+7.0
 			return Vector2.ZERO
 	if abs(y)<5 and abs(x)<reach:
 		var type="boneCut" if e.kind=="bone" else ("shieldBash" if e.kind=="shield" else "marauderChop")
