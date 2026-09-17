@@ -150,14 +150,6 @@ func _ready():
 	screen_backdrop.draw.connect(draw_screen_backdrop)
 	add_child(screen_backdrop)
 	art=ArtScript.new()
-	# Load every packaged image, including menu fuel masks, HUD and all levels.
-	for entry in DirAccess.get_files_at("res://assets"):
-		var file=entry.trim_suffix(".remap")
-		if file.ends_with(".png"): art.texture(file)
-	# Also retain atlas resources stored outside the asset directory.
-	for atlas in art.data.atlases.values():
-		for cel in atlas.cels: art.texture(cel.file)
-	for i in 48: art.texture("hero-idle-%d.png"%i)
 	m=MScript.new(art.data.attacks)
 	m.combat_extensions=true
 	telemetry=preload("res://scripts/telemetry.gd").new()
@@ -168,7 +160,6 @@ func _ready():
 	serif=load("res://assets/cinzel.ttf")
 	background=EnvironmentView.new()
 	add_child(background)
-	background.setup(art,"valley")
 	heat_node=ColorRect.new()
 	heat_node.size=Vector2(1440,810)
 	heat_node.z_index=-90
@@ -699,6 +690,14 @@ func screen_for_wave(number: int) -> int:
 
 func spawn_wave(preserve_corpses: bool=false):
 	var area=screen_for_wave(wave)
+	var area_kinds=[]
+	for index in encounters.size():
+		if screen_for_wave(index+1)==area:
+			for kind in encounters[index]:
+				if kind not in area_kinds:area_kinds.append(kind)
+	art.prepare_area(area_kinds)
+	art.texture(art.weapon_cel(art.weapon_data(hero)).file)
+	audio.prepare_episode(current_episode)
 	if not telemetry.active.is_empty() and telemetry.active.level!=area:telemetry.finish_attempt("completed",int(score))
 	if telemetry.active.is_empty():telemetry.begin_attempt(current_episode,area,difficulty,int(score))
 	combo.suspend()

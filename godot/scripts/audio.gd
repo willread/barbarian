@@ -26,9 +26,6 @@ func setup(source: Node2D):
 	mire_loop=AudioStreamPlayer.new()
 	mire_loop.bus=Mix.bus_for("mire_loop")
 	mire_loop.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
-	if not OS.has_feature("shareware"):
-		mire_loop.stream=load("res://audio/mire_loop.ogg")
-		mire_loop.stream.loop=true
 	mire_loop.pitch_scale=.7
 	mire_loop.volume_db=-60
 	add_child(mire_loop)
@@ -64,15 +61,31 @@ func setup(source: Node2D):
 		player.bus=&"Music"
 		player.playback_type=AudioServer.PLAYBACK_TYPE_STREAM
 		add_child(player)
-		player.stream=clips.get(id) if id in ["music_menu","music_game"] else load("res://audio_options/"+id+".ogg")
-		if player.stream!=null:
-			player.stream.loop=true
-			if id=="furnace-heart-overdrive":
-				var music=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
-				for job in music.jobs:
-					if job.id==id:player.stream.loop_offset=job.loop.get("playback_loop_offset",0.0)
+		player.set_meta("track_id",id)
+		player.stream=clips.get(id) if id in ["music_menu","music_game"] else null
+		if player.stream:player.stream.loop=true
 		player.volume_db=-60
 		tracks.append(player)
+
+func ensure_track(index: int):
+	var player=tracks[index]
+	if player.stream!=null or index<2:return
+	var id=player.get_meta("track_id")
+	player.stream=load("res://audio_options/"+id+".ogg")
+	player.stream.loop=true
+	if id=="furnace-heart-overdrive":
+		var music=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
+		for job in music.jobs:
+			if job.id==id:player.stream.loop_offset=job.loop.get("playback_loop_offset",0.0)
+
+func prepare_episode(episode: int):
+	if episode<tracks.size() and game.music_enabled and not game.muted:ensure_track(episode)
+	if episode==2 and mire_loop.stream==null:
+		mire_loop.stream=load("res://audio/mire_loop.ogg")
+		mire_loop.stream.loop=true
+	elif episode!=2:
+		mire_loop.stop()
+		mire_loop.stream=null
 
 func set_variant(id: String,variant: String,persist: bool=true):
 	if not originals.has(id):return
@@ -151,7 +164,9 @@ func _process(dt: float):
 	var hands=game.episode_combat.mire_views.values().any(func(view):return view.mode==1 and not view.exiting and not view.finished)
 	var bubbling=audible and game.phase=="playing" and hands
 	# One shared bed avoids multiplying volume with each hand or clump.
-	if bubbling and not mire_loop.playing:mire_loop.play()
+	if bubbling and not mire_loop.playing:
+		prepare_episode(2)
+		mire_loop.play()
 	if game.phase!="paused" and not get_tree().paused:mire_loop.volume_db=move_toward(mire_loop.volume_db,linear_to_db(.3) if bubbling else -60.0,dt*(90 if bubbling else 180))
 	mire_loop.stream_paused=game.phase=="paused" or get_tree().paused
 	if game.muted or (not bubbling and not mire_loop.stream_paused and mire_loop.volume_db<=-59):mire_loop.stop()
@@ -162,10 +177,12 @@ func _process(dt: float):
 			if i!=selected_music or not game.music_enabled:
 				tracks[i].stop()
 				tracks[i].volume_db=-60
+				if i>=2:tracks[i].stream=null
 	for i in tracks.size():
 		if music_preview:continue
 		var track=tracks[i]
 		var selected=game.music_enabled and i==(0 if game.phase=="title" else game.current_episode)
+		if audible and selected:ensure_track(i)
 		var target=-10.0+volumes.get("music_menu" if i==0 else "music_game",0.0) if audible and selected else -60.0
 		if audible and selected:target+=linear_to_db(cutscene_music_gain)
 		if game.phase in ["paused","dying","lost","won"]:target-=8

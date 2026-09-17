@@ -20,6 +20,7 @@ func run():
 			if retained:held_texture=load("res://art/ember-core-v1.png")
 			var values=[]
 			for i in 12:
+				if not retained and effect.has_method("release_assets"):effect.release_assets()
 				var begin=Time.get_ticks_usec()
 				var bomb=effect.new()
 				values.append((Time.get_ticks_usec()-begin)/1000.0)
@@ -56,6 +57,7 @@ func run():
 		viewport.canvas_transform=Transform2D(0,Vector2.ONE*float(resolution.x)/1440.0,0,Vector2.ZERO)
 		for episode in [1,2,3]:
 			game.current_episode=episode
+			game.encounters=game.e_ai.plan(episode)
 			for area in [1,2,3,4]:
 				if focus and (episode!=3 or area!=4 or resolution.x!=1920):continue
 				if stress and not [episode,area] in [[1,3],[2,2],[3,4]]:continue
@@ -70,6 +72,7 @@ func run():
 					enemy.boss=enemy.kind=="saint"
 					enemy.phaseTwo=enemy.boss
 					game.enemies.append(enemy)
+				game.art.prepare_area(game.enemies.map(func(enemy):return enemy.kind))
 				game.hero.x=720;game.hero.y=690
 				game.hero.hp=100000;game.hero.max=100000
 				game.stage_walk="";game.transition=-1;game.phase="playing"

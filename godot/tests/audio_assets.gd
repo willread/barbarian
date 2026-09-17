@@ -10,7 +10,9 @@ func _init():
 		assert(stream is AudioStreamOggVorbis and stream.get_length()>.08,"Invalid audio: "+id)
 		if id.begins_with("music_"):assert(stream.get_length()>40,"Music loop unexpectedly short")
 	assert(audio.tracks.size()==(2 if OS.has_feature("shareware") else 4))
-	for track in audio.tracks:
+	for i in audio.tracks.size():
+		audio.ensure_track(i)
+		var track=audio.tracks[i]
 		assert(track.stream is AudioStreamOggVorbis and track.stream.get_length()>40 and track.stream.loop)
 	source.free()
 	print("CAIRN_AUDIO_OK: runtime loader resolves all active Ogg assets and edition-specific music tracks")

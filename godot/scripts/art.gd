@@ -3,6 +3,8 @@ extends RefCounted
 var data: Dictionary
 var textures: Dictionary={}
 var armory: Dictionary={}
+var shared_ready=false
+var area_files: Dictionary={}
 const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310,"witch":250,"bearer":260,"king":390,"saint":420}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
@@ -25,6 +27,39 @@ func _init():
 func texture(file: String) -> Texture2D:
 	if not textures.has(file): textures[file]=load("res://assets/"+file)
 	return textures[file]
+
+func warm_atlas(id: String,hands: bool=false):
+	for cel in data.atlases[id].cels:
+		texture(cel.file)
+		var hand_file=cel.file.replace(".png","-hands.png")
+		if hands and ResourceLoader.exists("res://assets/"+hand_file):texture(hand_file)
+
+func prepare_area(kinds: Array):
+	if not shared_ready:
+		for id in data.atlases:
+			if id.begins_with("hero-") or id in ["weapons-v8","enemy-equipment-v1","chicken-v1"]:warm_atlas(id,id.begins_with("hero-"))
+		for i in 48:texture("hero-idle-%d.png"%i)
+		for file in ["fluid-fire-v2-0.png","fluid-fire-v2-1.png","fluid-fire-v2-2.png","fluid-fire-v2-3.png","fluid-smoke-v1.png"]:
+			if ResourceLoader.exists("res://assets/"+file):texture(file)
+		shared_ready=true
+	var wanted={}
+	for kind in kinds:
+		var atlases=["enemy-"+kind+"-v1"]
+		if kind=="king":atlases.append_array(["king-walk","king-attacks"])
+		if kind=="saint":atlases.append_array(["saint-walk","saint-toss"])
+		for id in atlases:
+			for cel in data.atlases[id].cels:wanted[cel.file]=true
+	for file in area_files:
+		if not wanted.has(file):textures.erase(file)
+	for file in wanted:texture(file)
+	area_files=wanted
+	if "bearer" in kinds or "saint" in kinds:preload("res://scripts/clinker_visual.gd").prepare_assets()
+	else:preload("res://scripts/clinker_visual.gd").release_assets()
+
+func release_scenery():
+	# Scenery is rebuilt at area boundaries; don't retain earlier animation sheets.
+	for file in textures.keys():
+		if file.begins_with("citadel-") or file.begins_with("swamp-") or file.begins_with("ashen-"):textures.erase(file)
 
 func pose(f: Dictionary, spell: int = -1) -> Array:
 	if f.kind=="saint" and f.hp>0 and f.moving and f.attack.is_empty() and f.down.is_empty() and not f.hurtTicks and not f.recovering:

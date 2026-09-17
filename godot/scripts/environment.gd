@@ -9,7 +9,9 @@ var chapter_screens=JSON.parse_string(FileAccess.get_file_as_string("res://world
 var episode_screens={} if OS.has_feature("shareware") else {"swamp":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/swamp.json")),"ashen":JSON.parse_string(FileAccess.get_file_as_string("res://worlds/ashen.json"))}
 var decorations: Array=[]
 func setup(source: CairnArt,name: String):
+	z_index=-100
 	art=source
+	art.release_scenery()
 	key=name
 	for child in get_children():
 		remove_child(child)

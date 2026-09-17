@@ -1,0 +1,862 @@
+{
+  "target": [
+    3840,
+    2160
+  ],
+  "note": "RGBA estimates are not measured VRAM. Animation sheets are compared per frame, not by total atlas dimensions. No resize performed.",
+  "backgrounds": [
+    {
+      "file": "godot/assets/citadel-1-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/citadel-2-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/citadel-3-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/citadel-4-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/swamp-1-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/swamp-2-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/swamp-3-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/swamp-4-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/ashen-1-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/ashen-2-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/ashen-3-base.png",
+      "source": [
+        1672,
+        940
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/assets/ashen-4-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    }
+  ],
+  "loops": [
+    {
+      "file": "godot/assets/citadel-1-loop-0.png",
+      "source": [
+        2032,
+        2480
+      ],
+      "rgbaMiB": 19.22,
+      "display4k": [
+        762,
+        930
+      ],
+      "framePixels": [
+        254,
+        310
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-1-loop-1.png",
+      "source": [
+        1208,
+        1392
+      ],
+      "rgbaMiB": 6.41,
+      "display4k": [
+        453,
+        522
+      ],
+      "framePixels": [
+        151,
+        174
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-2-loop-0.png",
+      "source": [
+        936,
+        816
+      ],
+      "rgbaMiB": 2.91,
+      "display4k": [
+        351,
+        306
+      ],
+      "framePixels": [
+        117,
+        102
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-2-loop-1.png",
+      "source": [
+        896,
+        824
+      ],
+      "rgbaMiB": 2.82,
+      "display4k": [
+        336,
+        309
+      ],
+      "framePixels": [
+        112,
+        103
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-3-loop-0.png",
+      "source": [
+        896,
+        960
+      ],
+      "rgbaMiB": 3.28,
+      "display4k": [
+        336,
+        360
+      ],
+      "framePixels": [
+        112,
+        120
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-3-loop-1.png",
+      "source": [
+        1272,
+        1064
+      ],
+      "rgbaMiB": 5.16,
+      "display4k": [
+        477,
+        399
+      ],
+      "framePixels": [
+        159,
+        133
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-4-loop-0.png",
+      "source": [
+        736,
+        664
+      ],
+      "rgbaMiB": 1.86,
+      "display4k": [
+        276,
+        249
+      ],
+      "framePixels": [
+        92,
+        83
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/citadel-4-loop-1.png",
+      "source": [
+        752,
+        632
+      ],
+      "rgbaMiB": 1.81,
+      "display4k": [
+        282,
+        237
+      ],
+      "framePixels": [
+        94,
+        79
+      ],
+      "frames": 60,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-0.png",
+      "source": [
+        900,
+        4800
+      ],
+      "rgbaMiB": 16.48,
+      "display4k": [
+        225,
+        600
+      ],
+      "framePixels": [
+        75,
+        200
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-1.png",
+      "source": [
+        780,
+        4080
+      ],
+      "rgbaMiB": 12.14,
+      "display4k": [
+        195,
+        510
+      ],
+      "framePixels": [
+        65,
+        170
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-2.png",
+      "source": [
+        780,
+        3480
+      ],
+      "rgbaMiB": 10.35,
+      "display4k": [
+        195,
+        435
+      ],
+      "framePixels": [
+        65,
+        145
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-3.png",
+      "source": [
+        1920,
+        2640
+      ],
+      "rgbaMiB": 19.34,
+      "display4k": [
+        480,
+        330
+      ],
+      "framePixels": [
+        160,
+        110
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-2-v3-detail-0.png",
+      "source": [
+        3960,
+        5760
+      ],
+      "rgbaMiB": 87.01,
+      "display4k": [
+        990,
+        720
+      ],
+      "framePixels": [
+        330,
+        240
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-3-v3-detail-0.png",
+      "source": [
+        1620,
+        3360
+      ],
+      "rgbaMiB": 20.76,
+      "display4k": [
+        405,
+        420
+      ],
+      "framePixels": [
+        135,
+        140
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-3-v3-detail-1.png",
+      "source": [
+        1080,
+        2400
+      ],
+      "rgbaMiB": 9.89,
+      "display4k": [
+        270,
+        300
+      ],
+      "framePixels": [
+        90,
+        100
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-4-v3-detail-0.png",
+      "source": [
+        1620,
+        4440
+      ],
+      "rgbaMiB": 27.44,
+      "display4k": [
+        405,
+        555
+      ],
+      "framePixels": [
+        135,
+        185
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-4-v3-detail-1.png",
+      "source": [
+        1620,
+        4440
+      ],
+      "rgbaMiB": 27.44,
+      "display4k": [
+        405,
+        555
+      ],
+      "framePixels": [
+        135,
+        185
+      ],
+      "frames": 288,
+      "sourcePixelsPer4kPixel": 0.333
+    },
+    {
+      "file": "godot/assets/swamp-4-v4-rocks.png",
+      "source": [
+        1280,
+        130
+      ],
+      "rgbaMiB": 0.63,
+      "display4k": [
+        3840,
+        390
+      ],
+      "framePixels": [
+        1280,
+        130
+      ],
+      "frames": 1,
+      "sourcePixelsPer4kPixel": 0.333
+    }
+  ],
+  "small": [
+    {
+      "file": "godot/art/ember-core-v1.png",
+      "source": [
+        1254,
+        1254
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        197.33333333333334,
+        218.66666666666666
+      ],
+      "note": "Fixed-size bomb body; rotation changes its bounding box, not texel density."
+    },
+    {
+      "file": "godot/art/weapon-gravecleaver.png",
+      "source": [
+        387,
+        789
+      ],
+      "rgbaMiB": 1.16,
+      "display4k": [
+        164.8060836501901,
+        336
+      ],
+      "note": "gravecleaver gameplay size only; inspect weapon-picker presentation before reducing."
+    },
+    {
+      "file": "godot/art/weapon-blacktooth.png",
+      "source": [
+        243,
+        837
+      ],
+      "rgbaMiB": 0.78,
+      "display4k": [
+        126.96774193548386,
+        437.3333333333333
+      ],
+      "note": "blacktooth gameplay size only; inspect weapon-picker presentation before reducing."
+    },
+    {
+      "file": "godot/art/weapon-barrow_star.png",
+      "source": [
+        326,
+        746
+      ],
+      "rgbaMiB": 0.93,
+      "display4k": [
+        135.17783735478105,
+        309.3333333333333
+      ],
+      "note": "barrow_star gameplay size only; inspect weapon-picker presentation before reducing."
+    },
+    {
+      "file": "godot/art/weapon-gatebreaker.png",
+      "source": [
+        380,
+        647
+      ],
+      "rgbaMiB": 0.94,
+      "display4k": [
+        169.14992272024728,
+        288
+      ],
+      "note": "gatebreaker gameplay size only; inspect weapon-picker presentation before reducing."
+    }
+  ],
+  "ui": [
+    {
+      "file": "godot/art/title-background.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        3840,
+        2160
+      ]
+    },
+    {
+      "file": "godot/art/controls/dialog-plaque.png",
+      "source": [
+        1942,
+        809
+      ],
+      "rgbaMiB": 5.99,
+      "display4k": [
+        1600,
+        666.6666666666666
+      ]
+    }
+  ],
+  "panoramas": [
+    {
+      "file": "godot/art/intro/revenge-panorama-v1.png",
+      "source": [
+        2106,
+        747
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        7680,
+        2724.102564102564
+      ],
+      "note": "Two-screen-wide panning artwork; comparing only to the visible viewport would undercount required detail."
+    },
+    {
+      "file": "godot/art/ending/reunion-panorama-v1.png",
+      "source": [
+        2105,
+        747
+      ],
+      "rgbaMiB": 6,
+      "display4k": [
+        7680,
+        2725.396674584323
+      ],
+      "note": "Two-screen-wide panning artwork; comparing only to the visible viewport would undercount required detail."
+    }
+  ],
+  "actors": [
+    {
+      "file": "godot/art/minotaur-0.png",
+      "source": [
+        307,
+        307
+      ],
+      "rgbaMiB": 0.36,
+      "display4k": [
+        1074.5599999999997,
+        1074.5599999999997
+      ],
+      "note": "Conservative 1.38x actor size; large variants need more pixels, not fewer."
+    },
+    {
+      "file": "godot/art/archer-6.png",
+      "source": [
+        374,
+        506
+      ],
+      "rgbaMiB": 0.72,
+      "display4k": [
+        797.6399999999999,
+        1079.1599999999999
+      ],
+      "note": "Conservative 1.38x actor size; large variants need more pixels, not fewer."
+    },
+    {
+      "file": "godot/assets/enemy-witch-3.png",
+      "source": [
+        384,
+        517
+      ],
+      "rgbaMiB": 0.76,
+      "display4k": [
+        725.4209445585215,
+        976.6735112936344
+      ],
+      "note": "Conservative 1.38x actor size; large variants need more pixels, not fewer."
+    },
+    {
+      "file": "godot/assets/enemy-bearer-4.png",
+      "source": [
+        496,
+        364
+      ],
+      "rgbaMiB": 0.69,
+      "display4k": [
+        1140.8,
+        837.1999999999999
+      ],
+      "note": "Conservative 1.38x actor size; large variants need more pixels, not fewer."
+    },
+    {
+      "file": "godot/assets/enemy-king-3.png",
+      "source": [
+        337,
+        498
+      ],
+      "rgbaMiB": 0.64,
+      "display4k": [
+        1203.1402985074626,
+        1777.9343283582089
+      ],
+      "note": "Conservative 1.38x actor size; large variants need more pixels, not fewer."
+    },
+    {
+      "file": "godot/art/saint-walk-0.png",
+      "source": [
+        456,
+        387
+      ],
+      "rgbaMiB": 0.67,
+      "display4k": [
+        1821.1720930232557,
+        1545.6
+      ],
+      "note": "Conservative 1.38x actor size; large variants need more pixels, not fewer."
+    }
+  ],
+  "largestAssetFiles": [
+    {
+      "file": "godot/assets/swamp-2-v3-detail-0.png",
+      "source": [
+        3960,
+        5760
+      ],
+      "rgbaMiB": 87.01,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-3-ambient.png",
+      "source": [
+        3504,
+        2280
+      ],
+      "rgbaMiB": 30.48,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-4-v3-detail-0.png",
+      "source": [
+        1620,
+        4440
+      ],
+      "rgbaMiB": 27.44,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-4-v3-detail-1.png",
+      "source": [
+        1620,
+        4440
+      ],
+      "rgbaMiB": 27.44,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-4-ambient.png",
+      "source": [
+        3720,
+        1560
+      ],
+      "rgbaMiB": 22.14,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-3-v3-detail-0.png",
+      "source": [
+        1620,
+        3360
+      ],
+      "rgbaMiB": 20.76,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-3.png",
+      "source": [
+        1920,
+        2640
+      ],
+      "rgbaMiB": 19.34,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/citadel-1-loop-0.png",
+      "source": [
+        2032,
+        2480
+      ],
+      "rgbaMiB": 19.22,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-0.png",
+      "source": [
+        900,
+        4800
+      ],
+      "rgbaMiB": 16.48,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-2-ambient.png",
+      "source": [
+        2040,
+        1896
+      ],
+      "rgbaMiB": 14.75,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-1-ambient.png",
+      "source": [
+        3160,
+        1140
+      ],
+      "rgbaMiB": 13.74,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-1.png",
+      "source": [
+        780,
+        4080
+      ],
+      "rgbaMiB": 12.14,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-1-v3-detail-2.png",
+      "source": [
+        780,
+        3480
+      ],
+      "rgbaMiB": 10.35,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-3-v3-detail-1.png",
+      "source": [
+        1080,
+        2400
+      ],
+      "rgbaMiB": 9.89,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-2-front-0.png",
+      "source": [
+        1240,
+        1956
+      ],
+      "rgbaMiB": 9.25,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/citadel-1-loop-1.png",
+      "source": [
+        1208,
+        1392
+      ],
+      "rgbaMiB": 6.41,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/swamp-4-front-0.png",
+      "source": [
+        1720,
+        936
+      ],
+      "rgbaMiB": 6.14,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/ashen-1-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/ashen-2-base.png",
+      "source": [
+        1672,
+        941
+      ],
+      "rgbaMiB": 6,
+      "display4k": null
+    },
+    {
+      "file": "godot/assets/ashen-3-base.png",
+      "source": [
+        1672,
+        940
+      ],
+      "rgbaMiB": 6,
+      "display4k": null
+    }
+  ]
+}

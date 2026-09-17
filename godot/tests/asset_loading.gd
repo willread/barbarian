@@ -1,0 +1,37 @@
+extends SceneTree
+func _init():call_deferred("check")
+func check():
+	var game=load("res://main.tscn").instantiate()
+	root.add_child(game);game.set_process(false)
+	assert(game.background.get_child_count()==0,"Title does not load the unused legacy valley")
+	assert(not game.art.shared_ready,"Player moves wait until gameplay starts")
+	assert(not game.art.textures.keys().any(func(file):return file.begins_with("swamp-") or file.begins_with("ashen-") or file.begins_with("hero-")))
+	game.start_game()
+	assert(game.art.shared_ready)
+	assert(not game.art.textures.has("enemy-walk-v4-0.png"),"Retired generic enemy artwork is not preloaded")
+	assert(not game.art.textures.has("swamp-2-v3-detail-0.png"))
+	assert(game.art.textures.has("hero-idle-47.png"),"All idle frames are warm before combat")
+	var core=load("res://scripts/clinker_visual.gd")
+	assert(core.CORE==null,"Episode one does not retain the bomb texture")
+	if not OS.has_feature("shareware"):
+		game.art.prepare_area(["bearer","saint"])
+		assert(core.CORE!=null)
+		var resource_id=core.CORE.get_instance_id()
+		var times=[]
+		for i in 12:
+			var before=Time.get_ticks_usec()
+			var bomb=core.new()
+			times.append((Time.get_ticks_usec()-before)/1000.0)
+			assert(bomb.body.texture.get_instance_id()==resource_id)
+			bomb.free()
+		assert(core.CORE.get_instance_id()==resource_id,"Bomb texture survives gaps between bombs")
+		print("WARM_BOMB_CONSTRUCTION_MS ",times)
+		game.background.setup(game.art,"swamp-2")
+		assert(game.art.textures.has("swamp-2-base.png"))
+		game.background.setup(game.art,"ashen-1")
+		assert(not game.art.textures.has("swamp-2-base.png") and not game.art.textures.has("swamp-2-v3-detail-0.png"),"Old scenery leaves the cache")
+		game.art.prepare_area(["legion"])
+		assert(core.CORE==null and not game.art.textures.has("../art/saint-walk-0.png"),"Unneeded enemies and bombs leave the cache")
+	game.queue_free();await process_frame
+	print("CAIRN_ASSET_LOADING_OK: selective startup, area warming, scenery eviction and retained bomb resources")
+	quit()

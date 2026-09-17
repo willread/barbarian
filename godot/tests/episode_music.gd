@@ -11,13 +11,15 @@ func check():
  var audio=game.audio
  audio.set_process(false)
  audio.unlocked=true
- assert(audio.tracks[2].stream.resource_path.ends_with("roots-below.ogg"))
- assert(audio.tracks[3].stream.resource_path.ends_with("furnace-heart-overdrive.ogg"))
- assert(audio.tracks[3].stream.loop_offset>2.0)
+ assert(audio.tracks[2].stream==null and audio.tracks[3].stream==null,"Other episode music stays unloaded")
  for episode in [1,2,3]:
   game.current_episode=episode
   game.phase="playing"
   audio._process(3.)
+  if episode==2:assert(audio.tracks[2].stream.resource_path.ends_with("roots-below.ogg"))
+  if episode==3:
+   assert(audio.tracks[3].stream.resource_path.ends_with("furnace-heart-overdrive.ogg"))
+   assert(audio.tracks[3].stream.loop_offset>2.0)
   for i in audio.tracks.size():assert(audio.tracks[i].playing==(i==episode))
   var stream=audio.tracks[episode].stream
   game.phase="paused"

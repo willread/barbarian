@@ -1,5 +1,20 @@
 extends Node2D
-var CORE=load("res://art/ember-core-v1.png")
+static var CORE: Texture2D
+static var falloff: GradientTexture2D
+static func prepare_assets():
+	if CORE==null:CORE=load("res://art/ember-core-v1.png")
+	if falloff!=null:return
+	var gradient=Gradient.new()
+	gradient.offsets=PackedFloat32Array([0,.12,.3,.55,.8,1])
+	gradient.colors=PackedColorArray([Color.WHITE,Color(1,1,1,.8),Color(1,1,1,.38),Color(1,1,1,.11),Color(1,1,1,.018),Color(1,1,1,0)])
+	falloff=GradientTexture2D.new()
+	falloff.gradient=gradient
+	falloff.width=256;falloff.height=256
+	falloff.fill=GradientTexture2D.FILL_RADIAL
+	falloff.fill_from=Vector2(.5,.5);falloff.fill_to=Vector2(1,.5)
+static func release_assets():
+	CORE=null
+	falloff=null
 var clock=0.0
 var urgency=0.0
 var body: Sprite2D
@@ -8,14 +23,7 @@ var object_light: PointLight2D
 var halo: Sprite2D
 
 func _init():
-	var gradient=Gradient.new()
-	gradient.offsets=PackedFloat32Array([0,.12,.3,.55,.8,1])
-	gradient.colors=PackedColorArray([Color.WHITE,Color(1,1,1,.8),Color(1,1,1,.38),Color(1,1,1,.11),Color(1,1,1,.018),Color(1,1,1,0)])
-	var falloff=GradientTexture2D.new()
-	falloff.gradient=gradient
-	falloff.width=256;falloff.height=256
-	falloff.fill=GradientTexture2D.FILL_RADIAL
-	falloff.fill_from=Vector2(.5,.5);falloff.fill_to=Vector2(1,.5)
+	prepare_assets()
 	ground_light=PointLight2D.new()
 	ground_light.texture=falloff
 	ground_light.color=Color(1,.30,.055)
