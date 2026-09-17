@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 import {foregroundRegion} from '../../studies/backgrounds/foreground.js';
-const ids=['citadel-01-v6','citadel-02-v2','citadel-03-v3','citadel-04-v1'],screens=[];
+const ids=['citadel-01-v6','citadel-02-v2','citadel-03-v4','citadel-04-v1'],screens=[];
 for(const [i,id] of ids.entries()){
  const dir='studies/backgrounds/'+id,m=JSON.parse(fs.readFileSync(dir+'/screen.json')),key='citadel-'+(i+1);
  fs.copyFileSync(path.resolve(dir,m.frames[0]),'godot/assets/'+key+'-base.png');
