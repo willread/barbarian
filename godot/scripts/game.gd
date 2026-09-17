@@ -1065,9 +1065,10 @@ func tick(dt: float):
 	episode_combat.prepare_actor(hero)
 	var dy=int(keys.has(KEY_S))-int(keys.has(KEY_W))
 	var run_held=keys.has(KEY_SHIFT)
-	if run_held and dx!=0 and hero.air.is_empty() and hero.attack.is_empty():
+	if run_held and (dx!=0 or dy!=0) and hero.air.is_empty() and hero.attack.is_empty():
 		hero.running=true
-		hero.runDir=dx
+		hero.runAxis=0 if dx else 1
+		hero.runDir=dx if dx else dy
 	elif run_button_active and not run_held:hero.running=false
 	run_button_active=run_held
 	var edge=-1 if pressed.has(KEY_A) else 1 if pressed.has(KEY_D) else 0
@@ -1087,7 +1088,7 @@ func tick(dt: float):
 	var was_diving=hero.diveUsed and not hero.air.is_empty() and hero.air.land==0
 	var landing_strike=hero.attack.duplicate() if was_diving else {}
 	var hero_before=Vector2(hero.x,hero.y)
-	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true)
+	m.motion(hero,0 if busy else dx,0 if busy else dy,0 if busy else edge,true,0 if busy else -1 if pressed.has(KEY_W) else 1 if pressed.has(KEY_S) else 0)
 	episode_combat.movement(hero,hero_before)
 	if was_diving and not hero.air.is_empty() and hero.air.land>0:
 		var impact=preload("res://scripts/landing_impact.gd").new()

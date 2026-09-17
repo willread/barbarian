@@ -20,7 +20,7 @@ func _init(data: Dictionary = {}):
 func make(id: int, x: float, y: float, hp: float, player: bool = false) -> Dictionary:
 	return {"id":id,"x":x,"y":y,"hp":hp,"max":hp,"player":player,"dir":1,"weapon":"axe","kind":"legion","boss":false,"size":1.0,"speedFactor":1.0,"variant":"regular",
 	"chargeRebound":0.0,"holdTicks":0,"spinUsed":false,"diveUsed":false,"diveHit":false,"diveAge":0,
-	"velocityX":0.0,"velocityY":0.0,"running":false,"runDir":0,"tapDir":0,"tapTicks":-1,"air":{},"height":0.0,"jump":null,"jumpLaunch":5.5,"stagger":0,"hurtTicks":0,"hurtAge":0,"down":{},"recovering":0,"invTicks":0,"attack":{},"lastSlash":0,"aiClock":0,"aiRest":0,"aiChain":0,"aiChargeRest":0,"aiDx":0,"aiDy":0,"moving":false,"stride":0.0,"clock":randf()*4.8,"death":0.0,"recoil":0.0,"hitGlow":0.0,"electricTicks":0,"pickup":{},"gearDropped":false,"burnAge":0.0,"engulf":1.0,"burnSeed":randf()*100,"burnPoints":[],"scorched":false,"trail":0.0,"bootDistance":0.0,"bootCoat":0.0,"bootSide":1,"bootPos":Vector2(x,y),"turnTicks":0,"brace":0,"moveIndex":0,"phaseTwo":false,"hopCooldown":90+randf()*90,"hopTicks":0,"thinkTicks":0,"tactic":0.0,"rushCooldown":50,"rushCombo":false}
+	"velocityX":0.0,"velocityY":0.0,"running":false,"runDir":0,"runAxis":0,"tapAxis":0,"tapDir":0,"tapTicks":-1,"air":{},"height":0.0,"jump":null,"jumpLaunch":5.5,"stagger":0,"hurtTicks":0,"hurtAge":0,"down":{},"recovering":0,"invTicks":0,"attack":{},"lastSlash":0,"aiClock":0,"aiRest":0,"aiChain":0,"aiChargeRest":0,"aiDx":0,"aiDy":0,"moving":false,"stride":0.0,"clock":randf()*4.8,"death":0.0,"recoil":0.0,"hitGlow":0.0,"electricTicks":0,"pickup":{},"gearDropped":false,"burnAge":0.0,"engulf":1.0,"burnSeed":randf()*100,"burnPoints":[],"scorched":false,"trail":0.0,"bootDistance":0.0,"bootCoat":0.0,"bootSide":1,"bootPos":Vector2(x,y),"turnTicks":0,"brace":0,"moveIndex":0,"phaseTwo":false,"hopCooldown":90+randf()*90,"hopTicks":0,"thinkTicks":0,"tactic":0.0,"rushCooldown":50,"rushCombo":false}
 
 func standing(f: Dictionary) -> bool:
 	return f.hp > 0 and f.down.is_empty() and f.recovering == 0
@@ -30,7 +30,7 @@ func start_jump(f: Dictionary) -> bool:
 		return false
 	var jump_scale=f.get("mire_jump_scale",1.0)
 	f.jumpLaunch=5.5*jump_scale
-	f.air={"age":0,"launch":f.jumpLaunch,"vz":0.0,"land":0,"carry":combat_extensions and f.running and jump_scale>=1.0}
+	f.air={"age":0,"launch":f.jumpLaunch,"vz":0.0,"land":0,"carry":combat_extensions and f.running and f.runAxis==0 and jump_scale>=1.0}
 	f.diveUsed=false
 	f.diveHit=false
 	f.diveAge=0
@@ -40,7 +40,7 @@ func start_jump(f: Dictionary) -> bool:
 	f.running=false
 	return true
 
-func motion(f: Dictionary, dx: float, dy: float, edge: int = 0, bounded: bool = false):
+func motion(f: Dictionary, dx: float, dy: float, edge: int = 0, bounded: bool = false, edge_y: int = 0):
 	if f.hurtTicks or not f.down.is_empty() or f.recovering:
 		f.moving=false
 		return
@@ -88,47 +88,55 @@ func motion(f: Dictionary, dx: float, dy: float, edge: int = 0, bounded: bool = 
 				f.height=max(0,f.height-a.vz)
 	else:
 		var just_ran=false
-		if f.running and dx!=f.runDir:
+		if f.running and (dx if f.runAxis==0 else dy)!=f.runDir:
 			f.running=false
 			just_ran=true
-		if edge:
-			if edge==f.tapDir and f.tapTicks>=0:
+		var tap=edge if edge else edge_y
+		var axis=0 if edge else 1
+		if tap:
+			if tap==f.tapDir and axis==f.tapAxis and f.tapTicks>=0:
 				f.running=true
-				f.runDir=edge
+				f.runDir=tap
+				f.runAxis=axis
 				f.tapDir=0
 				f.tapTicks=-1
 			elif f.tapDir:
 				f.tapDir=0
 				f.tapTicks=-1
 			else:
-				f.tapDir=edge
+				f.tapDir=tap
+				f.tapAxis=axis
 				f.tapTicks=16
 		else:
 			f.tapTicks-=1
 			if f.tapTicks<0: f.tapDir=0
 		if not just_ran:
-			var target=dx*(4 if f.running else 1.5)
+			var target=0.0 if f.running and f.runAxis==1 else dx*(4 if f.running else 1.5)
 			if dx and sign(f.velocityX)==dx and abs(f.velocityX)>abs(target): f.velocityX=target
 			else: f.velocityX=move_toward(f.velocityX,target,.5)
-		f.velocityY=0.0 if f.running or just_ran else dy
+		f.velocityY=dy*3.0 if f.running and f.runAxis==1 else 0.0 if f.running or just_ran else dy
 		var vx=f.velocityX
 		if f.velocityY and vx: vx-=sign(vx)*.5
 		f.x+=vx*SCALE
 		f.y+=f.velocityY*SCALE
 		f.moving=bool(dx or dy or f.velocityX)
 		if f.moving: f.stride=fmod(f.stride+1.0/(32 if f.running else 40),1)
-		if dx: f.dir=int(dx)
+		if dx and not (f.running and f.runAxis==1): f.dir=int(dx)
 	if bounded:
 		var x=clamp(f.x,70,1370)
 		if x!=f.x:
 			f.velocityX=0.0
 			f.running=false
 		f.x=x
-		f.y=clamp(f.y,lane_min,lane_max)
+		var y=clamp(f.y,lane_min,lane_max)
+		if y!=f.y and f.running and f.runAxis==1:
+			f.velocityY=0
+			f.running=false
+		f.y=y
 
 func select_strike(f: Dictionary, targets: Array) -> String:
 	if not f.air.is_empty(): return "air"
-	if f.running: return "charge"
+	if f.running and f.runAxis==0: return "charge"
 	var nearest={}
 	for e in targets:
 		var distance=(e.x-f.x)*f.dir
