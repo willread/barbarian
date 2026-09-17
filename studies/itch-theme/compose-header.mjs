@@ -6,7 +6,11 @@ const bg=await loadImage(png(root+'assets/header-scenery-v4.png'));
 const logo=await loadImage(png(root+'assets/banner.png'));
 const c=createCanvas(bg.width,bg.height),g=c.getContext('2d');g.drawImage(bg,0,0);
 const w=c.width*.43;g.drawImage(logo,(c.width-w)/2,c.height*.24,w,w*logo.height/logo.width);
-// Clear sub-visible alpha specks left by generation at the canvas boundary.
+// Restore the approved jagged alpha after generated edits flattened it to black.
+const mask=await loadImage(png(root+'assets/header-alpha-mask.png'));
+g.globalCompositeOperation='destination-in';
+g.drawImage(mask,0,0,c.width,c.height);
+g.globalCompositeOperation='source-over';
 g.clearRect(0,c.height-1,c.width,1);
 fs.writeFileSync(root+'assets/header-v4.png',c.toBuffer('image/png'));
 const edge=g.getImageData(0,c.height-1,c.width,1).data;if(edge.some((v,i)=>i%4===3&&v))throw Error('Opaque edge');console.log('Banner saved; bottom edge fully transparent.');
