@@ -29,7 +29,7 @@ func run():
 			var actor=m.make(i+1,260+(i%3)*520,600+(i/3)*750,100)
 			actor.kind="champion";actor.boss=true
 			m.begin(actor,"wardenWhirlwind")
-			actor.attack.age=[30,54,58,62,68,240][i]
+			actor.attack.age=[42,90,94,98,102,240][i]
 			var view=load("res://scripts/fighter_view.gd").new()
 			view.art=art;view.actor=actor
 			viewport.add_child(view)

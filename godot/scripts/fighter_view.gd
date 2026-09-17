@@ -6,10 +6,12 @@ var burn_material: ShaderMaterial
 var burning: BurningSprite
 var burn_finished=false
 var whirl_turn=1.0
+static var dust_texture: Texture2D
 func _ready():
 	burn_material=ShaderMaterial.new()
 	burn_material.shader=load("res://shaders/burn.gdshader")
 	material=burn_material
+	if actor.get("kind","")=="champion":prepare_dust()
 func update_view(spell: int):
 	pose=art.pose(actor,spell)
 	# Set the basis directly: decomposing negative X scale during reparenting can
@@ -18,7 +20,7 @@ func update_view(spell: int):
 	whirl_turn=1.0
 	if actor.attack.get("whirlwind",false) and actor.attack.age>=actor.attack.from and actor.attack.age<=actor.attack.to:
 		var turn=cos((actor.attack.age-actor.attack.from)*.43)
-		whirl_turn=(1 if turn>=0 else -1)*maxf(.28,absf(turn))
+		whirl_turn=(1 if turn>=0 else -1)*(.72+.28*absf(turn))
 		transform.x*=whirl_turn
 	z_index=int(actor.y)*2
 	burn_material.set_shader_parameter("burn_age",actor.burnAge if not actor.player else 0.0)
@@ -53,29 +55,60 @@ func _draw():
 	art.paint_weapon(self,actor,pose,false)
 	if actor.attack.get("whirlwind",false):paint_whirlwind(true)
 
+static func prepare_dust():
+	if dust_texture:return
+	var noise=FastNoiseLite.new()
+	noise.seed=7149
+	noise.frequency=.095
+	noise.fractal_octaves=3
+	var image=Image.create(64,64,false,Image.FORMAT_RGBA8)
+	for y in 64:
+		for x in 64:
+			var distance=Vector2(x-31.5,y-31.5).length()/31.5
+			var density=pow(maxf(0,1-distance*distance),2.3)*clampf(.58+noise.get_noise_2d(x,y)*.8,0,1)
+			image.set_pixel(x,y,Color(1,1,1,density))
+	dust_texture=ImageTexture.create_from_image(image)
+
 func paint_whirlwind(front: bool):
 	var a=actor.attack
-	if a.age>a.to:return
-	var strength=clampf(float(a.age)/a.from,0,1)
-	var active=a.age>=a.from
-	# Counter the body's turning squash so the wind keeps its circular footprint.
-	draw_set_transform(Vector2.ZERO,0,Vector2(1.0/whirl_turn,1))
-	for band in 6:
-		var points=PackedVector2Array()
-		var radius=lerpf(45,150,float(band)/5)*strength
-		var phase=a.age*(.43 if active else .13)+band*1.7
-		for step in 19:
-			var angle=phase+float(step)/18*PI*1.35
-			var point=Vector2(cos(angle)*radius,-18-band*36+sin(angle)*radius*.19)
-			if (sin(angle)>0)==front:points.append(point)
-			elif points.size()>1:
-				draw_polyline(points,Color(.80,.73,.57,(.30 if active else .12)*strength),2.5,true)
-				points=PackedVector2Array()
-			else:points=PackedVector2Array()
-		if points.size()>1:draw_polyline(points,Color(.88,.83,.69,(.38 if active else .16)*strength),2.5,true)
-	if front:
-		for fleck in 12:
-			var angle=a.age*.19+fleck*2.4
-			var radius=45+fmod(fleck*29.0,100)
-			draw_circle(Vector2(cos(angle)*radius,-8-absf(sin(angle*1.3))*32),2.0,Color(.61,.49,.32,.55*strength))
+	var active=a.age>=a.from and a.age<=a.to
+	var strength=smoothstep(0,18,a.age-a.from) if active else 0.0
+	var settle=1.0-smoothstep(a.to,a.to+36,a.age)
+	if a.age<a.from:strength=smoothstep(a.from-24,a.from,a.age)*.22
+	elif a.age>a.to:strength=settle
+	if strength<=0:return
+	prepare_dust()
+	# Keep dust in world orientation while the body turns inside it.
+	draw_set_transform(Vector2.ZERO,0,Vector2(1.0/(whirl_turn*actor.dir),1))
+	var time=float(a.age-a.from)/60.0
+	var travel: Vector2=a.get("travel",Vector2.ZERO)
+	for mote in 46:
+		var life=fposmod(time*.95+mote*.618,1.0)
+		var angle=mote*2.399+time*(3.0+fmod(mote*1.37,2.0))
+		var radius=40+life*125
+		var depth=sin(angle)
+		if (depth>0)!=front:continue
+		var point=Vector2(cos(angle)*radius-travel.x*life*3.0,depth*radius*.22-life*(45+fmod(mote*17.0,155.0)))
+		var size=Vector2(68+life*85,40+life*65)
+		var opacity=sin(life*PI)*(.62 if front else .82)*strength
+		draw_texture_rect(dust_texture,Rect2(point-size*.5,size),false,Color(.67,.58,.44,opacity))
+		# A few heavy chips stay low instead of orbiting in perfect rings.
+		if mote%4==0 and life<.65:
+			var chip=point+Vector2(0,life*life*30)
+			draw_line(chip,chip-Vector2(travel.x*.15,2.0),Color(.40,.32,.23,(1-life)*strength),2,true)
+	if active:
+		# Short, tapered motion blur follows the blade sweep; no stacked hoops.
+		var phase=(a.age-a.from)*.43
+		for segment in 24:
+			var tail=float(segment)/24
+			var angle=phase-tail*1.55
+			var next=angle-1.55/24
+			if (sin(angle)>0)!=front:continue
+			var center=Vector2(cos(angle)*192,-172+sin(angle)*43)
+			var end=Vector2(cos(next)*192,-172+sin(next)*43)
+			var width=(1-tail)*13.0
+			var color=Color(.82,.80,.72,pow(1-tail,1.8)*smoothstep(0,.12,tail)*.50*strength)
+			var edge=Color(color,0)
+			for side in [-1,1]:
+				draw_polygon(PackedVector2Array([center+Vector2(0,width*side),end+Vector2(0,width*.93*side),end,center]),PackedColorArray([edge,edge,color,color]))
 	draw_set_transform(Vector2.ZERO)
