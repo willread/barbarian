@@ -179,6 +179,10 @@ func begin(f: Dictionary, type: String) -> bool:
 		a.box=[0,a.reach,-64,64]
 	if combat_extensions and type=="air":
 		f.diveUsed=true
+		# The slam consumes this press just like a charge; release before spinning.
+		if f.player:
+			f.spinUsed=true
+			f.holdTicks=0
 		a.ticks=90
 		a.from=2 if f.weapon=="sword" else 3
 		a.to=89

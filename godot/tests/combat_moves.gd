@@ -24,6 +24,7 @@ func _init():
 	hero.running=true
 	assert(m.start_jump(hero) and hero.velocityX==3.2)
 	assert(m.begin(hero,"air") and hero.attack.from==3)
+	assert(hero.spinUsed and hero.holdTicks==0,"Slam consumes the held attack press")
 	var axe_damage=hero.attack.damage
 	var landing=[]
 	for connected in [false,true]:
@@ -38,6 +39,15 @@ func _init():
 				assert(h.attack.is_empty())
 				break
 	assert(landing==[24,8])
+	var slam=m.make(101,720,660,100,true)
+	m.start_jump(slam);m.begin(slam,"air")
+	for i in 180:
+		slam.recovering=maxi(0,slam.recovering-1)
+		m.motion(slam,0,0)
+	assert(slam.air.is_empty() and slam.attack.is_empty())
+	assert(not m.begin(slam,"spin"),"Holding through a completed slam cannot start a spin")
+	slam.spinUsed=false # Input re-arms only after release.
+	assert(m.begin(slam,"spin"),"A new press may spin after the slam")
 	var sword=m.make(1,720,660,100,true)
 	sword.weapon="sword"
 	m.start_jump(sword)
