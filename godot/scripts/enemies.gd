@@ -211,7 +211,7 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 			var heading=Vector2(h.x-e.x,(h.y-e.y)*2.0)
 			if absf(heading.y)<100:heading.y=180 if e.y<(m.lane_min+m.lane_max)*.5 else -180
 			e.attack["travel"]=heading.normalized()*9.0*(1.2 if e.phaseTwo else 1.0)
-			e["whirlwind_ready_at"]=e.clock+7.0
+			e["whirlwind_ready_at"]=e.clock+5.0
 			return Vector2.ZERO
 	if abs(y)<5 and abs(x)<reach:
 		var type="boneCut" if e.kind=="bone" else ("shieldBash" if e.kind=="shield" else "marauderChop")

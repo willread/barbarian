@@ -8,7 +8,7 @@ export function splitEpisodeSheet(image,kind){
  // The falling King and corpse touch along a diagonal silhouette seam.
  const kingSide=(p)=>{const x=p%w,y=Math.floor(p/w);if(y<h/2)return 0;const seam=y<820?1166:y<890?1166-(y-820)*1.12:y<950?1088+(y-890)*1.30:1166;return x<seam?0:1};
  // Fresh Warden sheet: the raised blade touches the previous pose's boot.
- const wardenSide=p=>p%w>w*.75 && Math.floor(p/w)>=h*.750 ? 1:0;
+ const wardenSide=p=>p%w>w*.75 && Math.floor(p/w)>=h*.760 ? 1:0;
  let next=0;
  for(let start=0;start<labels.length;start++){
   if(labels[start]||d[start*4+3]<128)continue;
