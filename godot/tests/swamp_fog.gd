@@ -25,10 +25,17 @@ func check():
    await RenderingServer.frame_post_draw
    root.get_texture().get_image().save_png("E:/Cairn-build-tools/swamp-fog.png")
   await process_frame
- game.background.setup(game.art,"ashen-1")
+ game.current_episode=3
+ for area in range(1,5):
+  game.background.setup(game.art,"ashen-%d"%area)
+  game.tick(0)
+  var actor=game.m.make(999,720,650,100,true)
+  for frame in 180:game.m.motion(actor,0,1,0,true)
+  game.background.constrain(actor)
+  assert(is_equal_approx(actor.y,.95*810-2),"Every E3 screen shares the reachable E2 bottom margin")
  await process_frame
  assert(not game.background.has_node("DriftingFog"))
  game.queue_free()
  await process_frame
- print("CAIRN_SWAMP_LANES_OK: no foreground fog; all four lanes reachable at shoreline and shared bottom margin")
+ print("CAIRN_SWAMP_LANES_OK: no foreground fog; expanded E2 lanes and consistent reachable bottom margins across E2/E3")
  quit()

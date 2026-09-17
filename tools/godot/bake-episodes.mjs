@@ -54,7 +54,7 @@ fs.writeFileSync('godot/worlds/swamp.json',JSON.stringify(swamp,null,2)+'\n');
 const ash=[];
 for(const [i,file] of ['01-road.png','02-mouth.png','03-crucible.png','04-reliquary.png'].entries()){
  const key='ashen-'+(i+1);fs.copyFileSync('studies/backgrounds/ashen-v1/'+file,out+key+'-base.png');
- ash.push({key,title:['Ashfall Road','The Furnace Mouth','The Black Crucible','Saint’s Reliquary'][i],regions:[],walkable:{polygon:[[0,.73],[1,.73],[1,.92],[0,.92]]},framing:{bottom_crop:.03}});
+ ash.push({key,title:['Ashfall Road','The Furnace Mouth','The Black Crucible','Saint’s Reliquary'][i],regions:[],walkable:{polygon:[[0,.73],[1,.73],[1,lane.bottom],[0,lane.bottom]]},movement_y:[.73*810,lane.bottom*810],framing:{bottom_crop:.03}});
 }
 fs.writeFileSync('godot/worlds/ashen.json',JSON.stringify(ash,null,2)+'\n');
 fs.writeFileSync(stamp,JSON.stringify(version));

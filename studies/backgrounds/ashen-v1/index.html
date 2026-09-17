@@ -7,7 +7,7 @@ import {drawActor} from '../swamp-v3/scene.js';
 const scenes=[['Ashfall Road','01-road.png'],['The Furnace Mouth','02-mouth.png'],['The Black Crucible','03-crucible.png'],["Saint’s Reliquary",'04-reliquary.png']];
 const canvas=document.querySelector('canvas'),g=canvas.getContext('2d'),lane=document.querySelector('#lane'),actor=document.querySelector('#actor');let selected=0,foot=[.5,.84];
 const images=await Promise.all(scenes.map(([,file])=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=file})));
-function draw(){g.drawImage(images[selected],0,0,1280,720);if(lane.checked){g.fillStyle='#87d7a02b';g.fillRect(0,.73*720,1280,.19*720);g.strokeStyle='#a2dfad';g.strokeRect(1,.73*720,1278,.19*720)}if(actor.checked)drawActor(g,...foot)}
+function draw(){g.drawImage(images[selected],0,0,1280,720);if(lane.checked){g.fillStyle='#87d7a02b';g.fillRect(0,.73*720,1280,.22*720);g.strokeStyle='#a2dfad';g.strokeRect(1,.73*720,1278,.22*720)}if(actor.checked)drawActor(g,...foot)}
 function select(i){selected=i;document.querySelector('#name').textContent=`E3/${i+1} · ${scenes[i][0]}`;document.querySelectorAll('nav button').forEach((b,j)=>b.setAttribute('aria-pressed',String(i===j)));history.replaceState(null,'',`#${i+1}`);draw()}
 scenes.forEach(([name,file],i)=>{const b=document.createElement('button');b.innerHTML=`<img src="${file}" alt=""><span>${i+1} · ${name}</span>`;b.onclick=()=>select(i);document.querySelector('nav').append(b)});
 lane.onchange=actor.onchange=draw;canvas.onclick=e=>{const r=canvas.getBoundingClientRect();foot=[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height];actor.checked=true;draw()};select(Math.max(0,Math.min(3,(Number(location.hash.slice(1))||1)-1)));
