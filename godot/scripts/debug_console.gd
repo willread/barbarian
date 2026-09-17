@@ -116,7 +116,7 @@ func execute(text: String):
  if game.muted or (not success and not game.voice_enabled):return
  feedback.bus=&"Foley" if success else &"Voice"
  feedback.stream=success_sound if success else failure_sound
- feedback.volume_db=0
+ feedback.volume_db=-6.0 if success else 0.0
  feedback.play()
 func travel(wave: int):
  game.wave=wave
