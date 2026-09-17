@@ -77,3 +77,7 @@ Daily aggregates are retained indefinitely; no scheduled cleanup or expiry is co
 The dashboard shows received attempt totals, completion rates and per-level metric totals by UTC day, with today, 7/30/90-day, exact-date and all-time views, plus dated authenticated JSON export. Dates use server receipt time; days without reports are omitted. It cannot measure unique/returning players, exact average times/scores or player histories. Missing submissions (crashes/offline/opt-outs) and spoofed submissions affect the results.
 
 References: [D1 batches](https://developers.cloudflare.com/d1/worker-api/d1-database/), [Access JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/).
+
+## Battle insights dashboard
+
+Progress bars split level attempts into completed, died and quit. A level/difficulty heatmap shows death rates and flags samples under 10 attempts. Activity charts include zero-report intervals and group long ranges into at most 90 time bins. Combat charts show move uses per attempt and the share of completed/death reports using each move; outcome samples count only available move breakdowns. Feature bars show flags per reported attempt. Date, episode and difficulty filters apply to charts and JSON export. Detailed daily/metric tables remain available in a collapsed section. No unique-player or causal claims are inferred from these aggregates.

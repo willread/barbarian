@@ -6,6 +6,7 @@ import worker from './src/worker.mjs';
 import { aggregate } from './src/metrics.mjs';
 import { dashboard, levelSummary } from './src/dashboard.mjs';
 import { dateRange, dailyRows } from './src/reporting.mjs';
+import { insights } from './src/insights.mjs';
 import { verifyAccessToken } from './src/auth.mjs';
 import { generateKeyPair, SignJWT } from 'jose';
 const sample = () => ({ schema: 1, episode: 1, level: 2, difficulty: 'normal', outcome: 'completed', duration: '3_5m', score: '5000_9999', moves: { normal: 42, slam: 3 }, features: { controls: true } });
@@ -21,6 +22,39 @@ test('level summary combines days and difficulties without counting relationship
   assert.deepEqual(levels[7],{episode:2,level:4,attempts:1,completed:0,died:0,quit:1});
   assert.equal(levels[11].attempts,0);
   assert.match(dashboard(rows,dateRange(new URLSearchParams('days=all'))),/Progress by level/);
+});
+test('insights use correct move denominators, fill missing dates and distinguish no data from zero deaths', () => {
+  const rows=[
+    ...aggregate({...sample(),moves:{normal:10},outcome:'completed'}).map(([metric,value])=>({day:'2026-09-15',episode:1,level:2,difficulty:'normal',metric,value})),
+    ...aggregate({...sample(),moves:{spin:2},outcome:'died'}).map(([metric,value])=>({day:'2026-09-17',episode:1,level:2,difficulty:'normal',metric,value}))
+  ];
+  const range=dateRange(new URLSearchParams('days=7'),Date.parse('2026-09-17T23:00:00Z'));
+  const data=insights(rows,range);
+  assert.equal(data.totals.attempts,2);
+  assert.equal(data.timeline.length,7);
+  assert.equal(data.timeline.find(v=>v.day==='2026-09-16').attempts,0);
+  assert.equal(data.combat[0].average,5);
+  assert.deepEqual(data.combat[0].outcomes,{completed:{total:1,used:1},died:{total:1,used:0}});
+  assert.equal(data.heat[1].cells[1].attempts,2);
+  assert.equal(data.heat[1].cells[0].attempts,0);
+  assert.equal(data.hotspot,null);
+  const empty=insights([],range);
+  assert.equal(empty.combat[0].average,null);
+  assert.equal(empty.timeline.length,0);
+  const long=insights([{day:'2020-01-01',episode:1,level:1,difficulty:'easy',metric:'attempts',value:2},{day:'2026-09-17',episode:1,level:1,difficulty:'easy',metric:'attempts',value:3}],dateRange(new URLSearchParams('days=all')));
+  assert.ok(long.timeline.length<=90);
+  assert.equal(long.timeline.reduce((n,v)=>n+v.attempts,0),5);
+});
+test('episode and difficulty filters apply to reports and survive date changes', async () => {
+  const {db,binding}=database();
+  db.exec("INSERT INTO totals VALUES ('2026-09-16',1,1,'normal','attempts',1), ('2026-09-16',2,1,'hard','attempts',2), ('2026-09-16',2,1,'easy','attempts',3)");
+  const range=dateRange(new URLSearchParams('days=all&day=&episode=2&difficulty=hard'));
+  assert.equal((await dailyRows(binding,range)).length,1);
+  assert.equal((await dailyRows(binding,range))[0].value,2);
+  assert.match(range.query,/episode=2&difficulty=hard/);
+  assert.equal(insights(await dailyRows(binding,range),range).levels.length,4);
+  for(const input of ['episode=4','episode=bad','difficulty=bad'])assert.throws(()=>dateRange(new URLSearchParams(input)));
+  db.close();
 });
 function database() {
   const db = new DatabaseSync(':memory:');
