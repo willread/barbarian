@@ -70,4 +70,18 @@ second.foreground=[
 ];
 second.notes+=' Revised foreground contours include the overlapping front rocks and loose center stones. Artwork, animation and walkable polygon unchanged.';
 save(second.id,second);
+const fourth=read('citadel-04-v1');
+fourth.id='citadel-04-v2';
+fourth.status='Expanded rectangular floor and foreground rubble';
+fourth.frames=['../citadel-04-v1/base.png'];
+for(const r of fourth.regions)r.animation.atlas='../citadel-04-v1/'+r.animation.atlas;
+fourth.walkable.polygon=[[0,.65],[1,.65],[1,.95],[0,.95]];
+fourth.walkable.description='Continuous rectangular fighting floor ending 5% above the bottom; overlapping rubble renders in front of actors.';
+fourth.movement_y=[.65*810,.95*810];
+fourth.foreground=[
+ shape('Left foreground rubble',[[0,826],[10,831],[15,852],[42,850],[59,847],[79,849],[80,874],[108,869],[119,871],[124,898],[145,896],[158,884],[192,879],[210,887],[212,894],[228,888],[251,890],[270,882],[283,884],[286,918],[311,917],[327,913],[350,918],[369,915],[394,911],[400,941],[0,941]]),
+ shape('Right foreground rubble',[[1052,941],[1056,911],[1081,907],[1082,900],[1108,901],[1112,889],[1131,887],[1144,898],[1157,895],[1159,884],[1185,879],[1208,888],[1240,886],[1241,921],[1265,915],[1304,919],[1321,916],[1353,924],[1358,912],[1390,906],[1427,910],[1442,900],[1455,899],[1475,869],[1490,863],[1520,870],[1531,868],[1532,848],[1553,840],[1578,849],[1593,850],[1596,834],[1609,834],[1626,843],[1655,847],[1656,823],[1672,821],[1672,941]])
+];
+fourth.notes='Original painting and brazier animation retained. Floor extends to a consistent 5% bottom margin, with front rubble silhouettes drawn over actors.';
+save(fourth.id,fourth);
 console.log('Rebuilt citadel ground revisions');

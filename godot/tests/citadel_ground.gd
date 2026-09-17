@@ -6,7 +6,7 @@ func check():
 	game.set_process(false)
 	game.start_game();game.transition=-1;game.stage_walk=""
 	game.pending_enemies.clear();game.enemies.clear()
-	for area in [1,2,3]:
+	for area in [1,2,3,4]:
 		game.wave=1+(area-1)*3
 		game.background.setup(game.art,"citadel-%d"%area)
 		game.hero.x=720 if area==1 else 120 if area==2 else 160
@@ -19,7 +19,16 @@ func check():
 			for i in 4:
 				var expected=[[0,.625],[1,.625],[1,.93],[0,.93]][i]
 				assert(Vector2(points[i][0],points[i][1]).is_equal_approx(Vector2(expected[0],expected[1])),"Foundry foot area is rectangular across its full width")
-		if area in [2,3]:
+		if area==4:
+			var points=game.background.screen.walkable.polygon
+			assert(points.size()==4)
+			assert(is_equal_approx(points[2][1],.95) and is_equal_approx(points[3][1],.95))
+			game.tick(0)
+			assert(is_equal_approx(game.m.lane_max,769.5),"Keep movement reaches the new 5% bottom margin")
+			game.hero.y=769.5
+			game.background.constrain(game.hero)
+			assert(game.hero.y>765,"Keep floor remains accessible behind foreground rubble")
+		if area in [2,3,4]:
 			assert(game.background.screen.foreground.size()>=2,"Foundry rubble has foreground masks")
 			var foreground=game.background.get_children().filter(func(node):return node is Sprite2D and node.z_index==1805)
 			assert(foreground.size()==1 and foreground[0].texture.get_image().get_used_rect().has_area())
