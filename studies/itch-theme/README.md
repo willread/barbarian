@@ -34,8 +34,8 @@ the video into Git. Other machines need that file or a changed server mapping.
 
 ## Current header
 
-`assets/header-v3.png` is the uploadable PNG banner. The original logo is scaled
-to 43% of the banner width and composited over generated `header-scenery-v3.png`; its
+`assets/header-v4.png` is the uploadable PNG banner. The original logo is scaled
+to 43% of the banner width and composited over generated `header-scenery-v4.png`; its
 lettering is not regenerated. Run `node studies/itch-theme/compose-header.mjs`
 to reproduce. Header padding is zero so artwork fills the panel width. Only the bottom edge
 breaks into transparent jagged stone, revealing the shared page texture and the bottom
@@ -84,3 +84,7 @@ Latest background supersedes the mirrored version: stone-tile-512.jpg, 512 x 512
 39369 bytes. New staggered masonry generated with built-in image generation,
 reduced and compressed with opposing borders matched in a narrow feather band.
 Reviewed as a 2 x 2 repeat. Use repeat both directions at original size, not cover.
+
+Header v4 replaces the foreground carved head with a slumped skeleton and removes
+the rightmost of the three background statues. The unused first masthead is
+archived at E:/Cairn-build-tools/itch-theme-generated/unused-masthead-v1.png.
