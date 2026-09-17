@@ -26,6 +26,14 @@ export function aggregate(payload) {
     if (typeof used !== 'boolean') throw Error('Invalid feature');
     if (used) result.push([`feature:${feature}`, 1]);
   }
+  // Useful relationships remain counters, never individual attempt records.
+  result.push([`outcome:${payload.outcome}:duration:${payload.duration}`, 1]);
+  result.push([`outcome:${payload.outcome}:score:${payload.score}`, 1]);
+  for (const move of moves) {
+    const count = payload.moves[move] || 0;
+    const range = count === 0 ? 'none' : count < 6 ? '1_5' : count < 21 ? '6_20' : '21_plus';
+    result.push([`outcome:${payload.outcome}:move:${move}:${range}`, 1]);
+  }
   return result;
 }
 export const UPSERT = `INSERT INTO totals(day, episode, level, difficulty, metric, value)

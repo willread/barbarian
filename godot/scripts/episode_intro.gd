@@ -143,6 +143,7 @@ func handle(event: InputEvent):
 
 func finish():
 	if done:return
+	if not ending:game.telemetry.feature_used("intro_watched" if age>=duration else "intro_skipped")
 	done=true
 	player.stop()
 	sting.stop()

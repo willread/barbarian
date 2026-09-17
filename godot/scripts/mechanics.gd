@@ -1,5 +1,6 @@
 class_name CairnMechanics
 extends RefCounted
+signal player_move(type: String)
 
 # Deliberately retain the ROM-derived fixed clock and scene-unit conversion.
 const HZ = 59.92274340431231
@@ -193,6 +194,7 @@ func begin(f: Dictionary, type: String) -> bool:
 	f.tapDir=0
 	f.tapTicks=-1
 	f.moving=false
+	if f.player:player_move.emit("slam" if type=="air" else type if type in ["spin","charge"] else "normal")
 	return true
 
 func rect(f: Dictionary, box: Array, direction: int) -> Rect2:

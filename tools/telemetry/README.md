@@ -1,8 +1,18 @@
 # Cairn gameplay statistics
 
-An independent Cloudflare Worker + D1 service. The game is **not yet instrumented** and collection ships disabled. Nothing in this folder publishes automatically or changes the game build.
+Cloudflare Worker + D1 service connected to the native Godot game. Collection is enabled at the service; the game sends only when its statistics preference is enabled. Nothing in this folder publishes automatically.
 
-Configured hostname: `cairn.haqt.com`. Dashboard: `https://cairn.haqt.com/admin`. Collector: `https://cairn.haqt.com/v1/attempt`. Browser origins remain empty because the current game is native; do not add a wildcard. Access team domain and audience must be filled in from the actual Access application before dashboard login works.
+Configured hostname: `cairn.haqt.com`. Dashboard: `https://cairn.haqt.com/admin`. Collector: `https://cairn.haqt.com/v1/attempt`. Cloudflare Access team/audience are configured. Local browser previews at localhost/127.0.0.1:3001 are allowed; add the exact hosting origin before publishing a browser build elsewhere. Native clients do not need CORS.
+
+## Game integration
+
+`godot/scripts/telemetry.gd` owns counters and HTTP requests. `statistics_panel.gd` provides the bottom-right title/pause control and details panel. Preferences live in a separate `user://statistics.cfg` file, so normal settings saves cannot erase them. No test or capture session sends network requests or changes the player's telemetry preference.
+
+On the first title screen, a five-second, best-effort `/v1/policy` lookup uses Cloudflare's country metadata (not Windows locale) to default on in GB/US/AU and off elsewhere, including Canada. No location is written to D1. Saved explicit choices override the lookup. Entering a game before it completes locks the default off for that launch. Defaults are a product policy, not a jurisdiction/compliance guarantee; review them as laws and deployment conditions change.
+
+Actual attack starts are counted once. `normal` groups slash/back/kick/pommel; `slam` is the airborne attack; `throw` counts bombs knocked back. Time excludes pauses, transitions and cutscenes. Reports occur on screen completion, death and abandoning a run. Immediate process exits/crashes can lose a final in-flight report; the game never waits on analytics to quit. Toggling the preference discards the current attempt; enabling mid-run starts fresh at the current score/time. Intro and menu feature flags are carried into the next attempt and cleared on submission or preference change.
+
+Outcome/time, outcome/score and outcome/move-usage (none, 1–5, 6–20, 21+) relationships are also retained as aggregate counters. No cross-session linkage or raw attempt records are added.
 
 ## Local development
 
@@ -56,7 +66,7 @@ Send **one** JSON summary when a level/screen attempt completes, ends in death, 
 
 Use an asynchronous request with a short timeout. Do not block gameplay or retry automatically: the service has no identifying deduplication key. On opt-out, discard local counters and queued submissions immediately, cancel pending requests where possible, and stop collecting. Already submitted aggregates cannot be attributed to a player or selectively deleted. Preserve the user's choice. Do not send historical activity from before consent/eligible collection was enabled. Do not put user data in URLs, headers or user-agent strings.
 
-Regional policy is intentionally not built into this service. The client must enforce the reviewed policy before collecting or sending anything. An accepted request is not evidence of consent. No country or IP is stored in D1.
+The client enforces the statistics preference before accumulating or sending gameplay data. An accepted request is not evidence of consent. No country or IP is stored in D1.
 
 ## Storage and privacy boundaries
 

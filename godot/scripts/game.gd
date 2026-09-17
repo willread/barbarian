@@ -59,6 +59,8 @@ var shareware=OS.has_feature("shareware")
 var upgrade_view: CanvasLayer
 var episode_intro: CanvasLayer
 var controls_hint: CanvasLayer
+var telemetry: Node
+var statistics_panel: CanvasLayer
 var music_player_view: CanvasLayer
 var controls_view: CanvasLayer
 var results_view: CanvasLayer
@@ -158,6 +160,9 @@ func _ready():
 	for i in 48: art.texture("hero-idle-%d.png"%i)
 	m=MScript.new(art.data.attacks)
 	m.combat_extensions=true
+	telemetry=preload("res://scripts/telemetry.gd").new()
+	add_child(telemetry)
+	m.player_move.connect(func(type):telemetry.move_used(type))
 	e_ai=EScript.new(m,art.data.roster)
 	font=load("res://assets/anton.ttf")
 	serif=load("res://assets/cinzel.ttf")
@@ -255,6 +260,9 @@ func _ready():
 	controls_hint=preload("res://scripts/controls_hint.gd").new()
 	controls_hint.game=self
 	add_child(controls_hint)
+	statistics_panel=preload("res://scripts/statistics_panel.gd").new()
+	statistics_panel.game=self
+	add_child(statistics_panel)
 	hero=make_actor(720,660,100,true)
 	loading_menu=OS.has_feature("web")
 	change_phase("title")
@@ -330,6 +338,10 @@ func begin_victory():
 	audio.play("flesh",-2)
 
 func change_phase(next: String):
+	if telemetry:
+		if next=="dying":telemetry.finish_attempt("died",int(score))
+		elif next in ["victory","won"]:telemetry.finish_attempt("completed",int(score))
+		elif next=="title":telemetry.finish_attempt("quit",int(score))
 	if next in ["lost","won"]:finish_run(next)
 	elif is_instance_valid(results_view):
 		results_view.queue_free()
@@ -371,6 +383,7 @@ func change_phase(next: String):
 
 func menu_action(label: String):
 	if label=="MUSIC PLAYER":
+		telemetry.feature_used("music_player")
 		if is_instance_valid(music_player_view):return
 		settings_page="music_player"
 		menu.visible=false
@@ -398,6 +411,7 @@ func menu_action(label: String):
 		hall_view.begin.connect(func():close_hall();menu_action("BEGIN"))
 		return
 	if label=="CONTROLS":
+		telemetry.feature_used("controls")
 		settings_page="controls"
 		menu.visible=false
 		controls_view=preload("res://scripts/controls_view.gd").new()
@@ -413,6 +427,7 @@ func menu_action(label: String):
 		refresh_settings(1)
 		return
 	if label.begins_with("WEAPON: "):
+		telemetry.feature_used("weapon_menu")
 		cycle_weapon(1)
 		refresh_settings(0)
 		return
@@ -592,6 +607,7 @@ func request_quit():
 	else:quit_game()
 
 func quit_game():
+	telemetry.finish_attempt("quit",int(score))
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.close(); setTimeout(() => alert('You can close this tab to quit Cairn.'), 100);")
 	else:
@@ -625,6 +641,7 @@ func begin_epilogue():
 		change_phase("won"))
 
 func begin_episode():
+	telemetry.lock_default()
 	if current_episode!=1:
 		start_game()
 		return
@@ -640,6 +657,8 @@ func begin_episode():
 		_process(0))
 
 func start_game():
+	telemetry.lock_default()
+	telemetry.finish_attempt("quit",int(score))
 	if shareware and current_episode>1:
 		current_episode=1
 		show_upgrade()
@@ -679,6 +698,9 @@ func screen_for_wave(number: int) -> int:
 	return clampi(1+int((number-1)/3),1,4)
 
 func spawn_wave(preserve_corpses: bool=false):
+	var area=screen_for_wave(wave)
+	if not telemetry.active.is_empty() and telemetry.active.level!=area:telemetry.finish_attempt("completed",int(score))
+	if telemetry.active.is_empty():telemetry.begin_attempt(current_episode,area,difficulty,int(score))
 	combo.suspend()
 	wave_clear_time=0.0
 	if not preserve_corpses:
@@ -740,6 +762,7 @@ func step_reinforcements(dt: float):
 		reinforcement_wait=randf_range(.8,1.9)
 
 func begin_walk(kind: String):
+	if kind=="exit":telemetry.finish_attempt("completed",int(score))
 	combo.suspend()
 	stage_walk=kind
 	if audio:audio.play("transition",-14)
@@ -1150,6 +1173,9 @@ func _process(raw: float):
 	for child in get_children():
 		if child is Node2D and child not in [screen_backdrop,hud,overlay,menu,wipe]:child.reparent(arena_clip)
 	raw=min(raw,.25)
+	if phase=="playing" and transition<0 and stage_walk=="" and pause_cover<=0:
+		if telemetry.active.is_empty():telemetry.begin_attempt(current_episode,screen_for_wave(wave),difficulty,int(score))
+		telemetry.advance(raw)
 	if phase=="playing" and not run_stats.is_empty():run_stats.time+=raw
 	if phase in ["lost","won"] and is_instance_valid(wipe) and wipe.age<3.8:wipe.advance(raw)
 	if phase=="victory":
@@ -1304,6 +1330,9 @@ func _input(event: InputEvent):
 		return
 	if loading_menu:return
 	if event is InputEventKey or event is InputEventMouseButton:audio.unlocked=true
+	if statistics_panel.handle(event):
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey:
 		var code=event.keycode
 		if event.pressed and not event.echo and code in [KEY_ESCAPE,KEY_P]:

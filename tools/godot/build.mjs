@@ -40,6 +40,7 @@ if(process.argv.includes('--test')){
  run(process.execPath,['tools/godot/check-episode-sprites.mjs']);
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
  run(binary,['--headless','--path','godot','--script','tests/run_records.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/telemetry.gd']);
  run(binary,['--headless','--path','godot','--script','tests/difficulty.gd']);
  run(binary,['--headless','--path','godot','--script','tests/results_ui.gd']);
  run(binary,['--headless','--path','godot','--script','tests/parity.gd']);

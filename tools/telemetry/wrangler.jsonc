@@ -9,10 +9,10 @@
   "preview_urls": false,
   "observability": { "enabled": false },
   "vars": {
-    "COLLECTION_ENABLED": "false",
+    "COLLECTION_ENABLED": "true",
     "ACCESS_TEAM_DOMAIN": "willread.cloudflareaccess.com",
     "ACCESS_AUD": "114f4f0dd25c47ebd68ef19993a6356a6e20ce356e44b6fc0d557a1d7ffe8fad",
-    "ALLOWED_ORIGINS": ""
+    "ALLOWED_ORIGINS": "http://localhost:3001,http://127.0.0.1:3001"
   },
   "d1_databases": [{
     "binding": "DB",

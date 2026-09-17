@@ -396,6 +396,7 @@ func step_scream(game,enemy: Dictionary,a: Dictionary):
 
 func strike_bomb(game,h: Dictionary,a: Dictionary):
 	if a.get("dive",false):return
+	game.telemetry.move_used("throw")
 	var hero=game.hero
 	var pose_actor=hero.duplicate()
 	pose_actor.dir=a.direction

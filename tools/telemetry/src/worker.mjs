@@ -28,6 +28,15 @@ async function bodyJSON(request) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/v1/policy') {
+      if (request.method !== 'GET') return response('Method not allowed', 405, { Allow: 'GET' });
+      const origin = request.headers.get('Origin');
+      const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (origin && !allowed.includes(origin)) return response('Origin denied', 403);
+      // Edge-derived country only; never trust a client-provided country header.
+      // No geolocation or request record is persisted. Unknown and Canada opt in.
+      return response(JSON.stringify({ default_enabled: ['GB', 'US', 'AU'].includes(request.cf?.country) }), 200, { 'Content-Type': 'application/json', ...(origin ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {}) });
+    }
     if (url.pathname === '/v1/attempt') {
       const origin = request.headers.get('Origin');
       const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);

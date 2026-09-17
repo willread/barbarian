@@ -69,6 +69,7 @@ func open():
 
 func choose():
 	if selected==1:close();return
+	game.telemetry.feature_used("controls")
 	canvas.hide()
 	controls=preload("res://scripts/controls_view.gd").new()
 	controls.art=game.art

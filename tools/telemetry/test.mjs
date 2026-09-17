@@ -94,3 +94,18 @@ test('ingestion fails closed when limits are missing, exceeded or unavailable', 
     assert.equal((await worker.fetch(request(sample()), env)).status, 503);
   }
 });
+test('regional defaults use edge country only and never cache decisions', async () => {
+  for (const country of ['GB', 'US', 'AU', 'CA', 'DE', undefined]) {
+    const req = new Request('https://stats.example/v1/policy', { headers: { 'X-Country': 'US' } });
+    if (country) req.cf = { country };
+    const result = await worker.fetch(req, {});
+    assert.equal((await result.json()).default_enabled, ['GB', 'US', 'AU'].includes(country));
+    assert.equal(result.headers.get('Cache-Control'), 'no-store');
+  }
+});
+test('outcome relationships remain aggregate counters, including unused moves', () => {
+  const metrics = new Map(aggregate(sample()));
+  assert.equal(metrics.get('outcome:completed:move:normal:21_plus'), 1);
+  assert.equal(metrics.get('outcome:completed:move:charge:none'), 1);
+  assert.equal(metrics.get('outcome:completed:duration:3_5m'), 1);
+});
