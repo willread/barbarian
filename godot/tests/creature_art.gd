@@ -15,7 +15,7 @@ func _init():
 				hero.attack={"type":"enemySlash"} if state=="attack" else {}
 				hero.hurtTicks=12 if state=="hurt" else 0
 				var body=mechanics.receiving_rect(hero)
-				var contact={"direction":direction,"type":"slash","reach":35,"box":[18*size,2*size,-62*size,4*size]}
+				var contact={"direction":direction,"type":"slash","reach":35,"box":[15*size,2*size,-54*size,4*size]}
 				assert(mechanics.can_hit(attacker,hero,contact),"Forward torso must receive grounded hits in either facing")
 				attacker.height=1
 				assert(mechanics.can_hit(attacker,hero,contact),"Airborne strikes must reach the visible head")
@@ -23,10 +23,10 @@ func _init():
 				contact.box=[26*size,2*size,-62*size,4*size]
 				assert(not mechanics.can_hit(attacker,hero,contact),"Strikes beyond the body must miss")
 				attacker.y=hero.y+mechanics.MELEE_LANE
-				contact.box=[18*size,2*size,-62*size,4*size]
+				contact.box=[15*size,2*size,-54*size,4*size]
 				assert(not mechanics.can_hit(attacker,hero,contact),"Body size must not widen the floor lane")
 				attacker.y=hero.y
-				assert(is_equal_approx(body.end.y,hero.y/mechanics.SCALE))
+				assert(body.end.y<hero.y/mechanics.SCALE,"Receiving box leaves a little grace at the feet")
 	var archer={"kind":"archer","hp":0,"attack":{},"down":{"ground":0,"vz":-2}}
 	assert(art.enemy_frame(archer)==10)
 	archer.down.vz=2

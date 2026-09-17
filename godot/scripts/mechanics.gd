@@ -215,19 +215,35 @@ func rect(f: Dictionary, box: Array, direction: int) -> Rect2:
 	var b=box.map(func(v):return v*f.size)
 	return Rect2(f.x/SCALE+(b[0] if direction>0 else -b[0]-b[1]),f.y/SCALE-f.height+b[2],b[1],b[3])
 
+# Receiving envelopes in local combat units (4.5 painted pixels per unit).
+# Fit head, torso and legs, excluding carried weapons/staffs and extended fists.
+# A stable envelope keeps walking, windups and recoil from dropping valid contact.
+const ENEMY_BODY_INSET=0.10
+const ENEMY_BODIES={
+	"bone":[-18,35,-60,60],
+	"shield":[-20,40,-58,58],
+	"marauder":[-19,38,-56,56],
+	"legion":[-19,42,-64,64],
+	"archer":[-12,24,-57,57],
+	"champion":[-26,44,-69,69],
+	"witch":[-19,35,-45,45],
+	"bearer":[-18,38,-56,56],
+	"king":[-30,61,-86,86],
+	"saint":[-27,52,-93,93],
+}
 func receiving_rect(e: Dictionary) -> Rect2:
-	# Minotaur art is 292 pixels tall; cover its torso and head around the foot anchor.
-	# Keep this envelope stable through attacks and recoil so contact cannot vanish.
-	if not e.player and e.get("kind","")=="legion":return rect(e,[-19,42,-64,64],e.dir)
-	var body=[-15,18,-47,47]
-	if e.player:
-		body=([-16,32,-56,56] if e.stagger==1 else [-8,24,-40,40]) if e.recovering or e.hurtTicks else [-16,28,-60,60]
-	elif e.hurtTicks: body=[-19,25,-37,37]
-	elif not e.attack.is_empty(): body=[-25,24,-45,45]
-	if not e.player and e.get("kind","")=="king":
-		# Broad, centered receiving box follows his rooted body in every pose.
-		# Keep the regular lane tolerance and existing airborne height checks.
-		body[0]=-32;body[1]=64
+	if not e.player:
+		var body=ENEMY_BODIES.get(e.get("kind",""),[-20,40,-60,60])
+		# These atlases move the torso itself relative to the grounded foot anchor.
+		if e.kind=="saint" and not e.hurtTicks and not e.recovering and e.down.is_empty():
+			if e.moving and e.attack.is_empty():body=[-14,58,-93,93]
+			elif e.attack.get("type","")=="saintVolley":body=[-25,65,-93,93]
+		elif e.kind=="champion" and (e.hurtTicks or e.recovering):body=[-36,54,-69,69]
+		var fitted=rect(e,body,e.dir)
+		# Forgive glancing silhouette contacts: inset each edge by 10% of its axis.
+		var margin=fitted.size*ENEMY_BODY_INSET
+		return Rect2(fitted.position+margin,fitted.size-margin*2)
+	var body=([-16,32,-56,56] if e.stagger==1 else [-8,24,-40,40]) if e.recovering or e.hurtTicks else [-16,28,-60,60]
 	return rect(e,body,e.dir)
 
 func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:

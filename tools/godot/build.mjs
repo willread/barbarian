@@ -48,6 +48,7 @@ if(process.argv.includes('--test')){
  run(binary,['--headless','--path','godot','--script','tests/run_records.gd']);
  run(binary,['--headless','--path','godot','--script','tests/telemetry.gd']);
  run(binary,['--headless','--path','godot','--script','tests/difficulty.gd']);
+ run(binary,['--headless','--path','godot','--script','tests/enemy_hitboxes.gd']);
  run(binary,['--headless','--path','godot','--script','tests/results_ui.gd']);
  run(binary,['--headless','--path','godot','--script','tests/parity.gd']);
  run(binary,['--headless','--path','godot','--script','tests/bindings.gd']);
