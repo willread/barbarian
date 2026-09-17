@@ -215,6 +215,17 @@ func intent(e: Dictionary,h: Dictionary,engaged: bool) -> Vector2:
 		return Vector2.ZERO
 	return Vector2(face if abs(x)>reach-4 else (-face if abs(x)<reach-12 else 0),sign(y) if abs(y)>2 else 0)
 
+func update_locomotion(e: Dictionary,travel: Vector2):
+	# Include crowd separation and lane clipping, but retain authored combat reactions.
+	if e.hp<=0 or not e.attack.is_empty() or e.hurtTicks or e.recovering or not e.down.is_empty() or e.height>0 or e.hopTicks:
+		e.moving=false
+		return
+	e.moving=travel.length_squared()>.0001
+	if not e.moving:return
+	var cycle=220*e.size if e.kind=="saint" else roster[e.kind].speed*m.SCALE*56*e.size
+	var direction=-1.0 if travel.x*e.dir<-.01 else 1.0
+	e.stride=fposmod(e.stride+direction*travel.length()/cycle,1)
+
 func motion(e: Dictionary):
 	if e.kind=="legion":
 		m.motion(e,0,0)

@@ -101,8 +101,8 @@ func enemy_frame(e: Dictionary) -> int:
 	if e.hurtTicks or e.recovering: return 11
 	if CairnEnemies.guard_open(e) and e.attack.age<e.attack.from:return 5
 	if e.kind=="legion" and e.attack.get("type","")=="enemyCharge":return 15
-	if e.brace and (e.attack.is_empty() or e.attack.age<e.attack.from): return 15
-	if e.turnTicks: return 2
+	if e.brace and not e.moving and (e.attack.is_empty() or e.attack.age<e.attack.from): return 15
+	if e.turnTicks and not e.moving: return 2
 	if not e.attack.is_empty():
 		var a=e.attack
 		if a.age<a.from: return 8 if a.get("overhead",false) else (15 if a.get("bash",false) else 5)

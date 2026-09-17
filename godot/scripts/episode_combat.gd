@@ -501,6 +501,7 @@ func avoid_bombs(game,enemy: Dictionary) -> Variant:
 	var direction=point.direction_to(best)
 	if absf(direction.x)>.2:enemy.dir=1 if direction.x>0 else -1
 	enemy.brace=0
+	enemy.turnTicks=0
 	return direction*1.85
 
 func movement(actor: Dictionary,before: Vector2):

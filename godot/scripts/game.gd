@@ -1110,9 +1110,11 @@ func tick(dt: float):
 	m.tick_attack(hero,enemies,damage)
 	pressed.clear()
 	var engaged=engaged_enemies()
+	var enemy_motion_origins={}
 	for f in enemies:
 		if f.hp<=0: continue
 		var enemy_before=Vector2(f.x,f.y)
+		enemy_motion_origins[f.id]=enemy_before
 		var escape=episode_combat.avoid_bombs(self,f)
 		var intent=e_ai.intent(f,hero,f.id in engaged) if escape==null else escape
 		if not f.attack.is_empty(): e_ai.motion(f)
@@ -1122,13 +1124,6 @@ func tick(dt: float):
 			f.velocityY=intent.y*speed
 			f.x+=f.velocityX*m.SCALE
 			f.y=clamp(f.y+f.velocityY*m.SCALE,m.lane_min,m.lane_max)
-			f.moving=intent!=Vector2.ZERO
-			if f.moving:
-				if f.kind=="saint":
-					var travel=Vector2(f.x,f.y)-enemy_before
-					var direction=-1.0 if travel.x*f.dir<-.01 else 1.0
-					f.stride=fposmod(f.stride+direction*travel.length()/(220*f.size),1)
-				else:f.stride=fmod(f.stride+f.speedFactor/(56*f.size),1)
 		episode_combat.movement(f,enemy_before)
 		f.x=clamp(f.x,-2400,3840)
 		var finished=m.tick_attack(f,[hero],damage)
@@ -1147,6 +1142,8 @@ func tick(dt: float):
 	for f in enemies:
 		e_ai.keep_in_arena(f)
 		background.constrain(f)
+		if enemy_motion_origins.has(f.id):
+			e_ai.update_locomotion(f,Vector2(f.x,f.y)-enemy_motion_origins[f.id])
 	if not hero.pickup.is_empty():return # Finish eating before an area transition can clear the pickup.
 	if phase=="playing" and pending_enemies.is_empty() and enemies.all(func(f):return f.hp<=0):
 		wave_clear_time+=dt
