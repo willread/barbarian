@@ -1,6 +1,7 @@
 import { aggregate, UPSERT } from './metrics.mjs';
 import { authorized } from './auth.mjs';
 import { dashboard } from './dashboard.mjs';
+import { dateRange, dailyRows } from './reporting.mjs';
 const headers = {
   'Cache-Control': 'no-store',
   'X-Content-Type-Options': 'nosniff',
@@ -68,20 +69,17 @@ export default {
     if (url.pathname === '/admin' || url.pathname === '/admin/' || url.pathname === '/admin/data') {
       if (!await authorized(request, env)) return response('Sign in through the configured Cloudflare Access application.', 403);
       if (request.method !== 'GET') return response('Method not allowed', 405, { Allow: 'GET' });
-      const days = Number(url.searchParams.get('days') || 30);
-      if (![7, 30, 90].includes(days)) return response('Invalid date range', 400);
+      let range;
+      try { range = dateRange(url.searchParams); } catch { return response('Invalid date range', 400); }
       try {
-        const start = new Date(Date.now() - (days - 1) * 86400000).toISOString().slice(0, 10);
-        const { results } = await env.DB.prepare('SELECT episode, level, difficulty, metric, SUM(value) AS value FROM totals WHERE day >= ? GROUP BY episode, level, difficulty, metric ORDER BY episode, level, difficulty, metric').bind(start).all();
+        const results = await dailyRows(env.DB, range);
         return url.pathname === '/admin/data'
           ? response(JSON.stringify(results), 200, { 'Content-Type': 'application/json', 'Content-Disposition': 'attachment; filename="cairn-statistics.json"' })
-          : response(dashboard(results, days), 200, { 'Content-Type': 'text/html; charset=utf-8' });
+          : response(dashboard(results, range), 200, { 'Content-Type': 'text/html; charset=utf-8' });
       } catch { return response('Statistics temporarily unavailable', 503); }
     }
     return response('Not found', 404);
   },
-  async scheduled(event, env) {
-    const cutoff = new Date(event.scheduledTime - 89 * 86400000).toISOString().slice(0, 10);
-    await env.DB.prepare('DELETE FROM totals WHERE day < ?').bind(cutoff).run();
-  }
+  // Keep stale, already queued timer events harmless after removing the cron.
+  async scheduled() {}
 };

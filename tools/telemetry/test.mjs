@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import worker from './src/worker.mjs';
 import { aggregate } from './src/metrics.mjs';
 import { dashboard } from './src/dashboard.mjs';
+import { dateRange, dailyRows } from './src/reporting.mjs';
 import { verifyAccessToken } from './src/auth.mjs';
 import { generateKeyPair, SignJWT } from 'jose';
 const sample = () => ({ schema: 1, episode: 1, level: 2, difficulty: 'normal', outcome: 'completed', duration: '3_5m', score: '5000_9999', moves: { normal: 42, slam: 3 }, features: { controls: true } });
@@ -61,16 +62,32 @@ test('dashboard and data fail closed without configuration or with forged header
     assert.equal((await worker.fetch(req, { ACCESS_TEAM_DOMAIN: 'cairn.cloudflareaccess.com', ACCESS_AUD: 'example' })).status, 403);
   }
 });
-test('retention deletes old aggregates but keeps the current 90-day window', async () => {
+test('old aggregates survive stale scheduled events', async () => {
   const { db, binding } = database();
   db.exec("INSERT INTO totals VALUES ('2025-01-01',1,1,'normal','attempts',1), ('2026-09-16',1,1,'normal','attempts',2)");
   await worker.scheduled({ scheduledTime: Date.parse('2026-09-16T04:00:00Z') }, { DB: binding });
-  assert.equal(db.prepare('SELECT SUM(value) AS total FROM totals').get().total, 2);
+  assert.equal(db.prepare('SELECT SUM(value) AS total FROM totals').get().total, 3);
+  assert.deepEqual(JSON.parse(readFileSync(new URL('./wrangler.jsonc', import.meta.url),'utf8')).triggers.crons, []);
   db.close();
 });
 test('dashboard escapes content and handles empty data', () => {
-  assert.match(dashboard([], 30), /No statistics received/);
-  assert.ok(!dashboard([{ episode: 1, level: 1, difficulty: 'normal', metric: '<script>bad()</script>', value: 1 }], 7).includes('<script>'));
+  const range=dateRange(new URLSearchParams('days=30'));
+  assert.match(dashboard([], range), /No statistics received/);
+  assert.ok(!dashboard([{ day:'2026-09-16', episode: 1, level: 1, difficulty: 'normal', metric: '<script>bad()</script>', value: 1 }], range).includes('<script>'));
+});
+
+test('daily reports preserve dates and support exact dates and all-time history', async () => {
+  const { db, binding } = database();
+  db.exec("INSERT INTO totals VALUES ('2025-01-01',1,1,'normal','attempts',1), ('2026-09-15',1,1,'normal','attempts',2), ('2026-09-16',1,1,'normal','attempts',3)");
+  const all=await dailyRows(binding,dateRange(new URLSearchParams('days=all')));
+  assert.deepEqual(all.map(r=>[r.day,r.value]),[['2026-09-16',3],['2026-09-15',2],['2025-01-01',1]]);
+  const exact=dateRange(new URLSearchParams('day=2026-09-15'));
+  assert.equal((await dailyRows(binding,exact))[0].value,2);
+  const recent=dateRange(new URLSearchParams('days=1'),Date.parse('2026-09-16T23:59:00Z'));
+  assert.equal((await dailyRows(binding,recent)).length,1);
+  for(const input of ['day=2026-02-30','day=bad','days=100','days=-1'])assert.throws(()=>dateRange(new URLSearchParams(input)));
+  assert.match(dashboard(all,dateRange(new URLSearchParams('days=all'))),/2025-01-01/);
+  db.close();
 });
 test('Access signature, audience, issuer and expiration are enforced', async () => {
   const { privateKey, publicKey } = await generateKeyPair('RS256');
