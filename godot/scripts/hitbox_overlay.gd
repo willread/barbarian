@@ -10,12 +10,7 @@ func _draw():
 	# Read-only projection of mechanics.can_hit; no actor or attack mutation.
 	for f in [game.hero]+game.enemies:
 		if f.is_empty() or f.hp<=0:continue
-		var body=[-15,18,-47,47]
-		if f.player:body=([-16,32,-56,56] if f.stagger==1 else [-8,24,-40,40]) if f.recovering or f.hurtTicks else [-16,28,-60,60]
-		elif f.hurtTicks:body=[-19,25,-37,37]
-		elif not f.attack.is_empty():body=[-25,24,-45,45]
-		if not f.player and f.kind=="king":body[0]=-32;body[1]=64
-		var target=game.m.rect(f,body,f.dir)
+		var target=game.m.receiving_rect(f)
 		box(Rect2(target.position*game.m.SCALE,target.size*game.m.SCALE),Color.GRAY if f.invTicks or not f.down.is_empty() else Color.CYAN)
 		draw_circle(Vector2(f.x,f.y),3,Color.WHITE)
 		if f.attack.is_empty():continue

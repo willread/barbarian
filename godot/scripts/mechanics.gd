@@ -215,9 +215,10 @@ func rect(f: Dictionary, box: Array, direction: int) -> Rect2:
 	var b=box.map(func(v):return v*f.size)
 	return Rect2(f.x/SCALE+(b[0] if direction>0 else -b[0]-b[1]),f.y/SCALE-f.height+b[2],b[1],b[3])
 
-func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
-	if a.get("dive",false):return false # Slam damage is resolved once, at ground contact.
-	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=minf(a.get("lane",MELEE_LANE),MELEE_LANE): return false
+func receiving_rect(e: Dictionary) -> Rect2:
+	# Minotaur art is 292 pixels tall; cover its torso and head around the foot anchor.
+	# Keep this envelope stable through attacks and recoil so contact cannot vanish.
+	if not e.player and e.get("kind","")=="legion":return rect(e,[-19,42,-64,64],e.dir)
 	var body=[-15,18,-47,47]
 	if e.player:
 		body=([-16,32,-56,56] if e.stagger==1 else [-8,24,-40,40]) if e.recovering or e.hurtTicks else [-16,28,-60,60]
@@ -227,9 +228,14 @@ func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
 		# Broad, centered receiving box follows his rooted body in every pose.
 		# Keep the regular lane tolerance and existing airborne height checks.
 		body[0]=-32;body[1]=64
+	return rect(e,body,e.dir)
+
+func can_hit(f: Dictionary, e: Dictionary, a: Dictionary) -> bool:
+	if a.get("dive",false):return false # Slam damage is resolved once, at ground contact.
+	if e.hp<=0 or not e.down.is_empty() or e.invTicks or abs(e.y-f.y)>=minf(a.get("lane",MELEE_LANE),MELEE_LANE): return false
 	var box=a.get("box",[-4,a.reach+4,-48,64 if a.type=="air" else 48])
 	var strike=rect(f,box,a.direction)
-	var target=rect(e,body,e.dir)
+	var target=receiving_rect(e)
 	# Floor depth is checked once above, independently of the drawn weapon height.
 	# Grounded actors in the same lane can trade blows from either side of it.
 	if f.height<=0 and e.height<=0:
