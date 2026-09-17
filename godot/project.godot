@@ -11,6 +11,7 @@ run/main_scene="res://presentation.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
 [autoload]
+BuildLabel="*res://scripts/build_label.gd"
 WindowPreferences="*res://scripts/window_preferences.gd"
 
 [display]

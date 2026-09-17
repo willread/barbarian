@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {incrementBuild} from './build-version.mjs';
 const root=process.cwd();
 const candidates=[process.env.GODOT_BIN,'E:/Cairn-build-tools/godot/Godot_v4.7.2-stable_win64_console.exe',path.join(root,'.tools/godot/Godot_v4.7.2-stable_win64_console.exe')].filter(Boolean);
 const binary=candidates.find(p=>fs.existsSync(p));
@@ -35,8 +36,10 @@ if(!fs.existsSync('godot/art/results/lettering.json'))run(process.execPath,['too
 if(!fs.existsSync('godot/art/controls/hall-of-legends.png'))run(process.execPath,['tools/godot/bake-controls.mjs','--hall']);
 if(!menuManifest.menu['HUD x10']||menuManifest.hudSmallLabelVersion!==1||menuManifest.hudMultiplierWeightVersion!==3)run(process.execPath,['--expose-gc','tools/godot/bake-score-hud.mjs']);
 run(process.execPath,['tools/godot/shareware-assets.mjs']);
+if(!process.argv.includes('--test'))incrementBuild(root);
 run(binary,['--headless','--path','godot','--editor','--import','--quit']);
 if(process.argv.includes('--test')){
+ run(process.execPath,['tools/godot/check-build-version.mjs']);
  run(process.execPath,['tools/godot/check-episode-sprites.mjs']);
  run(process.execPath,['tools/godot/parity-fixtures.mjs']);
  run(binary,['--headless','--path','godot','--script','tests/run_records.gd']);
