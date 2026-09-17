@@ -142,6 +142,13 @@ func draw_table():
 		text(content,"Finish your first run",Vector2(w*.5,content.size.y*.4+40),size,ink,true)
 		text(content,"to set a score.",Vector2(w*.5,content.size.y*.4+66),size,ink,true)
 		return
+	# Fit the whole table together so long values never shrink individual cells.
+	var table_size=20 if compact else text_size
+	if not compact:
+		for run in runs:
+			var values=row_values(run)
+			for j in values.size():
+				while table_size>1 and font.get_string_size(values[j],HORIZONTAL_ALIGNMENT_LEFT,-1,table_size).x>w*COLUMNS[j][3]-16:table_size-=1
 	for i in runs.size():
 		var run=runs[i]
 		var y=i*row_height
@@ -150,20 +157,26 @@ func draw_table():
 
 		elif i%2==0:content.draw_rect(Rect2(0,y,w,row_height),Color(.7,.65,.48,.025))
 		content.draw_line(Vector2(0,y),Vector2(w,y),Color(.40,.34,.24,.45))
-		var reached=CairnRunRecords.episode_name(int(run.get("episode",1)))+" - "+("BEAT" if run.get("outcome","")=="won" else "AREA %d/4"%run.get("area",1))
+		var reached=reached_label(run)
 		var time=CairnRunRecords.duration(run.get("time",0))
 		var date=display_date(str(run.get("date","")))
 		if compact:
-			text(content,str(run.table_rank),Vector2(18,y+22),22,ink)
+			text(content,str(run.table_rank),Vector2(18,y+22),table_size,ink)
 			var score=CairnRunRecords.number(run.score)
-			var score_size=24
+			var score_size=table_size
 			while score_size>1 and font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,score_size).x>w-90:score_size-=1
 			text(content,score,Vector2(w-18-font.get_string_size(score,HORIZONTAL_ALIGNMENT_LEFT,-1,score_size).x,y+22),score_size,ink)
-			text(content,reached+" / "+str(run.get("difficulty","normal")).capitalize(),Vector2(18,y+55),18,ink,false,w-36)
-			text(content,time+" · "+date,Vector2(18,y+81),16,ink,false,w-36)
+			text(content,reached+" / "+str(run.get("difficulty","normal")).capitalize(),Vector2(18,y+55),table_size,ink,false,w-36)
+			text(content,time+" · "+date,Vector2(18,y+81),table_size,ink,false,w-36)
 		else:
-			var values=[str(run.table_rank),CairnRunRecords.number(run.score),reached,str(run.get("difficulty","normal")).capitalize(),time,date]
-			for j in values.size():text(content,values[j],Vector2(w*COLUMNS[j][2]+8,y+row_height*.5),text_size,ink,false,w*COLUMNS[j][3]-16)
+			var values=row_values(run)
+			for j in values.size():text(content,values[j],Vector2(w*COLUMNS[j][2]+8,y+row_height*.5),table_size,ink)
+
+func reached_label(run: Dictionary) -> String:
+	return "EP%d - "%int(run.get("episode",1))+("Beat" if run.get("outcome","")=="won" else "Area %d/4"%run.get("area",1))
+
+func row_values(run: Dictionary) -> Array:
+	return [str(run.table_rank),CairnRunRecords.number(run.score),reached_label(run),str(run.get("difficulty","normal")).capitalize(),CairnRunRecords.duration(run.get("time",0)),display_date(str(run.get("date","")))]
 
 func reveal_selected():
 	if runs.is_empty():return
