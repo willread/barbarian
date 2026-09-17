@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cairn · The Ashen Depths</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#11100f;color:#e5d8bb;font:15px system-ui}main{max-width:1500px;margin:auto;padding:24px}a{color:#ddba78}h1{font:36px Georgia}nav,.tools{display:flex;gap:16px;margin:20px 0;flex-wrap:wrap}button{flex:1;min-width:180px;background:#241c17;color:inherit;border:1px solid #69503a;padding:0;cursor:pointer}button[aria-pressed=true]{border-color:#f8c47b}button img{width:100%;display:block}button span{display:block;padding:12px}canvas{width:100%;display:block;border:1px solid #69503a}p{color:#b7aa96}input{accent-color:#e5ae66}button:focus-visible{outline:2px solid #f8c47b}</style>
+<main><a href="../index.html">← Background workshop</a><h1>The Ashen Depths</h1><p>Episode 3 artwork, lane boundaries and character-scale preview. Animated scenery and heat haze are shown in the game.</p><nav aria-label="Episode 3 scenes"></nav><h2 id="name"></h2><div class="tools"><label><input id="lane" type="checkbox" checked> Walkable area</label><label><input id="actor" type="checkbox"> Actor scale — click the scene to place</label></div><canvas width="1280" height="720"></canvas></main>
+<script type="module">
+import {drawActor} from '../swamp-v3/scene.js';
+const scenes=[['Ashfall Road','01-road.png'],['The Furnace Mouth','02-mouth.png'],['The Black Crucible','03-crucible.png'],["Saint’s Reliquary",'04-reliquary.png']];
+const canvas=document.querySelector('canvas'),g=canvas.getContext('2d'),lane=document.querySelector('#lane'),actor=document.querySelector('#actor');let selected=0,foot=[.5,.84];
+const images=await Promise.all(scenes.map(([,file])=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=file})));
+function draw(){g.drawImage(images[selected],0,0,1280,720);if(lane.checked){g.fillStyle='#87d7a02b';g.fillRect(0,.73*720,1280,.19*720);g.strokeStyle='#a2dfad';g.strokeRect(1,.73*720,1278,.19*720)}if(actor.checked)drawActor(g,...foot)}
+function select(i){selected=i;document.querySelector('#name').textContent=`E3/${i+1} · ${scenes[i][0]}`;document.querySelectorAll('nav button').forEach((b,j)=>b.setAttribute('aria-pressed',String(i===j)));history.replaceState(null,'',`#${i+1}`);draw()}
+scenes.forEach(([name,file],i)=>{const b=document.createElement('button');b.innerHTML=`<img src="${file}" alt=""><span>${i+1} · ${name}</span>`;b.onclick=()=>select(i);document.querySelector('nav').append(b)});
+lane.onchange=actor.onchange=draw;canvas.onclick=e=>{const r=canvas.getBoundingClientRect();foot=[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height];actor.checked=true;draw()};select(Math.max(0,Math.min(3,(Number(location.hash.slice(1))||1)-1)));
+</script></html>
