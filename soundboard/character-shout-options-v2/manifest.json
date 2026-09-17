@@ -1,0 +1,147 @@
+{
+  "provider": "ElevenLabs",
+  "model": "eleven_text_to_sound_v2",
+  "previewOnly": true,
+  "jobs": [
+    {
+      "id": "marauder-1",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "prompt": "Rough, mid-low male voice. A vicious, reckless berserker. A short feral battle yell. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "marauder-1.mp3"
+    },
+    {
+      "id": "marauder-2",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "prompt": "Rough, mid-low male voice. A vicious, reckless berserker. A sharp angry attack bark. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "marauder-2.mp3"
+    },
+    {
+      "id": "marauder-3",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "prompt": "Rough, mid-low male voice. A vicious, reckless berserker. A hoarse shout of wild excitement. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "marauder-3.mp3"
+    },
+    {
+      "id": "marauder-4",
+      "character": "marauder",
+      "label": "Axe Marauder",
+      "prompt": "Rough, mid-low male voice. A vicious, reckless berserker. A snarling shout of rage. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "marauder-4.mp3"
+    },
+    {
+      "id": "warden-1",
+      "character": "warden",
+      "label": "Iron Warden",
+      "prompt": "Strong mature male baritone. An intimidating, disciplined warlord. A short commanding battle shout. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "warden-1.mp3"
+    },
+    {
+      "id": "warden-2",
+      "character": "warden",
+      "label": "Iron Warden",
+      "prompt": "Strong mature male baritone. An intimidating, disciplined warlord. A forceful, contemptuous attack cry. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "warden-2.mp3"
+    },
+    {
+      "id": "warden-3",
+      "character": "warden",
+      "label": "Iron Warden",
+      "prompt": "Strong mature male baritone. An intimidating, disciplined warlord. A deep defiant challenge. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "warden-3.mp3"
+    },
+    {
+      "id": "warden-4",
+      "character": "warden",
+      "label": "Iron Warden",
+      "prompt": "Strong mature male baritone. An intimidating, disciplined warlord. A controlled shout breaking into fury. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "warden-4.mp3"
+    },
+    {
+      "id": "bearer-1",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "prompt": "High, scratchy male voice. A nasty, frantic little brute. A short spiteful attack screech. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "bearer-1.mp3"
+    },
+    {
+      "id": "bearer-2",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "prompt": "High, scratchy male voice. A nasty, frantic little brute. A sharp excited battle yelp. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "bearer-2.mp3"
+    },
+    {
+      "id": "bearer-3",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "prompt": "High, scratchy male voice. A nasty, frantic little brute. A raspy, taunting shout. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "bearer-3.mp3"
+    },
+    {
+      "id": "bearer-4",
+      "character": "bearer",
+      "label": "Bomb Thrower",
+      "prompt": "High, scratchy male voice. A nasty, frantic little brute. A furious cracked yell. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "bearer-4.mp3"
+    },
+    {
+      "id": "king-1",
+      "character": "king",
+      "label": "Drowned King",
+      "prompt": "Very deep, hoarse male voice. An ancient exhausted king with slow, bitter anger. A short mournful battle bellow. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "king-1.mp3"
+    },
+    {
+      "id": "king-2",
+      "character": "king",
+      "label": "Drowned King",
+      "prompt": "Very deep, hoarse male voice. An ancient exhausted king with slow, bitter anger. A weary growl rising into an angry shout. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "king-2.mp3"
+    },
+    {
+      "id": "king-3",
+      "character": "king",
+      "label": "Drowned King",
+      "prompt": "Very deep, hoarse male voice. An ancient exhausted king with slow, bitter anger. A low, menacing challenge. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "king-3.mp3"
+    },
+    {
+      "id": "king-4",
+      "character": "king",
+      "label": "Drowned King",
+      "prompt": "Very deep, hoarse male voice. An ancient exhausted king with slow, bitter anger. A strained roar of bitter rage. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "king-4.mp3"
+    },
+    {
+      "id": "saint-1",
+      "character": "saint",
+      "label": "Kiln Saint",
+      "prompt": "Huge bass male voice, coarse and powerful. A relentless, fanatical giant. A short thunderous battle bellow. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "saint-1.mp3"
+    },
+    {
+      "id": "saint-2",
+      "character": "saint",
+      "label": "Kiln Saint",
+      "prompt": "Huge bass male voice, coarse and powerful. A relentless, fanatical giant. A guttural attack roar with tremendous effort. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "saint-2.mp3"
+    },
+    {
+      "id": "saint-3",
+      "character": "saint",
+      "label": "Kiln Saint",
+      "prompt": "Huge bass male voice, coarse and powerful. A relentless, fanatical giant. A deep furious shout. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "saint-3.mp3"
+    },
+    {
+      "id": "saint-4",
+      "character": "saint",
+      "label": "Kiln Saint",
+      "prompt": "Huge bass male voice, coarse and powerful. A relentless, fanatical giant. A rumbling growl opening into a forceful bellow. One nonverbal vocalization, about one second. Dry isolated voice, no words, music or added effects.",
+      "file": "saint-4.mp3"
+    }
+  ]
+}
