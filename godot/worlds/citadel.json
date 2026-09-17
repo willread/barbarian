@@ -904,7 +904,8 @@
           "columns": 8,
           "count": 60,
           "fps": 30
-        }
+        },
+        "protect_dark_structure": true
       }
     ],
     "walkable": {

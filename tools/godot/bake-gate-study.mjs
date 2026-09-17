@@ -3,10 +3,16 @@ import path from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 import {interiorWeights,sampleInterior} from './background-sampling.mjs';
 const dir=process.argv[2]||'studies/backgrounds/citadel-02-v1',m=JSON.parse(fs.readFileSync(path.join(dir,'screen.json'))),[w,h]=m.size;
-const base=createCanvas(w,h),g=base.getContext('2d');g.drawImage(await loadImage(path.join(dir,'base.png')),0,0,w,h);const pixels=g.getImageData(0,0,w,h).data;
+const base=createCanvas(w,h),g=base.getContext('2d');g.drawImage(await loadImage(path.join(dir,m.frames?.[0]||'base.png')),0,0,w,h);const pixels=g.getImageData(0,0,w,h).data;
 function mask(poly){const c=createCanvas(w,h),g=c.getContext('2d');g.fillStyle='white';g.beginPath();poly.forEach(([x,y],i)=>i?g.lineTo(x*w,y*h):g.moveTo(x*w,y*h));g.closePath();g.fill();return g.getImageData(0,0,w,h).data}
 for(const [index,r] of m.regions.entries()){
- const coverage=mask(r.polygon),motion=interiorWeights(mask(r.motion_polygon),w,h,0,1);
+ if(process.argv[3]!==undefined&&index!==Number(process.argv[3]))continue;
+ const coverage=mask(r.polygon),motionMask=mask(r.motion_polygon);
+ if(r.protect_dark_structure){
+  // Furnace grate bars must neither move nor be sampled into the rising flame.
+  for(let n=0;n<w*h;n++)if(pixels[n*4]<145||pixels[n*4+1]<70||pixels[n*4]-pixels[n*4+2]<70)motionMask[n*4+3]=0;
+ }
+ const motion=interiorWeights(motionMask,w,h,r.protect_dark_structure?1:0,r.protect_dark_structure?3:1);
  const x=Math.floor(Math.min(...r.polygon.map(p=>p[0]))*w),y=Math.floor(Math.min(...r.polygon.map(p=>p[1]))*h),cw=Math.ceil(Math.max(...r.polygon.map(p=>p[0]))*w)-x+1,ch=Math.ceil(Math.max(...r.polygon.map(p=>p[1]))*h)-y+1;
  const atlas=createCanvas(cw*8,ch*8),ag=atlas.getContext('2d'),frame=createCanvas(cw,ch),fg=frame.getContext('2d');
  for(let f=0;f<60;f++){

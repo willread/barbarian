@@ -171,7 +171,7 @@
         ]
       ],
       "animation": {
-        "atlas": "../citadel-03-v1/brazier-2.png",
+        "atlas": "brazier-2.png",
         "rect": [
           1038,
           259,
@@ -181,7 +181,8 @@
         "columns": 8,
         "count": 60,
         "fps": 30
-      }
+      },
+      "protect_dark_structure": true
     }
   ],
   "walkable": {

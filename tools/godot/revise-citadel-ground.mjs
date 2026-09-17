@@ -35,6 +35,8 @@ third.id='citadel-03-v3';third.title='The silent foundry — rectangular floor a
 third.status='Revised walkable depth and foreground occlusion';
 third.frames=['../citadel-03-v1/base.png'];
 for(const r of third.regions)r.animation.atlas='../citadel-03-v1/'+r.animation.atlas;
+third.regions[1].protect_dark_structure=true;
+third.regions[1].animation.atlas='brazier-2.png';
 third.walkable.polygon=[[0,.625],[1,.625],[1,.93],[0,.93]];
 third.walkable.description='Rectangular fighting floor with a level front edge; overlapping rocks and branches render in the foreground.';
 const shape=(name,points)=>({name,polygon:points.map(([x,y])=>[x/1672,y/941])});
