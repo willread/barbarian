@@ -11,7 +11,7 @@ upload `index.html`, JavaScript, or `preview.css` as a theme.
 ## Scope and accuracy
 
 Uses the ordinary theme editor with a smaller original Cairn logo over a full-width firelit stone war hall, no
-subtitle, a continuous stone page background, Cinzel headings, Georgia body,
+subtitle, a continuous stone page background, Cinzel headings, Libre Baskerville body,
 bronze links and a bronze native button. BG2 is #101213 at 68% opacity. The same
 translucent panel spans header and body, revealing one background beneath the alpha-faded header. The stone also extends outside the panel. No separate panel
 texture, custom button shape, bevel, or other custom-CSS effect is simulated.

@@ -28,7 +28,7 @@ not a ZIP to upload as a playable game. No custom CSS access is required.
 | Link | #D2AC70 |
 | Buttons | #795735 |
 | Headers | #E0BD83 |
-| Body font | Georgia |
+| Body font | Libre Baskerville |
 | Body size | 17px, or nearest available size |
 | Header font | Cinzel |
 | Screenshots | Sidebar |
