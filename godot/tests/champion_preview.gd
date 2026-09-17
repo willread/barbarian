@@ -1,5 +1,5 @@
 extends SceneTree
-# Manual visual review: all sixteen authored poses with the runtime weapon renderer.
+# Manual visual review: all sixteen integrated weapon poses through the runtime renderer.
 class Sheet extends Node2D:
 	var art=CairnArt.new()
 	func _draw():

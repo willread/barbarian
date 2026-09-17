@@ -1,0 +1,17 @@
+# Iron Warden integrated axe rebuild
+
+Generated with the built-in image_gen tool, using enemy-champion-v1.png as the identity and pose reference. Final source: iron-warden-v1.png. Runtime bake: node tools/godot/bake-warden.mjs.
+
+## Prompt
+
+Rebuild the same crowned warrior in gold/brass skull-engraved plate, black sleeves and torn red waist cloth as sixteen realistic painted game sprites in the original 4×4 pose order. Paint a stout single-bladed bearded executioner's axe into every pose: dark forged iron, worn polished cutting edge, brass socket, dark ash haft and oxblood leather grip. Fingers encircle the haft with opposing thumbs; anatomically correct wrists and weighted two-handed overhead swings. Preserve identity, costume and facing. Transparent background, isolated complete figures and weapons, no text, effects or detached weapons.
+
+Pose order: idle; three walking strides; fourth stride; side wind-up; horizontal cleave; follow-through; overhead wind-up; downward execution; kneeling recovery; hurt recoil; falling; prone death; rising; braced ready.
+
+## Layout correction prompt
+
+Preserve all sixteen poses and the integrated axe design. Shrink complete figures and weapons within their equal-size cells to create generous transparent gutters. Complete the follow-through axe blade, keep the raised axe inside its cell, and separate corpses and weapons from neighbouring figures. Preserve convincing hands around the haft, costume, colours and true alpha.
+
+## Original generation prompt (verbatim)
+
+Use case: identity-preserve. Production 2D dark fantasy game sprite sheet, edit reference into rebuilt Iron Warden wielding a REAL integrated axe. Preserve his identity: gold/brass skull-engraved plate armor, crown, black sleeves, red torn waist cloth, stern human face, realistic hand-painted rendered game-art finish. EXACTLY 16 full-body isolated poses in a regular 4 columns x 4 rows grid on genuinely transparent alpha background, preferably 2048x2048. No text or cell borders. Equal-size cells, same body scale, generous transparent gutters. Every figure and its complete weapon must fit entirely within its own cell. Reference is pose and identity guide, remove green background. Give him the SAME stout brutal single-bladed bearded executioner's axe in every cell: dark forged iron broad blade with polished worn cutting edge, brass socket matching armor, thick dark ash haft with oxblood leather grip, length approximately hip-to-shoulder height. Physically correct closed fingers wrap the haft, thumb opposes fingers, shaft passes inside the palm not over the knuckles; blade and shaft share correct perspective. Adjust forearms and wrists naturally to hold the real weight. Paint weapon, hands and body TOGETHER as one image per pose. Row1: idle and 3 different forward walking strides, axe carried low beside body blade downward clear of boots. Row2: fourth stride, raised side-swing windup, extended horizontal cleave, followthrough. Row3: two-handed overhead axe raised, downward execution chop, kneeling recovery with axe supported low horizontally, recoil hurt. Row4: falling sideways still gripping axe, prone dead with axe resting naturally alongside on same baseline, rising from kneeling holding axe, braced axe ready at shoulder. Match pose order of reference. All combat/walk figures face right in three-quarter side view. The overhead and swings must have unmistakable weight and anatomically convincing grip. No detached weapons, no extra limbs, no shadows on background, no effects, no duplicates, no clipping.

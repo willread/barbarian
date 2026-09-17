@@ -17,10 +17,10 @@ export function splitEpisodeSheet(image,kind){
   }
   parts.push({id,points,x0,y0,x1,y1});
  }
- const count=kind==='king-roots'?4:8;
+ const count=kind==='warden'?16:kind==='king-roots'?4:8;
  const figures=parts.sort((a,b)=>b.points.length-a.points.length).slice(0,count);
  if(figures.length!==count||figures.some(p=>p.points.length<10000))throw Error(kind+': expected '+count+' complete figures '+JSON.stringify(figures.map(p=>[p.points.length,p.x0,p.y0,p.x1,p.y1])));
- const row=p=>['king-polish','king-roots'].includes(kind)?Number((p.y0+p.y1)*.5>=h/2):Number(p.y0>=h/2);
+ const row=p=>kind==='warden'?Math.floor((p.y0+p.y1)*.5/(h/4)):['king-polish','king-roots'].includes(kind)?Number((p.y0+p.y1)*.5>=h/2):Number(p.y0>=h/2);
  figures.sort((a,b)=>row(a)-row(b)||a.x0-b.x0);
  const kept=new Set(figures.map(p=>p.id));
  for(let p=0;p<labels.length;p++)if(!kept.has(labels[p]))labels[p]=0;
@@ -38,7 +38,7 @@ export function splitEpisodeSheet(image,kind){
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){const p=(y+y0)*w+x+x0;if(labels[p]===part.id)result.data.set(d.subarray(p*4,p*4+4),(y*width+x)*4)}
   fg.putImageData(result,0,0);
   const columns=kind==='king-roots'?2:4;
-  const cw=Math.floor(w/columns),ch=Math.floor(h/2),flip=kind==='witch'&&i<2;
+  const cw=Math.floor(w/columns),ch=Math.floor(h/(kind==='warden'?4:2)),flip=kind==='witch'&&i<2;
   let left=x0-(i%columns)*cw;
   if(flip){const mirrored=createCanvas(width,height),mg=mirrored.getContext('2d');mg.translate(width,0);mg.scale(-1,1);mg.drawImage(frame,0,0);fg.clearRect(0,0,width,height);fg.drawImage(mirrored,0,0);left=cw-left-width}
   return {image:frame,left,top:y0-Math.floor(i/columns)*ch,width,height,sourceBounds:[x0,y0,x1,y1],corePixels:part.points.length};

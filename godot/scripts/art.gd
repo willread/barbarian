@@ -8,10 +8,10 @@ var area_files: Dictionary={}
 const HEIGHTS={"legion":292,"archer":255,"bone":270,"shield":260,"marauder":250,"champion":310,"witch":250,"bearer":260,"king":390,"saint":420}
 const NAMES={"bone":"bone-soldier","shield":"shield-revenant","marauder":"axe-marauder","champion":"cairn-champion"}
 const ANGLES=[125,125,115,125,115,-35,95,135,-20,135,85,110,100,85,80,-40]
-const CHAMPION_ANGLES=[145,148,142,140,135,-35,55,115,-20,100,85,135,85,85,85,-30]
 func _init():
 	armory=JSON.parse_string(FileAccess.get_file_as_string("res://art/armory.json"))
 	data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/manifest.json"))
+	data.atlases["enemy-champion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/warden-atlas.json"))
 	data.atlases["enemy-archer-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/archer-atlas.json"))
 	data.atlases["enemy-legion-v1"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/minotaur-atlas.json"))
 	data.atlases["hero-eat"]=JSON.parse_string(FileAccess.get_file_as_string("res://art/eat-atlas.json"))
@@ -207,7 +207,7 @@ func paint_body(node: Node2D,f: Dictionary,p: Array):
 	node.draw_set_transform(Vector2.ZERO)
 
 func has_separate_weapon(f: Dictionary) -> bool:
-	return f.player or f.kind not in ["archer","legion","witch","bearer","king","saint"]
+	return f.player or f.kind not in ["archer","legion","champion","witch","bearer","king","saint"]
 
 func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 	if f.gearDropped or not has_separate_weapon(f) or (f.player and not f.pickup.is_empty()): return
@@ -232,16 +232,8 @@ func paint_weapon(node: Node2D,f: Dictionary,p: Array,behind: bool):
 		var point=Vector2((right[0]-.5)*l.atlas.cellWidth*s,(right[1]*l.atlas.cellHeight-l.cel.top-l.cel.height)*s)
 		var blade_behind=f.kind=="shield" and f.attack.get("bash",false)
 		if blade_behind==behind:
-			node.draw_set_transform(point,deg_to_rad(CHAMPION_ANGLES[int(p[1])] if f.kind=="champion" else ANGLES[int(p[1])]))
-			if f.kind=="champion":
-				var cel=data.atlases["weapons-v8"].cels[0]
-				node.draw_texture_rect(texture(cel.file),Rect2(-182*cel.width/cel.height*.5,-182*.88,182*cel.width/cel.height,182),false)
-				# Keep the authored fist in front of the handle, with the leather grip in its palm.
-				node.draw_set_transform(Vector2.ZERO)
-				var source_hand=Vector2(right[0]*l.atlas.cellWidth-l.cel.left,right[1]*l.atlas.cellHeight-l.cel.top)
-				var patch=Rect2(source_hand-Vector2(6,6),Vector2(12,12))
-				node.draw_texture_rect_region(texture(l.cel.file),Rect2(point-Vector2(6,6)*s,Vector2(12,12)*s),patch)
-			else: draw_equipment(node,0 if f.kind=="bone" else 1 if f.kind=="shield" else 2,135 if f.kind=="bone" else 108 if f.kind=="shield" else 145)
+			node.draw_set_transform(point,deg_to_rad(ANGLES[int(p[1])]))
+			draw_equipment(node,0 if f.kind=="bone" else 1 if f.kind=="shield" else 2,135 if f.kind=="bone" else 108 if f.kind=="shield" else 145)
 		var shield_behind=f.kind=="shield" and ((not f.attack.is_empty() and not f.attack.get("bash",false)) or p[1] in [5,7,8,9,10,14])
 		if not shield_hand.is_empty() and shield_behind==behind:
 			point=Vector2((shield_hand[0]-.5)*l.atlas.cellWidth*s,(shield_hand[1]*l.atlas.cellHeight-l.cel.top-l.cel.height)*s)

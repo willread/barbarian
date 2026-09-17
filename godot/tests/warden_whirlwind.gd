@@ -5,6 +5,10 @@ func _init():
 	var ai=CairnEnemies.new(m,art.data.roster)
 	var boss=m.make(2,1299,740,100)
 	boss.kind="champion";boss.boss=true
+	assert(not art.has_separate_weapon(boss),"Warden axe is painted into the body frames")
+	assert(art.data.atlases["enemy-champion-v1"].cels.size()==16)
+	for cel in art.data.atlases["enemy-champion-v1"].cels:
+		assert(cel.file.begins_with("iron-warden-v1-") and art.texture(cel.file)!=null)
 	assert(m.begin(boss,"wardenWhirlwind"))
 	boss.attack.travel=Vector2(9,6)
 	var origin=Vector2(boss.x,boss.y)

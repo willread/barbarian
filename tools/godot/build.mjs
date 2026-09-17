@@ -29,6 +29,7 @@ run(process.execPath,['tools/godot/bake-world.mjs']);
 run(process.execPath,['tools/godot/bake-episodes.mjs']);
 run(process.execPath,['tools/godot/bake-furnace.mjs']);
 run(process.execPath,['tools/godot/bake-king.mjs']);
+run(process.execPath,['tools/godot/bake-warden.mjs']);
 run(process.execPath,['tools/godot/bake-mire-oil.mjs']);
 if(!fs.existsSync('godot/assets/cheat-letters.json')||!JSON.parse(fs.readFileSync('godot/assets/cheat-letters.json','utf8')).menu['?'])run(process.execPath,['tools/godot/bake-cheats.mjs']);
 const menuManifest=JSON.parse(fs.readFileSync('godot/assets/manifest.json','utf8'));

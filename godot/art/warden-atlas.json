@@ -1,0 +1,120 @@
+{
+  "cellWidth": 313,
+  "cellHeight": 313,
+  "referenceHeight": 273,
+  "facing": 1,
+  "cels": [
+    {
+      "file": "iron-warden-v1-0.png",
+      "left": 62,
+      "top": 32,
+      "width": 176,
+      "height": 273
+    },
+    {
+      "file": "iron-warden-v1-1.png",
+      "left": 65,
+      "top": 33,
+      "width": 195,
+      "height": 271
+    },
+    {
+      "file": "iron-warden-v1-2.png",
+      "left": 66,
+      "top": 33,
+      "width": 191,
+      "height": 269
+    },
+    {
+      "file": "iron-warden-v1-3.png",
+      "left": 69,
+      "top": 33,
+      "width": 192,
+      "height": 270
+    },
+    {
+      "file": "iron-warden-v1-4.png",
+      "left": 51,
+      "top": 35,
+      "width": 200,
+      "height": 262
+    },
+    {
+      "file": "iron-warden-v1-5.png",
+      "left": 54,
+      "top": 28,
+      "width": 216,
+      "height": 269
+    },
+    {
+      "file": "iron-warden-v1-6.png",
+      "left": 19,
+      "top": 54,
+      "width": 343,
+      "height": 243
+    },
+    {
+      "file": "iron-warden-v1-7.png",
+      "left": 44,
+      "top": 58,
+      "width": 266,
+      "height": 239
+    },
+    {
+      "file": "iron-warden-v1-8.png",
+      "left": 46,
+      "top": 15,
+      "width": 218,
+      "height": 281
+    },
+    {
+      "file": "iron-warden-v1-9.png",
+      "left": 40,
+      "top": 79,
+      "width": 254,
+      "height": 214
+    },
+    {
+      "file": "iron-warden-v1-10.png",
+      "left": 31,
+      "top": 114,
+      "width": 278,
+      "height": 174
+    },
+    {
+      "file": "iron-warden-v1-11.png",
+      "left": 75,
+      "top": 58,
+      "width": 208,
+      "height": 238
+    },
+    {
+      "file": "iron-warden-v1-12.png",
+      "left": 53,
+      "top": 83,
+      "width": 249,
+      "height": 177
+    },
+    {
+      "file": "iron-warden-v1-13.png",
+      "left": 28,
+      "top": 161,
+      "width": 284,
+      "height": 120
+    },
+    {
+      "file": "iron-warden-v1-14.png",
+      "left": 61,
+      "top": 76,
+      "width": 249,
+      "height": 181
+    },
+    {
+      "file": "iron-warden-v1-15.png",
+      "left": 67,
+      "top": 9,
+      "width": 212,
+      "height": 257
+    }
+  ]
+}
