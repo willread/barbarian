@@ -1,7 +1,10 @@
 extends Node2D
 var game: Node2D
+func _ready():
+	process_mode=Node.PROCESS_MODE_ALWAYS
+	hide()
 func _process(_dt):
-	visible=game.hitboxes_enabled and game.phase in ["playing","paused"]
+	visible=game.hitboxes_enabled and game.phase=="playing" and game.pause_cover<=0 and game.transition<0 and not game.menu.visible and not get_tree().paused
 	if visible:queue_redraw()
 func box(rect: Rect2,color: Color):
 	draw_rect(rect,Color(color,.10),true)
