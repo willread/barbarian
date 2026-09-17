@@ -48,6 +48,10 @@ func check():
  console.execute("HOH")
  assert(game.candy_override and game.weapon_skin=="candy_cane" and not paused)
  console.toggle()
+ console.execute("bun")
+ assert(game.easter_override and game.easter_active() and not paused)
+ assert(console.feedback.stream==console.success_sound,"BUN enables Easter and plays success feedback")
+ console.toggle()
  console.execute("KFC")
  assert(not game.chicken.is_empty() and not paused)
  for area in range(2,5):
@@ -97,6 +101,8 @@ func check():
  console.toggle()
  console.execute("TNT")
  assert(game.kills==before_kills+1,"TNT cannot kill a corpse twice")
+ console.feedback.stop()
+ await create_timer(.15).timeout
  game.queue_free()
  await process_frame
  print("CAIRN_CONSOLE_OK: three letter drops, automatic commands, freeze/resume, boss, cancel and unknown codes")

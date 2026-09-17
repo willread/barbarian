@@ -1,6 +1,8 @@
 extends Node2D
 var game: Node2D
 var golden=false
+var easter=false
+var shell: Texture2D
 var age=0.0
 var height=20.0
 var velocity=80.0
@@ -12,6 +14,9 @@ var eating=false
 var draw_scale=1.0
 var fire: ContourFire
 func _ready():
+	if easter:
+		dress_for_easter()
+		return
 	material=ShaderMaterial.new()
 	material.shader=preload("res://shaders/egg_shell.gdshader")
 	material.set_shader_parameter("golden",golden)
@@ -29,6 +34,14 @@ func _ready():
 		add_child(fire)
 		fire.setup(ImageTexture.create_from_image(mask),Vector2(32,40),Vector2(-16,-20),false)
 		sync_fire()
+func dress_for_easter():
+	easter=true
+	material=null
+	if fire!=null:
+		fire.queue_free()
+		fire=null
+	shell=game.art.texture("../art/easter-eggs-v1-%d.png"%(2 if golden else randi_range(0,1)))
+	queue_redraw()
 func advance(dt: float):
 	age+=dt
 	var h=game.hero
@@ -80,4 +93,8 @@ func _draw():
 	if collected:return
 	var opacity=minf(1.,(25.-age)/2.) if not eating else 1.
 	draw_set_transform(Vector2(0,-height-16),0,Vector2.ONE*draw_scale)
+	if shell!=null:
+		var width=34.*shell.get_width()/shell.get_height()
+		draw_texture_rect(shell,Rect2(-width*.5,-17,width,34),false,Color(1,1,1,opacity))
+		return
 	draw_rect(Rect2(-16,-20,32,40),Color(1,1,1,opacity))

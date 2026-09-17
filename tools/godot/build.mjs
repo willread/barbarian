@@ -14,6 +14,7 @@ function run(command,args){
  if(result.status!==0||/^(?:SCRIPT ERROR|SHADER ERROR|ERROR):/m.test((result.stdout||'')+(result.stderr||'')))process.exit(result.status||1);
 }
 run(process.execPath,['tools/godot/bake-saint.mjs']);
+run(process.execPath,['tools/godot/bake-easter-eggs.mjs']);
 // Keep the tiny Windows resize extension reproducible; web exports exclude it.
 if(process.platform==='win32'&&!process.argv.includes('--web')){
  const dll='godot/native/cairn_aspect.dll';

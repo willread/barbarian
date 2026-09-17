@@ -95,10 +95,11 @@ func landed():
 func execute(text: String):
  var success=false
  if game.phase=="playing":
-  success=text.to_upper() in ["TNT","HOH","EMT","ZAP","KFC","CEO","FWD"]
+  success=text.to_upper() in ["TNT","HOH","EMT","ZAP","KFC","CEO","FWD","BUN"]
   match text.to_upper():
    "TNT":game.kill_visible_enemies()
    "HOH":game.unlock_candy_session()
+   "BUN":game.enable_easter_session()
    "EMT":
     game.hero.hp=game.hero.max
     game.displayed_health=game.hero.max

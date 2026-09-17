@@ -11,6 +11,7 @@ const MenuScript=preload("res://scripts/menu.gd")
 const DeathWipe=preload("res://scripts/death_wipe.gd")
 var combo=CairnCombo.new()
 var holiday="off"
+var easter_override=false
 var unlocked_episodes: Array=[]
 var candy_override=false
 var weapon_day=""
@@ -1548,6 +1549,20 @@ func summon_chicken(point: Vector2=Vector2(90,610)) -> bool:
 	chicken_node.queue_redraw()
 	return true
 
+func easter_active() -> bool:
+	return easter_override or preload("res://scripts/seasonal_calendar.gd").is_easter(weapon_day)
+
+func enable_easter_session():
+	easter_override=true
+	for egg in eggs:
+		if is_instance_valid(egg):egg.dress_for_easter()
+
+func egg_lay_chance() -> float:
+	return .63 if easter_active() else .21
+
+func egg_lay_limit() -> int:
+	return 6 if easter_active() else 2
+
 func step_chicken(dt: float):
 	for egg in eggs:
 		egg.advance(dt)
@@ -1608,7 +1623,7 @@ func step_chicken(dt: float):
 		c["egg_check"]=c.get("egg_check",2.)-dt
 		if c.get("lay",-1.)<0 and c.egg_check<=0 and c.age<9 and c.height<=0:
 			c.egg_check=2.
-			if c.get("egg_count",0)<2 and randf()<.21:
+			if c.get("egg_count",0)<egg_lay_limit() and randf()<egg_lay_chance():
 				c["lay"]=0.
 				c["laid"]=false
 				c.hop=0.
@@ -1671,6 +1686,7 @@ func drop_egg(point: Vector2,golden: bool,direction: float=1.) -> Node2D:
 	var egg=preload("res://scripts/egg_pickup.gd").new()
 	egg.game=self
 	egg.golden=golden
+	egg.easter=easter_active()
 	egg.position=point
 	egg.drift=direction*35
 	arena_clip.add_child(egg)
