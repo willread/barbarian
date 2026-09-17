@@ -92,6 +92,12 @@ func check():
 	game.wave=2;voice.schedule_wave();voice.pending.clear();voice.gap=0
 	voice.request_line("dinner")
 	assert(voice.pending.is_empty(),"Spoken lines cannot repeat in later waves")
+	voice.request_line("knocked_aside")
+	assert(voice.pending.is_empty(),"Dinner and knockdown retort cannot both play in one scene, even across waves")
+	game.wave=3;voice.schedule_wave();voice.pending.clear()
+	voice.request_line("goat_search")
+	assert(voice.pending.is_empty(),"The third wave shares the scene's speech budget")
+	game.wave=4;voice.schedule_wave();voice.pending.clear();voice.gap=0
 	voice.request_line("goat_search")
 	voice._process(1.)
 	assert(voice.active=="goat_search" and voice.played.size()==2)

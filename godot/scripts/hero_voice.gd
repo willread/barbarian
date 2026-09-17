@@ -10,6 +10,8 @@ var scheduled_wave=""
 var was_knocked_down=false
 func wave_key() -> String:
 	return "%d:%d"%[game.current_episode,game.wave]
+func encounter_key() -> String:
+	return "%d:%s"%[game.current_episode,"boss" if game.wave>=13 else str(game.screen_for_wave(game.wave))]
 func new_run():
 	reset()
 	milestones.clear()
@@ -49,7 +51,7 @@ func setup(source):
 func request_line(id: String,delay: float=0.,expires: float=5.):
 	if game.muted or not game.voice_enabled:return
 	if not definitions.has(id) or id==active or cooldowns.get(id,0.)>time:return
-	if not definitions[id].get("menu",false) and (played.has(id) or spoken_waves.has(wave_key())):return
+	if not definitions[id].get("menu",false) and (played.has(id) or spoken_waves.has(encounter_key())):return
 	for item in pending:
 		if item.id==id:return
 	pending.append({"id":id,"due":time+delay,"expires":time+delay+expires,"wave":wave_key()})
@@ -112,7 +114,7 @@ func _process(dt):
 	if not menu_context and not game.hero.down.is_empty():return
 	for item in pending:
 		if item.due>time:continue
-		if not definitions[item.id].get("menu",false) and (item.wave!=wave_key() or spoken_waves.has(wave_key()) or played.has(item.id)):continue
+		if not definitions[item.id].get("menu",false) and (item.wave!=wave_key() or spoken_waves.has(encounter_key()) or played.has(item.id)):continue
 		active=item.id
 		player.stream=load(definitions[active].file)
 		player.volume_db=-3
@@ -120,7 +122,7 @@ func _process(dt):
 		if not definitions[active].get("menu",false):
 			played[active]=true
 			milestones[active]=true
-			spoken_waves[wave_key()]=true
+			spoken_waves[encounter_key()]=true
 		cooldowns[active]=time+definitions[active].cooldown
 		pending.erase(item)
 		if not definitions[active].get("menu",false):pending.clear()
