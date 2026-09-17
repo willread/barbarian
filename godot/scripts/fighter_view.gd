@@ -29,9 +29,11 @@ func update_view(spell: int):
 	burn_material.set_shader_parameter("electric",float(actor.electricTicks))
 	burn_material.set_shader_parameter("hit_glow",actor.hitGlow)
 	var minotaur=actor.kind=="legion" and not actor.player
-	burn_material.set_shader_parameter("exposure",1.4 if minotaur else 1.0)
+	var warden=actor.kind=="champion" and not actor.player
+	burn_material.set_shader_parameter("exposure",1.4 if minotaur else .96 if warden else 1.0)
 	burn_material.set_shader_parameter("shadow_lift",0.0)
-	burn_material.set_shader_parameter("tonal_contrast",1.12 if minotaur else 1.0)
+	burn_material.set_shader_parameter("tonal_contrast",1.12 if minotaur else 1.08 if warden else 1.0)
+	burn_material.set_shader_parameter("saturation",.65 if warden else 1.0)
 	if not actor.player and actor.burnAge>0 and not burn_finished:
 		if not burning:
 			var layout=art.layout(pose)

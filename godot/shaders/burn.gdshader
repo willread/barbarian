@@ -7,10 +7,12 @@ uniform float hit_glow=0.0;
 uniform float exposure=1.0;
 uniform float shadow_lift=0.0;
 uniform float tonal_contrast=1.0;
+uniform float saturation=1.0;
 void fragment(){
  vec4 c=texture(TEXTURE,UV)*COLOR;
  c.rgb=min(vec3(1.0),c.rgb*exposure+vec3(shadow_lift)*(vec3(1.0)-c.rgb));
  c.rgb=pow(max(c.rgb,vec3(0.0)),vec3(tonal_contrast));
+ c.rgb=mix(vec3(dot(c.rgb,vec3(.2126,.7152,.0722))),c.rgb,saturation);
  if(burn_age>0.0){
   // Consume from the top toward the feet; noise only roughens the burn front.
   float phase=clamp((burn_age-.15)/(engulf+.6),0.,1.);
