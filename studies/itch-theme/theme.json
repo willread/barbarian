@@ -20,7 +20,7 @@
   },
   "images": {
     "banner": "assets/header-v3.png",
-    "background": "assets/panel-stone.png",
+    "background": "assets/panel-stone-fine.jpg",
     "backgroundPosition": "center top",
     "backgroundRepeat": "no repeat",
     "backgroundSize": "cover"

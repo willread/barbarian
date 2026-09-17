@@ -73,3 +73,9 @@ image/font/content routes were checked over HTTP, including video byte ranges.
 The original logo and stone texture were checked for byte identity with their
 source files. Browser visual QA and live itch.io validation were not performed.
 No live itch.io account was changed or content published.
+
+Current delivery: E:/Cairn-build-tools/itch-page-assets (loose files, no ZIP).
+The background is panel-stone-fine.jpg: 1600 x 1600, JPEG quality 70, 560638 bytes.
+A mirrored 2 x 2 arrangement reduces displayed stone scale by half while joining
+the texture edges. Original source PNG is retained. Run package-kit.ps1 to refresh
+the folder; it no longer creates an archive.

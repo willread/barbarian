@@ -1,7 +1,7 @@
 # Cairn itch.io page setup
 
-Use the files in cairn-itch-page-kit.zip. This is an asset kit to extract locally,
-not a ZIP to upload as a playable game. No custom CSS access is required.
+Use the loose files in E:/Cairn-build-tools/itch-page-assets. No ZIP extraction
+or custom CSS access is required.
 
 ## 1. Edit game
 
@@ -33,7 +33,7 @@ not a ZIP to upload as a playable game. No custom CSS access is required.
 | Header font | Cinzel |
 | Screenshots | Sidebar |
 | Banner image | cairn-header.png |
-| Background image | cairn-stone-background.png |
+| Background image | cairn-stone-background.jpg |
 | Background placement | Center top |
 | Background repeat | No repeat |
 | Background size | Cover / fill, if provided |
@@ -45,7 +45,7 @@ do not upload it again as an additional heading image. Leave custom CSS empty.
 
 The header is 2172 × 724 (3:1). Use it at the full content-column width, with its
 aspect ratio preserved and no cropping. This size is our asset size, not an itch.io
-required size. The stone background is 1254 × 1254. Screenshots are 1920 × 1080.
+required size. The stone background is 1600 × 1600 (561 KB JPEG; stones about half the prior displayed size). Screenshots are 1920 × 1080.
 
 The mockup uses a 960px panel and zero header padding. Standard-editor spacing,
 background sizing controls and font-size increments have not been verified on
