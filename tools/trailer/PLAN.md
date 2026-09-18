@@ -1,5 +1,9 @@
 # Cairn trailer plan — 56 seconds
 
+## Current edit — September 17
+
+The recorded-gameplay cut supersedes the original shot list below. See GAMEPLAY-CUT.md and gameplay-edit.mjs for the actual selections. User selected Ash Engine industrial music. Generic STEEL / BLOOD / THUNDER cards were rejected in favor of feature-led copy: Three worlds to conquer / Twelve arenas; Chain hits / Crush your high score; Three bosses stand in your way. Both a running chicken and a successful chicken eating moment are included. No secret reveals or secret callouts. Keep the original gameplay HUD, effects and voices. The closing CTA is unconfirmed, so the current end card contains only Cairn branding and genre. No publishing.
+
 ## Current capture decision
 
 User direction supersedes the earlier clean-frame concept: preserve the full real gameplay HUD throughout, including score, multiplier, health and mana, plus naturally accumulated blood and corpses. Record continuous manual gameplay with OBS from the native Windows game; select moments from complete encounters. Keep effects and voices on, music off. Do not reset combat state per shot. The musical timeline below remains the scoring guide.
