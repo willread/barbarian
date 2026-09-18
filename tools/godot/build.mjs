@@ -3,6 +3,13 @@ import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {incrementBuild} from './build-version.mjs';
 const root=process.cwd();
+const steamShareware=process.argv.includes('--steam-shareware');
+if(steamShareware){
+ if(!process.argv.includes('--shareware'))process.argv.push('--shareware');
+ const appId=fs.readFileSync('godot/scripts/steam_store.gd','utf8').match(/^const APP_ID="([0-9]*)"\r?$/m)?.[1];
+ if(appId===undefined||(appId&&!/^[1-9][0-9]*$/.test(appId)))throw Error('Invalid APP_ID in godot/scripts/steam_store.gd. Use the full game Steam App ID or an empty string for the stub.');
+ if(!appId)console.warn('Steam store link is stubbed: set APP_ID in godot/scripts/steam_store.gd before release. The purchase button currently opens nothing.');
+}
 const candidates=[process.env.GODOT_BIN,'E:/Cairn-build-tools/godot/Godot_v4.7.2-stable_win64_console.exe',path.join(root,'.tools/godot/Godot_v4.7.2-stable_win64_console.exe')].filter(Boolean);
 const binary=candidates.find(p=>fs.existsSync(p));
 if(!binary)throw Error('Install Godot 4.7.2 and set GODOT_BIN to its executable. See godot/README.md.');
@@ -107,7 +114,7 @@ if(process.argv.includes('--test')){
 const targets=process.argv.includes('--web')?['Web']:process.argv.includes('--windows')?['Windows']:['Web','Windows'];
 for(const target of targets){
  const file=path.join(output,target==='Web'?'web/index.html':'windows/Cairn.exe');fs.mkdirSync(path.dirname(file),{recursive:true});
- run(binary,['--headless','--path','godot','--export-release',target+(process.argv.includes('--shareware')?' Shareware':''),file]);
+ run(binary,['--headless','--path','godot','--export-release',target+(steamShareware?' Steam Shareware':process.argv.includes('--shareware')?' Shareware':''),file]);
  if(target==='Windows'){
   fs.rmSync(path.join(path.dirname(file),'cairn_aspect.dll'),{force:true});
   run(file,['--headless','--','--native-template-test']);
@@ -115,7 +122,7 @@ for(const target of targets){
  if(!process.argv.includes('--shareware'))run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/soundboard.gd')]);
  // Exercise the actual exported pack: source-directory tests miss import remapping bugs.
  run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/audio_assets.gd')]);
- run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/shareware.gd'),'--',process.argv.includes('--shareware')?'--expect-shareware':'--expect-full']);
+ run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/shareware.gd'),'--',process.argv.includes('--shareware')?'--expect-shareware':'--expect-full',steamShareware?'--expect-steam':'--expect-itch']);
  if(process.argv.includes('--shareware'))run(binary,['--headless','--main-pack',target==='Web'?path.join(path.dirname(file),'index.pck'):file,'--script',path.join(root,'godot/tests/shareware_assets.gd')]);
  if(target==='Web'){
   // The shell comes from Godot; this deterministic post-step skins its loader.

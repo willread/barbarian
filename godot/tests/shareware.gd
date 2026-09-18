@@ -3,6 +3,8 @@ func _init():call_deferred("check")
 func check():
 	if "--expect-shareware" in OS.get_cmdline_user_args():assert(OS.has_feature("shareware"))
 	if "--expect-full" in OS.get_cmdline_user_args():assert(not OS.has_feature("shareware"))
+	if "--expect-steam" in OS.get_cmdline_user_args():assert(OS.has_feature("steam_shareware"))
+	if "--expect-itch" in OS.get_cmdline_user_args():assert(not OS.has_feature("steam_shareware"))
 	var game=load("res://main.tscn").instantiate()
 	game.shareware=true
 	root.add_child(game)
@@ -23,7 +25,13 @@ func check():
 	assert(game.current_episode==1 and is_instance_valid(game.upgrade_view))
 	assert(paused and not game.difficulty_select)
 	var view=game.upgrade_view
-	assert(view.STORE_URL=="https://maxforcegames.itch.io/")
+	if OS.has_feature("steam_shareware"):
+		assert(view.STORE_URL==load("res://scripts/steam_store.gd").url())
+		assert(view.STORE_URL.is_empty() or view.STORE_URL.begins_with("https://store.steampowered.com/app/"))
+		if view.STORE_URL.is_empty():
+			view.selected=0;view.activate()
+			assert(paused and is_instance_valid(game.upgrade_view),"Stub button keeps the upgrade screen open")
+	else:assert(view.STORE_URL=="https://maxforcegames.itch.io/")
 	assert(not view.quitting)
 	if "--shareware-capture" in OS.get_cmdline_user_args():
 		await create_timer(.4,true).timeout

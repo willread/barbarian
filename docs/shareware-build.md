@@ -1,5 +1,22 @@
 # Shareware builds
 
+## Steam shareware
+
+Double-click `build-steam-shareware.cmd` beside the other two build scripts, or run
+`npm.cmd run build:steam-shareware` (`godot:build:steam-shareware` is an alias).
+It accepts `-- --web` or `-- --windows`, and defaults to both platforms.
+It uses the same output paths, artwork and episode restrictions as ordinary
+shareware; only the purchase link changes. The generated **Web Steam Shareware**
+and **Windows Steam Shareware** presets add the `steam_shareware` feature.
+
+The Steam link is currently stubbed: the purchase button opens nothing.
+Before release, set `APP_ID` in `godot/scripts/steam_store.gd` to the **full game's**
+Steam App ID, then rebuild. The link will open that game's Steam store page,
+where players can wishlist before launch or purchase afterward. The build prints
+a reminder while the ID is blank. Ordinary shareware continues to link to itch.io.
+
+## Ordinary shareware
+
 Double-click `build-shareware.cmd` in the project folder, beside `build.cmd`.
 It builds both browser and Windows shareware editions and keeps the window open
 to show the result. Close any running Cairn windows first.

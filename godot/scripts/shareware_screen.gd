@@ -1,7 +1,7 @@
 extends CanvasLayer
 signal closed
 signal quit_requested
-const STORE_URL="https://maxforcegames.itch.io/"
+var STORE_URL=preload("res://scripts/steam_store.gd").url() if OS.has_feature("steam_shareware") else "https://maxforcegames.itch.io/"
 const DESIGN=Vector2(1672,941)
 const BUTTONS=[Rect2(100,692,823,116),Rect2(337,817,329,46)]
 var game: Node2D
@@ -71,7 +71,7 @@ func queue_redraw_label():
 
 func activate():
 	if selected==0:
-		OS.shell_open(STORE_URL)
+		if not STORE_URL.is_empty():OS.shell_open(STORE_URL)
 	elif quitting:quit_requested.emit()
 	else:closed.emit()
 

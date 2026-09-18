@@ -4,6 +4,7 @@ Godot dark-fantasy brawler. Browser and Windows builds.
 
 - `npm run godot:test` runs gameplay and asset regression checks.
 - `npm run godot:build` exports Web and Windows.
+- `npm run build:steam-shareware` exports the Steam demo; its store link is stubbed until `APP_ID` is set in `godot/scripts/steam_store.gd`. Double-click `build-steam-shareware.cmd` for the same build.
 - `npm run dev` serves the local web build at http://localhost:3001/.
 - F8 opens the live sound lab.
 

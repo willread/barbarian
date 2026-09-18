@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-// Keep source assets intact; only the two shareware export presets are stripped.
+// Keep source assets intact; shareware export presets are stripped.
 const omitted = [
  'assets/swamp-*','assets/ashen-*','assets/cinder-*','assets/crucible-brazier.png','assets/mire-*','assets/king-*',
  'assets/enemy-witch-*','assets/enemy-bearer-*','assets/enemy-king-*','assets/enemy-saint-*',
@@ -22,9 +22,17 @@ for(const file of fs.readdirSync('godot/audio_options').sort()){
 }
 const file='godot/export_presets.cfg';
 const original=fs.readFileSync(file,'utf8');
-const updated=original.replace(/(\[preset\.[23]\][\s\S]*?exclude_filter=")[^"]*(")/g,(_,before,after)=>{
+let updated=original.replace(/(\[preset\.[23]\][\s\S]*?exclude_filter=")[^"]*(")/g,(_,before,after)=>{
  const native='native/*,';
  return before+native+'tests/*,audio/*.mp3,audio/foot_*,audio/bow_draw*,audio/arrow_ground*,'+omitted.join(',')+after;
 });
+// Derive Steam presets from ordinary shareware so their contents stay identical.
+updated=updated.split('[preset.4]')[0].trimEnd()+'\n';
+for(const [source,destination] of [[2,4],[3,5]]){
+ const preset=updated.match(new RegExp('\\[preset\\.'+source+'\\][\\s\\S]*?(?=\\n\\[preset\\.\\d+\\]|$)'))[0];
+ updated+='\n'+preset.replaceAll('preset.'+source,'preset.'+destination)
+  .replace(' Shareware"',' Steam Shareware"')
+  .replace('custom_features="shareware"','custom_features="shareware,steam_shareware"').trimEnd()+'\n';
+}
 if(updated!==original)fs.writeFileSync(file,updated);
 console.log(`Shareware: omit later-episode assets and unused audio; retain ${retained.size} selected audio variants.`);
