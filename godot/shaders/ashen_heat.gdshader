@@ -1,7 +1,6 @@
 shader_type canvas_item;
 #include "res://shaders/ashen_track.gdshaderinc"
 #include "res://shaders/reliquary_lock.gdshaderinc"
-#include "res://shaders/sanctuary_cycle.gdshaderinc"
 uniform float clock=0.0;
 uniform float area=1.0;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -115,22 +114,9 @@ void fragment(){
  vec4 paint=texture(TEXTURE,clamp(uv,vec2(.001),vec2(.999)));
  if(area<1.5){paint=road_scene(clamp(uv,vec2(.001),vec2(.999)));}
  if(area>3.5){
-  // Door leaves slide into the fixed outer frame; inverse sampling keeps metal rigid.
-  vec2 door_pixel=uv*vec2(1672.,941.)-vec2(835.,407.);
-  float opening=sanctuary_open(clock);
-  float half_gap=22.*opening;
-  float disk=1.-smoothstep(164.,166.,length(door_pixel));
-  vec2 leaf_uv=uv;
-  leaf_uv.x-=sign(door_pixel.x)*half_gap/1672.;
-  vec4 leaf=texture(TEXTURE,leaf_uv);
-  float collar=lock_band(leaf_uv);
-  leaf=mix(leaf,texture(TEXTURE,lock_uv(leaf_uv,clock)),collar);
-  float gap=(1.-smoothstep(max(0.,half_gap-1.),half_gap+1.,abs(door_pixel.x)))*smoothstep(0.,.06,opening);
-  float furnace=noise(vec2(door_pixel.x*.14,door_pixel.y*.07-clock*3.));
-  vec3 interior=mix(vec3(1.,.24,.025),vec3(1.,.88,.48),furnace*.65+.35);
-  leaf.rgb=mix(leaf.rgb,interior,gap);
-  paint=mix(paint,leaf,disk);
-  paint.rgb+=vec3(.26,.082,.009)*exp(-abs(door_pixel.x)/40.)*disk*opening;
+  // The door stays sealed; only its original locking collars index slowly.
+  float collar=lock_band(uv);
+  if(collar>0.0){paint=mix(paint,texture(TEXTURE,lock_uv(uv,clock)),collar);}
 
  }
  // Animate only painted fire/lava; iron and stone keep their original colour.

@@ -24,7 +24,7 @@ func check():
 				assert(absf(lamp.pivot.rotation)<.025,"Foreground sway remains gentle")
 				var sprite=lamp.pivot.get_child(0)
 				var bottom=lamp.pivot.position.y+sprite.texture.get_height()*sprite.scale.y
-				assert(bottom>570 and bottom<635,"Lantern tips hang just below the back edge of the floor")
+				assert(bottom>535 and bottom<595,"Raised lantern tips sit near the back edge of the floor")
 		var heat=game.background.get_node("AshenSceneHeat")
 		var capture=game.background.get_node("AshenSceneCapture")
 		assert(capture.copy_mode==BackBufferCopy.COPY_MODE_VIEWPORT)

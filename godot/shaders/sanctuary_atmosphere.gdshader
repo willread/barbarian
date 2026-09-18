@@ -1,5 +1,4 @@
 shader_type canvas_item;
-#include "res://shaders/sanctuary_cycle.gdshaderinc"
 uniform float clock=0.0;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
@@ -44,16 +43,6 @@ void fragment(){
  v=over(v,flame(p,vec2(1082.,238.),vec2(23.,59.),17.));
  v=over(v,flame(p,vec2(542.,449.),vec2(12.,40.),23.));
  v=over(v,flame(p,vec2(897.,449.),vec2(12.,42.),29.));
- float belch=sanctuary_belch(clock);
- vec4 breath=smoke(p,vec2(720.,445.),230.,105.,37.);
- breath.a*=sanctuary_afterglow(clock)*.85;
- v=over(v,breath);
- vec4 jet=flame(p,vec2(720.,494.),vec2(95.,225.),41.);
- jet.a*=belch;
- v=over(v,jet);
- vec4 tongue=flame(p,vec2(735.,481.),vec2(63.,180.),53.);
- tongue.a*=belch*.8;
- v=over(v,tongue);
  // All added atmosphere stays behind and above the playable paving.
  COLOR=vec4(v.rgb,v.a*(1.-smoothstep(545.,565.,p.y)));
 }

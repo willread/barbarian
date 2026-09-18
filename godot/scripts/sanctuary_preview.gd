@@ -20,8 +20,6 @@ func _ready():
  fighters.pressed.connect(func():
   for actor in actors:actor.visible=not actor.visible
   fighters.text="Hide fighters" if actors[0].visible else "Show fighters")
- var cycle=Button.new();cycle.text="Replay door cycle";row.add_child(cycle)
- cycle.pressed.connect(func():clock=10.;running=true;pause.text="Pause motion")
  var label=Label.new();label.text="FINAL ARENA • AMBIENT PREVIEW";row.add_child(label)
  if OS.has_feature("web"):JavaScriptBridge.eval("window.cairnMenuReady=true; window.dispatchEvent(new Event('cairn-menu-ready'));")
  if "--sanctuary-capture" in OS.get_cmdline_user_args():capture.call_deferred()
@@ -32,7 +30,7 @@ func _process(dt):
   view.actor.clock=clock;view.update_view(-1)
 func capture():
  for i in 3:
-  await get_tree().create_timer(2.).timeout
+  await get_tree().create_timer(1.75).timeout
   await RenderingServer.frame_post_draw
   get_viewport().get_texture().get_image().save_png("E:/Cairn-build-tools/sanctuary-preview-%d.png"%i)
  print("SANCTUARY_PREVIEW_OK")
