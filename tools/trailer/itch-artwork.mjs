@@ -3,13 +3,23 @@ import {spawnSync} from 'node:child_process';
 import {createCanvas,loadImage,GlobalFonts} from '@napi-rs/canvas';
 const out='E:/Cairn-build-tools/itch-artwork';fs.mkdirSync(out,{recursive:true});
 fs.mkdirSync(out+'/screenshots',{recursive:true});
-const captures=[['01-citadel-under-pressure', '19-15-19',146],['02-swamp-lightning','19-21-11',69],['03-forge-aerial-combat','19-28-41',207],['04-king-charge','19-21-11',383],['05-saint-bomb-volley','19-28-41',381.5]];
+const captures=[['01-citadel-under-pressure', '19-15-19',146],['02-swamp-lightning','19-21-11',69],['03-forge-aerial-combat','19-28-41',207],['04-king-charge','19-21-11',383],['05-saint-bomb-volley','19-28-41',381.5],
+ ['06-shareware-warden-axe-duel','19-15-19',238],
+ ['07-shareware-warden-windup','19-15-19',242],
+ ['08-shareware-warden-charge','19-15-19',243.4],
+ ['09-ashen-mixed-enemy-lineup','19-28-41',26],
+ ['10-swamp-leaping-marauder','19-21-11',105],
+ ['11-citadel-ranged-and-melee','19-12-14',44.5],
+ ['12-swamp-ten-times-combo','19-21-11',80],
+ ['13-ashen-bomb-and-aerial-strike','19-28-41',30],
+ ['14-shareware-warden-close-combat','19-15-19',255],
+ ['15-forge-bomb-thrower-pressure','19-28-41',150.5]];
 for(const [name,clip,at] of captures){const p=spawnSync('ffmpeg',['-y','-hide_banner','-loglevel','error','-ss',String(at),'-i',`C:/Users/will/Videos/2026-09-17 ${clip}.mp4`,'-frames:v','1','-q:v','2',`${out}/screenshots/${name}.jpg`],{windowsHide:true});if(p.status!==0)throw Error(p.stderr.toString());}
 GlobalFonts.registerFromPath('asset-sources/fonts/anton.ttf','Anton');
 GlobalFonts.registerFromPath('asset-sources/fonts/oswald.ttf','Oswald');
 GlobalFonts.registerFromPath('asset-sources/fonts/cinzel.ttf','Cinzel');
 const logo=await loadImage('godot/art/maximum-force-logo.png');
-for(const size of (process.argv.includes('--cover-only')?[]:[512,256])){
+for(const size of ((process.argv.includes('--cover-only')||process.argv.includes('--screenshots-only'))?[]:[512,256])){
  const c=createCanvas(size,size),g=c.getContext('2d');g.scale(size/512,size/512);
  g.fillStyle='#111317';g.fillRect(0,0,512,512);
  const glow=g.createRadialGradient(256,230,10,256,230,300);glow.addColorStop(0,'#3b2720');glow.addColorStop(1,'#111317');g.fillStyle=glow;g.fillRect(0,0,512,512);
@@ -24,7 +34,7 @@ const sheet=createCanvas(1200,Math.ceil(names.length/2)*370),sg=sheet.getContext
 for(let i=0;i<names.length;i++){const x=i%2*600,y=Math.floor(i/2)*370;sg.drawImage(await loadImage(out+'/screenshots/'+names[i]),x,y,600,337.5);sg.fillStyle='#eee';sg.font='18px Oswald';sg.fillText(names[i],x+12,y+362);}
 fs.writeFileSync(out+'/screenshot-contact.jpg',sheet.toBuffer('image/jpeg'));
 const source='asset-sources/marketing/itch-keyart.png';
-if(fs.existsSync(source)){
+if(fs.existsSync(source)&&!process.argv.includes('--screenshots-only')){
  const art=await loadImage(source),frames=out+'/cover-frames';fs.mkdirSync(frames,{recursive:true});
  const brand=await loadImage('godot/art/cairn-logo.png');
  const native=out+'/native-fire';fs.mkdirSync(native+'/scripts',{recursive:true});fs.mkdirSync(native+'/shaders',{recursive:true});
@@ -62,5 +72,5 @@ if(fs.existsSync(source)){
  const r=spawnSync('ffmpeg',['-y','-hide_banner','-loglevel','error','-framerate','12','-i',frames+'/%03d.png','-frames:v','48','-filter_complex','split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=bayer:bayer_scale=4','-loop','0',out+'/cairn-cover-animated-630x500.gif'],{windowsHide:true});if(r.status!==0)throw Error(r.stderr.toString());
 }
 const files=fs.readdirSync(out).filter(n=>/\.(png|gif)$/.test(n));
-const html=`<!doctype html><meta charset="utf-8"><title>Cairn · itch artwork</title><style>body{background:#101115;color:#e8e1d3;font:16px system-ui;margin:40px}h1{font-size:28px}section{display:flex;flex-wrap:wrap;gap:24px}figure{margin:0 0 30px;background:#1b1c20;padding:16px}img{display:block;max-width:630px;max-height:500px;width:auto;height:auto}figcaption{margin-top:12px}a{color:#edc58d}.screens img{max-width:640px}</style><h1>CAIRN — itch.io artwork</h1><p>Local review · Click a filename to download. Screenshots are unretouched gameplay.</p><section>${files.map(n=>`<figure><img src="${n}"><figcaption><a href="${n}" download>${n}</a> · ${(fs.statSync(out+'/'+n).size/1024).toFixed(0)} KB</figcaption></figure>`).join('')}</section><h2>Gameplay screenshots</h2><section class="screens">${names.map(n=>`<figure><img src="screenshots/${n}"><figcaption><a href="screenshots/${n}" download>${n}</a></figcaption></figure>`).join('')}</section>`;
+const html=`<!doctype html><meta charset="utf-8"><title>Cairn · itch artwork</title><style>body{background:#101115;color:#e8e1d3;font:16px system-ui;margin:40px}h1{font-size:28px}section{display:flex;flex-wrap:wrap;gap:24px}figure{margin:0 0 30px;background:#1b1c20;padding:16px}img{display:block;max-width:630px;max-height:500px;width:auto;height:auto}figcaption{margin-top:12px}a{color:#edc58d}.screens img{max-width:640px}</style><h1>CAIRN — itch.io artwork</h1><p>Local review · Click a filename to download. Screenshots are unretouched gameplay.</p><section>${files.map(n=>`<figure><img src="${n}"><figcaption><a href="${n}" download>${n}</a> · ${(fs.statSync(out+'/'+n).size/1024).toFixed(0)} KB</figcaption></figure>`).join('')}</section><h2>Gameplay screenshot options</h2><p>Choose 3�5 for the store page. Options 06, 07, 08 and 14 show the Iron Warden, the shareware boss. All retain the full HUD.</p><section class="screens">${names.map(n=>`<figure><img src="screenshots/${n}"><figcaption><a href="screenshots/${n}" download>${n}</a></figcaption></figure>`).join('')}</section>`;
 fs.writeFileSync(out+'/index.html',html);console.log(out);
