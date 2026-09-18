@@ -18,9 +18,10 @@ func check():
    var texture=game.art.texture(region.animation.atlas)
    assert(texture.get_width()/region.animation.columns==region.animation.rect[2],"Full resolution detail frames")
   if area==0:
-   assert(game.background.decorations.size()==1)
+   assert(game.background.has_node("ForegroundReeds"))
+   assert(game.background.get_node("ForegroundReeds").clumps.size()==10)
    game.background.advance(52)
-   assert(game.background.decorations[0].clock==52,"Bird timing must not reset every 24 seconds")
+   assert(game.background.decorations[-1].clock==52,"Bird timing must not reset every 24 seconds")
    for sample in range(40):
     game.background.advance(8+sample*.2)
     await process_frame
@@ -40,5 +41,5 @@ func check():
    root.get_texture().get_image().save_png("E:/Cairn-build-tools/swamp-v3-game-%d.png"%(area+1))
  game.queue_free()
  await process_frame
- print("CAIRN_SWAMP_V3_OK: four baked scenes, sharp frames, continuous birds, no foreground effects and static throne rocks")
+ print("CAIRN_SWAMP_V3_OK: four baked scenes, sharp frames, continuous birds, foreground crossing reeds and static throne rocks")
  quit()

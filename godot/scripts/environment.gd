@@ -169,6 +169,13 @@ func setup(source: CairnArt,name: String):
 			scene_heat.material=scene_material
 			add_child(scene_heat)
 			layers.append(scene_material)
+		if name=="swamp-1":
+			var reeds=preload("res://scripts/swamp_reeds.gd").new()
+			reeds.name="ForegroundReeds"
+			reeds.z_as_relative=false
+			reeds.z_index=1811
+			add_child(reeds)
+			decorations.append(reeds)
 		if chapter=="swamp":
 			var fog=ColorRect.new()
 			fog.name="DriftingFog"
