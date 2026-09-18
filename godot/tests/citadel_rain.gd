@@ -14,6 +14,9 @@ func check():
 		var rain=game.background.get_node("CitadelRainNear")
 		var ground=game.background.get_node("CitadelRainGround")
 		assert(rain.drops.size()>40)
+		if area==4:
+			assert(rain.drops.size()>750 and game.background.get_node("CitadelRainDistant").drops.size()==540,"Final citadel area has a dense storm across both depths")
+			assert(game.background.layers.any(func(mat):return mat.shader.resource_path.ends_with("citadel_banners.gdshader")),"Banners use a dedicated continuous wind shader")
 		assert(rain.drops==ground.drops,"Splashes and falling drops share impact positions and timing")
 		assert(ground.z_index<0 and rain.z_index<game.hud.z_index)
 		game.background.advance(61.7)

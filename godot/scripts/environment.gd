@@ -39,6 +39,12 @@ func setup(source: CairnArt,name: String):
 				heat.set_shader_parameter("road_clear",art.texture("ashen-track-clear.png"))
 			painting.material=heat
 			layers.append(heat)
+		if name=="citadel-4":
+			var cloth=ShaderMaterial.new()
+			cloth.shader=preload("res://shaders/citadel_banners.gdshader")
+			cloth.set_meta("continuous_clock",true)
+			painting.material=cloth
+			layers.append(cloth)
 		add_child(painting)
 		for region in screen.regions:
 			var a=region.animation

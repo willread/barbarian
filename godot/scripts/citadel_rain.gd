@@ -6,21 +6,27 @@ var area=1
 var drops: Array=[]
 
 func configure(polygon: Array,screen_number: int,kind: String):
+	drops.clear()
 	area=screen_number
 	pass_kind=kind
 	var floor_shape=PackedVector2Array()
 	for point in polygon:floor_shape.append(Vector2(point[0]*1440,point[1]*810))
 	var rng=RandomNumberGenerator.new()
 	rng.seed=91873+area*317
-	for i in 330:
+	for i in (1050 if area==4 else 330):
 		var point=Vector2(rng.randf_range(12,1428),rng.randf_range(540,795))
 		if not Geometry2D.is_point_in_polygon(point,floor_shape):continue
 		var depth=clampf((point.y-510)/290,0,1)
 		drops.append({"p":point,"depth":depth,"speed":lerpf(620,1220,depth)*rng.randf_range(.85,1.15),"phase":rng.randf()*3,"period":rng.randf_range(1.1,2.3),"length":rng.randf_range(12,23),"alpha":rng.randf_range(.13,.30)})
 	if kind=="distant":
 		drops.clear()
-		for i in 180:
+		for i in (540 if area==4 else 180):
 			drops.append({"p":Vector2(rng.randf_range(-30,1470),rng.randf_range(440,560)),"depth":.05,"speed":rng.randf_range(450,650),"phase":rng.randf()*3,"period":rng.randf_range(1.1,2.1),"length":rng.randf_range(6,12),"alpha":rng.randf_range(.055,.12)})
+	if area==4:
+		for drop in drops:
+			drop.speed*=1.35
+			drop.period*=.72
+			drop.length*=1.5
 	set_meta("continuous_clock",true)
 
 func advance(time: float):
@@ -28,8 +34,8 @@ func advance(time: float):
 	queue_redraw()
 
 func _draw():
-	var wind=85+sin(clock*.37+area)*28+sin(clock*.91)*12
-	var strength=[1.0,.85,.7,.9][area-1]
+	var wind=(155 if area==4 else 85)+sin(clock*.37+area)*(48 if area==4 else 28)+sin(clock*.91)*12
+	var strength=[1.0,.85,.7,1.25][area-1]
 	for drop in drops:
 		var age=fposmod(clock+drop.phase,drop.period)
 		var impact=drop.p
