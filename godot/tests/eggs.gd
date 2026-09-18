@@ -36,7 +36,7 @@ func check():
 	egg.velocity=0
 	egg.advance(.01)
 	egg.advance(.93)
-	assert(game.combo.multiplier()==10 and game.combo.hits==0 and game.combo.remaining==5)
+	assert(game.combo.multiplier()==10 and game.combo.hits==0 and game.combo.remaining==game.combo.timeout)
 	assert(not egg.fire.visible,"Flames disappear when the egg is consumed")
 	assert(game.run_stats.peak_multiplier==10 and game.run_stats.best_combo==0)
 	egg.advance(.3)

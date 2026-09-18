@@ -30,7 +30,9 @@ const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
 const MIRE_HIT_DAMAGE=2.2+48.0/(100.0*.65) # About 4 HP per hit at default tuning.
 const MIRE_TICK_INTERVAL=2.0
+const MIRE_FIRST_HIT_DELAY=.5
 var mire_exposure=0.0
+var mire_has_hit=false
 var mire_views: Dictionary={}
 var retiring_mire: Array=[]
 var next_mire_id=0
@@ -52,6 +54,7 @@ func prepare_actor(actor: Dictionary):
 
 func clear():
 	mire_exposure=0.0
+	mire_has_hit=false
 	hazards.clear()
 	for view in scream_views.values():view.queue_free()
 	scream_views.clear()
@@ -325,11 +328,15 @@ func step(game,dt: float):
 	if not mire.is_empty() and game.hero.hp>0:
 		# One exposure clock for the hero: overlapping pools cannot stack pulses.
 		mire_exposure+=dt
-		while mire_exposure+0.000001>=MIRE_TICK_INTERVAL and game.hero.hp>0:
-			mire_exposure=maxf(0,mire_exposure-MIRE_TICK_INTERVAL)
+		var interval=MIRE_TICK_INTERVAL if mire_has_hit else MIRE_FIRST_HIT_DELAY
+		while mire_exposure+0.000001>=interval and game.hero.hp>0:
+			mire_exposure=maxf(0,mire_exposure-interval)
+			mire_has_hit=true
+			interval=MIRE_TICK_INTERVAL
 			game.damage(game.hero,{"type":"mireDrain","damage":MIRE_HIT_DAMAGE,"direction":1 if game.hero.x>=mire.owner.x else -1,"knock":false},mire.owner)
 	else:
 		mire_exposure=0.0
+		mire_has_hit=false
 
 
 func step_saint_volley(game,enemy: Dictionary,a: Dictionary):

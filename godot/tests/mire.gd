@@ -56,11 +56,12 @@ func check():
 	game.hero.attack={"type":"slash","age":1,"to":12}
 	var hp=game.hero.hp
 	combat.mire_exposure=0
+	combat.mire_has_hit=false
 	var per_hit=2.2*game.damage_multiplier*100./48.+game.damage_multiplier/.65
-	for i in 119:combat.step(game,1.0/60)
+	for i in 29:combat.step(game,1.0/60)
 	assert(game.hero.hp==hp,"Health holds steady between mire pulses")
 	combat.step(game,1.0/60)
-	assert(is_equal_approx(game.hero.hp,hp-per_hit),"First real hit after two seconds")
+	assert(is_equal_approx(game.hero.hp,hp-per_hit),"First real hit after half a second")
 	assert(game.hero.hurtTicks>0 and game.hero.recoil>0 and game.shake>0,"Puddle hits trigger normal stun, recoil and impact shake")
 	assert(game.hero.attack.is_empty(),"Puddle hit interrupts an attack")
 	var first_pulse=game.hero.hp
@@ -73,17 +74,20 @@ func check():
 	assert(game.hero.hurtTicks==0,"Normal hit stun ends well before the next two-second pulse")
 	# Coarse updates and overlapping patches still deliver the same pulse.
 	game.hero.hp=hp;combat.mire_exposure=0;patch.age=.5
+	combat.mire_has_hit=false
 	combat.hazards=[patch,patch.duplicate()]
 	combat.step(game,2.)
 	assert(abs(game.hero.hp-(hp-per_hit))<.01,"Frame-rate independence and no overlap stacking")
-	combat.hazards=[patch];combat.mire_exposure=0
+	combat.hazards=[patch];combat.mire_exposure=0;combat.mire_has_hit=false
 	combat.step(game,.25)
 	game.hero.x=1100;combat.step(game,.01)
 	game.hero.x=720
 	var before_return=game.hero.hp
 	combat.step(game,.25)
 	assert(game.hero.hp==before_return,"Leaving clears exposure instead of carrying a surprise pulse on re-entry")
-	combat.clear();assert(combat.mire_exposure==0)
+	combat.step(game,.25)
+	assert(is_equal_approx(game.hero.hp,before_return-per_hit),"Re-entry uses the same half-second first hit")
+	combat.clear();assert(combat.mire_exposure==0 and not combat.mire_has_hit)
 	combat.hazards=[patch]
 	# A jump started in the grasp has a much lower apex, even with run held.
 	var trapped=game.make_actor(720,680,100,true)
@@ -147,7 +151,7 @@ func check():
 	hag.attack={};hag.mire_count=5
 	game.e_ai.hag_intent(hag,game.hero)
 	assert(hag.attack.is_empty(),"Keep the five-clump cap")
-	print("CAIRN_MIRE_OK: heavy slow, two-second damage hits with stun, limited jump, independent patches, owner death and defensive claw")
+	print("CAIRN_MIRE_OK: heavy slow, half-second first hit then two-second pulses with stun, limited jump, independent patches, owner death and defensive claw")
 	game.queue_free()
 	await process_frame
 	quit()

@@ -5,7 +5,17 @@ func check():
  for i in 3:c.hit()
  assert(c.multiplier()==2 and is_equal_approx(c.mana_multiplier(),1.2))
  for i in 9:c.hit()
- assert(c.multiplier()==5 and c.advance(1.)==1.5)
+ assert(c.multiplier()==5 and c.advance(1.)==0.0)
+ for i in 12:c.hit()
+ assert(c.multiplier()==9 and c.advance(1.)==0.0,"No regeneration below 10x")
+ for i in 3:c.hit()
+ assert(c.multiplier()==10 and c.advance(1.)==1.5,"10x regenerates health")
+ c.reset()
+ c.hit()
+ c.advance(4.49)
+ assert(c.hits==1)
+ c.advance(.02)
+ assert(c.hits==0,"Combo expires after 4.5 seconds")
  c.advance(10.)
  assert(c.multiplier()==1 and c.hits==0)
  for i in 100:c.hit()
@@ -45,7 +55,7 @@ func check():
  var magic_score=game.score
  game.combo.remaining=.01
  game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
- assert(game.combo.hits==1 and is_equal_approx(game.score,magic_score+1.2*game.damage_multiplier) and game.combo.remaining==game.combo.timeout)
+ assert(game.combo.hits==1 and is_equal_approx(game.score,magic_score+1.2*game.damage_multiplier*1.25) and game.combo.remaining==game.combo.timeout)
  game.spell_combo_targets.clear()
  game.damage(magic_target,{"damage":.12,"direction":1,"magic":true,"continuous":true},game.hero)
  assert(game.combo.hits==2)
@@ -54,11 +64,11 @@ func check():
  var enemy=game.make_actor(900,660,100)
  enemy.kind="bone"
  for i in 3:game.damage(enemy,{"damage":1,"direction":1},game.hero)
- assert(is_equal_approx(game.score,40*game.damage_multiplier) and game.combo.multiplier()==2)
+ assert(is_equal_approx(game.score,40*game.damage_multiplier*1.25) and game.combo.multiplier()==2)
  var points=game.score
  var mana=game.magic
  game.damage(enemy,{"damage":.1,"direction":1,"magic":true,"continuous":true},game.hero)
- assert(is_equal_approx(game.score,points+game.damage_multiplier*2) and game.combo.hits==4 and game.magic==mana)
+ assert(is_equal_approx(game.score,points+game.damage_multiplier*2*1.25) and game.combo.hits==4 and game.magic==mana)
  var dying=game.make_actor(900,660,.25)
  dying.kind="bone"
  var before_kill=game.score
@@ -72,7 +82,7 @@ func check():
  game.settings_page="game"
  assert("CONTROLS" in game.option_labels())
  assert(game.art.weapon_data(game.hero).length>0)
- for i in 12:game.combo.hit()
+ for i in 27:game.combo.hit()
  game.combo.remaining=.5
  game.hero.x=720
  game.hero.hp=50

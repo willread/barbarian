@@ -3,12 +3,12 @@ extends RefCounted
 var hits=0
 var bonus_multiplier=1
 var remaining=0.0
-var timeout=5.0
+var timeout=4.5
 var waiting_for_combat=false
 var resume_grace=3.25
 var hits_per_tier=3
 var max_multiplier=10
-var heal_threshold=5
+var heal_threshold=10
 var heal_per_second=1.5
 func multiplier() -> int:return maxi(bonus_multiplier,mini(max_multiplier,1+int(hits/hits_per_tier)))
 func golden_egg():
