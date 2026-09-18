@@ -7,7 +7,7 @@ func check():
 	mix.setup()
 	assert(AudioServer.bus_count==count,"Reloading scenes must not stack effects")
 	assert(mix.bus_for("enemy_impact")=="Combat" and mix.bus_for("death_fire")=="Combat")
-	assert(mix.bus_for("magic_shout")=="Voice" and mix.bus_for("egg_lay")=="Foley")
+	assert(mix.bus_for("magic_shout")=="Combat" and mix.bus_for("egg_lay")=="Foley")
 	assert(AudioServer.get_bus_send(AudioServer.get_bus_index("Music"))=="Master")
 	assert(AudioServer.get_bus_effect_count(AudioServer.get_bus_index("Music"))==0)
 	var game=load("res://main.tscn").instantiate()
@@ -28,6 +28,22 @@ func check():
 	var burns=game.audio.voices.filter(func(v):return v.playing and v.get_meta("sound_id","")=="death_fire")
 	assert(burns.size()==1 and burns[0].bus=="Combat")
 	assert(is_equal_approx(db_to_linear(burns[0].get_meta("base_db")+10),2.),"Burn gain must double independently of user volume settings")
+	game.audio.stop_gameplay()
+	game.voice_enabled=false
+	game.audio.gates.clear()
+	for id in mix.VOCALS:
+		assert(mix.bus_for(id)=="Combat","Combat vocalizations are sound effects")
+		if not game.audio.clips.has(id):continue
+		game.audio.play(id)
+		assert(game.audio.voices.any(func(v):return v.playing and v.get_meta("sound_id","")==id),"Voice OFF must allow shouts: "+id)
+	game.audio._process(.01)
+	assert(game.audio.voices.any(func(v):return v.playing and v.get_meta("sound_id","")=="magic_shout"),"Voice OFF must not stop an active shout")
+	game.muted=true
+	game.audio._process(.01)
+	assert(not game.audio.voices.any(func(v):return v.playing),"Sound OFF stops combat shouts")
+	game.audio.gates.clear()
+	game.audio.play("hero_pain")
+	assert(not game.audio.voices.any(func(v):return v.playing),"Sound OFF blocks new combat shouts")
 	assert(game.hero_voice.player.bus=="Voice")
 	for track in game.audio.tracks:assert(track.bus=="Music")
 	game.process_mode=Node.PROCESS_MODE_DISABLED

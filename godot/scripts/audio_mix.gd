@@ -4,7 +4,7 @@ const VOCALS=["hero_effort","hero_pain","magic_shout","roar","death","roar_marau
 static func bus_for(id: String) -> StringName:
 	if id.begins_with("music_"):return &"Music"
 	if id in COMBAT:return &"Combat"
-	if id in VOCALS:return &"Voice"
+	if id in VOCALS:return &"Combat"
 	return &"Foley"
 
 static func setup():
