@@ -20,7 +20,7 @@ const shots=[
  {clip:3,start:33.4,duration:3,note:'Witch pressure and mire pools'},
  {clip:3,start:163.6,duration:3,note:'Lightning crowd control'},
  {card:'arsenal',duration:2,note:'Dash. Charge. Unleash magic.'},
- {clip:1,start:63,duration:3,note:'Marauder close pressure and player hit'},
+ {clip:1,start:62,duration:3,note:'Marauder close pressure and player hit'},
  {clip:3,start:382,duration:3,note:'King rolling charge and player hit'},
  {clip:4,start:373,duration:3,note:'Saint bomb volley'},
  {clip:4,start:38.2,duration:4,note:'Bomb thrower and archer pressure; hero knocked down'},
