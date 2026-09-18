@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
-import {renderMotionTitle} from './motion-titles.mjs';
+import {renderMotionTitle} from './native-titles.mjs';
 
 const out='E:/Cairn-build-tools/trailer/gameplay-cut';
 fs.mkdirSync(out,{recursive:true});
@@ -11,8 +11,8 @@ const shots=[
  {card:'worlds',duration:2},
  {clip:1,start:51.1,duration:2,note:'Citadel axe impact'},
  {clip:3,start:159.2,duration:2,note:'Swamp enemy launched'},
- {clip:4,start:206.1,duration:2,note:'Ashen furnace jump attack'},
- {clip:2,start:236.5,duration:4,note:'Warden sword exchange'},
+ {clip:4,start:29.5,duration:2,note:'Ashen ranged enemies and bomb explosion'},
+ {clip:2,start:241.1,duration:4,note:'Warden charge tell, rush and player knockdown'},
  {card:'combo',duration:2},
  {clip:3,start:78.3,duration:3.5,note:'Combo reaches 10x'},
  {clip:3,start:167.8,duration:1.5,note:'Crowd combat and blood'},
@@ -20,10 +20,10 @@ const shots=[
  {clip:2,start:150.5,duration:3,note:'Chicken eaten; health rises'},
  {clip:3,start:163.6,duration:3,note:'Lightning crowd control'},
  {card:'arsenal',duration:2,note:'Dash. Charge. Unleash magic.'},
- {clip:2,start:251.3,duration:3,note:'Warden melee escalation'},
- {clip:3,start:380.5,duration:3,note:'King roots and rolling attack'},
+ {clip:3,start:104.1,duration:3,note:'Marauder leap pressure with ranged enemy'},
+ {clip:3,start:382,duration:3,note:'King rolling charge and player hit'},
  {clip:4,start:373,duration:3,note:'Saint bomb volley'},
- {clip:4,start:206.1,duration:4,note:'Furnace melee payoff'},
+ {clip:4,start:38.2,duration:4,note:'Bomb thrower and archer pressure; hero knocked down'},
  {clip:3,start:68.4,duration:1,note:'Lightning accent'},
  {clip:2,start:120.7,duration:1,note:'Burning melee accent'},
  {clip:4,start:212.4,duration:1,note:'Jump accent'},
@@ -38,6 +38,7 @@ const run=args=>{const p=spawnSync('ffmpeg',['-hide_banner','-loglevel','error',
 for(let i=0;i<shots.length;i++){
  const s=shots[i],dest=`${out}/shot-${String(i).padStart(2,'0')}.mkv`;
  const signature=JSON.stringify(s);
+ if(process.argv.includes('--logo-only')&&s.card&&s.card!=='logo'&&fs.existsSync(dest))continue;
  if(fs.existsSync(dest)&&fs.existsSync(dest+'.json')&&fs.readFileSync(dest+'.json','utf8')===signature&&!process.argv.includes('--force')&&!s.card)continue;
  if(s.card){
   const backgrounds={worlds:[2,122.4],combo:[3,76.3],arsenal:[4,212.4],logo:[4,362.5]};
