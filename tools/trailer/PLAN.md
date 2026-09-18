@@ -1,5 +1,9 @@
 # Cairn trailer plan — 56 seconds
 
+## Current capture decision
+
+User direction supersedes the earlier clean-frame concept: preserve the full real gameplay HUD throughout, including score, multiplier, health and mana, plus naturally accumulated blood and corpses. Record continuous manual gameplay with OBS from the native Windows game; select moments from complete encounters. Keep effects and voices on, music off. Do not reset combat state per shot. The musical timeline below remains the scoring guide.
+
 ## Reference and scope
 
 Reference: https://store.steampowered.com/app/588650/Dead_Cells/
@@ -32,10 +36,10 @@ Target 18–22 selected gameplay shots. Exact boundaries adapt to music and the 
 
 ## Capture package
 
-- Extend the existing offline Godot trailer staging to cover all three episodes and current mechanics. The old script and edit are a foundation, not final footage.
+- Capture continuous manual runs through all three episodes using OBS. The old staged capture and edit remain reference material, not the source of authentic new gameplay footage.
 - Capture 2–3 takes for each key action, including 1–2 seconds of handles before and after. Select by clarity of intent, successful contact, readable reaction and attractive composition.
-- Keep real gameplay speed, damage, enemy behavior and plausible encounter sizes. Stage positions, seeds and earned loadouts as needed. Do not rely on frozen opponents or universally weakened enemies to imply false combat pacing.
-- Add capture-only HUD visibility control. Use clean gameplay for most shots, retaining in-world effects and tells. Include a normal-HUD combo shot. Hiding HUD must not stretch the arena or reveal unfinished scenery; inspect framing first.
+- Keep real gameplay speed, damage, enemy behavior, earned equipment and naturally accumulated combat state. Do not assign score, multipliers, mana or blood for a shot, freeze opponents or weaken enemies for trailer pacing.
+- Keep the full normal HUD throughout. Preserve battlefield and HUD continuity within each exchange; cuts between different runs and locations are fine.
 - Target native 1920×1080, 60 fps after validating offline capture against simulation timing. Existing captures are 30 fps. Do not interpolate a 30 fps recording to claim 60 fps.
 - Separate game SFX from music; retain useful voice moments only if they strengthen a shot. Keep recordings and renders on E:/Cairn-build-tools/trailer. No new Windows executable location.
 - Confirm the TODO about episode 3 screen 4 animation is current before selecting that environment for a hero shot. Other game work may be in progress; capture from an agreed stable revision.
@@ -56,4 +60,4 @@ Audition the existing guitar music first. Make a deliberate 56-second arrangemen
 
 ## User input
 
-No manual playthrough recording is required initially. The existing capture pipeline can stage the shots. The only unresolved marketing input is the CTA and destination: wishlist, demo/shareware, or full-game availability. Use a clearly marked CTA placeholder in the rough cut until confirmed. User review of the first full cut should focus on combat feel, music and any spoiler concerns. This document is planning only; no new footage or game changes have been made for it.
+Capture a normal run through each episode, followed by targeted extra attempts for missing standout moments. The unresolved marketing input is the CTA and destination: wishlist, demo/shareware, or full-game availability. Use a clearly marked CTA placeholder until confirmed. Four ElevenLabs music options are available through music-preview.mjs; see MUSIC.md. No new gameplay footage has been captured for this plan.
