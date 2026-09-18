@@ -2,7 +2,7 @@
 
 ## Current edit — September 17
 
-The recorded-gameplay cut supersedes the original shot list below. See GAMEPLAY-CUT.md and gameplay-edit.mjs for the actual selections. User selected Ash Engine industrial music. Generic STEEL / BLOOD / THUNDER cards were rejected in favor of feature-led copy: Three worlds to conquer / Twelve arenas; Chain hits / Crush your high score; Three bosses stand in your way. Both a running chicken and a successful chicken eating moment are included. No secret reveals or secret callouts. Keep the original gameplay HUD, effects and voices. The closing CTA is unconfirmed, so the current end card contains only Cairn branding and genre. No publishing.
+The recorded-gameplay cut supersedes the original shot list below. See GAMEPLAY-CUT.md and gameplay-edit.mjs for the actual selections. User selected Ash Engine industrial music. Generic STEEL / BLOOD / THUNDER cards were rejected in favor of feature-led copy: Three worlds to conquer / Twelve arenas; Chain hits / Crush your high score; Dash. Charge. Unleash magic.. Both a running chicken and a successful chicken eating moment are included. No secret reveals or secret callouts. Keep the original gameplay HUD, effects and voices. The closing CTA is unconfirmed, so the current end card contains only Cairn branding and genre. No publishing. The latest visual revision replaces separate ornate cards with condensed ivory motion typography over gameplay, animated flames/embers and a fire-reveal ending.
 
 ## Current capture decision
 

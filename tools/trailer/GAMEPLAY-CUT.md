@@ -19,7 +19,7 @@ Output: `E:/Cairn-build-tools/trailer/gameplay-cut/cairn-gameplay-trailer.mp4`
 | 22–24 | Chicken running |
 | 24–27 | Chicken eaten, visible health recovery |
 | 27–30 | Lightning crowd control |
-| 30–32 | Three bosses stand in your way |
+| 30–32 | Dash. Charge. Unleash magic. |
 | 32–41 | Warden, King, Saint |
 | 41–45 | Furnace combat |
 | 45–49 | Four impact cuts |
@@ -30,7 +30,7 @@ The user explicitly excludes secrets from this trailer. No secret, cheat-code, h
 
 ## Artwork and audio
 
-Original Cairn logo and licensed project Cinzel/Oswald typography. Editorial cards use darkened, softened recorded backgrounds, restrained gold rules, ember accents and a short settling motion. Cropping and motion apply only to cards; gameplay framing is untouched. These are reproducible graphics, not generated cinematic footage.
+Revised motion titles use licensed project Anton/Oswald typography, ivory lettering, animated procedural flames and drifting embers over moving recorded footage. Short opacity ramps and entry blends replace the separate static backgrounds. The final Saint shot continues into the ending: a rising fire surge reveals a large CAIRN wordmark, which holds over embers before fading out. The HUD stays unobstructed during the feature overlays. These are editorial graphics, not in-game effects or generated cinematic footage.
 
 Ash Engine uses the original ElevenLabs source, normalized to -19 LUFS before mixing. The deep editorial volume pockets from the music auditions are removed; the source composition's own arrangement remains. Original gameplay audio is boosted by approximately 13 dB, with 8–12 ms edge fades to avoid cut clicks. A final peak limiter prevents overload. No additional generated voices. Final export uses H.264 and stereo 48 kHz AAC at 320 kbps.
 
@@ -43,6 +43,6 @@ node tools/trailer/gameplay-edit.mjs
 node tools/trailer/gameplay-preview.mjs
 ```
 
-Requires FFmpeg/ffprobe and the repository's @napi-rs/canvas. Media and intermediate files stay outside Git on E:. Original user recordings remain untouched in C:/Users/will/Videos. The edit script writes a precise edit-decisions.json beside the export and reuses unchanged gameplay intermediates; `--force` rebuilds them. `--cards-only` generates still card previews. The preview binds only to loopback and supports seeking and downloading.
+Requires FFmpeg/ffprobe and the repository's @napi-rs/canvas. Media and intermediate files stay outside Git on E:. Original user recordings remain untouched in C:/Users/will/Videos. The edit script writes a precise edit-decisions.json beside the export and reuses unchanged gameplay intermediates; `--force` rebuilds them. Motion title check frames and the final poster are generated alongside the export. The preview binds only to loopback and supports seeking and downloading.
 
-Contact sheets inspected for gameplay, readable copy, full HUD, chicken run/pickup and boss coverage. Complete export decoded by FFmpeg; dimensions, 60 fps and 3,360-frame duration checked with ffprobe. Final audio measures -16.83 LUFS integrated and -1.79 dBTP; subjective sound balance still benefits from playback on the user's speakers. HTTP preview and byte-range seeking return 200/206 correctly. This export cannot recover fine detail already lost in the approximately 2.4 Mbps source captures.
+Contact sheets inspected for gameplay, readable copy, full HUD, chicken run/pickup and boss coverage. Complete export decoded by FFmpeg; dimensions, 60 fps and 3,360-frame duration checked with ffprobe. The revised mix measures -16.75 LUFS integrated and -1.79 dBTP. Subjective sound balance still benefits from playback on the user's speakers. HTTP preview and byte-range seeking return 200/206 correctly. This export cannot recover fine detail already lost in the approximately 2.4 Mbps source captures.
