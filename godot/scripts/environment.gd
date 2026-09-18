@@ -170,6 +170,20 @@ func setup(source: CairnArt,name: String):
 			add_child(scene_heat)
 			layers.append(scene_material)
 		if chapter=="swamp":
+			var fog=ColorRect.new()
+			fog.name="DriftingFog"
+			fog.size=Vector2(1440,810)
+			fog.mouse_filter=Control.MOUSE_FILTER_IGNORE
+			fog.z_as_relative=false
+			fog.z_index=1810
+			var fog_material=ShaderMaterial.new()
+			fog_material.shader=preload("res://shaders/swamp_fog.gdshader")
+			fog_material.set_meta("continuous_clock",true)
+			fog_material.set_shader_parameter("area",float(name.get_slice("-",1)))
+			fog_material.set_shader_parameter("density",1.85 if name=="swamp-4" else 1.0)
+			fog.material=fog_material
+			add_child(fog)
+			layers.append(fog_material)
 			if screen.get("birds",false):
 				var birds=preload("res://scripts/swamp_birds.gd").new()
 				birds.set_meta("continuous_clock",true)
