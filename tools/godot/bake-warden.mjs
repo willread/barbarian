@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {loadImage,createCanvas} from '@napi-rs/canvas';
 import {splitEpisodeSheet} from './split-episode-sheet.mjs';
-const source=await loadImage('asset-sources/art/iron-warden-v3.png');
+const source=await loadImage('asset-sources/art/iron-warden-v4.png');
 // Decode the generated chroma backdrop using the established animation key.
 const image=createCanvas(source.width,source.height),ctx=image.getContext('2d');
 ctx.drawImage(source,0,0);
