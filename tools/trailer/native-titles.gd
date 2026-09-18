@@ -38,7 +38,7 @@ func setup():
 	var face=Sprite2D.new();face.texture=ImageTexture.create_from_image(image)
 	face.scale=Vector2.ONE*width/image.get_width();group.add_child(face)
 	fire.heat_face(face,Rect2(-Vector2(mask.get_size())*.5,Vector2(mask.get_size())))
-	group.position=Vector2(960,500 if config.id=="logo" else 345)
+	group.position=Vector2(960,540)
 	ready_capture=true
 
 func _process(_dt):
@@ -69,4 +69,4 @@ func paint():
 	if config.id=="logo":
 		canvas.draw_rect(Rect2(0,0,1920,1080),Color(0,0,0,a*.30))
 	else:
-		canvas.draw_rect(Rect2(0,130,1920,410),Color(.025,.018,.012,a*.30))
+		canvas.draw_rect(Rect2(0,280,1920,520),Color(.025,.018,.012,a*.30))

@@ -9,39 +9,40 @@ const sources=['19-12-14','19-15-19','19-21-11','19-28-41'].map(t=>`C:/Users/wil
 const shots=[
  {clip:2,start:119.4,duration:3,note:'Opening jump and slam'},
  {card:'worlds',duration:2},
- {clip:1,start:51.1,duration:2,note:'Citadel axe impact'},
- {clip:3,start:159.2,duration:2,note:'Swamp enemy launched'},
+ {clip:2,start:202.4,duration:2,note:'Bell courtyard mixed melee and ranged pressure'},
+ {clip:3,start:16.5,duration:2,note:'Sword closes on mire witch'},
  {clip:4,start:29.5,duration:2,note:'Ashen ranged enemies and bomb explosion'},
  {clip:2,start:241.1,duration:4,note:'Warden charge tell, rush and player knockdown'},
  {card:'combo',duration:2},
  {clip:3,start:78.3,duration:3.5,note:'Combo reaches 10x'},
- {clip:3,start:167.8,duration:1.5,note:'Crowd combat and blood'},
- {clip:1,start:44.2,duration:2,note:'Chicken running'},
- {clip:2,start:150.5,duration:3,note:'Chicken eaten; health rises'},
+ {clip:1,start:44.2,duration:1.5,note:'Chicken running'},
+ {clip:2,start:150.8,duration:2,note:'Single chicken pickup and health recovery'},
+ {clip:3,start:33.4,duration:3,note:'Witch pressure and mire pools'},
  {clip:3,start:163.6,duration:3,note:'Lightning crowd control'},
  {card:'arsenal',duration:2,note:'Dash. Charge. Unleash magic.'},
- {clip:3,start:104.1,duration:3,note:'Marauder leap pressure with ranged enemy'},
+ {clip:1,start:63,duration:3,note:'Marauder close pressure and player hit'},
  {clip:3,start:382,duration:3,note:'King rolling charge and player hit'},
  {clip:4,start:373,duration:3,note:'Saint bomb volley'},
  {clip:4,start:38.2,duration:4,note:'Bomb thrower and archer pressure; hero knocked down'},
- {clip:3,start:68.4,duration:1,note:'Lightning accent'},
- {clip:2,start:120.7,duration:1,note:'Burning melee accent'},
- {clip:4,start:212.4,duration:1,note:'Jump accent'},
- {clip:3,start:160.7,duration:1,note:'Launched enemy accent'},
+ {clip:4,start:276.6,duration:1,note:'Shield enemy launched'},
+ {clip:1,start:60.2,duration:1,note:'Skeleton melee formation after pickup'},
+ {clip:3,start:36.6,duration:1,note:'Witch slash amid mire hazards'},
+ {clip:4,start:43.1,duration:1,note:'Bomb blast and archer threat'},
  {clip:4,start:360.5,duration:2,note:'Saint furnace threat'},
  {card:'logo',duration:5},
 ];
-let elapsed=0;for(const s of shots){s.timeline=elapsed;elapsed+=s.duration;}
+const backgrounds={worlds:[2,122.4],combo:[3,76.3],arsenal:[4,212.4],logo:[4,362.5]};
+let elapsed=0;for(const s of shots){s.timeline=elapsed;elapsed+=s.duration;if(s.card)s.background={clip:backgrounds[s.card][0],start:backgrounds[s.card][1]};}
 if(elapsed!==56)throw Error('Timeline must be 56 seconds');
 fs.writeFileSync(out+'/edit-decisions.json',JSON.stringify({duration:elapsed,sources,shots},null,2));
 const run=args=>{const p=spawnSync('ffmpeg',['-hide_banner','-loglevel','error','-y',...args],{windowsHide:true,maxBuffer:12*1024*1024});if(p.status!==0)throw Error(p.stderr.toString());return p.stdout;};
 for(let i=0;i<shots.length;i++){
  const s=shots[i],dest=`${out}/shot-${String(i).padStart(2,'0')}.mkv`;
  const signature=JSON.stringify(s);
+ if(process.argv.includes('--reuse-titles')&&s.card&&fs.existsSync(dest))continue;
  if(process.argv.includes('--logo-only')&&s.card&&s.card!=='logo'&&fs.existsSync(dest))continue;
  if(fs.existsSync(dest)&&fs.existsSync(dest+'.json')&&fs.readFileSync(dest+'.json','utf8')===signature&&!process.argv.includes('--force')&&!s.card)continue;
  if(s.card){
-  const backgrounds={worlds:[2,122.4],combo:[3,76.3],arsenal:[4,212.4],logo:[4,362.5]};
   const [clip,start]=backgrounds[s.card];
   const prev=shots[i-1];
   await renderMotionTitle({id:s.card,duration:s.duration,source:sources[clip-1],start,previous:prev?.clip?{source:sources[prev.clip-1],start:prev.start+prev.duration-1/60}:null,out,dest});
