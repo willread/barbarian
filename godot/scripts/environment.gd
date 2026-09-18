@@ -169,6 +169,16 @@ func setup(source: CairnArt,name: String):
 			scene_heat.material=scene_material
 			add_child(scene_heat)
 			layers.append(scene_material)
+		if name=="swamp-3":
+			var tree=Sprite2D.new()
+			tree.name="ForegroundTree"
+			tree.texture=load("res://art/scenery/procession-tree.png")
+			tree.centered=false
+			tree.position=Vector2(920,-15)
+			tree.scale=Vector2(560,840)/tree.texture.get_size()
+			tree.z_as_relative=false
+			tree.z_index=1811
+			add_child(tree)
 		if name=="swamp-1":
 			var reeds=preload("res://scripts/swamp_reeds.gd").new()
 			reeds.name="ForegroundReeds"

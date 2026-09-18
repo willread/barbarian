@@ -25,6 +25,7 @@ func check():
    for sample in range(40):
     game.background.advance(8+sample*.2)
     await process_frame
+  assert(game.background.has_node("ForegroundTree")== (area==2),"Foreground tree belongs only to E2/3")
   var front=game.background.screen.regions.filter(func(r):return r.foreground)
   assert(front.size()==(1 if area==3 else 0),"Only painted throne rocks remain in foreground")
   if area==3:assert(front[0].animation.count==1,"Throne foreground is static rock occlusion")
