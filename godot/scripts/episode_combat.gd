@@ -28,8 +28,8 @@ const ROOT_WARNING=.55
 const MireLayout=preload("res://scripts/mire_layout.gd")
 const MIRE_SPEED=.10
 const MIRE_JUMP_SCALE=.4
-const MIRE_DRAIN=2.2+48.0/(100.0*.65) # +1 HP/s at default tuning; about 4 HP/s total.
-const MIRE_TICK_INTERVAL=1.0
+const MIRE_HIT_DAMAGE=2.2+48.0/(100.0*.65) # About 4 HP per hit at default tuning.
+const MIRE_TICK_INTERVAL=2.0
 var mire_exposure=0.0
 var mire_views: Dictionary={}
 var retiring_mire: Array=[]
@@ -327,7 +327,7 @@ func step(game,dt: float):
 		mire_exposure+=dt
 		while mire_exposure+0.000001>=MIRE_TICK_INTERVAL and game.hero.hp>0:
 			mire_exposure=maxf(0,mire_exposure-MIRE_TICK_INTERVAL)
-			game.damage(game.hero,{"type":"mireDrain","damage":MIRE_DRAIN*MIRE_TICK_INTERVAL,"direction":1 if game.hero.x>=mire.owner.x else -1,"knock":false},mire.owner)
+			game.damage(game.hero,{"type":"mireDrain","damage":MIRE_HIT_DAMAGE,"direction":1 if game.hero.x>=mire.owner.x else -1,"knock":false},mire.owner)
 	else:
 		mire_exposure=0.0
 
