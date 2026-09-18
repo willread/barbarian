@@ -1,8 +1,20 @@
 export const duration=120;
 export const lane={top:.63,bottom:.95};
+// Source-pixel silhouettes: follow the rock tops, including gaps between spires.
+// These polygons are also used by the native foreground atlas baker.
 export const throneForeground=[
- [[0,781],[31,783],[55,799],[66,831],[91,854],[108,883],[145,893],[170,884],[202,886],[215,907],[239,941],[0,941]],
- [[1450,941],[1463,898],[1490,882],[1525,866],[1568,854],[1590,819],[1623,816],[1650,824],[1672,820],[1672,941]]
+ [[0,831],[8,830],[16,844],[23,861],[32,864],[39,854],
+  [47,850],[52,833],[59,831],[62,804],[69,794],[79,793],
+  [87,798],[91,818],[98,830],[103,859],[111,870],[118,866],
+  [125,850],[132,849],[138,857],[140,877],[147,885],[154,887],
+  [158,897],[166,897],[177,887],[190,884],[204,882],[215,889],
+  [222,909],[229,928],[239,941],[0,941]],
+ [[1450,941],[1458,924],[1463,914],[1476,911],[1482,917],
+  [1490,902],[1501,897],[1509,880],[1520,876],[1527,882],
+  [1536,869],[1544,867],[1550,855],[1558,853],[1568,861],
+  [1576,848],[1582,844],[1588,823],[1597,813],[1605,810],
+  [1615,818],[1620,843],[1627,850],[1631,871],[1640,879],
+  [1647,872],[1653,849],[1662,844],[1672,849],[1672,941]]
 ];
 export const screens=[
  {name:'Leechwater Crossing',file:'crossing.png',mood:'Open water. Wind in the cypress.',motion:'Occasional small groups of distant marsh birds cross the water with varied routes, spacing and wingbeats. Longer moss strands catch the wind while reeds bow along the bank.',effects:['Hanging moss','Crossing marsh flock','Bank reeds'],bounds:[[.08,.1,.38,.4],[0,.24,1,.3],[.84,.48,.14,.15]]},
