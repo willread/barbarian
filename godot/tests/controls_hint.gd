@@ -3,6 +3,7 @@ func _init():call_deferred("check")
 func check():
 	var game=load("res://main.tscn").instantiate()
 	root.add_child(game)
+	game.audio.unlocked=false
 	game.set_process(false)
 	game.start_game()
 	var hint=game.controls_hint
@@ -66,6 +67,10 @@ func check():
 				var button=InputEventJoypadButton.new();button.button_index=JOY_BUTTON_B;button.pressed=true
 				hint._input(button)
 		assert(not hint.active and not paused and hint.dismissed)
+	game.process_mode=Node.PROCESS_MODE_DISABLED
+	game.audio.stop_gameplay()
+	for track in game.audio.tracks:track.stop()
+	await create_timer(.2).timeout
 	game.queue_free();await process_frame
 	await create_timer(.15).timeout
 	DirAccess.remove_absolute("user://controls_hint_test.cfg")

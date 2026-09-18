@@ -26,13 +26,16 @@ func check():
 	intro.age=1
 	intro._process(.01)
 	assert(intro.player.playing and intro.voice_started)
+	await create_timer(.03).timeout
 	intro.age=intro.sting_start-.01;intro._process(0)
 	assert(not intro.sting_started,"Riff waits until the gap between lines")
 	intro.age=intro.sting_start;intro._process(.001)
 	assert(intro.sting_started and intro.sting.playing)
+	await create_timer(.03).timeout
 	assert(intro.sting.stream.resource_path.ends_with("revenge-riff-v1.ogg"))
 	intro.age=intro.second_line_start+.01;intro._process(0)
 	assert(intro.second_line_started and intro.player.stream.resource_path.ends_with("revenge-line-two.ogg"))
+	await create_timer(.03).timeout
 	assert(intro.caption_at(3.0)=="","Subtitles clear between the separated lines")
 	assert(is_equal_approx(intro.second_line_start-intro.sting_start-intro.sting.stream.get_length(),1.0),"Full guitar clip ends one second before the second line")
 	assert(intro.sting_start>=intro.voice_start+1.1,"Guitar starts after the first line")
@@ -82,6 +85,10 @@ func check():
 	game.current_episode=2
 	game.begin_episode()
 	assert(not is_instance_valid(game.episode_intro) and game.phase=="playing")
+	game.process_mode=Node.PROCESS_MODE_DISABLED
+	game.audio.stop_gameplay()
+	for track in game.audio.tracks:track.stop()
+	await create_timer(.2).timeout
 	game.queue_free()
 	await process_frame
 	await create_timer(.15).timeout

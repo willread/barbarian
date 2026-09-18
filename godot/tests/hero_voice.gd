@@ -3,6 +3,8 @@ func _init():call_deferred("check")
 func check():
 	var game=load("res://main.tscn").instantiate()
 	root.add_child(game)
+	game.muted=false
+	game.voice_enabled=true
 	game.start_game()
 	var voice=game.hero_voice
 	voice.set_process(false)

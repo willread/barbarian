@@ -16,6 +16,7 @@ func check():
   game.current_episode=episode
   game.phase="playing"
   audio._process(3.)
+  await create_timer(.03).timeout
   if episode==2:assert(audio.tracks[2].stream.resource_path.ends_with("roots-below.ogg"))
   if episode==3:
    assert(audio.tracks[3].stream.resource_path.ends_with("furnace-heart-overdrive.ogg"))
@@ -36,6 +37,7 @@ func check():
   audio._process(1.0/60)
   for i in audio.tracks.size():
    assert(not audio.tracks[i].playing or i==episode,"Previous music stops before the next track starts")
+  await create_timer(.03).timeout
  game.phase="title"
  audio._process(3.)
  assert(audio.tracks[0].playing)
@@ -43,6 +45,9 @@ func check():
  game.music_enabled=false
  audio._process(3.)
  for track in audio.tracks:assert(not track.playing)
+ game.process_mode=Node.PROCESS_MODE_DISABLED
+ audio.stop_gameplay()
+ await create_timer(.2).timeout
  game.queue_free()
  await process_frame
  print("CAIRN_EPISODE_MUSIC_OK: separate looping tracks, transitions, pause/death continuity and mute")
