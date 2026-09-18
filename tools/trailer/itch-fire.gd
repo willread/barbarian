@@ -11,8 +11,8 @@ func setup():
 		for y in range(edge,100):fuel.set_pixel(x,y,Color.WHITE)
 	var fire=load("res://scripts/contour_fire.gd").new()
 	root.add_child(fire)
-	fire.position=Vector2(0,395)
-	fire.scale=Vector2.ONE*1.5
+	fire.position=Vector2(0,185)
+	fire.scale=Vector2(1.5,4.5) # Triple the visible flame height, anchored at the bottom edge.
 	fire.strength=1.1
 	fire.interior=.15
 	fire.clock=73.0

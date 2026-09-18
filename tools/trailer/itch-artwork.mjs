@@ -50,7 +50,7 @@ if(fs.existsSync(source)&&!process.argv.includes('--screenshots-only')){
   const scale=Math.max(630/art.width,500/art.height)*1.025,w=art.width*scale,h=art.height*scale;
   g.drawImage(art,(630-w)/2,(500-h)/2,w,h);
   const shade=g.createLinearGradient(0,0,380,0);shade.addColorStop(0,'rgba(3,7,11,.65)');shade.addColorStop(1,'rgba(3,7,11,0)');g.fillStyle=shade;g.fillRect(0,0,630,500);
-  g.drawImage(brand,14,22,390,390*brand.height/brand.width);
+  g.drawImage(brand,14,250-195*brand.height/brand.width,390,390*brand.height/brand.width);
   const fireLayer=createCanvas(630,500),fl=fireLayer.getContext('2d');fl.drawImage(await loadImage(`${native}/${String(i+1).padStart(3,'0')}.jpg`),0,0);
   if(i>41){fl.globalAlpha=(i-41)/7;fl.drawImage(firstFire,0,0);}
   g.globalCompositeOperation='screen';g.globalAlpha=.78;g.filter='blur(0.6px)';g.drawImage(fireLayer,0,0);g.filter='none';g.globalAlpha=1;
