@@ -12,6 +12,7 @@ func check():
  assert(game.art.data.menu.has("MUSIC PLAYER"))
  game.audio.tracks[0].play()
  await process_frame
+ assert(game.audio.tracks[2].stream==null and game.audio.tracks[3].stream==null,"Opening the player must load unvisited episode music")
  game.menu_action("MUSIC PLAYER")
  var view=game.music_player_view
  assert(view.names.size()==5 and view.names[2]=="Roots Below")

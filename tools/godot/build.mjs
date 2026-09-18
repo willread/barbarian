@@ -8,7 +8,9 @@ const binary=candidates.find(p=>fs.existsSync(p));
 if(!binary)throw Error('Install Godot 4.7.2 and set GODOT_BIN to its executable. See godot/README.md.');
 const output=path.resolve(process.env.CAIRN_BUILD_DIR||(fs.existsSync('E:/Cairn-build-tools')?'E:/Cairn-build-tools/build':'godot/build'));
 function run(command,args){
- const result=spawnSync(command,args,{stdio:['inherit','pipe','pipe'],encoding:'utf8',maxBuffer:32*1024*1024,windowsHide:true});
+ // Invoke Godot itself so a timed-out test cannot leave the console wrapper's child alive.
+ if(process.argv.includes('--test')&&command.endsWith('_console.exe')&&fs.existsSync(command.replace(/_console\.exe$/,'.exe')))command=command.replace(/_console\.exe$/,'.exe');
+ const result=spawnSync(command,args,{stdio:['inherit','pipe','pipe'],encoding:'utf8',maxBuffer:32*1024*1024,windowsHide:true,timeout:process.argv.includes('--test')?120000:undefined});
  if(result.stdout)process.stdout.write(result.stdout);if(result.stderr)process.stderr.write(result.stderr);
  if(result.error)throw result.error;
  if(result.status!==0||/^(?:SCRIPT ERROR|SHADER ERROR|ERROR):/m.test((result.stdout||'')+(result.stderr||'')))process.exit(result.status||1);

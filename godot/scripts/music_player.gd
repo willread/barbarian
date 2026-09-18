@@ -19,10 +19,12 @@ func _ready():
  player=AudioStreamPlayer.new();player.bus=&"Music";player.volume_db=-10;add_child(player)
  var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/manifest.json"))
  var candidates=JSON.parse_string(FileAccess.get_file_as_string("res://audio_options/ep3-music.json"))
- for track in game.audio.tracks:
+ for index in game.audio.tracks.size():
+  var track=game.audio.tracks[index]
   saved_pauses.append(track.stream_paused)
   track.stream_paused=true
   if game.shareware and names.size()>=2:continue
+  game.audio.ensure_track(index)
   var id=track.stream.resource_path.get_file().get_basename()
   var title="Roots Below" if id=="roots-below" else "Original Menu Theme" if id=="music_menu" else "Original Battle Theme"
   for job in manifest.get("jobs",[])+candidates.jobs:

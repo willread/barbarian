@@ -95,7 +95,7 @@ func check():
  king.hp=king.max*.5
  game.e_ai.king_intent(king,game.hero)
  assert(king.phaseTwo and king.roam_charge_wait==397 and king.escape_cooldown==297,"Phase two doubles charge timer speed immediately")
- # King has regular depth but a broad, symmetric horizontal receiving body.
+ # King has regular depth and the fitted, inset body envelope used by all enemies.
  king.attack={};king.hurtTicks=0;king.down={};king.invTicks=0;king.hp=65;king.x=760;king.y=670
  game.hero.x=700;game.hero.height=0;game.hero.dir=1
  var strike={"type":"light","reach":40,"direction":1}
@@ -110,9 +110,9 @@ func check():
    for pose in [0,1,2]:
     king.hurtTicks=10 if pose==1 else 0
     king.attack={"type":"rootSlam"} if pose==2 else {}
-    game.hero.x=king.x+side*300
+    game.hero.x=king.x+side*280
     assert(game.m.can_hit(game.hero,king,strike),"Attacks reach his visible body from either side in every pose")
-    game.hero.x=king.x+side*350
+    game.hero.x=king.x+side*300
     assert(not game.m.can_hit(game.hero,king,strike),"Hits still require horizontal weapon contact")
  king.attack={}
  game.queue_free();await process_frame;await create_timer(.15).timeout

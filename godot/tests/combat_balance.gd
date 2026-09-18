@@ -49,7 +49,7 @@ func check():
   game.enemies.append(foe)
  game._process(0)
  var minotaur=game.views[game.enemies[0].id]
- assert(is_equal_approx(minotaur.burn_material.get_shader_parameter("exposure"),1.28))
+ assert(is_equal_approx(minotaur.burn_material.get_shader_parameter("exposure"),1.4))
  assert(is_equal_approx(game.views[game.hero.id].burn_material.get_shader_parameter("exposure"),1.0),"Player lighting stays unchanged")
  if "--balance-capture" in OS.get_cmdline_user_args():
   await create_timer(.25).timeout

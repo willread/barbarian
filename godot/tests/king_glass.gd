@@ -20,7 +20,7 @@ func check():
  assert(king.max==81.25)
  var hp=king.hp
  game.damage(king,{"damage":10,"direction":1},game.hero)
- assert(is_equal_approx(hp-king.hp,6.5*game.damage_multiplier))
+ assert(is_equal_approx(hp-king.hp,6.5*game.damage_multiplier*1.25*game.difficulty_damage(false)))
  var root_hazard={"kind":"root","owner":king,"p":Vector2(740,660),"age":.5,"life":3.5}
  game.episode_combat.hazards.append(root_hazard)
  game.episode_combat.sync_views(game)

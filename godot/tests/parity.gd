@@ -36,9 +36,10 @@ func _init():
 		entrant.x=edge
 		enemy_ai.keep_in_arena(entrant)
 		assert(entrant.x>=140*1.18 and entrant.x<=1440-140*1.18)
-	for v in ["swift","brute"]:
+	for v in CairnEnemies.ENABLED_VARIANTS:
 		var found=false
 		for attempt in 100:
+			enemy_ai.used_variants.clear()
 			var actor=m.make(99,720,660,16,false)
 			actor.kind="legion"
 			actor.boss=false
@@ -62,7 +63,8 @@ func _init():
 			var allowed=["bone","legion"]+enemy_ai.unlock_order.slice(0,screen)
 			for kind in plan[w]:assert(kind in allowed)
 			assert(plan[w].size()<=9)
-			assert(enemy_ai.wave_variants[w].size()==(0 if screen<2 else screen-1))
+			assert(enemy_ai.wave_variants[w].size()==(0 if screen<2 else mini(screen-1,CairnEnemies.ENABLED_VARIANTS.size())))
+			assert("swift" not in enemy_ai.wave_variants[w])
 		var types=[]
 		for wave in plan:
 			for kind in wave:

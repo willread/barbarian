@@ -36,7 +36,7 @@ func check():
 		f.y=1000
 		game.background.constrain(f)
 		assert(f.y>630 and f.y<780)
-		assert(game.background.layers.size()==2)
+		assert(game.background.layers.size()==game.background.screen.regions.size()+(1 if pair[1]==4 else 0),"Animated regions plus the keep's banner material")
 		var expected=game.encounters[game.wave-1].size()
 		var spawned=game.enemies.size()
 		for tick in 30:

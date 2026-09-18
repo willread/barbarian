@@ -21,7 +21,8 @@ func check():
 	assert(game.menu.title_mode and game.menu.items[0].label=="GAME")
 	game.menu_action("SOUND")
 	await create_timer(.6).timeout
-	assert(game.menu.title_mode and game.menu.items.size()==5)
+	assert(game.menu.title_mode and game.menu.items.size()==6)
+	assert(game.menu.items[4].label=="MUSIC PLAYER")
 	game.menu_action("BACK")
 	await create_timer(.6).timeout
 	game.menu_action("BACK")

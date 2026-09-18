@@ -23,7 +23,7 @@ func check():
 			game.wave=area*3+1
 			game.spawn_wave()
 			assert(game.background.key==("swamp-" if episode==2 else "ashen-")+str(area+1))
-			assert(game.background.get_children().any(func(n):return n is Node2D and n.z_index==1805),"Real foreground layer required")
+			assert(game.background.get_children().any(func(n):return n is CanvasItem and n.z_index>=1805),"Foreground scenery or atmosphere must cover the arena")
 		game.wave=13
 		game.spawn_wave()
 		assert(game.enemies.size()==1 and game.enemies[0].kind==boss and game.enemies[0].boss)

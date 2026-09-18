@@ -54,8 +54,9 @@ func check():
 	assert(game.results_view.actions.items[1].drop_offset<0)
 	await create_timer(1.15).timeout
 	var saved_id=game.finished_run.id
+	# Winning results can be opened without a death wipe.
+	assert(game.wipe==null)
 	for i in 40:
-		game.wipe.advance(.12)
 		await process_frame
 	game.results_view.age=2
 	for dimensions in [Vector2i(1280,720),Vector2i(1920,1080),Vector2i(640,360),Vector2i(540,960)]:
