@@ -22,9 +22,8 @@ const logo=await loadImage('godot/art/maximum-force-logo.png');
 for(const size of ((process.argv.includes('--cover-only')||process.argv.includes('--screenshots-only'))?[]:[512,256])){
  const c=createCanvas(size,size),g=c.getContext('2d');g.scale(size/512,size/512);
  g.fillStyle='#111317';g.fillRect(0,0,512,512);
- const glow=g.createRadialGradient(256,230,10,256,230,300);glow.addColorStop(0,'#3b2720');glow.addColorStop(1,'#111317');g.fillStyle=glow;g.fillRect(0,0,512,512);
- g.drawImage(logo,280,15,1410,720,40,92,432,221);
- g.fillStyle='#e9e7df';g.textAlign='center';g.font='51px Anton';g.fillText('MAXIMUM',256,386);g.fillText('FORCE',256,447);
+ const glow=g.createRadialGradient(256,256,10,256,256,300);glow.addColorStop(0,'#3b2720');glow.addColorStop(1,'#111317');g.fillStyle=glow;g.fillRect(0,0,512,512);
+ g.drawImage(logo,280,15,1410,720,40,145.5,432,221);
  fs.writeFileSync(`${out}/maximum-force-profile-${size}.png`,c.toBuffer('image/png'));
 }
 // The full existing transparent lockup is also supplied, unchanged in design.
@@ -51,11 +50,10 @@ if(fs.existsSync(source)&&!process.argv.includes('--screenshots-only')){
   const scale=Math.max(630/art.width,500/art.height)*1.025,w=art.width*scale,h=art.height*scale;
   g.drawImage(art,(630-w)/2,(500-h)/2,w,h);
   const shade=g.createLinearGradient(0,0,380,0);shade.addColorStop(0,'rgba(3,7,11,.65)');shade.addColorStop(1,'rgba(3,7,11,0)');g.fillStyle=shade;g.fillRect(0,0,630,500);
-  g.drawImage(brand,14,28,310,310*brand.height/brand.width);
-  g.font='bold 18px Cinzel';g.textAlign='center';g.shadowColor='#000';g.shadowBlur=5;g.fillStyle='#15100d';g.fillText('DARK FANTASY',166,158);g.fillText('ARCADE COMBAT',166,182);g.fillStyle='#e7d4ab';g.fillText('DARK FANTASY',165,157);g.fillText('ARCADE COMBAT',165,181);g.shadowBlur=0;
+  g.drawImage(brand,14,22,390,390*brand.height/brand.width);
   const fireLayer=createCanvas(630,500),fl=fireLayer.getContext('2d');fl.drawImage(await loadImage(`${native}/${String(i+1).padStart(3,'0')}.jpg`),0,0);
   if(i>41){fl.globalAlpha=(i-41)/7;fl.drawImage(firstFire,0,0);}
-  g.globalCompositeOperation='screen';g.drawImage(fireLayer,0,0);
+  g.globalCompositeOperation='screen';g.globalAlpha=.78;g.filter='blur(0.6px)';g.drawImage(fireLayer,0,0);g.filter='none';g.globalAlpha=1;
   g.globalCompositeOperation='source-over';
   for(let p=0;p<65;p++){
    const phase=(i/48+p/65)%1,seed=p*2.39996,angle=t+seed;
