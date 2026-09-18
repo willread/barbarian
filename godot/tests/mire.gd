@@ -53,10 +53,38 @@ func check():
 	var pixels=view.texture.get_image()
 	assert(pixels.get_pixel(0,0).a<.01,"Effect must have real alpha, not a checkerboard")
 	game.hero.x=720;game.hero.y=680;game.hero.hp=100
+	game.hero.attack={"type":"slash","age":1,"to":12}
 	var hp=game.hero.hp
-	for i in 60:combat.step(game,1.0/60)
-	assert(abs(game.hero.hp-(hp-(2.2*game.damage_multiplier*100./48.+game.damage_multiplier/.65)))<.01,"Drain must be gradual and frame-rate independent")
-	assert(game.hero.hurtTicks==0 and game.hero.down.is_empty(),"Drain must not repeatedly stun the player")
+	combat.mire_exposure=0
+	var per_second=2.2*game.damage_multiplier*100./48.+game.damage_multiplier/.65
+	for i in 59:combat.step(game,1.0/60)
+	assert(game.hero.hp==hp,"Health holds steady between mire pulses")
+	combat.step(game,1.0/60)
+	assert(is_equal_approx(game.hero.hp,hp-per_second),"First real hit after one second")
+	assert(game.hero.hurtTicks>0 and game.hero.recoil>0 and game.shake>0,"Puddle hits trigger normal stun, recoil and impact shake")
+	assert(game.hero.attack.is_empty(),"Puddle hit interrupts an attack")
+	var first_pulse=game.hero.hp
+	for i in 59:combat.step(game,1.0/60)
+	assert(game.hero.hp==first_pulse,"No continuous damage between pulses")
+	combat.step(game,1.0/60)
+	assert(abs(game.hero.hp-(hp-per_second*2))<.01,"Pulses preserve sustained damage per second")
+	assert(game.hero.hurtTicks>0 and game.hero.down.is_empty(),"Each pulse stuns without forcing knockdown")
+	for i in 12:game.m.reaction(game.hero)
+	assert(game.hero.hurtTicks==0,"Normal hit stun ends well before the next one-second pulse")
+	# Coarse updates and overlapping patches still deliver the same pulse.
+	game.hero.hp=hp;combat.mire_exposure=0
+	combat.hazards=[patch,patch.duplicate()]
+	combat.step(game,1.)
+	assert(abs(game.hero.hp-(hp-per_second))<.01,"Frame-rate independence and no overlap stacking")
+	combat.hazards=[patch];combat.mire_exposure=0
+	combat.step(game,.25)
+	game.hero.x=1100;combat.step(game,.01)
+	game.hero.x=720
+	var before_return=game.hero.hp
+	combat.step(game,.25)
+	assert(game.hero.hp==before_return,"Leaving clears exposure instead of carrying a surprise pulse on re-entry")
+	combat.clear();assert(combat.mire_exposure==0)
+	combat.hazards=[patch]
 	# A jump started in the grasp has a much lower apex, even with run held.
 	var trapped=game.make_actor(720,680,100,true)
 	var free=game.make_actor(1100,680,100,true)
@@ -119,7 +147,7 @@ func check():
 	hag.attack={};hag.mire_count=5
 	game.e_ai.hag_intent(hag,game.hero)
 	assert(hag.attack.is_empty(),"Keep the five-clump cap")
-	print("CAIRN_MIRE_OK: heavy slow, health drain, limited jump, independent patches, owner death and defensive claw")
+	print("CAIRN_MIRE_OK: heavy slow, one-second damage hits with stun, limited jump, independent patches, owner death and defensive claw")
 	game.queue_free()
 	await process_frame
 	quit()
